@@ -1,0 +1,68 @@
+<div class="card">
+  <p-table [value]="financialSettingsList" dataKey="id" editMode="row" [tableStyle]="{ 'min-width': '50rem' }">
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 20%">ID</th>
+        <th style="width: 20%">Type</th>
+        <th style="width: 20%">Value</th>
+        <th style="width: 20%"></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-product let-editing="editing" let-ri="rowIndex">
+      <tr [pEditableRow]="product">
+        <td>{{ product.id }}</td>
+        <td>{{ product.settingType }}</td>
+
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input type="number" pInputText mode="decimal" [(ngModel)]="product.value" />
+            </ng-template>
+            <ng-template pTemplate="output">{{ product.value }} </ng-template>
+          </p-cellEditor>
+        </td>
+
+        <td>
+          <div class="flex align-items-center justify-content-center gap-2">
+            <!-- زرار Edit -->
+            <button
+              *ngIf="!editing"
+              pButton
+              pRipple
+              type="button"
+              pInitEditableRow
+              icon="pi pi-pencil"
+              (click)="onRowEditInit(product)"
+              class="p-button-rounded p-button-text"
+            ></button>
+
+            <!-- زرار Save -->
+            <button
+              *ngIf="editing"
+              pButton
+              pRipple
+              type="button"
+              pSaveEditableRow
+              icon="pi pi-check"
+              (click)="onRowEditSave(product)"
+              class="p-button-rounded p-button-text p-button-success mr-2"
+            ></button>
+
+            <!-- زرار Cancel -->
+            <button
+              *ngIf="editing"
+              pButton
+              pRipple
+              type="button"
+              pCancelEditableRow
+              icon="pi pi-times"
+              (click)="onRowEditCancel(product, ri)"
+              class="p-button-rounded p-button-text p-button-danger"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

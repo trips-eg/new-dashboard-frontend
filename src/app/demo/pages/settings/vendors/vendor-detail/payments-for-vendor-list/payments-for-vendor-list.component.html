@@ -1,0 +1,31 @@
+<p-table
+  [value]="archivedPayment"
+  [lazy]="true"
+  [first]="first"
+  [paginator]="true"
+  [rows]="rows"
+  [totalRecords]="totalRecords"
+  (onPage)="onPageChange($event)"
+  [showCurrentPageReport]="true"
+  [currentPageReportTemplate]="'showingEntries' | translate"
+  [rowsPerPageOptions]="[5, 10, 25, 50]"
+>
+  <ng-template pTemplate="header">
+    <tr>
+      <th>{{ 'account Name' | translate }}</th>
+      <th>{{ 'bank Name' | translate }}</th>
+      <th>{{ 'amount In' | translate }}</th>
+      <th>{{ 'amount Out' | translate }}</th>
+      <th>{{ 'total Amount' | translate }}</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-payment>
+    <tr>
+      <td>{{ payment.accountName }}</td>
+      <td>{{ payment.bankName }}</td>
+      <td>{{ payment.amountIn }}</td>
+      <td>{{ payment.amountOut }}</td>
+      <td>{{ payment.totalAmount }}</td>
+    </tr>
+  </ng-template>
+</p-table>

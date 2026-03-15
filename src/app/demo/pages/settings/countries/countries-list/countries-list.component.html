@@ -1,0 +1,73 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+<div class="card">
+  <p-toolbar styleClass="mb-4">
+    <ng-template pTemplate="right">
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" [placeholder]="'search' | translate" />
+      </span>
+    </ng-template>
+  </p-toolbar>
+  <p-table
+    #dt
+    [value]="countries"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    [totalRecords]="totalRecords"
+    [loading]="isLoading"
+    [lazy]="true"
+    (onLazyLoad)="loadCountries($event)"
+    [responsiveLayout]="'scroll'"
+    dataKey="id"
+    [showCurrentPageReport]="true"
+    [currentPageReportTemplate]="'showingEntries' | translate"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="Name">
+          {{ 'Arabic Name' | translate }}
+          <p-sortIcon field="Name"></p-sortIcon>
+        </th>
+        <th pSortableColumn="EnName">
+          {{ 'English Name' | translate }}
+          <p-sortIcon field="EnName"></p-sortIcon>
+        </th>
+        <th style="width: 35%" pSortableColumn="Status">
+          {{ 'status' | translate }}
+          <p-sortIcon field="Status"></p-sortIcon>
+        </th>
+      </tr>
+      <tr>
+        <th>
+          <p-columnFilter type="text" field="Name" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="EnName" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <!-- Status filter could be added here if needed, but sticking to text filters for now or leaving empty -->
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-country>
+      <tr>
+        <td>{{ country.name }}</td>
+        <td>{{ country.enName }}</td>
+
+        <td><p-inputSwitch [(ngModel)]="country.status" (onChange)="onStatusChange(country.id, country.status)" /></td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="3">
+          <div class="flex flex-column align-items-center justify-content-center py-5">
+            <i class="pi pi-inbox text-500 text-5xl mb-3"></i>
+            <span class="text-700 font-medium text-lg">{{ 'No Data found' | translate }}</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

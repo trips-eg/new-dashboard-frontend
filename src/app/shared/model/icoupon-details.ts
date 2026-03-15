@@ -1,0 +1,162 @@
+export interface IcouponDetails {
+  id: number;
+  code: string;
+  description: string;
+  discountType: number;
+  discountAmount: number;
+  usageNumber: number;
+  startDate: string;
+  endDate: string;
+  isGenral: boolean;
+  userLimit: number;
+  trip: Trip[];
+  room: Room[];
+  outing: Outing[];
+  hajj: Hajj[];
+}
+
+export interface Trip {
+  id: number;
+  name: string;
+  address: string;
+  rating: number;
+  price: number;
+  childPrice: number;
+  isActive: boolean;
+  fromLocation: string;
+  toLocation: string;
+  numberOfDays: number;
+  startDate: string;
+  endDate: string;
+  capacity: number;
+  remainingSeats: number;
+  isExternallTrip: boolean;
+  isRecommended: boolean;
+  isFake: boolean;
+  externalLink: string;
+  isFav: boolean;
+  isBlocked: boolean;
+  isIncludeVate: boolean;
+  cancellationPolicy: string;
+  isRefundable: boolean;
+  minimumDaysToRefund: number;
+  isAllowPaymentUponArrival: boolean;
+  depositRate: number;
+  images: any[];
+}
+
+export interface Room {
+  id: number;
+  name: string;
+  description: string;
+  size: number;
+  bedCount: number;
+  price: number;
+  childPrice: number;
+  cancellationPolicy: string;
+  isRefundable: boolean;
+  minimumDaysToRefund: number;
+  isAllowPaymentUponArrival: boolean;
+  depositRate: number;
+  boarding: string;
+  boardingType: any;
+  bordingObj: BordingObj;
+  availableFrom: string;
+  availableTo: string;
+  hotelId: number;
+  hotel: any;
+  roomTypeId: number;
+  roomType: any;
+  isIncludeVate: boolean;
+  bedTypeId: number;
+  bedType: any;
+  holidayPrice: number;
+  calculatedPrice: any;
+  features: any[];
+  featuresNames: any;
+  images: any[];
+  groupImages: any[];
+  customPrice: any[];
+  isInCart: boolean;
+  isFake: boolean;
+  isBlocked: boolean;
+  companyDto: any;
+}
+
+export interface BordingObj {
+  value: number;
+  nameEn: any;
+  nameAr: any;
+}
+
+export interface Outing {
+  id: number;
+  name: string;
+  description: string;
+  location: string;
+  startDate?: string;
+  endDate?: string;
+  rating: number;
+  targetAudience: string;
+  imageUrl: string;
+  isActive: boolean;
+  isBlocked: boolean;
+  outingCategoryId: number;
+  outingCategoryName: any;
+  vendorId: number;
+  vendorName: any;
+  outingCategory: any;
+  vendor: any;
+  tickets: any[];
+  addOns: any[];
+  features: any[];
+  offers: any[];
+  reviews: any[];
+  images: any[];
+  maxPrice: number;
+  miniPrice: number;
+  isFav: boolean;
+  depositRate?: number;
+  cancellationPolicy?: string;
+  isRefundable: boolean;
+  minimumDaysToRefund: any;
+  savingsRatio?: number;
+  outingType: number;
+  outingSchedules: any[];
+  branshes: any[];
+}
+
+export interface Hajj {
+  id: number;
+  name: string;
+  rating: number;
+  price: number;
+  childPrice: number;
+  isActive: boolean;
+  daysInMakkah: number;
+  daysInMadinah: number;
+  residenceInMakkah: string;
+  residenceInMadinah: string;
+  flightLine: string;
+  numberOfDays: number;
+  type: number;
+  startDate: string;
+  endDate: string;
+  capacity: number;
+  remainingSeats: number;
+  isRecommended: boolean;
+  isFake: boolean;
+  externalLink: string;
+  isFav: boolean;
+  isBlocked: boolean;
+  isIncludeVate: boolean;
+  fromLocation: string;
+  toLocation: string;
+  cancellationPolicy: string;
+  isRefundable: boolean;
+  minimumDaysToRefund: number;
+  isAllowPaymentUponArrival: boolean;
+  depositRate: number;
+  images: any[];
+  tickets: any[];
+}

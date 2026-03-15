@@ -1,0 +1,110 @@
+
+
+<div class="main ">
+<sub-header
+  [mainHeader]="'Room Details' | translate"
+  [mainSection]="'Rooms' | translate"
+  [subSection]="'Details' | translate"
+  [actionButtons]="[
+    { label: 'Edit', action: 'edit', icon: 'pi pi-pen-to-square', class: 'btn-warning' }
+  ]"
+(actionClicked)="handleAction($event)">
+</sub-header>
+
+  <!-- Product Details Section -->
+  <div class=" border-1 border-solid surface-border border-round mb-4 p-4">
+    <div class="grid">
+      <!-- Product Images -->
+      <div class="col-6">
+        <!-- <p-galleria
+        [value]="images"
+        [autoPlay]="true"
+        [circular]="true"
+        [showItemNavigators]="true"
+
+        [thumbnailsPosition]="'bottom'"
+        [responsiveOptions]="responsiveOptions"
+        [containerStyle]="{ 'max-width': '640px' }"
+        [numVisible]="5">
+            <ng-template pTemplate="item" let-item>
+                <img
+                    [src]="item.itemImageSrc"
+                    style="width: 100%; height: 280px; display: block;margin-bottom: 10px;
+    border-radius: 15px;" />
+            </ng-template>
+            <ng-template pTemplate="thumbnail" let-item>
+                <div class="grid grid-nogutter justify-content-center">
+                    <img [src]="item.thumbnailImageSrc" width="70px" style="border-radius: 5px;" />
+                </div>
+            </ng-template>
+    </p-galleria> -->
+      </div>
+
+      <!-- Product Info -->
+      <div class="col-6">
+        <h2 class="mb-2">{{ '3 Founding Day Abaya' }}</h2>
+        <h3 class="text-orange-500 mb-3">$300.00</h3>
+        <p class="text-muted mb-3">
+          The Founding Day Abaya features a design inspired by the rich heritage of the Kingdom, with modern touches that reflect the spirit of the occasion and highlight your national identity.
+        </p>
+        <p class="text-muted">
+          The Founding Day Abaya features a design inspired by the rich heritage of the Kingdom, with modern touches that reflect the spirit of the occasion and highlight your national identity.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Details Table -->
+  <div class="p-card bg-light p-3">
+    <div class="grid">
+      <div class="col-6">
+        <div class="flex align-items-center justify-content-between">
+        <strong>{{ 'Category' | translate }}</strong>
+        <p>Abaya</p>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="flex align-items-center justify-content-between">
+        <strong>{{ 'Stock' | translate }}</strong>
+        <p>50</p>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="flex align-items-center justify-content-between">
+        <strong>{{ 'Discount' | translate }}</strong>
+        <p>5%</p>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="flex align-items-center justify-content-between">
+        <strong>{{ 'Discount Started' | translate }}</strong>
+        <p>01/03/2015</p>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="flex align-items-center justify-content-between">
+        <strong>{{ 'Discount Ended' | translate }}</strong>
+        <p>01/03/2015</p>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="flex align-items-center justify-content-between">
+        <strong>{{ 'Product Status' | translate }}</strong>
+        <p>
+          <p-toggleButton
+    [(ngModel)]="productStatus"
+    onLabel="Disabled"
+    offLabel="Enable"
+
+    offIcon="pi pi-times"
+    icon="pi pi-lock"
+    offIcon="pi pi-lock-open"
+    styleClass="w-9rem"
+    />
+
+        </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

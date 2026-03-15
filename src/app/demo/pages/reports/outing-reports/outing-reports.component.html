@@ -1,0 +1,437 @@
+<div class="reports-container">
+  <!-- Header -->
+  <sub-header [mainHeader]="'Outing Reports'"></sub-header>
+
+  <!-- Filter Card -->
+  <div class="filter-card card mb-4">
+    <div class="card-body">
+      <div class="filter-header mb-3">
+        <h5 class="m-0">
+          <i class="fas fa-filter me-2 text-primary"></i>
+          {{ 'Filter Options' | translate }}
+        </h5>
+      </div>
+
+      <form [formGroup]="filterForm" class="filter-form">
+        <div class="grid">
+          <!-- From Date -->
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="field">
+              <label for="fromDate" class="font-medium">
+                {{ 'From Date' | translate }}
+                <span class="text-danger">*</span>
+              </label>
+              <p-calendar
+                id="fromDate"
+                formControlName="fromDate"
+                [showIcon]="true"
+                [showButtonBar]="true"
+                dateFormat="dd/mm/yy"
+                [style]="{ width: '100%' }"
+                [inputStyle]="{ width: '100%' }"
+                placeholder="{{ 'Select date' | translate }}"
+              ></p-calendar>
+              <small class="text-danger" *ngIf="filterForm.get('fromDate')?.touched && filterForm.get('fromDate')?.invalid">
+                {{ 'From Date is required' | translate }}
+              </small>
+            </div>
+          </div>
+
+          <!-- To Date -->
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="field">
+              <label for="toDate" class="font-medium">{{ 'To Date' | translate }}</label>
+              <p-calendar
+                id="toDate"
+                formControlName="toDate"
+                [showIcon]="true"
+                [showButtonBar]="true"
+                dateFormat="dd/mm/yy"
+                [style]="{ width: '100%' }"
+                [inputStyle]="{ width: '100%' }"
+                placeholder="{{ 'Select date' | translate }}"
+              ></p-calendar>
+            </div>
+          </div>
+
+          <!-- Vendor Dropdown (Admin only) -->
+          <div class="col-12 col-md-6 col-lg-3" *ngIf="!isVendor">
+            <div class="field">
+              <label for="companyId" class="font-medium">{{ 'Vendor' | translate }}</label>
+              <p-dropdown
+                id="companyId"
+                formControlName="companyId"
+                [options]="vendors"
+                optionLabel="name"
+                optionValue="id"
+                [showClear]="true"
+                [filter]="true"
+                filterBy="name"
+                [style]="{ width: '100%' }"
+                placeholder="{{ 'Select Vendor' | translate }}"
+              ></p-dropdown>
+            </div>
+          </div>
+
+          <!-- Status Dropdown -->
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="field">
+              <label for="status" class="font-medium">{{ 'Status' | translate }}</label>
+              <p-dropdown
+                id="status"
+                formControlName="status"
+                [options]="statusOptions"
+                optionLabel="label"
+                optionValue="value"
+                [showClear]="true"
+                [style]="{ width: '100%' }"
+                placeholder="{{ 'All Statuses' | translate }}"
+              ></p-dropdown>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-content-end gap-2 mt-3">
+          <button type="button" pButton class="p-button-outlined p-button-secondary" (click)="onReset()">
+            <i class="fas fa-redo me-2"></i>
+            {{ 'Reset' | translate }}
+          </button>
+          <button type="button" pButton class="p-button-primary" [loading]="isLoading" (click)="onSearch()">
+            <i class="fas fa-search me-2"></i>
+            {{ 'Search' | translate }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-cards grid mb-4" *ngIf="reportData.length > 0">
+    <!-- Total Bookings -->
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="summary-card booking-card">
+        <div class="card-content">
+          <div class="icon-wrapper bg-primary-light">
+            <i class="fas fa-ticket-alt text-primary"></i>
+          </div>
+          <div class="info">
+            <span class="label">{{ 'Total Bookings' | translate }}</span>
+            <span class="value">{{ summaryCards.totalBookings | number }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Revenue -->
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="summary-card revenue-card">
+        <div class="card-content">
+          <div class="icon-wrapper bg-success-light">
+            <i class="fas fa-dollar-sign text-success"></i>
+          </div>
+          <div class="info">
+            <span class="label">{{ 'Total Revenue' | translate }}</span>
+            <span class="value">{{ summaryCards.totalRevenue | number: '1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Used Tickets -->
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="summary-card vendor-card">
+        <div class="card-content">
+          <div class="icon-wrapper bg-success-light">
+            <i class="fas fa-check-circle text-success"></i>
+          </div>
+          <div class="info">
+            <span class="label">{{ 'Used Tickets' | translate }}</span>
+            <span class="value">{{ summaryCards.usedTicketsCount | number }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unused Tickets -->
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="summary-card trips-card">
+        <div class="card-content">
+          <div class="icon-wrapper bg-warning-light">
+            <i class="fas fa-times-circle text-warning"></i>
+          </div>
+          <div class="info">
+            <span class="label">{{ 'Unused Tickets' | translate }}</span>
+            <span class="value">{{ summaryCards.unUsedTicketsCount | number }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Client Paid (Completed) -->
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="summary-card revenue-card">
+        <div class="card-content">
+          <div class="icon-wrapper bg-info-light">
+            <i class="fas fa-hand-holding-usd text-info"></i>
+          </div>
+          <div class="info">
+            <span class="label">{{ 'Client Paid (Completed)' | translate }}</span>
+            <span class="value">{{ summaryCards.clientPaidTotal_Completed | number: '1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trips Total (Completed) -->
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="summary-card trips-card">
+        <div class="card-content">
+          <div class="icon-wrapper bg-primary-light">
+            <i class="fas fa-route text-primary"></i>
+          </div>
+          <div class="info">
+            <span class="label">{{ 'Trips Total (Completed)' | translate }}</span>
+            <span class="value">{{ summaryCards.tripsTotal_Completed | number: '1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vendor Total (Completed) -->
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="summary-card vendor-card">
+        <div class="card-content">
+          <div class="icon-wrapper bg-warning-light">
+            <i class="fas fa-store text-warning"></i>
+          </div>
+          <div class="info">
+            <span class="label">{{ 'Vendor Total (Completed)' | translate }}</span>
+            <span class="value">{{ summaryCards.vendorTotal_Completed | number: '1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trips Total (All) -->
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="summary-card trips-card">
+        <div class="card-content">
+          <div class="icon-wrapper bg-secondary-light">
+            <i class="fas fa-route text-secondary"></i>
+          </div>
+          <div class="info">
+            <span class="label">{{ 'Trips Total (All)' | translate }}</span>
+            <span class="value">{{ summaryCards.tripsTotal_All | number: '1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vendor Total (All) -->
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="summary-card vendor-card">
+        <div class="card-content">
+          <div class="icon-wrapper bg-secondary-light">
+            <i class="fas fa-store text-secondary"></i>
+          </div>
+          <div class="info">
+            <span class="label">{{ 'Vendor Total (All)' | translate }}</span>
+            <span class="value">{{ summaryCards.vendorTotal_All | number: '1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="data-table-card card">
+    <div class="card-header flex justify-content-between align-items-center">
+      <h5 class="m-0">
+        <i class="fas fa-table me-2 text-primary"></i>
+        {{ 'Outing Summary' | translate }}
+      </h5>
+      <button
+        type="button"
+        pButton
+        class="p-button-success p-button-sm"
+        [loading]="isExporting"
+        (click)="exportToExcel()"
+        *ngIf="reportData.length > 0"
+      >
+        <i class="fas fa-file-excel me-2"></i>
+        {{ 'Export' | translate }}
+      </button>
+    </div>
+
+    <div class="card-body p-0">
+      <!-- Loading State -->
+      <div class="loading-overlay" *ngIf="isLoading">
+        <p-progressSpinner strokeWidth="4"></p-progressSpinner>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!isLoading && reportData.length === 0">
+        <div class="empty-content">
+          <i class="fas fa-search fa-4x text-muted mb-3"></i>
+          <h5>{{ 'No Data Found' | translate }}</h5>
+          <p class="text-muted">{{ 'Use the filters above to search for outing reports' | translate }}</p>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <p-table
+        [value]="reportData"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="{{ 'Showing {first} to {last} of {totalRecords} entries' | translate }}"
+        [tableStyle]="{ 'min-width': '100%' }"
+        styleClass="p-datatable-striped p-datatable-gridlines"
+        *ngIf="!isLoading && reportData.length > 0"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="outingName">
+              {{ 'Outing Name' | translate }}
+              <p-sortIcon field="outingName"></p-sortIcon>
+            </th>
+            <th pSortableColumn="vendorName">
+              {{ 'Vendor' | translate }}
+              <p-sortIcon field="vendorName"></p-sortIcon>
+            </th>
+            <th pSortableColumn="totalBookings" class="text-center">
+              {{ 'Total Bookings' | translate }}
+              <p-sortIcon field="totalBookings"></p-sortIcon>
+            </th>
+            <th class="text-center">{{ 'Booking Status' | translate }}</th>
+            <th class="text-center">{{ 'Tickets' | translate }}</th>
+            <th pSortableColumn="pricePayedTotal" class="text-end">
+              {{ 'Revenue' | translate }}
+              <p-sortIcon field="pricePayedTotal"></p-sortIcon>
+            </th>
+            <th pSortableColumn="clientPaidTotal_Completed" class="text-end">
+              {{ 'Client Paid (Completed)' | translate }}
+              <p-sortIcon field="clientPaidTotal_Completed"></p-sortIcon>
+            </th>
+            <th pSortableColumn="tripsTotal_Completed" class="text-end">
+              {{ 'Trips (Completed)' | translate }}
+              <p-sortIcon field="tripsTotal_Completed"></p-sortIcon>
+            </th>
+            <th pSortableColumn="vendorTotal_Completed" class="text-end">
+              {{ 'Vendor (Completed)' | translate }}
+              <p-sortIcon field="vendorTotal_Completed"></p-sortIcon>
+            </th>
+            <th pSortableColumn="tripsTotal_All" class="text-end">
+              {{ 'Trips (All)' | translate }}
+              <p-sortIcon field="tripsTotal_All"></p-sortIcon>
+            </th>
+            <th pSortableColumn="vendorTotal_All" class="text-end">
+              {{ 'Vendor (All)' | translate }}
+              <p-sortIcon field="vendorTotal_All"></p-sortIcon>
+            </th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-item>
+          <tr>
+            <td>
+              <div class="outing-info">
+                <span class="outing-name">{{ item.outingName }}</span>
+                <small class="outing-id text-muted">#{{ item.outingId }}</small>
+              </div>
+            </td>
+            <td>{{ item.vendorName }}</td>
+            <td class="text-center">
+              <span class="badge badge-primary">{{ item.totalBookings }}</span>
+            </td>
+            <td>
+              <div class="status-badges">
+                <p-tag
+                  *ngIf="item.pendingCount > 0"
+                  severity="warning"
+                  [value]="'Pending: ' + item.pendingCount"
+                  [rounded]="true"
+                  class="me-1 mb-1"
+                ></p-tag>
+                <p-tag
+                  *ngIf="item.confirmedCount > 0"
+                  severity="info"
+                  [value]="'Confirmed: ' + item.confirmedCount"
+                  [rounded]="true"
+                  class="me-1 mb-1"
+                ></p-tag>
+                <p-tag
+                  *ngIf="item.completedCount > 0"
+                  severity="success"
+                  [value]="'Completed: ' + item.completedCount"
+                  [rounded]="true"
+                  class="me-1 mb-1"
+                ></p-tag>
+                <p-tag
+                  *ngIf="item.cancelledCount > 0"
+                  severity="danger"
+                  [value]="'Cancelled: ' + item.cancelledCount"
+                  [rounded]="true"
+                  class="me-1 mb-1"
+                ></p-tag>
+                <p-tag
+                  *ngIf="item.refundedCount > 0"
+                  severity="secondary"
+                  [value]="'Refunded: ' + item.refundedCount"
+                  [rounded]="true"
+                  class="mb-1"
+                ></p-tag>
+              </div>
+            </td>
+            <td>
+              <div class="ticket-badges">
+                <p-tag severity="success" [value]="'Used: ' + item.usedTicketsCount" [rounded]="true" class="me-1 mb-1"></p-tag>
+                <p-tag severity="warning" [value]="'Unused: ' + item.unUsedTicketsCount" [rounded]="true" class="mb-1"></p-tag>
+              </div>
+            </td>
+            <td class="text-end font-semibold text-success">
+              {{ item.pricePayedTotal | number: '1.2-2' }}
+            </td>
+            <td class="text-end">
+              {{ item.clientPaidTotal_Completed | number: '1.2-2' }}
+            </td>
+            <td class="text-end">
+              {{ item.tripsTotal_Completed | number: '1.2-2' }}
+            </td>
+            <td class="text-end">
+              {{ item.vendorTotal_Completed | number: '1.2-2' }}
+            </td>
+            <td class="text-end">
+              {{ item.tripsTotal_All | number: '1.2-2' }}
+            </td>
+            <td class="text-end">
+              {{ item.vendorTotal_All | number: '1.2-2' }}
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Summary Footer -->
+        <ng-template pTemplate="footer">
+          <tr class="summary-row">
+            <td colspan="2" class="font-bold text-end">{{ 'Totals:' | translate }}</td>
+            <td class="text-center font-bold">{{ summaryCards.totalBookings | number }}</td>
+            <td></td>
+            <td class="text-center font-bold">
+              <span class="text-success">{{ summaryCards.usedTicketsCount | number }}</span>
+              /
+              <span class="text-warning">{{ summaryCards.unUsedTicketsCount | number }}</span>
+            </td>
+            <td class="text-end font-bold text-success">{{ summaryCards.totalRevenue | number: '1.2-2' }}</td>
+            <td class="text-end font-bold">{{ summaryCards.clientPaidTotal_Completed | number: '1.2-2' }}</td>
+            <td class="text-end font-bold">{{ summaryCards.tripsTotal_Completed | number: '1.2-2' }}</td>
+            <td class="text-end font-bold">{{ summaryCards.vendorTotal_Completed | number: '1.2-2' }}</td>
+            <td class="text-end font-bold">{{ summaryCards.tripsTotal_All | number: '1.2-2' }}</td>
+            <td class="text-end font-bold">{{ summaryCards.vendorTotal_All | number: '1.2-2' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>

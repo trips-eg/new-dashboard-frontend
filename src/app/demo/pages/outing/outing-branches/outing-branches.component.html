@@ -1,0 +1,8 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'Branches'"
+    [actionButtons]="[{ label: 'Add', action: 'add', icon: 'pi pi-plus', class: 'btn-primary' }]"
+    (actionClicked)="handleAction($event)"
+  ></sub-header>
+  <app-branches-list></app-branches-list>
+</div>

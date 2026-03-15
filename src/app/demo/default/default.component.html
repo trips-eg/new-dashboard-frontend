@@ -1,0 +1,198 @@
+
+<!-- <div class="search-section p-grid">
+  <div class="row">
+    <div class="col-12 col-md-8 col-lg-8" style="z-index: 3;">
+      <div class="welcome-text w-75">
+        <h1 class="mb-3 ">{{'Hello' |translate}} {{username}}</h1>
+        <h2>{{'How can we help you?' | translate}}</h2>
+        <p>{{'Main Content in home' |translate}}</p>
+        <section class="search-box mt-4 mb-5">
+          <search-field></search-field>
+        </section>
+        <div>
+          <h4>{{'Topics' | translate}}</h4>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+<div class="topics">
+  <div class="row">
+    <div class="col-12 col-md-8 col-lg-8 row">
+      <div class="col-6 col-md-3" *ngFor="let topic of topics">
+        <div class="topic-card card">
+          <div class="card-body px-3 py-2">
+            <div class="my-2">
+              <i class="text-info {{ topic.icon }} f-30" ></i>
+            </div>
+            <p class="text-main f-w-700" >{{ topic.name  |translate}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4 col-lg-4">
+      <div class="news-card card">
+        <div class="card-body bg-main rounded">
+          <p-galleria [value]="newsItems" [showIndicators]="true" [showThumbnails]="false"
+            [responsiveOptions]="responsiveOptions" [autoPlay]="true" [circular]="true">
+            <ng-template pTemplate="item" let-news>
+              <div class="text-left " style="height: 70%;">
+                <h5 class="f-w-600">{{news.title}}</h5>
+                <p class="f-15 mt-3">{{news.description}}</p>
+
+              </div>
+
+            </ng-template>
+          </p-galleria>
+        </div>
+      </div>
+    </div>
+
+
+
+
+  </div>
+</div> -->
+
+<app-vendor-detail [CompanyId]="companyId"></app-vendor-detail>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ---------------previous----------------------------------- -->
+
+<!-- <div class="row">
+
+  <div class="col-xl-8 col-md-12">
+    <app-card cardTitle="Recommended for you">
+      <div class="row"></div>
+    </app-card>
+  </div>
+  <div class="col-xl-4 col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row mb-3 align-items-center">
+          <div class="col">
+            <h4>Popular Stocks</h4>
+          </div>
+          <div class="col-auto"></div>
+        </div>
+        <div class="rounded bg-light-secondary overflow-hidden mb-3">
+          <div class="px-3 pt-3">
+            <div class="row mb-1 align-items-start">
+              <div class="col">
+                <h5 class="text-secondary mb-0">Bajaj Finery</h5>
+                <small class="text-muted">10% Profit</small>
+              </div>
+              <div class="col-auto">
+                <h4 class="mb-0">$1839.00</h4>
+              </div>
+            </div>
+          </div>
+          <app-bajaj-chart />
+        </div>
+        <ul class="list-group list-group-flush">
+          @for (list of ListGroup; track list) {
+            <li class="list-group-item px-0 {{ list.space }}">
+              <div class="row align-items-start">
+                <div class="col">
+                  <h5 class="mb-0">{{ list.name }}</h5>
+                  <small class="{{ list.color }}">{{ list.profit }}</small>
+                </div>
+                <div class="col-auto">
+                  <h4 class="mb-0">
+                    {{ list.invest }}
+                    <span class="ms-2 align-top avatar avatar-xxs {{ list.bgColor }}">
+                      <i class="{{ list.icon }} {{ list.color }}"></i>
+                    </span>
+                  </h4>
+                </div>
+              </div>
+            </li>
+          }
+        </ul>
+        <div class="text-center">
+          <a href="javascript:" class="b-b-primary text-primary f-w-500">
+            View all
+            <i class="ti ti-chevron-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-8 col-md-12">
+    <app-card cardTitle="Hello Card">
+      <p>
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+        ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+        reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt
+        in culpa qui officia deserunt mollit anim id est laborum."
+      </p>
+    </app-card>
+  </div>
+  <div class="col-xl-4 col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row mb-3 align-items-center">
+          <div class="col">
+            <h4>Popular Stocks</h4>
+          </div>
+          <div class="col-auto"></div>
+        </div>
+        <div class="rounded bg-light-secondary overflow-hidden mb-3">
+          <div class="px-3 pt-3">
+            <div class="row mb-1 align-items-start">
+              <div class="col">
+                <h5 class="text-secondary mb-0">Bajaj Finery</h5>
+                <small class="text-muted">10% Profit</small>
+              </div>
+              <div class="col-auto">
+                <h4 class="mb-0">$1839.00</h4>
+              </div>
+            </div>
+          </div>
+          <app-bajaj-chart />
+        </div>
+        <ul class="list-group list-group-flush">
+          @for (list of ListGroup; track list) {
+            <li class="list-group-item px-0 {{ list.space }}">
+              <div class="row align-items-start">
+                <div class="col">
+                  <h5 class="mb-0">{{ list.name }}</h5>
+                  <small class="{{ list.color }}">{{ list.profit }}</small>
+                </div>
+                <div class="col-auto">
+                  <h4 class="mb-0">
+                    {{ list.invest }}
+                    <span class="ms-2 align-top avatar avatar-xxs {{ list.bgColor }}">
+                      <i class="{{ list.icon }} {{ list.color }}"></i>
+                    </span>
+                  </h4>
+                </div>
+              </div>
+            </li>
+          }
+        </ul>
+        <div class="text-center">
+          <a href="javascript:" class="b-b-primary text-primary f-w-500">
+            View all
+            <i class="ti ti-chevron-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> -->

@@ -1,0 +1,168 @@
+<div class="main">
+  <sub-header [mainHeader]="'Mobile Side Bar Details'" [mainSection]="'side bar list'" [subSection]="'side bar details'"></sub-header>
+
+  <div class="grid" *ngIf="sideBarItemDetails; else loadingTpl">
+    <!-- General Info Card -->
+    <div class="col-12">
+      <div class="card p-4 shadow-3 border-round-lg">
+        <div class="flex align-items-center justify-content-between mb-4">
+          <h4 class="m-0 text-primary font-bold">
+            <i class="pi pi-info-circle mr-2"></i>
+            {{ sideBarItemDetails.title }}
+          </h4>
+          <span [class]="'customer-badge status-' + (sideBarItemDetails.isActive ? 'qualified' : 'unqualified')">
+            {{ sideBarItemDetails.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+
+        <div class="grid">
+          <div class="col-12 col-md-4">
+            <div class="info-box p-3 border-round-md bg-primary-50 text-center">
+              <i class="pi pi-sort-alt text-primary text-2xl mb-2"></i>
+              <div class="text-500 font-medium mb-1">Sequence</div>
+              <div class="text-900 font-bold text-2xl">{{ sideBarItemDetails.squence }}</div>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="info-box p-3 border-round-md bg-purple-50 text-center">
+              <i class="pi pi-palette text-purple-500 text-2xl mb-2"></i>
+              <div class="text-500 font-medium mb-1">Color Theme</div>
+              <div class="flex align-items-center justify-content-center gap-2 mt-2">
+                <div [style.background]="sideBarItemDetails.color" class="w-3rem h-3rem border-circle shadow-2"></div>
+                <code class="text-sm">{{ sideBarItemDetails.color }}</code>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="info-box p-3 border-round-md bg-blue-50 text-center">
+              <i class="pi pi-list text-blue-500 text-2xl mb-2"></i>
+              <div class="text-500 font-medium mb-1">Total Items</div>
+              <div class="text-900 font-bold text-2xl">{{ sideBarItemDetails.sideBarItems?.length || 0 }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Items Carousel -->
+    <div class="col-12">
+      <div class="card p-4 shadow-3 border-round-lg">
+        <div class="flex align-items-center justify-content-between mb-4">
+          <h4 class="m-0 text-primary font-bold">
+            <i class="pi pi-th-large mr-2"></i>
+            Sidebar Items
+          </h4>
+          <span class="text-500">Swipe to browse</span>
+        </div>
+
+        <p-carousel
+          *ngIf="sideBarItemDetails.sideBarItems?.length > 0; else noItems"
+          [value]="sideBarItemDetails.sideBarItems"
+          [numVisible]="3"
+          [numScroll]="1"
+          [responsiveOptions]="responsiveOptions"
+          [circular]="true"
+          [autoplayInterval]="0"
+        >
+          <ng-template pTemplate="item" let-item>
+            <div class="p-3">
+              <div class="item-card border-1 surface-border border-round-lg p-4 shadow-2 hover:shadow-4 transition-duration-300">
+                <!-- Item Header -->
+                <div class="flex align-items-center justify-content-between mb-3">
+                  <span
+                    class="item-type-badge px-3 py-2 border-round-md font-semibold text-sm"
+                    [ngClass]="getItemTypeClass(item.sideBarItemType)"
+                  >
+                    <i [class]="getItemTypeIcon(item.sideBarItemType)" class="mr-2"></i>
+                    {{ SideBarItemType[item.sideBarItemType] }}
+                  </span>
+                  <span class="text-500 text-sm">#{{ item.squence }}</span>
+                </div>
+
+                <!-- Item Image -->
+                <div
+                  class="item-image mb-3 border-round-md overflow-hidden"
+                  style="height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                >
+                  <img
+                    *ngIf="getItemImage(item)"
+                    [src]="getItemImage(item)"
+                    [alt]="getItemName(item)"
+                    class="w-full h-full object-fit-cover"
+                  />
+                  <div *ngIf="!getItemImage(item)" class="flex align-items-center justify-content-center h-full">
+                    <i [class]="getItemTypeIcon(item.sideBarItemType)" class="text-white" style="font-size: 4rem; opacity: 0.5"></i>
+                  </div>
+                </div>
+
+                <!-- Item Details -->
+                <h5 class="mt-0 mb-2 text-900 font-bold line-height-3">{{ getItemName(item) }}</h5>
+
+                <div class="item-meta">
+                  <div class="flex align-items-center gap-2 mb-2 text-600">
+                    <i class="pi pi-tag text-sm"></i>
+                    <span class="text-sm">ID: {{ item.outing?.id || item.hajj?.id || item.trip?.id || item.room?.id }}</span>
+                  </div>
+
+                  <!-- Type-specific info -->
+                  <div *ngIf="item.outing" class="text-sm text-600">
+                    <div class="flex align-items-center gap-2 mb-1">
+                      <i class="pi pi-map-marker"></i>
+                      <span>{{ item.outing.location || 'N/A' }}</span>
+                    </div>
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-star-fill text-yellow-500"></i>
+                      <span>{{ item.outing.rating || 0 }} / 5</span>
+                    </div>
+                  </div>
+
+                  <div *ngIf="item.hajj" class="text-sm text-600">
+                    <div class="flex align-items-center gap-2 mb-1">
+                      <i class="pi pi-calendar"></i>
+                      <span>{{ item.hajj.numberOfDays }} Days</span>
+                    </div>
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-star-fill text-yellow-500"></i>
+                      <span>{{ item.hajj.rating || 0 }} / 5</span>
+                    </div>
+                  </div>
+
+                  <div *ngIf="item.trip" class="text-sm text-600">
+                    <div class="flex align-items-center gap-2 mb-1">
+                      <i class="pi pi-calendar"></i>
+                      <span>{{ item.trip.numberOfDays }} Days</span>
+                    </div>
+                  </div>
+
+                  <div *ngIf="item.room" class="text-sm text-600">
+                    <div class="flex align-items-center gap-2 mb-1">
+                      <i class="pi pi-home"></i>
+                      <span>{{ item.room.boarding || 'Hotel Room' }}</span>
+                    </div>
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-users"></i>
+                      <span>{{ item.room.bedCount }} Beds</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </p-carousel>
+
+        <ng-template #noItems>
+          <div class="text-center p-5">
+            <i class="pi pi-inbox text-400" style="font-size: 4rem"></i>
+            <p class="text-600 mt-3">No items found for this sidebar.</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #loadingTpl>
+    <div class="flex align-items-center justify-content-center h-20rem">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+  </ng-template>
+</div>

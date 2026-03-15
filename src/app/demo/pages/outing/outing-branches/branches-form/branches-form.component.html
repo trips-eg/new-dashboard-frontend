@@ -1,0 +1,59 @@
+<div class="product-form p-4 mb-4">
+  <div class="form-field">
+    <form [formGroup]="branchesForm" (ngSubmit)="onSubmit()">
+      <h3 class="flex justify-content-between">
+        {{ config.data ? ('Edit Branch' | translate) : ('Add Branch' | translate) }}
+      </h3>
+
+      <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+        <!-- Name -->
+        <div class="field col-md-12">
+          <div class="flex flex-column gap-2">
+            <label for="name">{{ 'Branch Name' | translate }}</label>
+            <input
+              pInputText
+              id="name"
+              formControlName="name"
+              [ngClass]="{ 'ng-invalid ng-dirty': nameCtrl?.invalid && (nameCtrl?.touched || nameCtrl?.dirty) }"
+            />
+          </div>
+          <small class="p-error" *ngIf="nameCtrl?.hasError('required') && (nameCtrl?.touched || nameCtrl?.dirty)">
+            {{ 'Name is required' | translate }}
+          </small>
+          <small class="p-error" *ngIf="nameCtrl?.hasError('minlength')">
+            {{ 'Name must be at least 3 characters' | translate }}
+          </small>
+        </div>
+
+        <!-- Description -->
+        <div class="field col-md-12">
+          <div class="flex flex-column gap-2">
+            <label for="desc">{{ 'Description' | translate }}</label>
+            <textarea
+              pInputTextarea
+              id="desc"
+              formControlName="description"
+              [ngClass]="{ 'ng-invalid ng-dirty': descCtrl?.invalid && (descCtrl?.touched || descCtrl?.dirty) }"
+            ></textarea>
+          </div>
+          <small class="p-error" *ngIf="descCtrl?.hasError('required') && (descCtrl?.touched || descCtrl?.dirty)">
+            {{ 'Description is required' | translate }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="buttons mt-3 text-end">
+        <p-button label="{{ 'Cancel' | translate }}" class="mx-1" severity="secondary" (onClick)="onCancel()"></p-button>
+
+        <p-button
+          label="{{ 'Save' | translate }}"
+          severity="success"
+          icon="pi pi-save"
+          type="submit"
+          [disabled]="branchesForm.invalid"
+        ></p-button>
+      </div>
+    </form>
+  </div>
+</div>

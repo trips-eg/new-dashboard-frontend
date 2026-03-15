@@ -1,0 +1,80 @@
+<form [formGroup]="form" (ngSubmit)="save()" class="p-fluid grid pl-5 pr-5">
+  <div class="field col-12">
+    <label for="title">Title</label>
+    <input pInputText id="title" formControlName="title" placeholder="Enter title" />
+    <small class="p-error" *ngIf="form.get('title')?.touched && form.get('title')?.invalid">Title is required</small>
+  </div>
+
+  <div class="field col-12">
+    <label for="body">Message Body</label>
+    <textarea pInputTextarea id="body" formControlName="body" rows="3" placeholder="Enter message"></textarea>
+    <small class="p-error" *ngIf="form.get('body')?.touched && form.get('body')?.invalid">Message body is required</small>
+  </div>
+
+  <div class="field col-12" *ngIf="mode === 'Add'">
+    <label>User Type</label>
+    <div class="flex gap-3 mt-2">
+      <div class="flex align-items-center">
+        <p-checkbox formControlName="LoginUser" [binary]="true" inputId="loginUser"></p-checkbox>
+        <label for="loginUser" class="ml-2">Login User</label>
+      </div>
+      <div class="flex align-items-center">
+        <p-checkbox formControlName="Anonymous" [binary]="true" inputId="anonymous"></p-checkbox>
+        <label for="anonymous" class="ml-2">Anonymous</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="field col-12" *ngIf="form.get('LoginUser')?.value === true || mode === 'Edit'">
+    <label for="usersId">Select Users</label>
+    <p-multiSelect
+      *ngIf="mode === 'Add'"
+      id="usersId"
+      [options]="users"
+      formControlName="usersId"
+      optionLabel="name"
+      optionValue="id"
+      placeholder="Select Users"
+      [filter]="true"
+      display="chip"
+      [showClear]="true"
+      [virtualScroll]="true"
+      [virtualScrollItemSize]="40"
+      (onFilter)="onFilterUsers($event)"
+      [loading]="usersLoading"
+      scrollHeight="250px"
+    ></p-multiSelect>
+
+    <p-dropdown
+      *ngIf="mode === 'Edit'"
+      id="usersId"
+      [options]="users"
+      formControlName="usersId"
+      optionLabel="name"
+      optionValue="id"
+      placeholder="Select User"
+      [filter]="true"
+      [showClear]="true"
+      [virtualScroll]="true"
+      [virtualScrollItemSize]="40"
+      [lazy]="true"
+      (onFilter)="onFilterUsers($event)"
+      [loading]="usersLoading"
+      scrollHeight="250px"
+    ></p-dropdown>
+
+    <small class="p-error" *ngIf="form.get('usersId')?.touched && form.get('usersId')?.invalid">At least one User ID is required</small>
+  </div>
+
+  <div class="field col-12">
+    <label for="image">Image</label>
+    <div class="">
+      <app-img-uploader [multiple]="false" [displayFile]="displayFile" (filesChanged)="onFileSelect($event)"></app-img-uploader>
+    </div>
+  </div>
+
+  <div class="col-12 flex justify-content-end gap-2 mt-3 mb-3">
+    <button pButton type="button" label="Cancel" class="p-button-secondary p-button-text" (click)="close()"></button>
+    <button pButton type="submit" label="Send Notification" [loading]="loading" [disabled]="form.invalid || loading"></button>
+  </div>
+</form>

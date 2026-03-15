@@ -1,0 +1,42 @@
+<div class="product-form p-4 mb-4">
+  <p-toast></p-toast> <!-- Add toast for success/error messages -->
+
+  <div class="form-field">
+    <form [formGroup]="roomFeatureForm" (ngSubmit)="onSubmit()">
+      <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+        <div class="field col">
+          <label for="name">
+            {{ 'room feature' | translate }}
+            <small *ngIf="roomFeatureForm.get('name')?.invalid && (roomFeatureForm.get('name')?.touched || roomFeatureForm.get('name')?.dirty)" class="text-danger">*</small>
+          </label>
+
+          <input type="text" pInputText id="name" formControlName="name" />
+
+          <!-- Error message for required field -->
+          <small class="error" *ngIf="roomFeatureForm.get('name')?.hasError('required') && (roomFeatureForm.get('name')?.touched || roomFeatureForm.get('name')?.dirty)">
+            * {{ 'required' | translate }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="buttons mt-3 text-end">
+        <p-button
+          label="{{ 'Cancel' | translate }}"
+          class="mx-1"
+          severity="secondary"
+          (onClick)="onCancel()"
+          [disabled]="isLoading"
+        ></p-button>
+        <p-button
+          type="submit"
+          label="{{ 'save' | translate }}"
+          severity="success"
+          icon="pi pi-save"
+          [disabled]="roomFeatureForm.invalid || isLoading"
+          [loading]="isLoading"
+        ></p-button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,8 @@
+<div class="main">
+  <sub-header
+  [mainHeader]="'Notifications'| translate"
+   [actionButtons]="[{ label: 'Add', action: 'add', icon: 'pi pi-plus', class: 'btn-primary' }]"
+    (actionClicked)="handleAction($event)"
+  />
+  <app-notifications-list></app-notifications-list>
+</div>

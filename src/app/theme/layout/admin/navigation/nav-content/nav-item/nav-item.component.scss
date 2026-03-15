@@ -1,0 +1,21 @@
+li.active {
+  a.nav-link {
+    color: #ff6600; // لو حابب النص الأساسي يتلون
+
+    .coded-mtext {
+      color: #ff6600;
+      font-weight: 600;
+    }
+
+    .coded-micon i {
+      color: #ff6600;
+    }
+
+    // لو عايز تضيف خلفية خفيفة:
+    background-color: #fff3e0;
+    border-radius: 8px;
+  }
+}
+
+
+

@@ -1,0 +1,291 @@
+<div class="main" *ngIf="!loading">
+  <sub-header
+    [mainHeader]="manasik?.name || ('Manasik Details' | translate)"
+    [mainSection]="'Manasik' | translate"
+    [subSection]="'Details' | translate"
+  ></sub-header>
+
+  <div class="border-1 border-solid surface-border border-round mb-4 p-4 shadow-3">
+    <div class="grid">
+      <div class="col-12 col-md-6">
+        <p-galleria
+          [value]="images"
+          [autoPlay]="true"
+          [circular]="true"
+          [showItemNavigators]="true"
+          [thumbnailsPosition]="'bottom'"
+          [containerStyle]="{ 'max-width': '100%' }"
+          [numVisible]="4"
+        >
+          <ng-template pTemplate="item" let-item>
+            <img [src]="item" class="w-full h-20rem border-round" style="object-fit: cover; margin-bottom: 10px" />
+          </ng-template>
+          <ng-template pTemplate="thumbnail" let-item>
+            <div class="grid grid-nogutter justify-content-center">
+              <img [src]="item" class="w-7rem h-5rem border-round" style="object-fit: cover" />
+            </div>
+          </ng-template>
+        </p-galleria>
+      </div>
+
+      <div class="col-12 col-md-6 pl-4">
+        <h2 class="text-3xl mb-2">{{ manasik?.name }}</h2>
+        <div class="medium text-body-secondary mb-1">
+          <i class="fas fa-map-marker-alt me-1"></i>
+          {{ manasik?.city || '-' }}, {{ manasik?.country || '-' }}
+        </div>
+        <div class="flex align-items-center gap-3 mb-4">
+          <p-rating [ngModel]="manasik?.rating" [readonly]="true" [cancel]="false"></p-rating>
+          <span class="text-muted text-lg">({{ manasik?.rating }} / 5)</span>
+        </div>
+
+        <p class="text-muted mb-2">
+          <i class="fa-solid fa-map-location-dot mr-2"></i>
+          {{ 'Type' | translate }}: {{ manasik?.type }}
+        </p>
+
+        <p class="text-muted mb-2">
+          <i class="fas fa-calendar-alt mr-2"></i>
+          {{ 'Trip Duration' | translate }}: {{ manasik?.numberOfDays }} {{ 'days' | translate }}
+        </p>
+
+        <p class="text-muted mb-2">
+          <i class="fas fa-calendar-day mr-2"></i>
+          {{ 'Start Date' | translate }}: {{ manasik?.startDate | date }}
+        </p>
+
+        <p class="text-muted mb-2">
+          <i class="fas fa-calendar-day mr-2"></i>
+          {{ 'End Date' | translate }}: {{ manasik?.endDate | date }}
+        </p>
+
+        <p class="text-muted mb-2">
+          <i class="fas fa-users mr-2"></i>
+          {{ 'Capacity' | translate }}: {{ manasik?.capacity }} ({{ manasik?.remainingSeats }} {{ 'remaining' | translate }})
+        </p>
+
+        <p class="text-muted mb-2">
+          <i class="fas fa-tag mr-2"></i>
+          {{ 'Price' | translate }}: {{ manasik?.price }}
+        </p>
+
+        <div class="text-muted mt-3" *ngIf="manasik?.descriptions?.length">
+          <strong class="block mb-2">{{ 'Descriptions' | translate }}:</strong>
+          <div class="ml-2" *ngFor="let d of manasik?.descriptions">
+            <i class="fas fa-circle text-xs mr-2 text-primary"></i>
+            {{ d.description }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accommodation Section -->
+  <div class="border-1 border-solid surface-border border-round mb-4 p-4 shadow-3">
+    <h3 class="text-2xl mb-4 flex align-items-center">
+      <i class="fas fa-hotel accommodation-header-icon mr-2"></i>
+      <span>{{ 'Accommodation' | translate }}</span>
+    </h3>
+
+    <div class="grid">
+      <!-- Makkah Residence Card -->
+      <div class="col-12 col-md-4" *ngIf="manasik?.residenceInMakkah">
+        <div
+          class="accommodation-card p-4 border-round shadow-2 h-full"
+          style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+        >
+          <div class="flex align-items-center mb-3">
+            <div class="flex align-items-center justify-content-center bg-white border-circle accommodation-icon-wrapper">
+              <i class="fas fa-kaaba text-3xl" style="color: #667eea"></i>
+            </div>
+            <div class="flex-1">
+              <h5 class="text-white mb-1 text-xl font-semibold">{{ 'Makkah' | translate }}</h5>
+              <p class="text-white-alpha-90 mb-0 text-sm flex align-items-center">
+                <i class="fas fa-calendar-alt accommodation-text-icon"></i>
+                <span>{{ manasik?.daysInMakkah }} {{ 'days' | translate }}</span>
+              </p>
+            </div>
+          </div>
+          <div class="flex align-items-start">
+            <i class="fas fa-building accommodation-building-icon text-white"></i>
+            <p class="text-white mb-0 line-height-3 flex-1">{{ manasik?.residenceInMakkah }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Madinah Residence Card -->
+      <div class="col-12 col-md-4" *ngIf="manasik?.residenceInMadinah">
+        <div
+          class="accommodation-card p-4 border-round shadow-2 h-full"
+          style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+        >
+          <div class="flex align-items-center mb-3">
+            <div class="flex align-items-center justify-content-center bg-white border-circle accommodation-icon-wrapper">
+              <i class="fas fa-mosque text-3xl" style="color: #f5576c"></i>
+            </div>
+            <div class="flex-1">
+              <h5 class="text-white mb-1 text-xl font-semibold">{{ 'Madinah' | translate }}</h5>
+              <p class="text-white-alpha-90 mb-0 text-sm flex align-items-center">
+                <i class="fas fa-calendar-alt accommodation-text-icon"></i>
+                <span>{{ manasik?.daysInMadinah }} {{ 'days' | translate }}</span>
+              </p>
+            </div>
+          </div>
+          <div class="flex align-items-start">
+            <i class="fas fa-building accommodation-building-icon text-white"></i>
+            <p class="text-white mb-0 line-height-3 flex-1">{{ manasik?.residenceInMadinah }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flight Information Card -->
+      <div class="col-12 col-md-4" *ngIf="manasik?.flightLine">
+        <div
+          class="accommodation-card p-4 border-round shadow-2 h-full"
+          style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
+        >
+          <div class="flex align-items-center mb-3">
+            <div class="flex align-items-center justify-content-center bg-white border-circle accommodation-icon-wrapper">
+              <i class="fas fa-plane text-3xl" style="color: #4facfe"></i>
+            </div>
+            <div class="flex-1">
+              <h5 class="text-white mb-1 text-xl font-semibold">{{ 'Flight Information' | translate }}</h5>
+            </div>
+          </div>
+          <div class="flex align-items-start">
+            <i class="fas fa-plane-departure accommodation-building-icon text-white"></i>
+            <p class="text-white mb-0 line-height-3 flex-1">{{ manasik?.flightLine }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENHANCED: Segments Section -->
+  <div class="shadow-3 bg-white p-4 border-round mt-4">
+    <div class="flex align-items-center justify-content-between mb-4">
+      <h3 class="text-2xl mb-0">
+        <i class="fas fa-route mr-2"></i>
+        {{ 'Trip Program' | translate }}
+      </h3>
+      <p-tag [value]="programs?.length + ' ' + ('Segments' | translate)" severity="info"></p-tag>
+    </div>
+
+    <p-timeline [value]="programs" layout="vertical" [align]="timelineAlign" styleClass="customized-timeline">
+      <ng-template pTemplate="marker" let-program let-i="index">
+        <span
+          class="flex w-3rem h-3rem align-items-center justify-content-center text-white border-circle z-1 shadow-3"
+          [ngClass]="{
+            'segment-marker-flight': program.type === 1,
+            'segment-marker-hotel': program.type === 2,
+            'segment-marker-transport': program.type === 3,
+            'segment-marker-tour': program.type === 4,
+            'segment-marker-meal': program.type === 5,
+            'segment-marker-default': !program.type || program.type > 5
+          }"
+        >
+          <i
+            class="fas text-lg"
+            [ngClass]="{
+              'fa-plane-departure': program.type === 1,
+              'fa-hotel': program.type === 2,
+              'fa-bus': program.type === 3,
+              'fa-map-marked-alt': program.type === 4,
+              'fa-utensils': program.type === 5,
+              'fa-circle-dot': !program.type || program.type > 5
+            }"
+          ></i>
+        </span>
+      </ng-template>
+
+      <ng-template pTemplate="content" let-program let-i="index">
+        <div
+          class="segment-card p-4 border-round shadow-3 hover:shadow-4 transition-all transition-duration-300"
+          [ngClass]="{
+            'segment-card-flight': program.type === 1,
+            'segment-card-hotel': program.type === 2,
+            'segment-card-transport': program.type === 3,
+            'segment-card-tour': program.type === 4,
+            'segment-card-meal': program.type === 5,
+            'segment-card-default': !program.type || program.type > 5
+          }"
+        >
+          <!-- Segment Header -->
+          <div class="flex align-items-center justify-content-between mb-3 segment-header">
+            <div class="flex-1">
+              <h4 class="text-xl mb-1 font-bold segment-title">{{ program.typeObj?.nameEn }}</h4>
+              <span class="text-sm segment-subtitle">{{ program.typeObj?.nameAr }}</span>
+            </div>
+            <!-- <p-tag
+              [value]="'Day ' + (i + 1)"
+              [style]="{ background: 'rgba(255,255,255,0.9)', color: '#334155', 'font-weight': '600' }"
+            ></p-tag> -->
+          </div>
+
+          <!-- Title & Details -->
+          <div class="mb-3 p-3 segment-info-box border-round" *ngIf="program.title">
+            <p class="mb-0 text-lg font-semibold segment-info-title">
+              <i class="fas fa-bookmark segment-inline-icon"></i>
+              <span>{{ program.title }}</span>
+            </p>
+            <p class="mb-0 mt-2 segment-info-text" *ngIf="program.details">{{ program.details }}</p>
+          </div>
+
+          <!-- Time & Location Info -->
+          <div class="grid mb-2">
+            <div class="col-12 md:col-6" *ngIf="program.time">
+              <p class="mb-1 text-sm segment-meta">
+                <i class="fas fa-clock segment-inline-icon"></i>
+                <strong>{{ 'Time' | translate }}:</strong>
+                <span class="segment-meta-value">{{ program.time | date: 'short' }}</span>
+              </p>
+            </div>
+            <div class="col-12 md:col-6" *ngIf="program.fromLocation || program.toLocation">
+              <p class="mb-1 text-sm segment-meta">
+                <i class="fas fa-route segment-inline-icon"></i>
+                <strong>{{ 'Route' | translate }}:</strong>
+                <span class="segment-meta-value">{{ program.fromLocation || '-' }} → {{ program.toLocation || '-' }}</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Step Descriptions -->
+          <div *ngIf="program.stepDescriptions?.length" class="mt-3">
+            <div class="segment-divider mb-3"></div>
+            <strong class="block mb-2 segment-steps-title">
+              <i class="fas fa-list-check segment-inline-icon"></i>
+              <span>{{ 'Steps' | translate }}:</span>
+            </strong>
+            <div class="segment-steps-list">
+              <div
+                *ngFor="let step of program.stepDescriptions; let idx = index"
+                class="flex align-items-start mb-2 p-2 segment-step-item border-round transition-all transition-duration-200"
+              >
+                <span
+                  class="flex align-items-center justify-content-center segment-step-number text-white border-circle"
+                  style="min-width: 1.5rem; height: 1.5rem; font-size: 0.75rem; font-weight: 600"
+                >
+                  {{ idx + 1 }}
+                </span>
+                <span class="segment-step-text flex-1">{{ step.description }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="opposite" let-program>
+        <div class="text-right">
+          <p class="text-600 font-semibold mb-1">{{ program.time | date: 'mediumDate' }}</p>
+          <p class="text-sm text-muted mb-0" *ngIf="program.fromTime || program.toTime">
+            {{ program.fromTime | date: 'mediumDate' }} - {{ program.toTime | date: 'mediumDate' }}
+          </p>
+        </div>
+      </ng-template>
+    </p-timeline>
+  </div>
+</div>
+
+<div *ngIf="loading" class="flex align-items-center justify-content-center p-8">
+  <p-progressSpinner></p-progressSpinner>
+</div>

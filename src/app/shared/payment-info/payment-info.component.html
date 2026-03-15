@@ -1,0 +1,136 @@
+<div class="main">
+  <sub-header [mainHeader]="'Reservation Details'" [mainSection]="'Reservations'" [subSection]="'Reservation Details'"></sub-header>
+  <div class="grid mx-0 card" *ngIf="!isLoading">
+    <div class="col-md-12 mb-3">
+      <p-panel [header]="'Customer Info' | translate" [toggleable]="true">
+        <div class="p-text-sm card-content-scroll">
+          <div class="mb-2 d-flex justify-content-between">
+            <strong>{{ 'Customer Name' | translate }}:</strong>
+            <span class="ms-5">{{ reservationData.user?.userName || 'N/A' }}</span>
+          </div>
+          <div class="mb-2 d-flex justify-content-between">
+            <strong>{{ 'Phone Number' | translate }}:</strong>
+            <span class="ms-5">{{ reservationData.user?.phoneNumber || 'N/A' }}</span>
+          </div>
+          <div class="mb-2 d-flex justify-content-between">
+            <strong>{{ 'Email address' | translate }}:</strong>
+            <span class="ms-5">{{ reservationData.user?.email }}</span>
+          </div>
+        </div>
+      </p-panel>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <p-panel [header]="'Reserve Information' | translate" [toggleable]="true">
+          <div class="card-content-scroll">
+            <div class="mb-2 d-flex justify-content-between">
+              <strong>{{ 'Reserve Status' | translate }}:</strong>
+              <span [ngClass]="getStatusClass(reservationData.sataus)" class="status-badge">
+                {{ getStatusLabel(reservationData.sataus) }}
+              </span>
+            </div>
+            <div class="mb-2 d-flex justify-content-between">
+              <strong>{{ 'Reserve Date' | translate }}:</strong>
+              <span class="ms-5">{{ reservationData.createdDate | date: 'short' }}</span>
+            </div>
+          </div>
+        </p-panel>
+      </div>
+      <!-- Invoice -->
+      <div class="col-md-6">
+        <p-panel header="{{ 'Invoice' | translate }}" [toggleable]="true">
+          <div class="my-1 card-content-scroll">
+            <div class="mb-2 d-flex justify-content-between">
+              <strong>{{ 'vendor Price' | translate }}</strong>
+              <span>{{ reservationData.totalPrice }}</span>
+            </div>
+            <div class="mb-2 d-flex justify-content-between">
+              <strong>{{ 'Tax Amount' | translate }}</strong>
+              <span>{{ reservationData.totalTax }}</span>
+            </div>
+            <div class="mb-2 d-flex justify-content-between">
+              <strong>{{ 'trips Operation Expense Value' | translate }}</strong>
+              <span>{{ reservationData.tripsOperationExpenseValue }}</span>
+            </div>
+            <div class="mb-2 d-flex justify-content-between">
+              <strong>{{ 'trips Operation Expense Rate' | translate }}</strong>
+              <span>{{ reservationData.tripsOperationExpenseRate }}</span>
+            </div>
+            <div class="mb-2 d-flex justify-content-between">
+              <strong>{{ 'tripsOperationExpenseRateAmount' | translate }}</strong>
+              <span>{{ reservationData.tripsOperationExpenseRateAmount }}</span>
+            </div>
+            <div class="mb-2 d-flex justify-content-between">
+              <strong>{{ 'opayRate' | translate }}</strong>
+              <span>{{ reservationData.opayRate }}</span>
+            </div>
+            <div class="mb-2 d-flex justify-content-between">
+              <strong>{{ 'opayRateAmount' | translate }}</strong>
+              <span>{{ reservationData.opayRateAmount }}</span>
+            </div>
+            <div class="mb-2 d-flex justify-content-between">
+              <strong>{{ 'opayValue' | translate }}</strong>
+              <span>{{ reservationData.opayValue }}</span>
+            </div>
+            <div class="mb-2 d-flex justify-content-between">
+              <strong>{{ 'TOTAL' | translate }}</strong>
+              <span>{{ reservationData.total }}</span>
+            </div>
+          </div>
+        </p-panel>
+      </div>
+    </div>
+
+    <p-panel header="{{ 'Reservation History' | translate }}" [toggleable]="true" class="mt-4 w-100">
+      <p-tabView>
+        <!--  Travel -->
+        <p-tabPanel [header]="'Travel' | translate" *ngIf="travelReservationDetail?.length > 0">
+          <ng-template pTemplate="content">
+            <app-travel-booking-info
+              [totalRecords]="totalRecorsOfTravel"
+              [consumerTravelDetailReserved]="travelReservationDetail"
+              (refundedSuccess)="getTravelReservationDetail()"
+            />
+          </ng-template>
+        </p-tabPanel>
+
+        <!--  Room -->
+        <p-tabPanel [header]="'Room' | translate" *ngIf="roomReservationDetail?.length > 0">
+          <ng-template pTemplate="content">
+            <app-room-booking-info
+              [totalRecords]="totalRecorsOfRooms"
+              [consumerRoomDetailReserved]="roomReservationDetail"
+              [reservationUser]="reservationUser"
+              (refundedSuccess)="getroomReservationDetail()"
+            />
+          </ng-template>
+        </p-tabPanel>
+
+        <!--  outing -->
+        <p-tabPanel [header]="'outing' | translate" *ngIf="outingReservationDetail?.length > 0">
+          <ng-template pTemplate="content">
+            <app-outing-booking-info
+              [totalRecords]="totalRecorsOfOutings"
+              [consumerOutingDetailReserved]="outingReservationDetail"
+              [reservationUser]="reservationUser"
+              (refundedSuccess)="getOutingReservationDetail()"
+            />
+          </ng-template>
+        </p-tabPanel>
+
+        <!-- Hajj/Umrah -->
+        <p-tabPanel [header]="'hajj-ummrah' | translate" *ngIf="hajjReservationDetail?.length > 0">
+          <ng-template pTemplate="content">
+            <app-manasik-booking-info
+              [totalRecords]="totalRecorsOfHajj"
+              [consumerHajjDetailReserved]="hajjReservationDetail"
+              [reservationUser]="reservationUser"
+              (refundedSuccess)="getHajjReservationDetail()"
+            />
+          </ng-template>
+        </p-tabPanel>
+      </p-tabView>
+    </p-panel>
+  </div>
+</div>

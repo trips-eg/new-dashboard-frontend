@@ -1,0 +1,9 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="(type === ManasikType.Hajj ? 'Hajj Management' : 'Umrah Management') | translate"
+    [actionButtons]="actionButtons"
+    (actionClicked)="handleAction($event)"
+  ></sub-header>
+
+  <app-manasik-list [type]="type"></app-manasik-list>
+</div>

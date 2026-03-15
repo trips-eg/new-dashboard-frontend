@@ -1,0 +1,30 @@
+<form [formGroup]="roleForm" (ngSubmit)="onSubmit()" class="p-fluid p-formgrid grid mb-4">
+  <div class="field col-12 md:col-6">
+    <label for="name">{{ 'Name' | translate }}</label>
+    <input pInputText id="name" formControlName="name" [placeholder]="'Enter role name' | translate" />
+    <small *ngIf="getControl('name')?.invalid && getControl('name')?.touched" class="p-error">
+      {{ 'Name is required' | translate }}
+    </small>
+  </div>
+
+  <div class="field col-12 md:col-6">
+    <label for="roleType">{{ 'Role Type' | translate }}</label>
+    <p-dropdown
+      id="roleType"
+      formControlName="roleType"
+      [options]="roleTypes"
+      [placeholder]="'Select Role' | translate"
+      optionLabel="label"
+      optionValue="value"
+      appendTo="body">
+    </p-dropdown>
+    <small *ngIf="getControl('roleType')?.invalid && getControl('roleType')?.touched" class="p-error">
+      {{ 'Role Type is required' | translate }}
+    </small>
+  </div>
+
+</form>
+<div class="buttons mb-3 text-end">
+  <p-button label="{{ 'Cancel' | translate }}" class="mx-1" severity="secondary" (onClick)="onCancel()"></p-button>
+  <p-button label="{{ 'save' | translate }}" severity="success" icon="pi pi-save" (onClick)="onSubmit()"></p-button>
+</div>

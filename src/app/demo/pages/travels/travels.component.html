@@ -1,0 +1,9 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'travels'"
+    [actionButtons]="isVendor()?[{ label: 'Add', action: 'add', icon: 'pi pi-plus', class: 'btn-primary' }]:[]"
+    (actionClicked)="handleAction($event)"
+  ></sub-header>
+  <app-travels-list></app-travels-list>
+</div>
+

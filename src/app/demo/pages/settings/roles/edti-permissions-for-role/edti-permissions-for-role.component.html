@@ -1,0 +1,21 @@
+<div class="main">
+  <sub-header [mainHeader]="translatedHeader" [mainSection]="'Roles'" [subSection]="'Permissions'"></sub-header>
+  <div class="card">
+    <p-table [value]="permissionsForRole" [tableStyle]="{ 'min-width': '40rem' }">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'Permission' | translate }}</th>
+          <th>{{ 'Allowed' | translate }}</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-permission>
+        <tr>
+          <td>{{ permission.displayValue }}</td>
+          <td>
+            <p-inputSwitch [ngModel]="permission.isSelected" (onChange)="onPermissionToggle(permission)"></p-inputSwitch>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

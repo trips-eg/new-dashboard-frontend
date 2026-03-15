@@ -1,0 +1,940 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="isEditMode ? ('Edit Outing' | translate) : ('Add Outing' | translate)"
+    [mainSection]="'Outing' | translate"
+    [subSection]="isEditMode ? ('Edit' | translate) : ('Add' | translate)"
+  ></sub-header>
+  <div class="product-form shadow-3 p-4">
+    <p-stepper [(activeStep)]="activeStep" *ngIf="reloadStepper">
+      <!-- Step 1: Outing Information -->
+      <p-stepperPanel [header]="'Outing Information' | translate">
+        <ng-template pTemplate="content" let-nextCallback="nextCallback">
+          <form class="form-field" [formGroup]="outingForm">
+            <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+              <div class="field col-12 col-md-6">
+                <label>{{ 'Outing Type' | translate }}</label>
+                <p-dropdown
+                  formControlName="OutingType"
+                  [options]="outingTypeOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="{{ '-- Select Outing Type --' | translate }}"
+                  styleClass="w-full"
+                ></p-dropdown>
+                <small
+                  class="p-error"
+                  *ngIf="
+                    outingForm.get('OutingType')?.invalid && (outingForm.get('OutingType')?.touched || outingForm.get('OutingType')?.dirty)
+                  "
+                >
+                  {{ 'Please select outing type' | translate }}
+                </small>
+              </div>
+
+              <div class="field col-12 col-md-6">
+                <label>{{ 'Name' | translate }}</label>
+                <input pInputText formControlName="Name" />
+                <small class="p-error" *ngIf="nameCtrl?.invalid && (nameCtrl?.touched || nameCtrl?.dirty)">
+                  {{ 'This field is required' | translate }}
+                </small>
+              </div>
+
+              <div class="field col-12 col-md-6">
+                <label>{{ 'Target Audience' | translate }}</label>
+                <input pInputText formControlName="TargetAudience" />
+              </div>
+
+              <div class="field col-12">
+                <label>{{ 'Description' | translate }}</label>
+                <textarea pInputTextarea rows="4" formControlName="Description" class="w-full"></textarea>
+                <small class="p-error" *ngIf="descCtrl?.invalid && (descCtrl?.touched || descCtrl?.dirty)">
+                  {{ 'This field is required' | translate }}
+                </small>
+              </div>
+
+              <div class="field col-12 col-md-3">
+                <label>{{ 'Location' | translate }}</label>
+                <input pInputText formControlName="Location" />
+              </div>
+
+              <div class="field col-12 col-md-3">
+                <label>{{ 'External Link' | translate }}</label>
+                <input pInputText formControlName="ExternalLink" type="url" placeholder="https://..." />
+              </div>
+
+              <div class="field col-12 col-md-3">
+                <label>{{ 'Category' | translate }}</label>
+                <p-dropdown
+                  formControlName="OutingCategoryId"
+                  [options]="categories"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="{{ '-- Select --' | translate }}"
+                  styleClass="w-full"
+                ></p-dropdown>
+                <small class="p-error" *ngIf="categoryCtrl?.invalid && (categoryCtrl?.touched || categoryCtrl?.dirty)">
+                  {{ 'Please select Outing Category' | translate }}
+                </small>
+              </div>
+
+              <div class="field col-12 col-md-3">
+                <label class="block mb-2">{{ 'Features' | translate }}</label>
+                <p-multiSelect
+                  formControlName="FeatureIds"
+                  [options]="features"
+                  optionLabel="name"
+                  optionValue="id"
+                  [filter]="true"
+                  (onFilter)="onFeaturesFilter($event)"
+                  placeholder="{{ 'Select Features' | translate }}"
+                  styleClass="w-full"
+                  display="chip"
+                ></p-multiSelect>
+                <small class="p-error" *ngIf="featuresCtrl?.invalid && (featuresCtrl?.touched || featuresCtrl?.dirty)">
+                  {{ 'Please select at least one feature' | translate }}
+                </small>
+              </div>
+
+              <div class="field col-12 col-md-3">
+                <label>{{ 'Rating' | translate }}</label>
+                <p-dropdown
+                  formControlName="Rating"
+                  [options]="starRatings"
+                  placeholder="{{ '-- Select rating --' | translate }}"
+                  styleClass="w-full"
+                ></p-dropdown>
+                <small class="p-error" *ngIf="ratingCtrl?.invalid && (ratingCtrl?.touched || ratingCtrl?.dirty)">
+                  {{ 'Please select at least one feature' | translate }}
+                </small>
+              </div>
+
+              <!-- Added Branches Field -->
+              <div class="field col-12 col-md-4">
+                <label class="block mb-2">{{ 'Branches' | translate }}</label>
+                <p-multiSelect
+                  formControlName="BranchIds"
+                  [options]="branches"
+                  optionLabel="name"
+                  optionValue="id"
+                  [filter]="true"
+                  placeholder="{{ 'Select Branches' | translate }}"
+                  styleClass="w-full"
+                  display="chip"
+                >
+                  <ng-template pTemplate="footer">
+                    <div class="p-2 flex gap-2 align-items-center">
+                      <input
+                        pInputText
+                        type="text"
+                        [(ngModel)]="newBranchName"
+                        [ngModelOptions]="{ standalone: true }"
+                        placeholder="{{ 'New Branch Name' | translate }}"
+                        class="flex-1 p-inputtext-sm"
+                      />
+                      <input
+                        pInputText
+                        type="text"
+                        [(ngModel)]="newBranchLocation"
+                        [ngModelOptions]="{ standalone: true }"
+                        placeholder="{{ 'Location' | translate }}"
+                        class="flex-1 p-inputtext-sm"
+                      />
+
+                      <p-button icon="pi pi-plus" styleClass="p-button-sm" (onClick)="addNewBranch()"></p-button>
+                    </div>
+                  </ng-template>
+                </p-multiSelect>
+                <small
+                  class="p-error"
+                  *ngIf="
+                    outingForm.get('BranchIds')?.invalid && (outingForm.get('BranchIds')?.touched || outingForm.get('BranchIds')?.dirty)
+                  "
+                >
+                  {{ 'Please select at least one branch' | translate }}
+                </small>
+              </div>
+
+              <!-- Start Date - Only shown for Normal type -->
+              <div class="field col-12 col-md-4" *ngIf="outingForm.get('OutingType')?.value === OutingType.Normal">
+                <label>{{ 'Start Date' | translate }}</label>
+                <p-calendar
+                  formControlName="StartDate"
+                  [showIcon]="true"
+                  [showTime]="true"
+                  dateFormat="dd-mm-yy"
+                  styleClass="w-full"
+                  [iconDisplay]="'input'"
+                ></p-calendar>
+                <small class="p-error" *ngIf="startDateCtrl?.invalid && (startDateCtrl?.touched || startDateCtrl?.dirty)">
+                  {{ 'Please select start date' | translate }}
+                </small>
+              </div>
+
+              <!-- End Date - Only shown for Normal type -->
+              <div class="field col-12 col-md-4" *ngIf="outingForm.get('OutingType')?.value === OutingType.Normal">
+                <label>{{ 'End Date' | translate }}</label>
+                <p-calendar
+                  [iconDisplay]="'input'"
+                  formControlName="EndDate"
+                  [showIcon]="true"
+                  [showTime]="true"
+                  dateFormat="dd-mm-yy"
+                  styleClass="w-full"
+                ></p-calendar>
+                <small class="p-error" *ngIf="endDateCtrl?.invalid && (endDateCtrl?.touched || endDateCtrl?.dirty)">
+                  {{ 'Please select end date' | translate }}
+                </small>
+              </div>
+
+              <div class="field col-12 col-md-4">
+                <label>{{ 'Savings Ratio' | translate }}</label>
+                <p-inputNumber
+                  formControlName="SavingsRatio"
+                  mode="decimal"
+                  [min]="0"
+                  [max]="100"
+                  suffix="%"
+                  styleClass="w-full"
+                ></p-inputNumber>
+              </div>
+
+              <div class="field col-12 col-md-4">
+                <label>{{ 'Price Before' | translate }}</label>
+                <p-inputNumber formControlName="PriceBefore" mode="decimal" [min]="0" styleClass="w-full"></p-inputNumber>
+              </div>
+
+              <div class="field col-12 col-md-6">
+                <label>{{ 'Is Active' | translate }}</label>
+                <div><p-inputSwitch formControlName="IsActive"></p-inputSwitch></div>
+              </div>
+
+              <div class="field col-12 col-md-6">
+                <label>{{ 'Is Blocked' | translate }}</label>
+                <div><p-inputSwitch formControlName="IsBlocked"></p-inputSwitch></div>
+              </div>
+              <!-- Add this section after the Images field and before the buttons in Step 1 -->
+
+              <!-- Policies Panel -->
+              <div class="field col-12 mt-3">
+                <p-panel header="{{ 'policies' | translate }}" [toggleable]="true" styleClass="custom-panel">
+                  <!-- Refund Policy -->
+                  <h3 class="flex justify-content-between align-items-center">
+                    <span>{{ 'is refund enabled' | translate }}</span>
+                    <span><p-inputSwitch formControlName="IsRefundable" /></span>
+                  </h3>
+
+                  <div
+                    class="formgrid grid p-3 border-1 border-dashed surface-border border-round"
+                    *ngIf="outingForm.get('IsRefundable')?.value"
+                  >
+                    <div class="field col-12 col-md-6 mx-auto">
+                      <label for="MinimumDaysToRefund">
+                        {{ 'Minimum Days To Refund' | translate }}
+                      </label>
+                      <p-inputNumber
+                        mode="decimal"
+                        inputId="MinimumDaysToRefund"
+                        id="MinimumDaysToRefund"
+                        formControlName="MinimumDaysToRefund"
+                        [min]="1"
+                      />
+                      <div class="text-danger" *ngIf="shouldShowError('MinimumDaysToRefund')">
+                        {{ 'Please enter minimum days to refund' | translate }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Deposit Rate (always visible after price section) -->
+                  <h3 class="mt-4">
+                    {{ 'Deposit Rate' | translate }}
+                  </h3>
+                  <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+                    <div class="field col-12 col-md-6 mx-auto">
+                      <label for="depositRate">
+                        {{ 'depositRate' | translate }}
+                      </label>
+                      <p-inputNumber
+                        mode="decimal"
+                        inputId="depositRate"
+                        id="depositRate"
+                        formControlName="depositRate"
+                        [min]="0"
+                        [max]="100"
+                        suffix="%"
+                      />
+                      <small class="text-muted d-block mt-1">{{ 'Optional: Set deposit percentage (0-100%)' | translate }}</small>
+                    </div>
+                  </div>
+
+                  <!-- Cancellation Policy -->
+                  <h3 class="mt-4">
+                    {{ 'Cancellation policies' | translate }}
+                  </h3>
+                  <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+                    <div class="field col-12">
+                      <label for="cancellationPolicy">
+                        {{ 'Cancellation Policy' | translate }}
+                      </label>
+                      <p-editor id="cancellationPolicy" formControlName="CancellationPolicy" [style]="{ height: '150px' }"></p-editor>
+                      <small class="text-muted d-block mt-1">
+                        {{ 'Optional: Describe the cancellation policy for customers' | translate }}
+                      </small>
+                      <div class="text-danger" *ngIf="shouldShowError('CancellationPolicy')">
+                        {{ 'Please enter minimum days to refund' | translate }}
+                      </div>
+                    </div>
+                  </div>
+                </p-panel>
+              </div>
+
+              <div class="field col-12">
+                <label>{{ 'Images' | translate }}</label>
+                <app-img-uploader
+                  [multiple]="true"
+                  [displayFiles]="existingImages"
+                  (filesChanged)="onImagesUpload($event)"
+                  (removeImgFromDBWithId)="onImageDeleted($event)"
+                ></app-img-uploader>
+                <small class="p-error" *ngIf="showImageError">{{ 'At least one image is required' | translate }}</small>
+              </div>
+            </div>
+
+            <div class="buttons mt-3 text-end">
+              <p-button label="{{ 'Back' | translate }}" class="mx-1" severity="secondary" (onClick)="onBack()"></p-button>
+              <p-button label="{{ 'Next' | translate }}" class="mx-1" severity="primary" (onClick)="onNext(nextCallback)"></p-button>
+            </div>
+          </form>
+        </ng-template>
+      </p-stepperPanel>
+
+      <!-- Step 2: Add-Ons -->
+      <p-stepperPanel [header]="'Add-Ons' | translate">
+        <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback">
+          <form class="form-field" [formGroup]="addOnsForm">
+            <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+              <div class="col-12 mb-3">
+                <h5>{{ 'Manage Outing Add-Ons' | translate }}</h5>
+              </div>
+
+              <div class="field col-12 col-md-4">
+                <label>{{ 'Add-On Name' | translate }}</label>
+                <input pInputText formControlName="name" />
+              </div>
+
+              <div class="field col-12 col-md-4">
+                <label>{{ 'Price' | translate }}</label>
+                <p-inputNumber formControlName="price"></p-inputNumber>
+              </div>
+
+              <div class="field col-12 col-md-4">
+                <label>{{ 'Description' | translate }}</label>
+                <input pInputText formControlName="description" />
+              </div>
+
+              <div class="col-12">
+                <p-button
+                  label="{{ 'Add to List' | translate }}"
+                  icon="pi pi-plus"
+                  (onClick)="addAddOn()"
+                  [disabled]="addOnsForm.invalid"
+                ></p-button>
+              </div>
+
+              <!-- Add-Ons List -->
+              <div class="col-12 mt-3" *ngIf="addOnsList.length > 0">
+                <p-table [value]="addOnsList" styleClass="p-datatable-sm">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>{{ 'Name' | translate }}</th>
+                      <th>{{ 'Price' | translate }}</th>
+                      <th>{{ 'Description' | translate }}</th>
+                      <th>{{ 'Actions' | translate }}</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-addon let-i="rowIndex">
+                    <tr>
+                      <td>{{ addon.name }}</td>
+                      <td>{{ addon.price }}</td>
+                      <td>{{ addon.description }}</td>
+                      <td>
+                        <p-button icon="pi pi-trash" severity="danger" [text]="true" (onClick)="removeAddOn(i)"></p-button>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            </div>
+
+            <div class="buttons mt-3 text-end">
+              <p-button label="{{ 'Previous' | translate }}" class="mx-1" severity="secondary" (onClick)="prevCallback.emit()"></p-button>
+              <p-button
+                label="{{ 'Next' | translate }}"
+                class="mx-1"
+                severity="primary"
+                [loading]="isLoading"
+                [disabled]="isLoading"
+                (onClick)="onNextAddOns(nextCallback)"
+              ></p-button>
+            </div>
+          </form>
+        </ng-template>
+      </p-stepperPanel>
+
+      <!-- Step 3: Offers -->
+      <p-stepperPanel [header]="'Offers' | translate">
+        <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback">
+          <form class="form-field" [formGroup]="offersForm">
+            <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+              <div class="col-12 mb-3">
+                <h5>{{ 'Manage Outing Offers' | translate }}</h5>
+              </div>
+
+              <div class="field col-12 col-md-12">
+                <label>{{ 'Offer Title' | translate }}</label>
+                <input pInputText formControlName="title" placeholder="{{ 'Enter title' | translate }}" />
+              </div>
+
+              <div class="field col-12 col-md-12">
+                <label>{{ 'Description' | translate }}</label>
+                <textarea pInputTextarea rows="4" formControlName="description" class="w-full"></textarea>
+              </div>
+
+              <div class="col-12">
+                <p-button
+                  label="{{ 'Add to List' | translate }}"
+                  icon="pi pi-plus"
+                  (onClick)="addOffer()"
+                  [disabled]="offersForm.invalid"
+                ></p-button>
+              </div>
+
+              <!-- Single Offer Preview -->
+              <div class="col-12 mt-3" *ngIf="offer">
+                <div class="card p-3">
+                  <div class="flex align-items-center justify-content-between gap-3">
+                    <div class="flex-1">
+                      <h6 class="m-0">{{ offer.title }}</h6>
+                      <p class="m-0 text-500">{{ offer.description }}</p>
+                    </div>
+                    <div>
+                      <p-button icon="pi pi-trash" severity="danger" [text]="true" (onClick)="removeOffer()"></p-button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="buttons mt-3 text-end">
+              <p-button label="{{ 'Previous' | translate }}" class="mx-1" severity="secondary" (onClick)="prevCallback.emit()"></p-button>
+              <p-button
+                label="{{ 'Next' | translate }}"
+                class="mx-1"
+                severity="primary"
+                [loading]="isLoading"
+                [disabled]="isLoading"
+                (onClick)="onNextOffers(nextCallback)"
+              ></p-button>
+            </div>
+          </form>
+        </ng-template>
+      </p-stepperPanel>
+
+      <!-- <p-stepperPanel [header]="'Offers' | translate">
+        <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback">
+          <form class="form-field" [formGroup]="offersForm">
+            <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+              <div class="col-12 mb-3">
+                <h5>{{ 'Manage Outing Offers' | translate }}</h5>
+              </div>
+
+              <div class="field col-12 col-md-4">
+                <label>{{ 'Offer Name' | translate }}</label>
+                <input pInputText formControlName="name" />
+              </div>
+
+              <div class="field col-12 col-md-4">
+                <label>{{ 'Discount (%)' | translate }}</label>
+                <p-inputNumber formControlName="discount" [min]="0" [max]="100"></p-inputNumber>
+              </div>
+
+              <div class="field col-12 col-md-2">
+                <label>{{ 'Start Date' | translate }}</label>
+                <p-calendar
+                  formControlName="startDate"
+                  [showIcon]="true"
+                  dateFormat="dd-mm-yy"
+                  styleClass="w-full"
+                ></p-calendar>
+              </div>
+
+              <div class="field col-12 col-md-2">
+                <label>{{ 'End Date' | translate }}</label>
+                <p-calendar
+                  formControlName="endDate"
+                  [showIcon]="true"
+                  dateFormat="dd-mm-yy"
+                  styleClass="w-full"
+                ></p-calendar>
+              </div>
+
+              <div class="col-12">
+                <p-button
+                  label="{{ 'Add to List' | translate }}"
+                  icon="pi pi-plus"
+                  (onClick)="addOffer()"
+                  [disabled]="offersForm.invalid"
+                ></p-button>
+              </div>
+
+            
+              <div class="col-12 mt-3" *ngIf="offersList.length > 0">
+                <p-table [value]="offersList" styleClass="p-datatable-sm">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>{{ 'Name' | translate }}</th>
+                      <th>{{ 'Discount' | translate }}</th>
+                      <th>{{ 'Start Date' | translate }}</th>
+                      <th>{{ 'End Date' | translate }}</th>
+                      <th>{{ 'Actions' | translate }}</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-offer let-i="rowIndex">
+                    <tr>
+                      <td>{{ offer.name }}</td>
+                      <td>{{ offer.discount }}%</td>
+                      <td>{{ offer.startDate | date: 'dd-MM-yyyy' }}</td>
+                      <td>{{ offer.endDate | date: 'dd-MM-yyyy' }}</td>
+                      <td>
+                        <p-button
+                          icon="pi pi-trash"
+                          severity="danger"
+                          [text]="true"
+                          (onClick)="removeOffer(i)"
+                        ></p-button>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            </div>
+
+            <div class="buttons mt-3 text-end">
+              <p-button
+                label="{{ 'Previous' | translate }}"
+                class="mx-1"
+                severity="secondary"
+                (onClick)="prevCallback.emit()"
+              ></p-button>
+              <p-button
+                label="{{ 'Next' | translate }}"
+                class="mx-1"
+                severity="primary"
+                [loading]="isLoading"
+                [disabled]="isLoading"
+                (onClick)="onNextOffers(nextCallback)"
+              ></p-button>
+            </div>
+          </form>
+        </ng-template>
+      </p-stepperPanel> -->
+
+      <!-- Step 4: Tickets -->
+      <p-stepperPanel [header]="'Tickets' | translate">
+        <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback">
+          <form class="form-field" [formGroup]="ticketsForm">
+            <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+              <div class="col-12 mb-3 flex justify-content-between align-items-center">
+                <h5 class="m-0">{{ 'Manage Outing Tickets' | translate }}</h5>
+                <div class="flex gap-3">
+                  <p-inputSwitch
+                    formControlName="hasSerialNumber"
+                    pTooltip="{{ 'Has Serial Number' | translate }}"
+                    tooltipPosition="top"
+                  ></p-inputSwitch>
+                  <p-inputSwitch formControlName="isActive" pTooltip="{{ 'Is Active' | translate }}" tooltipPosition="top"></p-inputSwitch>
+                </div>
+              </div>
+
+              <div class="field col-12 col-md-6">
+                <label>{{ 'Ticket Type' | translate }}</label>
+                <input pInputText formControlName="ticketType" />
+              </div>
+
+              <div class="field col-12 col-md-6">
+                <label>{{ 'Description' | translate }}</label>
+                <input pInputText formControlName="description" />
+              </div>
+
+              <div class="field col-12 col-md-4">
+                <label>{{ 'Price' | translate }}</label>
+                <p-inputNumber formControlName="price"></p-inputNumber>
+              </div>
+
+              <div class="field col-12 col-md-4">
+                <label>{{ 'Available Quantity' | translate }}</label>
+                <p-inputNumber formControlName="availableQuantity" [min]="1"></p-inputNumber>
+                <small class="text-info" *ngIf="isAvailableQuantityDisabled">
+                  {{ 'Auto-calculated from uploaded Excel file' | translate }}
+                </small>
+              </div>
+
+              <!-- Excel Uploader (conditional) -->
+              <div class="field col-12 col-md-4" *ngIf="ticketsForm.get('hasSerialNumber')?.value">
+                <label class="block mb-2">{{ 'Upload Serial Numbers' | translate }}</label>
+                <p-fileUpload
+                  #excelUploader
+                  mode="basic"
+                  accept=".xlsx,.xls"
+                  [maxFileSize]="5000000"
+                  [auto]="true"
+                  chooseLabel="{{ 'Choose Excel File' | translate }}"
+                  (onSelect)="onExcelFileSelect($event)"
+                  [disabled]="isUploadingExcel"
+                ></p-fileUpload>
+              </div>
+
+              <!-- Serial Numbers Preview -->
+              <div class="col-12 mt-2 mb-3" *ngIf="excelSerialNumbers.length > 0">
+                <p-panel header="{{ 'Serial Numbers Preview' | translate }}" [toggleable]="true">
+                  <p-table [value]="excelSerialNumbers" [rows]="15" [paginator]="true" styleClass="p-datatable-sm">
+                    <ng-template pTemplate="header">
+                      <tr>
+                        <th>#</th>
+                        <th>{{ 'Ticket Code' | translate }}</th>
+                      </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-serial let-i="rowIndex">
+                      <tr>
+                        <td>{{ i + 1 }}</td>
+                        <td>{{ serial.ticketCode }}</td>
+                      </tr>
+                    </ng-template>
+                  </p-table>
+                  <div class="mt-2">
+                    <p-button
+                      label="{{ 'Clear' | translate }}"
+                      icon="pi pi-times"
+                      severity="secondary"
+                      [text]="true"
+                      (onClick)="clearExcelUpload()"
+                    ></p-button>
+                  </div>
+                </p-panel>
+              </div>
+
+              <div class="col-12 flex gap-2">
+                <p-button
+                  [label]="editingTicketIndex >= 0 ? ('Update Ticket' | translate) : ('Add to List' | translate)"
+                  [icon]="editingTicketIndex >= 0 ? 'pi pi-check' : 'pi pi-plus'"
+                  (onClick)="addTicket()"
+                  [disabled]="ticketsForm.invalid"
+                ></p-button>
+                <p-button
+                  *ngIf="editingTicketIndex >= 0"
+                  label="{{ 'Cancel' | translate }}"
+                  icon="pi pi-times"
+                  severity="secondary"
+                  (onClick)="cancelTicketEdit()"
+                ></p-button>
+              </div>
+
+              <!-- Tickets List with Row Expansion -->
+              <div class="col-12 mt-3" *ngIf="ticketsList.length > 0">
+                <p-table [value]="ticketsList" dataKey="ticketType" styleClass="p-datatable-sm">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th style="width: 3rem"></th>
+                      <th>{{ 'Ticket Type' | translate }}</th>
+                      <th>{{ 'Description' | translate }}</th>
+                      <th>{{ 'Price' | translate }}</th>
+                      <th>{{ 'Quantity' | translate }}</th>
+                      <th>{{ 'Has Serial' | translate }}</th>
+                      <th>{{ 'Active' | translate }}</th>
+                      <th>{{ 'Actions' | translate }}</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-ticket let-i="rowIndex" let-expanded="expanded">
+                    <tr>
+                      <td>
+                        <p-button
+                          *ngIf="ticket.hasSerialNumber && ticket.excelData?.length > 0"
+                          type="button"
+                          pRipple
+                          [pRowToggler]="ticket"
+                          [text]="true"
+                          [rounded]="true"
+                          [plain]="true"
+                          [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                        ></p-button>
+                      </td>
+                      <td>{{ ticket.ticketType }}</td>
+                      <td>{{ ticket.description }}</td>
+                      <td>{{ ticket.price }}</td>
+                      <td>{{ ticket.availableQuantity }}</td>
+                      <td>
+                        <i class="pi" [ngClass]="ticket.hasSerialNumber ? 'pi-check text-green-500' : 'pi-times text-gray-400'"></i>
+                      </td>
+                      <td>
+                        <i class="pi" [ngClass]="ticket.isActive ? 'pi-check text-green-500' : 'pi-times text-red-500'"></i>
+                      </td>
+                      <td>
+                        <p-button
+                          icon="pi pi-pencil"
+                          severity="info"
+                          [text]="true"
+                          (onClick)="editTicket(i)"
+                          pTooltip="{{ 'Edit' | translate }}"
+                          tooltipPosition="top"
+                        ></p-button>
+                        <p-button
+                          *ngIf="ticket.id"
+                          icon="pi pi-save"
+                          severity="success"
+                          [text]="true"
+                          (onClick)="saveIndividualTicket(i)"
+                          pTooltip="{{ 'Save to Server' | translate }}"
+                          tooltipPosition="top"
+                          [loading]="isLoading"
+                        ></p-button>
+                        <p-button
+                          icon="pi pi-trash"
+                          severity="danger"
+                          [text]="true"
+                          (onClick)="removeTicket(i)"
+                          pTooltip="{{ 'Delete' | translate }}"
+                          tooltipPosition="top"
+                        ></p-button>
+                      </td>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="rowexpansion" let-ticket>
+                    <tr>
+                      <td colspan="8">
+                        <div class="p-3">
+                          <h5>{{ 'Serial Numbers' | translate }} ({{ ticket.excelData?.length || 0 }})</h5>
+                          <p-table [value]="ticket.excelData" [rows]="10" [paginator]="true" styleClass="p-datatable-sm">
+                            <ng-template pTemplate="header">
+                              <tr>
+                                <th>#</th>
+                                <th>{{ 'Ticket Code' | translate }}</th>
+                              </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-serial let-idx="rowIndex">
+                              <tr>
+                                <td>{{ idx + 1 }}</td>
+                                <td>{{ serial.ticketCode || serial.serialNumber }}</td>
+                              </tr>
+                            </ng-template>
+                          </p-table>
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            </div>
+
+            <div class="buttons mt-3 text-end">
+              <p-button label="{{ 'Previous' | translate }}" class="mx-1" severity="secondary" (onClick)="prevCallback.emit()"></p-button>
+
+              <!-- Next button for Scheduled type -->
+              <p-button
+                *ngIf="isScheduledOuting"
+                label="{{ 'Next' | translate }}"
+                class="mx-1"
+                severity="primary"
+                [loading]="isLoading"
+                [disabled]="isLoading"
+                (onClick)="onNextTickets(nextCallback)"
+              ></p-button>
+
+              <!-- Finish button for Normal type -->
+              <p-button
+                *ngIf="!isScheduledOuting"
+                label="{{ 'Finish' | translate }}"
+                class="mx-1"
+                severity="success"
+                [loading]="isLoading"
+                [disabled]="isLoading"
+                (onClick)="onFinishNormal()"
+              ></p-button>
+            </div>
+          </form>
+
+          <p-toast></p-toast>
+        </ng-template>
+      </p-stepperPanel>
+
+      <!-- Step 5: Schedules - Only shown for Scheduled type -->
+      <p-stepperPanel [header]="'Schedules' | translate" *ngIf="isScheduledOuting">
+        <ng-template pTemplate="content" let-prevCallback="prevCallback">
+          <form class="form-field" [formGroup]="schedulesForm">
+            <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+              <div class="col-12 mb-3">
+                <h5>{{ 'Manage Outing Schedules' | translate }}</h5>
+              </div>
+
+              <div class="field col-12 col-md-4">
+                <label>{{ 'Day of Week' | translate }}</label>
+                <p-multiSelect
+                  formControlName="dayOfWeek"
+                  [options]="availableDays"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="{{ 'Select Days' | translate }}"
+                  styleClass="w-full"
+                  emptyMessage="{{ 'No days available' | translate }}"
+                  display="chip"
+                ></p-multiSelect>
+              </div>
+
+              <div class="field col-12 col-md-4">
+                <label>{{ 'Schedule Type' | translate }}</label>
+                <p-dropdown
+                  formControlName="schedualType"
+                  [options]="[
+                    { label: 'Specific', value: SchedualType.Spacific },
+                    { label: 'Interval', value: SchedualType.Interval }
+                  ]"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="{{ 'Select Type' | translate }}"
+                  styleClass="w-full"
+                ></p-dropdown>
+              </div>
+
+              <div class="field col-12 col-md-4"></div>
+
+              <div class="field col-12 col-md-6">
+                <label>{{ 'Valid From' | translate }}</label>
+                <p-calendar formControlName="validFrom" dateFormat="yy-mm-dd"></p-calendar>
+              </div>
+
+              <div class="field col-12 col-md-6">
+                <label>{{ 'Valid To' | translate }}</label>
+                <p-calendar formControlName="validTo" dateFormat="yy-mm-dd"></p-calendar>
+              </div>
+
+              <!-- Time Slots Management -->
+              <div class="col-12">
+                <p class="font-bold mb-2">{{ 'Time Slots' | translate }}</p>
+                <div class="formgrid grid p-2 surface-50 border-round">
+                  <div class="field col-12 col-md-5">
+                    <label>{{ 'Start Time' | translate }}</label>
+                    <p-calendar
+                      formControlName="startTime"
+                      [timeOnly]="true"
+                      [hourFormat]="'12'"
+                      dataType="string"
+                      inputId="starttime"
+                    ></p-calendar>
+                  </div>
+
+                  <div class="field col-12 col-md-5">
+                    <label>{{ 'End Time' | translate }}</label>
+                    <p-calendar
+                      formControlName="endTime"
+                      [timeOnly]="true"
+                      [hourFormat]="'12'"
+                      dataType="string"
+                      inputId="endtime"
+                    ></p-calendar>
+                  </div>
+
+                  <div class="field col-12 col-md-2 flex align-items-end">
+                    <p-button
+                      icon="pi pi-plus"
+                      label="{{ 'Add Time Slot' | translate }}"
+                      (onClick)="addTimeSlot()"
+                      styleClass="p-button-outlined"
+                      [disabled]="!schedulesForm.get('startTime')?.value || !schedulesForm.get('endTime')?.value"
+                    ></p-button>
+                  </div>
+
+                  <!-- Temp Times Display -->
+                  <div class="col-12" *ngIf="tempTimeSlots.length > 0">
+                    <div class="flex flex-wrap gap-2">
+                      <span *ngFor="let time of tempTimeSlots; let i = index" class="p-tag p-tag-info text-base px-3 py-1">
+                        {{ time.startTime }} - {{ time.endTime }}
+                        <i class="pi pi-times ml-2 cursor-pointer" (click)="removeTimeSlot(i)"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 mt-3">
+                <p-button
+                  label="{{ 'Add Schedule' | translate }}"
+                  icon="pi pi-plus"
+                  (onClick)="addSchedule()"
+                  [disabled]="schedulesForm.invalid"
+                ></p-button>
+              </div>
+
+              <div class="col-12 mt-3" *ngIf="schedulesList.length > 0">
+                <p-table [value]="schedulesList" styleClass="p-datatable-sm" [rowTrackBy]="trackByFn">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>{{ 'Day' | translate }}</th>
+                      <th>{{ 'Type' | translate }}</th>
+                      <th>{{ 'Times' | translate }}</th>
+                      <th>{{ 'Validity' | translate }}</th>
+                      <th>{{ 'Actions' | translate }}</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-schedule let-i="rowIndex">
+                    <tr>
+                      <td>
+                        <div class="flex flex-wrap gap-1">
+                          <span *ngFor="let day of schedule.dayOfWeek" class="p-tag p-tag-secondary">
+                            <ng-container [ngSwitch]="day">
+                              <span *ngSwitchCase="0">{{ 'Sun' | translate }}</span>
+                              <span *ngSwitchCase="1">{{ 'Mon' | translate }}</span>
+                              <span *ngSwitchCase="2">{{ 'Tue' | translate }}</span>
+                              <span *ngSwitchCase="3">{{ 'Wed' | translate }}</span>
+                              <span *ngSwitchCase="4">{{ 'Thu' | translate }}</span>
+                              <span *ngSwitchCase="5">{{ 'Fri' | translate }}</span>
+                              <span *ngSwitchCase="6">{{ 'Sat' | translate }}</span>
+                            </ng-container>
+                          </span>
+                        </div>
+                      </td>
+                      <td>{{ schedule.schedualType === SchedualType.Spacific ? 'Specific' : 'Interval' }}</td>
+                      <td>
+                        <div *ngFor="let time of schedule.times">
+                          <span class="p-tag p-tag-info mr-1 mb-1">{{ time.startTime }} - {{ time.endTime }}</span>
+                        </div>
+                      </td>
+                      <td>
+                        {{ schedule.validFrom | date: 'yyyy-MM-dd' }} {{ 'to' | translate }} {{ schedule.validTo | date: 'yyyy-MM-dd' }}
+                      </td>
+                      <td>
+                        <p-button icon="pi pi-trash" severity="danger" [text]="true" (onClick)="removeSchedule(i)"></p-button>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            </div>
+
+            <div class="buttons mt-3 text-end">
+              <p-button label="{{ 'Previous' | translate }}" class="mx-1" severity="secondary" (onClick)="prevCallback.emit()"></p-button>
+              <p-button
+                label="{{ 'Finish' | translate }}"
+                class="mx-1"
+                severity="success"
+                [loading]="isLoading"
+                [disabled]="isLoading"
+                (onClick)="onNextSchedules()"
+              ></p-button>
+            </div>
+          </form>
+          <p-toast></p-toast>
+        </ng-template>
+      </p-stepperPanel>
+    </p-stepper>
+  </div>
+</div>
+
+<p-toast />

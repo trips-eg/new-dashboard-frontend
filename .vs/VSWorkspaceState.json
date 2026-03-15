@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\app",
+    "\\src\\app\\demo",
+    "\\src\\app\\shared",
+    "\\src\\app\\shared\\tables-booking-info",
+    "\\src\\app\\shared\\tables-booking-info\\manasik-booking-info",
+    "\\src\\app\\shared\\tables-booking-info\\outing-booking-info",
+    "\\src\\app\\shared\\tables-booking-info\\room-booking-info",
+    "\\src\\app\\shared\\tables-booking-info\\travel-booking-info"
+  ],
+  "PreviewInSolutionExplorer": false
+}

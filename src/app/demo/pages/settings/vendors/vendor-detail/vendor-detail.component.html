@@ -1,0 +1,938 @@
+<div class="store-overview p-4">
+  <!-- Store Header -->
+  <div class="p-card store-banner p-5 mb-4" *ngIf="CompanyId || vendorId">
+    <div class="grid align-items-center">
+      <div class="col-8" style="z-index: 3">
+        <div class="flex align-items-center">
+          <img [src]="imgUrl ?? 'https://placehold.co/600x400?text=No+Image'" alt="Store Banner" class="store-logo border-round mr-3" />
+          <div>
+            <h2 class="mb-1 text-white">{{ VendorData.name }}</h2>
+            <p class="mb-2 text-white">
+              {{ VendorData.description }}
+            </p>
+            <div class="flex align-items-center text-white">
+              <i class="pi pi-envelope mr-2 info"></i>
+              {{ VendorData.email }}
+              <i class="pi pi-phone ml-4 mr-2 info"></i>
+              {{ VendorData.phone }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="col-4 text-right" style="height: 165px" *ngIf="!isVendor()">
+        <p-button
+          [label]="'payments' | translate"
+          pTooltip="archive payments"
+          tooltipPosition="bottom"
+          icon="pi pi-pen-to-square"
+          class="p-main"
+          (onClick)="openPaymentsForm()"
+        ></p-button>
+      </div> -->
+    </div>
+  </div>
+
+  <!-- vendor Statistics -->
+  <div class="grid mb-4">
+    <div class="col-12 col-md-4">
+      <p-card class="stat">
+        <div class="flex align-items-center justify-content-between">
+          <div>
+            <h4>{{ 'Total Trip Reservation' | translate }}</h4>
+
+            <h4 class="text-success">
+              {{ VendorStatistics?.totalTripReservation }}
+            </h4>
+          </div>
+          <i class="pi pi-wallet text-orange-500 text-4xl"></i>
+        </div>
+      </p-card>
+    </div>
+    <div class="col-12 col-md-4">
+      <p-card class="stat">
+        <div class="flex align-items-center justify-content-between">
+          <div>
+            <h4>{{ 'Total Room Reservation' | translate }}</h4>
+
+            <h4 class="text-success">
+              {{ VendorStatistics?.totalRoomReservation }}
+            </h4>
+          </div>
+          <i class="pi pi-dollar text-green-500 text-4xl"></i>
+        </div>
+      </p-card>
+    </div>
+    <div class="col-12 col-md-4">
+      <p-card class="stat">
+        <div class="flex align-items-center justify-content-between">
+          <div>
+            <h4>{{ 'Total Vendor Income' | translate }}</h4>
+
+            <h4 class="text-success">
+              {{ VendorStatistics?.totalVendorIncome }}
+            </h4>
+          </div>
+          <i class="pi pi-users text-purple-500 text-4xl"></i>
+        </div>
+      </p-card>
+    </div>
+    <!-- Outing Reservation (TODO: backend) -->
+    <div class="col-12 col-md-4" *ngIf="isOutingVendor">
+      <p-card class="stat">
+        <div class="flex align-items-center justify-content-between">
+          <div>
+            <h4>
+              {{ 'Total Outing Reservation' | translate }}
+              <i
+                class="pi pi-exclamation-triangle text-orange-500 text-sm ml-1"
+                pTooltip="Backend needs to return this value in GetDashboardInfo"
+                tooltipPosition="top"
+              ></i>
+            </h4>
+
+            <h4 class="text-success">
+              {{ VendorStatistics?.totalOutingReservation ?? '—' }}
+            </h4>
+          </div>
+          <i class="pi pi-compass text-cyan-500 text-4xl"></i>
+        </div>
+      </p-card>
+    </div>
+    <!-- Hajj Reservation (TODO: backend) -->
+    <div class="col-12 col-md-4" *ngIf="isManasikVendor">
+      <p-card class="stat">
+        <div class="flex align-items-center justify-content-between">
+          <div>
+            <h4>
+              {{ 'Total Hajj Reservation' | translate }}
+              <i
+                class="pi pi-exclamation-triangle text-orange-500 text-sm ml-1"
+                pTooltip="Backend needs to return this value in GetDashboardInfo"
+                tooltipPosition="top"
+              ></i>
+            </h4>
+
+            <h4 class="text-success">
+              {{ VendorStatistics?.totalHajjReservation ?? '—' }}
+            </h4>
+          </div>
+          <i class="pi pi-moon text-indigo-500 text-4xl"></i>
+        </div>
+      </p-card>
+    </div>
+    <div class="col-12 col-md-4" *ngIf="VendorData.id">
+      <p-card class="stat">
+        <div class="flex align-items-center justify-content-between">
+          <div>
+            <h4>{{ 'Commission' | translate }}</h4>
+            <h4>
+              <small class="text-success text-sm">{{ 'Hotel' | translate }} :</small>
+              {{ VendorData?.hotelCommissionRate }} %
+            </h4>
+            <h4>
+              <small class="text-warning text-sm">{{ 'Trip' | translate }} :</small>
+              {{ VendorData?.travelCommissionRate }} %
+            </h4>
+            <h4 *ngIf="isOutingVendor">
+              <small class="text-cyan-500 text-sm">{{ 'Outing' | translate }} :</small>
+              {{ VendorData?.outingCommissionRate ?? '—' }} %
+              <i
+                *ngIf="!VendorData?.outingCommissionRate"
+                class="pi pi-exclamation-triangle text-orange-500 text-xs ml-1"
+                pTooltip="Backend needs to return this field"
+                tooltipPosition="top"
+              ></i>
+            </h4>
+            <h4 *ngIf="isManasikVendor">
+              <small class="text-indigo-500 text-sm">{{ 'Hajj' | translate }} :</small>
+              {{ VendorData?.hajjCommissionRate ?? '—' }} %
+              <i
+                *ngIf="!VendorData?.hajjCommissionRate"
+                class="pi pi-exclamation-triangle text-orange-500 text-xs ml-1"
+                pTooltip="Backend needs to return this field"
+                tooltipPosition="top"
+              ></i>
+            </h4>
+          </div>
+          <i class="pi pi-chart-line text-blue-500 text-4xl"></i>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- <div class="col-12 col-md-4">
+      <p-card class="stat">
+        <div class="flex align-items-center justify-content-between">
+          <div>
+            <h4>{{ 'Total payed' | translate }}</h4>
+
+            <p class="text-success">
+              {{ VendorStatistics?.totalPayed }}
+            </p>
+          </div>
+          <i class="pi pi-users text-purple-500 text-4xl"></i>
+        </div>
+      </p-card>
+    </div> -->
+    <div class="col-12 col-md-4" *ngIf="!isVendor()">
+      <p-card class="stat">
+        <div class="flex align-items-center justify-content-between">
+          <div>
+            <h4>{{ 'Total Customers' | translate }}</h4>
+
+            <p class="text-success">
+              {{ VendorStatistics?.customerCount }}
+            </p>
+          </div>
+          <i class="pi pi-users text-purple-500 text-4xl"></i>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- store Order status Section -->
+  <!--
+  <div class="card p-3">
+    <div class="card-header flex align-items-center justify-content-between py-3 mb-4">
+      <h2>{{ 'Orders' | translate }}</h2>
+      <div class="flex align-items-center justify-content-between">
+        <h3 class="mx-3 text-blue-600 d-inline-block">
+          {{ 'total orders' | translate }} :
+          <strong class="text-gray-500">{{ 122 }}</strong>
+        </h3>
+        <h3 class="text-green-600 d-inline-block">
+          {{ 'Sales' | translate }}:
+          <strong class="text-gray-500">{{ 333 | number: '1.2-2' }}</strong>
+          $
+        </h3>
+      </div>
+    </div>
+
+    <div class="grid mb-4 order-state">
+
+
+      <div class="col-12 col-md-3">
+        <p-card class="order-status-card">
+          <div class="flex align-items-center gap-2 mb-2">
+            <i class="pi pi-truck text-main text-2xl"></i>
+            <span class="fw-bold text-gray-400">{{ 'Transferred' | translate }}</span>
+          </div>
+          <div class="flex align-items-center justify-content-between">
+            <span class="font-bold text-2xl">{{ 888 }}</span>
+            <span class="text-success font-medium">
+              {{ 'sales' | translate }} : {{ 888 | number: '1.2-2' }}
+              $
+            </span>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-12 col-md-3">
+        <p-card class="order-status-card">
+          <div class="flex align-items-center gap-2 mb-2">
+            <i class="pi pi-money-bill text-main text-2xl"></i>
+            <span class="fw-bold text-gray-400">{{ 'Due' | translate }}</span>
+          </div>
+          <div class="flex align-items-center justify-content-between">
+            <span class="font-bold text-2xl">{{ 80 }}</span>
+            <span class="text-success font-medium">
+              {{ 'sales' | translate }} : {{ 888 | number: '1.2-2' }}
+              $
+            </span>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-12 col-md-3">
+        <p-card class="order-status-card">
+          <div class="flex align-items-center gap-2 mb-2">
+            <i class="pi pi-shopping-cart text-main text-2xl"></i>
+            <span class="fw-bold text-gray-400">{{ 'Pending' | translate }}</span>
+          </div>
+          <div class="flex align-items-center justify-content-between">
+            <span class="font-bold text-2xl">{{ 666 }}</span>
+            <span class="text-danger font-medium">
+              {{ 'sales' | translate }} : {{ 666 | number: '1.2-2' }}
+              $
+            </span>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-12 col-md-3">
+        <p-card class="order-status-card">
+          <div class="flex align-items-center gap-2 mb-2">
+            <i class="pi pi-shopping-bag text-main text-2xl"></i>
+            <span class="fw-bold text-gray-400">{{ 'Not Completed' | translate }}</span>
+          </div>
+          <div class="flex align-items-center justify-content-between">
+            <span class="font-bold text-2xl">{{ 4444 }}</span>
+            <span class="text-danger font-medium">
+              {{ 'sales' | translate }} : {{ 222 | number: '1.2-2' }}
+              $
+            </span>
+          </div>
+        </p-card>
+      </div>
+    </div>
+  </div> -->
+  <div class="mb-4">
+    <p-panel header="{{ 'Statistics details' | translate }}" [toggleable]="true" class="mt-4">
+      <div class="col-md-12">
+        <p-toolbar styleClass="mb-4 gap-2">
+          <ng-template pTemplate="left">
+            <form [formGroup]="vendorSectorStatisticsForm" (ngSubmit)="onSubmitvendorSectorStatisticsForm()" class="w-full">
+              <div class="grid align-items-end">
+                <!-- From Date -->
+                <div class="field col-12 col-md-4 mb-0">
+                  <label for="from">{{ 'search from' | translate }}</label>
+                  <p-calendar
+                    id="from"
+                    formControlName="from"
+                    showIcon="true"
+                    dateFormat="dd-mm-yy"
+                    [iconDisplay]="'input'"
+                    class="w-full"
+                  />
+                  <small
+                    class="text-danger d-block"
+                    style="min-height: 1.25rem"
+                    *ngIf="
+                      vendorSectorStatisticsForm.controls['from'].invalid &&
+                      (vendorSectorStatisticsForm.controls['from'].dirty || vendorSectorStatisticsForm.controls['from'].touched)
+                    "
+                  >
+                    {{ 'Please select date' | translate }}
+                  </small>
+                  <!-- حتى لو الرسالة مش ظاهرة، min-height يضمن مساحة ثابتة -->
+                  <small
+                    *ngIf="
+                      !(
+                        vendorSectorStatisticsForm.controls['from'].invalid &&
+                        (vendorSectorStatisticsForm.controls['from'].dirty || vendorSectorStatisticsForm.controls['from'].touched)
+                      )
+                    "
+                    style="display: block; min-height: 1.25rem"
+                  ></small>
+                </div>
+
+                <!-- To Date -->
+                <div class="field col-12 col-md-4 mb-0">
+                  <label for="to">{{ 'search To' | translate }}</label>
+                  <p-calendar id="to" formControlName="to" showIcon="true" dateFormat="dd-mm-yy" [iconDisplay]="'input'" class="w-full" />
+                  <small
+                    class="text-danger d-block"
+                    style="min-height: 1.25rem"
+                    *ngIf="
+                      vendorSectorStatisticsForm.controls['to'].invalid &&
+                      (vendorSectorStatisticsForm.controls['to'].dirty || vendorSectorStatisticsForm.controls['to'].touched)
+                    "
+                  >
+                    {{ 'Please select date' | translate }}
+                  </small>
+                  <small
+                    *ngIf="
+                      !(
+                        vendorSectorStatisticsForm.controls['to'].invalid &&
+                        (vendorSectorStatisticsForm.controls['to'].dirty || vendorSectorStatisticsForm.controls['to'].touched)
+                      )
+                    "
+                    style="display: block; min-height: 1.25rem"
+                  ></small>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="field col-12 col-md-4 mb-4">
+                  <p-button label="{{ 'search' | translate }}" icon="pi pi-search" type="submit" class="w-full" />
+                </div>
+              </div>
+            </form>
+          </ng-template>
+        </p-toolbar>
+      </div>
+      <p-tabView>
+        <!--  Travel -->
+        <p-tabPanel [header]="'Travel' | translate" *ngIf="isTravelVendor">
+          <ng-template pTemplate="content">
+            <div class="grid mb-4" *ngIf="!showNoDataMessage && VendorTravelStatistics; else noData">
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Reservations' | translate }}</h4>
+
+                      <h4 class="text-success">
+                        {{ VendorTravelStatistics?.totalReservations }}
+                      </h4>
+                    </div>
+                    <i class="pi pi-wallet text-orange-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'totalRevenue' | translate }}</h4>
+
+                      <h4 class="text-success">
+                        {{ VendorTravelStatistics?.totalRevenue }}
+                      </h4>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Vendor Profit' | translate }}</h4>
+
+                      <h4 class="text-success">
+                        {{ VendorTravelStatistics?.totalVendorProfit }}
+                      </h4>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Profit' | translate }}</h4>
+
+                      <p class="text-success">
+                        {{ VendorTravelStatistics?.totalProfit }}
+                      </p>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Sales Tax' | translate }}</h4>
+
+                      <p class="text-success">
+                        {{ VendorTravelStatistics?.totalSalesTax }}
+                      </p>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Coupons Value' | translate }}</h4>
+
+                      <p class="text-success">
+                        {{ VendorTravelStatistics?.totalCouponsValue }}
+                      </p>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total CommissionVat' | translate }}</h4>
+
+                      <p class="text-success">
+                        {{ VendorTravelStatistics?.totalCommissionVat }}
+                      </p>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #noData>
+            <div class="text-center py-5 text-600">
+              <i class="pi pi-info-circle text-orange-500 text-2xl mb-2"></i>
+              <p>{{ 'Please enter a date range to search' | translate }}</p>
+            </div>
+          </ng-template>
+        </p-tabPanel>
+
+        <!--  Room -->
+        <p-tabPanel [header]="'Room' | translate" *ngIf="isRoomlVendor">
+          <ng-template pTemplate="content">
+            <div class="grid mb-4" *ngIf="!showNoDataMessage && VendorTravelStatistics; else noData">
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Reservations' | translate }}</h4>
+
+                      <h4 class="text-success">
+                        {{ VendorRoomStatistics?.totalReservations }}
+                      </h4>
+                    </div>
+                    <i class="pi pi-wallet text-orange-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'totalRevenue' | translate }}</h4>
+
+                      <h4 class="text-success">
+                        {{ VendorRoomStatistics?.totalRevenue }}
+                      </h4>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Vendor Profit' | translate }}</h4>
+
+                      <h4 class="text-success">
+                        {{ VendorRoomStatistics?.totalVendorProfit }}
+                      </h4>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Profit' | translate }}</h4>
+
+                      <p class="text-success">
+                        {{ VendorRoomStatistics?.totalProfit }}
+                      </p>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Sales Tax' | translate }}</h4>
+
+                      <p class="text-success">
+                        {{ VendorRoomStatistics?.totalSalesTax }}
+                      </p>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Coupons Value' | translate }}</h4>
+
+                      <p class="text-success">
+                        {{ VendorRoomStatistics?.totalCouponsValue }}
+                      </p>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total CommissionVat' | translate }}</h4>
+
+                      <p class="text-success">
+                        {{ VendorRoomStatistics?.totalCommissionVat }}
+                      </p>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #noData>
+            <div class="text-center py-5 text-600">
+              <i class="pi pi-info-circle text-orange-500 text-2xl mb-2"></i>
+              <p>{{ 'Please enter a date range to search' | translate }}</p>
+            </div>
+          </ng-template>
+        </p-tabPanel>
+
+        <!--  Outing -->
+        <p-tabPanel [header]="'outing' | translate" *ngIf="isOutingVendor">
+          <ng-template pTemplate="content">
+            <div class="grid mb-4" *ngIf="!showNoDataMessage && VendorOutingStatistics; else noDataOuting">
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Reservations' | translate }}</h4>
+
+                      <h4 class="text-success">
+                        {{ VendorOutingStatistics?.totalReservations }}
+                      </h4>
+                    </div>
+                    <i class="pi pi-wallet text-orange-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'totalRevenue' | translate }}</h4>
+
+                      <h4 class="text-success">
+                        {{ VendorOutingStatistics?.totalRevenue }}
+                      </h4>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Vendor Profit' | translate }}</h4>
+
+                      <h4 class="text-success">
+                        {{ VendorOutingStatistics?.totalVendorProfit }}
+                      </h4>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Profit' | translate }}</h4>
+
+                      <p class="text-success">
+                        {{ VendorOutingStatistics?.totalProfit }}
+                      </p>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Sales Tax' | translate }}</h4>
+
+                      <p class="text-success">
+                        {{ VendorOutingStatistics?.totalSalesTax }}
+                      </p>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Coupons Value' | translate }}</h4>
+
+                      <p class="text-success">
+                        {{ VendorOutingStatistics?.totalCouponsValue }}
+                      </p>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total CommissionVat' | translate }}</h4>
+
+                      <p class="text-success">
+                        {{ VendorOutingStatistics?.totalCommissionVat }}
+                      </p>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #noDataOuting>
+            <div class="text-center py-5 text-600">
+              <i class="pi pi-info-circle text-orange-500 text-2xl mb-2"></i>
+              <p>{{ 'Please enter a date range to search' | translate }}</p>
+            </div>
+          </ng-template>
+        </p-tabPanel>
+
+        <!--  Hajj / Manasik -->
+        <p-tabPanel [header]="'manasik' | translate" *ngIf="isManasikVendor">
+          <ng-template pTemplate="content">
+            <div class="grid mb-4" *ngIf="!showNoDataMessage && VendorHajjStatistics; else noDataHajj">
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Reservations' | translate }}</h4>
+
+                      <h4 class="text-success">
+                        {{ VendorHajjStatistics?.totalReservations }}
+                      </h4>
+                    </div>
+                    <i class="pi pi-wallet text-orange-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'totalRevenue' | translate }}</h4>
+
+                      <h4 class="text-success">
+                        {{ VendorHajjStatistics?.totalRevenue }}
+                      </h4>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Vendor Profit' | translate }}</h4>
+
+                      <h4 class="text-success">
+                        {{ VendorHajjStatistics?.totalVendorProfit }}
+                      </h4>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Profit' | translate }}</h4>
+
+                      <p class="text-success">
+                        {{ VendorHajjStatistics?.totalProfit }}
+                      </p>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Sales Tax' | translate }}</h4>
+
+                      <p class="text-success">
+                        {{ VendorHajjStatistics?.totalSalesTax }}
+                      </p>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total Coupons Value' | translate }}</h4>
+
+                      <p class="text-success">
+                        {{ VendorHajjStatistics?.totalCouponsValue }}
+                      </p>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+              <div class="col-12 col-md-4">
+                <p-card class="stat">
+                  <div class="flex align-items-center justify-content-between">
+                    <div>
+                      <h4>{{ 'total CommissionVat' | translate }}</h4>
+
+                      <p class="text-success">
+                        {{ VendorHajjStatistics?.totalCommissionVat }}
+                      </p>
+                    </div>
+                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                  </div>
+                </p-card>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #noDataHajj>
+            <div class="text-center py-5 text-600">
+              <i class="pi pi-info-circle text-orange-500 text-2xl mb-2"></i>
+              <p>{{ 'Please enter a date range to search' | translate }}</p>
+            </div>
+          </ng-template>
+        </p-tabPanel>
+      </p-tabView>
+    </p-panel>
+  </div>
+  <div class="mb-4" *ngIf="CompanyId || vendorId">
+    <p-panel header="{{ 'Reservation History' | translate }}" [toggleable]="true" class="mt-4">
+      <div class="flex justify-end mb-3" *ngIf="!isVendor()">
+        <p-button
+          [label]="'payments' | translate"
+          pTooltip="archive payments"
+          tooltipPosition="bottom"
+          icon="pi pi-pen-to-square"
+          class="p-button-primary"
+          (onClick)="openPaymentsForm()"
+          [disabled]="!selectedItems || selectedItems.length === 0"
+        ></p-button>
+      </div>
+      <p-tabView>
+        <!--  Travel -->
+        <p-tabPanel [header]="'Travel' | translate" *ngIf="isTravelVendor">
+          <ng-template pTemplate="content">
+            <app-travel-booking-info
+              #travelsBookingsInfo
+              [totalRecords]="totalRecorsOfTravel"
+              [consumerTravelDetailReserved]="travelList"
+              (pageChange)="getVendorReservationsData($event, 'travel')"
+              (refundedSuccess)="getTravelReservationForVendor()"
+              (selectionChange)="onChildSelectionChange($event)"
+            />
+          </ng-template>
+        </p-tabPanel>
+
+        <!--  Room -->
+        <p-tabPanel [header]="'Room' | translate" *ngIf="isRoomlVendor">
+          <ng-template pTemplate="content">
+            <app-room-booking-info
+              #roomsBookingsInfo
+              [consumerRoomDetailReserved]="roomsList"
+              [totalRecords]="totalRecorsOfRooms"
+              (pageChange)="getVendorReservationsData($event, 'room')"
+              (refundedSuccess)="getRoomReservationForVendor()"
+              (selectionChange)="onChildSelectionChange($event)"
+            />
+          </ng-template>
+        </p-tabPanel>
+        <!--  outing -->
+        <p-tabPanel [header]="'outing' | translate" *ngIf="isOutingVendor">
+          <ng-template pTemplate="content">
+            <app-outing-booking-info
+              [consumerOutingDetailReserved]="outingsList"
+              [totalRecords]="totalRecorsOfOutings"
+              [reservationUser]="VendorData"
+              (pageChange)="getVendorReservationsData($event, 'outing')"
+              (refundedSuccess)="getOutingReservationForVendor()"
+              (selectionChange)="onChildSelectionChange($event)"
+            ></app-outing-booking-info>
+          </ng-template>
+        </p-tabPanel>
+        <!--  manasik -->
+        <p-tabPanel [header]="'manasik' | translate" *ngIf="isManasikVendor">
+          <ng-template pTemplate="content">
+            <app-manasik-booking-info
+              [consumerHajjDetailReserved]="manasikList"
+              [totalRecords]="totalRecorsOfManasik"
+              [reservationUser]="VendorData"
+              (pageChange)="getVendorReservationsData($event, 'manasik')"
+              (refundedSuccess)="getManasikReservationForVendor()"
+              (selectionChange)="onChildSelectionChange($event)"
+            ></app-manasik-booking-info>
+          </ng-template>
+        </p-tabPanel>
+
+        <!-- no data-->
+        <!-- <p-tabPanel  header="{{ 'Info' | translate }}">
+          <ng-template pTemplate="content">
+            <div class="text-center text-gray-500 p-4">
+              {{ 'No reservation data found' | translate }}
+            </div>
+          </ng-template>
+        </p-tabPanel> -->
+      </p-tabView>
+    </p-panel>
+  </div>
+
+  <p-panel header="{{ 'payments History' | translate }}" [toggleable]="true" *ngIf="CompanyId || vendorId">
+    <app-payments-for-vendor-list [vendorId]="VendorData.id"></app-payments-for-vendor-list>
+  </p-panel>
+  <div class="mt-4" *ngIf="CompanyId || vendorId">
+    <p-panel header="{{ 'vendor fields' | translate }}" [toggleable]="true" *ngIf="CompanyId || vendorId">
+      <p-tabView>
+        <!--  Travel -->
+        <p-tabPanel [header]="'Travel' | translate" *ngIf="isTravelVendor">
+          <ng-template pTemplate="content">
+            <app-travels-list *ngIf="VendorData?.id" [CompanyId]="VendorData.id" />
+          </ng-template>
+        </p-tabPanel>
+
+        <!--  Room -->
+        <p-tabPanel [header]="'Room' | translate" *ngIf="isRoomlVendor">
+          <ng-template pTemplate="content">
+            <app-room-list [CompanyId]="VendorData.id" />
+          </ng-template>
+        </p-tabPanel>
+        <!--  Outing -->
+        <p-tabPanel [header]="'Outing' | translate" *ngIf="isOutingVendor">
+          <ng-template pTemplate="content">
+            <app-outing-list [CompanyId]="VendorData.id" />
+          </ng-template>
+        </p-tabPanel>
+        <!-- manasik -->
+        <!-- hajj -->
+        <p-tabPanel [header]="'hajj' | translate" *ngIf="isManasikVendor">
+          <ng-template pTemplate="content">
+            <app-manasik-list [CompanyId]="VendorData.id" [type]="ManasikType.Hajj" />
+          </ng-template>
+        </p-tabPanel>
+
+        <!-- umrah -->
+        <p-tabPanel [header]="'umrah' | translate" *ngIf="isManasikVendor">
+          <ng-template pTemplate="content">
+            <app-manasik-list [CompanyId]="VendorData.id" [type]="ManasikType.Umrah" />
+          </ng-template>
+        </p-tabPanel>
+
+        <!-- no data-->
+        <!-- <p-tabPanel  header="{{ 'Info' | translate }}">
+          <ng-template pTemplate="content">
+            <div class="text-center text-gray-500 p-4">
+              {{ 'No reservation data found' | translate }}
+            </div>
+          </ng-template>
+        </p-tabPanel> -->
+      </p-tabView>
+    </p-panel>
+  </div>
+</div>

@@ -1,0 +1,9 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'vendors' | translate"
+    [actionButtons]="[{ label: 'Add', action: 'add', icon: 'pi pi-plus', class: 'btn-primary' }]"
+    (actionClicked)="handleAction($event)"
+  ></sub-header>
+
+  <app-vendors-list></app-vendors-list>
+</div>

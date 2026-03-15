@@ -1,0 +1,9 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'room groups'"
+    [actionButtons]="[{ label: 'Add', action: 'add', icon: 'pi pi-plus', class: 'btn-primary' }]"
+    (actionClicked)="handleAction($event)"
+  ></sub-header>
+
+  <app-room-group-list></app-room-group-list>
+</div>

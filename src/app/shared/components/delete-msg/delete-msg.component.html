@@ -1,0 +1,9 @@
+<div class="py-5 mx-auto w-75">
+  <div class="d-flex flex-column gap-2 mb-4">
+    <p>{{'Are you sure you want to delete this record ?' | translate}} </p>
+</div>
+</div>
+<p-footer class="d-flex justify-content-between p-3 bg-light">
+  <button type="button" class="btn btn-warning mx-0" (click)="cancel()">{{'No' | translate}} </button>
+  <button type="button" class="btn btn-success mx-0" (click)="save()"><i class="feather icon-check"></i> {{'Yes' | translate}} </button>
+</p-footer>

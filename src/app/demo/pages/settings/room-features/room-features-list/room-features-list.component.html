@@ -1,0 +1,75 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+<div class="card">
+  <p-toolbar>
+    <ng-template pTemplate="right">
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" [(ngModel)]="searchTerm" (input)="onSearch()" [placeholder]="'search' | translate" />
+      </span>
+    </ng-template>
+  </p-toolbar>
+  <p-table
+    #dt
+    [value]="roomFeaturies"
+    [paginator]="true"
+    [rows]="rows"
+    [lazy]="true"
+    (onLazyLoad)="loadRoomFeatures($event)"
+    [totalRecords]="totalRecords"
+    [rowsPerPageOptions]="[5, 10]"
+    [showCurrentPageReport]="true"
+    [loading]="loading"
+    [currentPageReportTemplate]="'showingEntries' | translate"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 35%" pSortableColumn="name">
+          {{ 'room features' | translate }}
+          <p-sortIcon field="name"></p-sortIcon>
+        </th>
+        <th style="width: 35%">{{ 'action' | translate }}</th>
+        <!-- <th style="width: 30%">Action</th> -->
+      </tr>
+      <tr>
+        <th>
+          <input
+            pInputText
+            type="text"
+            (input)="dt.filter($any($event.target).value, 'name', 'contains')"
+            [placeholder]="'Search by Name' | translate"
+          />
+        </th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-roomFeature>
+      <tr>
+        <td>{{ roomFeature.name }}</td>
+
+        <td>
+          <div class="flex gap-1 justify-content-center">
+            <p-button
+              [raised]="true"
+              icon="pi pi-pencil"
+              severity="success"
+              [rounded]="true"
+              (onClick)="handleEdit(roomFeature.id, roomFeature.name)"
+            ></p-button>
+            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" (onClick)="handleDelete(roomFeature.id)"></p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6">
+          <div class="d-flex justify-content-center align-items-center py-3 w-100">
+            <i class="pi pi-info-circle" style="font-size: 1rem; color: gray"></i>
+            <span class="ms-2" style="color: gray">{{ 'No Data found' | translate }}</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

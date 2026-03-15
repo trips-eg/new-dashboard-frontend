@@ -1,0 +1,129 @@
+.title {
+  font-weight: bold;
+  color: #333;
+}
+
+.scanner-wrapper {
+  overflow: hidden;
+  border-radius: 8px;
+
+  ::ng-deep ngx-scanner-qrcode {
+    max-width: 100%;
+  }
+}
+
+.history-table {
+  margin-top: 20px;
+}
+
+// Loading overlay
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  color: white;
+
+  p {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+  }
+}
+
+// Ticket Details Dialog
+.ticket-details {
+  .card {
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .card-title {
+      color: #495057;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 10px;
+
+      i {
+        color: #007bff;
+      }
+    }
+  }
+
+  .info-row {
+    label {
+      display: block;
+      color: #6c757d;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: #212529;
+      white-space: pre-line;
+    }
+  }
+
+  .info-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+
+    label {
+      margin: 0;
+      color: #6c757d;
+    }
+
+    span {
+      color: #212529;
+      font-weight: 500;
+    }
+
+    i {
+      font-size: 1.2rem;
+    }
+  }
+
+  .serial-numbers-section {
+    h6 {
+      color: #495057;
+
+      i {
+        color: #6610f2;
+      }
+    }
+
+    .serial-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+
+      .badge {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.75rem;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .alert {
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+
+    i {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+// Serial Number Text in Table
+.serial-number-text {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.95rem;
+}

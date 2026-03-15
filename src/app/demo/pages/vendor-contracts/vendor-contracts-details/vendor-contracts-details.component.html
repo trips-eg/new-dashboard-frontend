@@ -1,0 +1,90 @@
+<div class="main">
+  <sub-header [mainHeader]="'Vendor Contracts' | translate"></sub-header>
+
+  <p-tabView>
+    <p-tabPanel [header]="'Basic Information' | translate">
+      <div class="grid text-sm">
+        <div class="col-12 md:col-6">
+          <strong>{{ 'Name' | translate }}:</strong>
+          {{ vendor?.name }}
+        </div>
+        <div class="col-12 md:col-6">
+          <strong>{{ 'Specialty' | translate }}:</strong>
+          {{ vendor?.specialty }}
+        </div>
+        <div class="col-12 md:col-6">
+          <strong>{{ 'Commercial Number' | translate }}:</strong>
+          {{ vendor?.commercialNumber }}
+        </div>
+        <div class="col-12 md:col-6">
+          <strong>{{ 'Status' | translate }}:</strong>
+          {{ getStatusName(vendor?.vendorStatus)}}
+        </div>
+      </div>
+    </p-tabPanel>
+
+    <p-tabPanel [header]="'Contact Information' | translate">
+      <p>
+        <strong>{{ 'Email' | translate }}:</strong>
+        {{ vendor?.email }}
+      </p>
+      <p>
+        <strong>{{ 'Phone' | translate }}:</strong>
+        {{ vendor?.phone }}
+      </p>
+      <p>
+        <strong>{{ 'Address' | translate }}:</strong>
+        {{ vendor?.addresss }}
+      </p>
+    </p-tabPanel>
+
+   <p-tabPanel [header]="'Documents' | translate">
+  <div *ngIf="vendor?.vendorContractDocuments?.length > 0; else noDocs">
+    <div class="grid">
+      <div class="col-12 col-md-2" *ngFor="let doc of vendor?.vendorContractDocuments">
+        <p-image
+          [src]="getFullUrl(doc.url)"
+          preview
+          styleClass="w-full border-round shadow-1"
+          width="100%">
+        </p-image>
+        <!-- <p class="text-center mt-2 text-sm">{{ 'Document Type' | translate }} {{ doc.documentType }}</p> -->
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noDocs>
+    <p class="text-center text-500 py-4">
+      {{ 'No Documents Available' | translate }}
+    </p>
+  </ng-template>
+</p-tabPanel>
+
+    <p-tabPanel [header]="'Communication with the vendor' | translate">
+      <!-- Add Button -->
+      <div class="flex justify-content-end mb-3">
+        <button pButton [label]="'Add Description' | translate" icon="pi pi-plus" class="p-button-primary" (click)="openStatusDialog()"></button>
+      </div>
+
+      <!-- Timeline -->
+      <p-card [header]="'Descriptions History' | translate" styleClass="shadow-2 border-round mb-4">
+        <p-timeline [value]="vendor?.vendorContractDescriptions" align="alternate">
+          <ng-template pTemplate="marker" let-item>
+            <span class="flex align-items-center justify-content-center bg-primary text-white border-circle w-2rem h-2rem">
+              <i class="pi pi-comment"></i>
+            </span>
+          </ng-template>
+
+          <ng-template pTemplate="content" let-item>
+            <div class="p-3 surface-50 border-round shadow-1">
+              <p class="m-0 description-text">{{ item.description }}</p>
+              <small class="text-500 block mt-2">
+                {{ 'By' | translate }} {{ item.createdBy?.userName || ('Unknown' | translate) }} – {{ item.createDate | date: 'medium' }}
+              </small>
+            </div>
+          </ng-template>
+        </p-timeline>
+      </p-card>
+    </p-tabPanel>
+  </p-tabView>
+</div>

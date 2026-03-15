@@ -1,0 +1,65 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="customerId ? ('Edit Customer' | translate) : ('Add Customer' | translate)"
+    [mainSection]="'Customers' | translate"
+    [subSection]="customerId ? ('Edit' | translate) : ('Add' | translate)"
+  ></sub-header>
+
+  <div class="product-form shadow-3 p-4">
+    <!-- Discount Section -->
+
+    <div class="formgrid grid">
+      <div class="field col-12 col-md-6">
+        <label for="lastname2">
+          {{ 'Username' | translate }}
+          <small class="text-danger">*</small>
+        </label>
+        <input
+          id="lastname2"
+          type="text"
+          class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+        />
+        <small class="error">{{ 'This field is required' | translate }}</small>
+      </div>
+      <div class="field col-12 col-md-6">
+        <label for="lastname2">
+          {{ 'Email' | translate }}
+          <small class="text-danger">*</small>
+        </label>
+        <input
+          id="lastname2"
+          type="text"
+          class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+        />
+        <small class="error">{{ 'This field is required' | translate }}</small>
+      </div>
+      <div class="field col-12 col-md-6">
+        <label for="lastname2">
+          {{ 'Phone Number' | translate }}
+          <small class="text-danger">*</small>
+        </label>
+        <input
+          id="lastname2"
+          type="text"
+          class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"
+        />
+        <small class="error">{{ 'This field is required' | translate }}</small>
+      </div>
+      <div class="field col">
+        <label for="password">
+          {{ 'Password' | translate }}
+          <small class="text-danger">*</small>
+        </label>
+        <p-password #passwordField id="password" class="w-full" [toggleMask]="true" />
+        <!-- <input id="firstname2" type="text" class="text-base text-color surface-overlay p-2 border-1 border-solid surface-border border-round appearance-none outline-none focus:border-primary w-full"> -->
+        <small class="error">{{ 'This field is required' | translate }}</small>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="buttons mt-3 text-end">
+      <p-button label="{{ 'Cancel' | translate }}" class="mx-1" severity="secondary"></p-button>
+      <p-button label="{{ 'save' | translate }}" severity="success" icon="pi pi-save"></p-button>
+    </div>
+  </div>
+</div>

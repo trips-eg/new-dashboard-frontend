@@ -1,0 +1,9 @@
+<p-toast></p-toast>
+<div class="main">
+  <sub-header
+    [mainHeader]="'room tybe' | translate"
+    [actionButtons]="[{ label: 'Add', action: 'add', icon: 'pi pi-plus', class: 'btn-primary' }]"
+    (actionClicked)="handleAction($event)"
+  ></sub-header>
+<app-room-tybies-list></app-room-tybies-list>
+</div>

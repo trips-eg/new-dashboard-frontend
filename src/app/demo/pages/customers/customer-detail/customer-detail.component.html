@@ -1,0 +1,299 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'Customer Details' | translate"
+    [mainSection]="'Customers' | translate"
+    [subSection]="'Details' | translate"
+  ></sub-header>
+
+  <div class="card">
+    <!-- Hero Card -->
+    <div class="card hero-card mb-4">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <!-- Customer Image -->
+          <div class="col-12 col-md-auto text-center mb-3 mb-md-0">
+            <div class="customer-avatar-wrapper">
+              <img [src]="getAvatar(customer.imageUrl)" [alt]="customer.name" class="customer-avatar" referrerpolicy="no-referrer" />
+            </div>
+          </div>
+
+          <!-- Customer Info -->
+          <div class="col-12 col-md">
+            <h2 class="customer-name mb-2">{{ customer.name || 'N/A' }}</h2>
+            <p class="customer-username text-muted mb-3">
+              <i class="pi pi-at me-2"></i>
+              {{ customer.userName || 'N/A' }}
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+              <span class="badge" [ngClass]="customer.iActive ? 'bg-success' : 'bg-danger'">
+                <i class="pi" [ngClass]="customer.iActive ? 'pi-check-circle' : 'pi-times-circle'"></i>
+                {{ (customer.iActive ? 'Active' : 'Inactive') | translate }}
+              </span>
+              <!-- <span class="badge bg-info">
+                <i class="pi pi-calendar me-1"></i>
+                {{ 'Joined' | translate }}: {{ customer.createdDate | date:'mediumDate' }}
+              </span> -->
+            </div>
+          </div>
+
+          <!-- Wallet Balance -->
+          <div class="col-12 col-md-auto mt-3 mt-md-0">
+            <div class="wallet-balance-card">
+              <div class="wallet-icon">
+                <i class="pi pi-wallet"></i>
+              </div>
+              <div>
+                <p class="wallet-label mb-1">{{ 'Wallet Balance' | translate }}</p>
+                <h3 class="wallet-amount mb-0">{{ walletBalance | currency: 'EGP' }}</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Information Cards Grid -->
+    <div class="row g-3 mb-4">
+      <!-- Contact Information Card -->
+      <div class="col-12 col-lg-6">
+        <div class="card info-card h-100">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="pi pi-phone me-2"></i>
+              {{ 'Contact Information' | translate }}
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="info-item">
+              <div class="info-icon">
+                <i class="pi pi-envelope"></i>
+              </div>
+              <div class="info-content">
+                <label>{{ 'Email' | translate }}</label>
+                <p>{{ customer.email || 'N/A' }}</p>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon">
+                <i class="pi pi-mobile"></i>
+              </div>
+              <div class="info-content">
+                <label>{{ 'Phone Number' | translate }}</label>
+                <p>{{ customer.phoneNumber || 'N/A' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Personal Information Card -->
+      <div class="col-12 col-lg-6">
+        <div class="card info-card h-100">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="pi pi-user me-2"></i>
+              {{ 'Personal Information' | translate }}
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="info-item">
+              <div class="info-icon">
+                <i class="pi pi-users"></i>
+              </div>
+              <div class="info-content">
+                <label>{{ 'Gender' | translate }}</label>
+                <p>{{ customer.gender || 'N/A' }}</p>
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-icon">
+                <i class="pi pi-id-card"></i>
+              </div>
+              <div class="info-content">
+                <label>{{ 'Customer ID' | translate }}</label>
+                <p>#{{ customer.id }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transactions Tabs -->
+    <div class="card">
+      <div class="card-body p-0">
+        <p-tabView styleClass="custom-tabs">
+          <!-- Wallet Transactions Tab -->
+          <p-tabPanel [header]="'Wallet Transactions' | translate">
+            <p-table
+              [value]="transactions"
+              [paginator]="true"
+              [rows]="rows"
+              [first]="first"
+              [lazy]="true"
+              [loading]="isLoadingTransactions"
+              [totalRecords]="totalRecords"
+              [showCurrentPageReport]="true"
+              (onPage)="onPageChange($event)"
+              [currentPageReportTemplate]="'showingEntries' | translate"
+              [rowsPerPageOptions]="[10, 25, 50]"
+            >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>{{ 'Date' | translate }}</th>
+                  <th>{{ 'Type' | translate }}</th>
+                  <th>{{ 'Amount In' | translate }}</th>
+                  <th>{{ 'Amount Out' | translate }}</th>
+                  <th>{{ 'Balance' | translate }}</th>
+                  <th>{{ 'Reference' | translate }}</th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-transaction>
+                <tr>
+                  <td>{{ transaction.transactionDate | date: 'short' }}</td>
+                  <td>
+                    <span
+                      class="badge badge-sm"
+                      [ngClass]="{
+                        'bg-success': transaction.amountIn > 0,
+                        'bg-danger': transaction.amountOut > 0
+                      }"
+                    >
+                      {{ transaction.transactionTypeName }}
+                    </span>
+                  </td>
+                  <td>
+                    <span *ngIf="transaction.amountIn > 0" class="text-success fw-bold">+{{ transaction.amountIn | currency: 'EGP' }}</span>
+                    <span *ngIf="transaction.amountIn === 0">-</span>
+                  </td>
+                  <td>
+                    <span *ngIf="transaction.amountOut > 0" class="text-danger fw-bold">
+                      -{{ transaction.amountOut | currency: 'EGP' }}
+                    </span>
+                    <span *ngIf="transaction.amountOut === 0">-</span>
+                  </td>
+                  <td>
+                    <span class="fw-bold">
+                      {{ transaction.balanceAfterTransaction | currency: 'EGP' }}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      *ngIf="transaction.bookingRefernce; else noRef"
+                      class="text-primary fw-bold cursor-pointer text-decoration-underline"
+                      (click)="navigateToPaymentInfo(transaction.bookingRefernce)"
+                      role="button"
+                      [title]="'View payment details' | translate"
+                    >
+                      {{ transaction.bookingRefernce }}
+                    </span>
+                    <ng-template #noRef>-</ng-template>
+                  </td>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="6" class="text-center py-4">
+                    <i class="pi pi-info-circle me-2"></i>
+                    {{ 'No wallet transactions found' | translate }}
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </p-tabPanel>
+
+          <!-- Charge Transactions Tab -->
+          <p-tabPanel [header]="'Charge Transactions' | translate">
+            <p-table
+              [value]="chargeTransactions"
+              [paginator]="true"
+              [rows]="chargeRows"
+              [first]="chargeFirst"
+              [lazy]="true"
+              [loading]="isLoadingChargeTransactions"
+              [totalRecords]="chargeTotalRecords"
+              [showCurrentPageReport]="true"
+              (onPage)="onChargePageChange($event)"
+              [currentPageReportTemplate]="'showingEntries' | translate"
+              [rowsPerPageOptions]="[10, 25, 50]"
+            >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>{{ 'ID' | translate }}</th>
+                  <th>{{ 'Reference' | translate }}</th>
+                  <th>{{ 'Status' | translate }}</th>
+                  <th>{{ 'Amount to Pay' | translate }}</th>
+                  <th>{{ 'Client Payed' | translate }}</th>
+                  <th>{{ 'Total Tax' | translate }}</th>
+                  <th>{{ 'Opay Value' | translate }}</th>
+                  <th>{{ 'Opay Rate' | translate }}</th>
+                  <th>{{ 'Trips Expense' | translate }}</th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-transaction>
+                <tr>
+                  <td>{{ transaction.id }}</td>
+
+                  <td>
+                    <span class="font-monospace">{{ transaction.reference }}</span>
+                  </td>
+                  <td>
+                    <span class="badge badge-sm" [ngClass]="getStatusBadgeClass(transaction.sataus)">
+                      {{ getStatusText(transaction.sataus) | translate }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="fw-bold text-primary">
+                      {{ transaction.amountToPay | currency: 'EGP' }}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      class="fw-bold"
+                      [ngClass]="{
+                        'text-success': transaction.clientPayed >= transaction.amountToPay,
+                        'text-warning': transaction.clientPayed < transaction.amountToPay && transaction.clientPayed > 0,
+                        'text-danger': transaction.clientPayed === 0
+                      }"
+                    >
+                      {{ transaction.clientPayed | currency: 'EGP' }}
+                    </span>
+                  </td>
+                  <td>{{ transaction.totalTax | currency: 'EGP' }}</td>
+                  <td>{{ transaction.opayValue | currency: 'EGP' }}</td>
+                  <td>
+                    <span class="text-muted small">{{ transaction.opayRate }}% ({{ transaction.opayRateAmount | currency: 'EGP' }})</span>
+                  </td>
+                  <td>
+                    <span class="text-muted small">
+                      {{ transaction.tripsOperationExpenseRate }}% ({{ transaction.tripsOperationExpenseRateAmount | currency: 'EGP' }})
+                    </span>
+                  </td>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="9" class="text-center py-4">
+                    <i class="pi pi-info-circle me-2"></i>
+                    {{ 'No charge transactions found' | translate }}
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </p-tabPanel>
+
+          <!-- Emails Tab -->
+          <p-tabPanel [header]="'Emails' | translate">
+            <app-email-list [userId]="customerId!" [showSearch]="false"></app-email-list>
+          </p-tabPanel>
+        </p-tabView>
+      </div>
+    </div>
+
+    <!-- emails tab -->
+  </div>
+</div>

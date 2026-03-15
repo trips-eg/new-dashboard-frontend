@@ -1,0 +1,73 @@
+<div class="product-form p-4 mb-4">
+  <div class="form-field">
+    <form [formGroup]="countriesForm" (ngSubmit)="onSubmit()">
+      <h3 class="flex justify-content-between">
+        {{ 'add country' | translate }}
+        <!-- Always show "add" -->
+        <span><p-inputSwitch formControlName="status" /></span>
+      </h3>
+      <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+        <div class="field col-md-12">
+          <label for="">
+            {{ 'country name' | translate }}
+            <small *ngIf="countriesForm.invalid" class="text-danger">*</small>
+          </label>
+          <p-dropdown
+            [options]="countries"
+            formControlName="enName"
+            [filter]="true"
+            optionLabel="name"
+            placeholder="اختر الدولة"
+            appendTo="body"
+          >
+            <!-- العناصر -->
+            <ng-template let-country pTemplate="item">
+              <div class="flex align-items-center">
+                <img [src]="country.flag" alt="{{ country.name }}" width="20" class="mr-2" />
+                <span>{{ country.name }} ({{ country.dialCode }})</span>
+              </div>
+            </ng-template>
+
+            <!-- العنصر المختار -->
+            <ng-template let-country pTemplate="selectedItem">
+              <div class="flex align-items-center">
+                <img [src]="country.flag" alt="{{ country.name }}" width="20" class="mr-2" />
+                <span>{{ country.name }} ({{ country.dialCode }})</span>
+              </div>
+            </ng-template>
+          </p-dropdown>
+
+          <!-- رسالة الخطأ إذا لم يتم اختيار دولة -->
+          <small
+            class="error"
+            *ngIf="countriesForm.get('enName').errors && (countriesForm.get('enName').touched || countriesForm.get('enName').dirty)"
+          >
+            * country name is required
+          </small>
+        </div>
+        <div class="field col-md-12">
+          
+          <div class="flex flex-column gap-2">
+            <label for="username"> {{ 'country name in arabic' | translate }}</label>
+            <input pInputText id="username" aria-describedby="username-help" formControlName="name" />
+            <small id="username-help">enter country name in arabic</small>
+          </div>
+
+          <!-- رسالة الخطأ إذا لم يتم اختيار دولة -->
+          <small
+            class="error"
+            *ngIf="countriesForm.get('name').errors && (countriesForm.get('name').touched || countriesForm.get('name').dirty)"
+          >
+            * country name is required
+          </small>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Buttons -->
+  <div class="buttons mt-3 text-end">
+    <p-button label="{{ 'Cancel' | translate }}" class="mx-1" severity="secondary" (onClick)="onCancel()"></p-button>
+    <p-button label="{{ 'save' | translate }}" severity="success" icon="pi pi-save" (onClick)="onSubmit()"></p-button>
+  </div>
+</div>

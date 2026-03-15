@@ -1,0 +1,10 @@
+<p-confirmDialog />
+<p-toast></p-toast>
+<div class="main">
+  <sub-header
+    [mainHeader]="'outing mangement'"
+    [actionButtons]="isVendor()?[{ label: 'Add', action: 'add', icon: 'pi pi-plus', class: 'btn-primary' }]:[]"
+    (actionClicked)="handleAction($event)"
+  ></sub-header>
+  <app-outing-list></app-outing-list>
+</div>

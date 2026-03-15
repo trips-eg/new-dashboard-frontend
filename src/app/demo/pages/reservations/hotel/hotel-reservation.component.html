@@ -1,0 +1,9 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'Hotel reservations'"
+
+    [actionButtons]="[{ label: 'Add', action: 'add', icon: 'pi pi-plus', class: 'btn-primary' }]"
+    (actionClicked)="handleAction($event)"
+  ></sub-header>
+  <app-reservation-list></app-reservation-list>
+</div>

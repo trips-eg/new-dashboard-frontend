@@ -1,0 +1,38 @@
+<p-confirmDialog></p-confirmDialog>
+
+<div class="card">
+  <p-table [value]="roles" [tableStyle]="{ 'min-width': '50rem' }">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>{{ 'Id' | translate }}</th>
+        <th>{{ 'role Name' | translate }}</th>
+        <th>{{ 'permissions' | translate }}</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-roles>
+      <tr>
+        <td>{{ roles.id }}</td>
+        <td>{{ roles.name }}</td>
+        <td>
+          <!-- <p-button
+            [raised]="true"
+            icon="pi pi-trash"
+            severity="danger"
+            [rounded]="true"
+            class="mx-2"
+            (onClick)="deleteRole(roles.id)"
+          ></p-button>
+          <p-button [raised]="true" icon="pi pi-pencil" severity="success" [rounded]="true" class="mx-2"></p-button> -->
+          <p-button
+          [pTooltip]="'view permissions' | translate"
+            icon="pi pi-eye"
+            severity="info"
+            [rounded]="true"
+            class="mx-2"
+            (onClick)="navigateToPermissions(roles.id, roles.name)"
+          ></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

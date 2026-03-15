@@ -1,0 +1,42 @@
+// Table styling
+:host ::ng-deep .p-datatable-table {
+  width: 100%;
+}
+
+// Align table headings to left
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  text-align: left !important;
+}
+
+// Compact filter row styling
+:host ::ng-deep .p-datatable .p-datatable-thead > tr:nth-child(2) > th {
+  padding: 0.25rem 0.5rem !important;
+  background: #f8f9fa;
+}
+
+:host ::ng-deep .p-datatable .p-column-filter-row {
+  padding: 0 !important;
+}
+:host ::ng-deep .p-datatable .p-column-filter-element {
+  width: 100%;
+}
+
+:host ::ng-deep .p-datatable .p-column-filter-row .p-inputtext {
+  padding: 0.35rem 0.5rem !important;
+  font-size: 13px;
+}
+
+:host ::ng-deep .p-datatable .p-column-filter-row .p-column-filter-menu-button,
+:host ::ng-deep .p-datatable .p-column-filter-row .p-column-filter-clear-button {
+  width: 1.75rem !important;
+  height: 1.75rem !important;
+}
+
+// Hide increase/decrease spinner buttons on numeric filters
+:host ::ng-deep .p-datatable .p-inputnumber-button-group {
+  display: none !important;
+}
+
+:host ::ng-deep .p-datatable .p-inputnumber-buttons-stacked .p-inputnumber-input {
+  border-radius: 6px !important;
+}

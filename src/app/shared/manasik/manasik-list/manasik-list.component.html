@@ -1,0 +1,164 @@
+<p-confirmDialog></p-confirmDialog>
+<div class="card">
+  <div class="p-toolbar mb-4">
+    <div class="p-toolbar-group-left">
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" [(ngModel)]="search" (input)="onSearch()" placeholder="Search..." />
+      </span>
+    </div>
+  </div>
+
+  <p-table
+    #dt
+    [value]="data"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    [totalRecords]="totalCount"
+    [loading]="isLoading"
+    [lazy]="true"
+    (onLazyLoad)="loadManasik($event)"
+    [responsiveLayout]="'scroll'"
+    dataKey="id"
+    [showCurrentPageReport]="true"
+    [currentPageReportTemplate]="'showingEntries' | translate"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="Id">
+          #ID
+          <p-sortIcon field="Id"></p-sortIcon>
+        </th>
+        <th pSortableColumn="Name">
+          Name
+          <p-sortIcon field="Name"></p-sortIcon>
+        </th>
+        <th pSortableColumn="CompanyDto.Name">
+          Vendor
+          <p-sortIcon field="CompanyDto.Name"></p-sortIcon>
+        </th>
+        <th pSortableColumn="Price">
+          Price
+          <p-sortIcon field="Price"></p-sortIcon>
+        </th>
+        <th pSortableColumn="startDate">
+          Dates
+          <p-sortIcon field="startDate"></p-sortIcon>
+        </th>
+        <th pSortableColumn="remainingSeats">
+          Seats
+          <p-sortIcon field="remainingSeats"></p-sortIcon>
+        </th>
+        <th pSortableColumn="rating">
+          Rating
+          <p-sortIcon field="rating"></p-sortIcon>
+        </th>
+        <th pSortableColumn="isActive">
+          {{ 'status' | translate }}
+          <p-sortIcon field="isActive"></p-sortIcon>
+        </th>
+        <th pSortableColumn="isBlocked">
+          {{ 'is block' | translate }}
+          <p-sortIcon field="isBlocked"></p-sortIcon>
+        </th>
+        <th>Actions</th>
+      </tr>
+      <tr>
+        <th>
+          <p-columnFilter type="text" field="Id" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="Name" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="CompanyDto.Name" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="Price" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="date" field="startDate" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="remainingSeats" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="rating" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item>
+      <tr>
+        <td>{{ item.id }}</td>
+        <td style="max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis" [pTooltip]="item.name">
+          {{ item.name }}
+        </td>
+        <td>{{ item.companyDto?.name || item.vendorName || '-' }}</td>
+        <td>{{ item.price | number }}</td>
+        <td>
+          {{ item.startDate | date: 'mediumDate' }}
+          <span *ngIf="item.endDate">- {{ item.endDate | date: 'mediumDate' }}</span>
+        </td>
+        <td>{{ item.remainingSeats ?? item.remainingSeats === 0 ? item.remainingSeats : item.capacity }}</td>
+        <td>{{ item.rating ?? '-' }}</td>
+        <td>
+          <p-inputSwitch [(ngModel)]="item.isActive" (onChange)="toggleStatus(item.id)" [disabled]="!isVendor() && !isAdmin()"></p-inputSwitch>
+        </td>
+        <td>
+          <p-inputSwitch [(ngModel)]="item.isBlocked" (onChange)="toggleBlockStatus(item.id)" [disabled]="isVendor()"></p-inputSwitch>
+        </td>
+        <td>
+          <div class="flex gap-1">
+            <p-button
+              [raised]="true"
+              icon="pi pi-eye"
+              severity="info"
+              [rounded]="true"
+              (onClick)="view(item)"
+              pTooltip="{{ 'view' | translate }}"
+              tooltipPosition="top"
+              appendTo="body"
+            ></p-button>
+            <p-button
+              *ngIf="isVendor() || isAdmin()"
+              [raised]="true"
+              icon="pi pi-pencil"
+              severity="success"
+              [rounded]="true"
+              (onClick)="edit(item)"
+              pTooltip="{{ 'edit' | translate }}"
+              tooltipPosition="top"
+              appendTo="body"
+            ></p-button>
+            <p-button
+              [raised]="true"
+              icon="pi pi-trash"
+              severity="danger"
+              [rounded]="true"
+              pTooltip="{{ 'delete' | translate }}"
+              tooltipPosition="top"
+              appendTo="body"
+              (click)="deleteConfirm(item)"
+            ></p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="10">
+          <div class="flex flex-column align-items-center justify-content-center py-5">
+            <i class="pi pi-inbox text-500 text-5xl mb-3"></i>
+            <span class="text-700 font-medium text-lg">No records found.</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

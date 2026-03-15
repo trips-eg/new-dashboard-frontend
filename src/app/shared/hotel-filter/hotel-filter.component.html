@@ -1,0 +1,93 @@
+<div class="p-fluid grid formgrid main div" [formGroup]="filterForm">
+  <!-- Travelers Count -->
+  <div class="field col-12 col-md-3">
+    <label for="travelersCount">Travelers</label>
+    <p-inputNumber inputId="travelersCount" formControlName="travelersCount" [min]="1"></p-inputNumber>
+  </div>
+
+  <!-- Rooms Count -->
+  <div class="field col-12 col-md-3">
+    <label for="roomsCount">Rooms</label>
+    <p-inputNumber inputId="roomsCount" formControlName="roomsCount" [min]="1"></p-inputNumber>
+  </div>
+
+  <!-- Country -->
+  <div class="field col-12 col-md-3">
+    <label for="countryId">Country</label>
+    <p-dropdown
+      inputId="countryId"
+      [options]="countries"
+      optionLabel="name"
+      optionValue="id"
+      formControlName="countryId"
+      placeholder="Select Country"
+    ></p-dropdown>
+  </div>
+
+  <!-- City -->
+  <div class="field col-12 col-md-3">
+    <label for="cityId">City</label>
+    <p-dropdown
+      inputId="cityId"
+      [options]="cities"
+      optionLabel="name"
+      optionValue="id"
+      formControlName="cityId"
+      placeholder="Select City"
+    ></p-dropdown>
+  </div>
+
+  <!-- Hotel -->
+  <div class="field col-12 col-md-3">
+    <label for="hotelId">Hotel</label>
+    <p-dropdown
+      inputId="hotelId"
+      [options]="Hotels"
+      optionValue="id"
+      optionLabel="name"
+      formControlName="HotelId"
+      placeholder="Select Hotel"
+    ></p-dropdown>
+  </div>
+ <!-- Sort -->
+  <div class="field col-12 col-md-3">
+    <label for="sort">Sort</label>
+    <p-dropdown
+      inputId="sort"
+      [options]="[
+        { label: 'Rating High to Low', value: 'rating_desc' },
+        { label: 'Rating Low to High', value: 'rating_asc' }
+      ]"
+      formControlName="sort"
+      placeholder="Sort By"
+    ></p-dropdown>
+  </div>
+  <!-- Check-in -->
+  <div class="field col-12 col-md-3">
+    <label for="checkIn">Check In</label>
+    <p-calendar inputId="checkIn" formControlName="checkIn" dateFormat="yy-mm-dd"></p-calendar>
+  </div>
+
+  <!-- Check-out -->
+  <div class="field col-12 col-md-3">
+    <label for="checkOut">Check Out</label>
+    <p-calendar inputId="checkOut" formControlName="checkOut" dateFormat="yy-mm-dd"></p-calendar>
+  </div>
+
+  <!-- Search -->
+  <div class="field col-12 col-md-3">
+    <label for="search">Search</label>
+    <input pInputText inputId="search" formControlName="search" />
+  </div>
+
+
+  <!-- Actions -->
+
+
+    <div class="buttons col-12  mb-2 flex gap-2 justify-content-end">
+        <p-button  label="{{ 'Search' | translate }}" severity="success" class="shadow"   (click)="onSubmit()"></p-button>
+        <p-button label="{{ 'Reset' | translate }}" type="button" class="mx-1 shadow" severity="secondary" (click)="onReset()"></p-button>
+
+
+      </div>
+</div>

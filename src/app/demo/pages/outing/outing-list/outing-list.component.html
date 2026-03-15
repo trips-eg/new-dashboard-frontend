@@ -1,0 +1,181 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="card">
+  <p-toolbar styleClass="mb-4">
+    <ng-template pTemplate="left">
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" (input)="searchByName()" [(ngModel)]="searchedWord" [placeholder]="'search' | translate" />
+      </span>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    [value]="outings"
+    [lazy]="true"
+    (onLazyLoad)="loadOutings($event)"
+    [paginator]="true"
+    [rows]="50"
+    [totalRecords]="totalRecords"
+    [loading]="loading"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [showCurrentPageReport]="true"
+    [scrollable]="true"
+    scrollHeight="1000px"
+    [currentPageReportTemplate]="'showingEntries' | translate"
+    [globalFilterFields]="['id', 'name', 'outingType', 'outingCategoryName', 'vendorName', 'miniPrice', 'startDate', 'rating']"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pFrozenColumn style="width: 90px; min-width: 90px" pSortableColumn="id">
+          {{ '#ID' | translate }}
+          <p-sortIcon field="id"></p-sortIcon>
+        </th>
+        <th pFrozenColumn style="width: 200px; min-width: 200px" pSortableColumn="name">
+          {{ 'Name' | translate }}
+          <p-sortIcon field="name"></p-sortIcon>
+        </th>
+        <th style="width: 150px; min-width: 150px" pSortableColumn="outingType">
+          {{ 'Type' | translate }}
+          <p-sortIcon field="outingType"></p-sortIcon>
+        </th>
+        <th style="width: 190px; min-width: 190px" pSortableColumn="outingCategoryName">
+          {{ 'Category' | translate }}
+          <p-sortIcon field="outingCategoryName"></p-sortIcon>
+        </th>
+        <th *ngIf="!isVendor()" style="width: 150px; min-width: 150px" pSortableColumn="vendorName">
+          {{ 'Vendor' | translate }}
+          <p-sortIcon field="vendorName"></p-sortIcon>
+        </th>
+        <th style="width: 150px; min-width: 150px" pSortableColumn="maxPrice">
+          {{ 'Price' | translate }}
+          <p-sortIcon field="maxPrice"></p-sortIcon>
+        </th>
+        <th style="width: 150px; min-width: 150px" pSortableColumn="startDate">
+          {{ 'Dates' | translate }}
+          <p-sortIcon field="startDate"></p-sortIcon>
+        </th>
+        <th style="width: 150px; min-width: 150px" pSortableColumn="rating">
+          {{ 'Rating' | translate }}
+          <p-sortIcon field="rating"></p-sortIcon>
+        </th>
+        <th style="width: 110px; min-width: 110px" pSortableColumn="isActive">
+          {{ 'status' | translate }}
+          <p-sortIcon field="isActive"></p-sortIcon>
+        </th>
+        <th style="width: 130px; min-width: 130px" pSortableColumn="isBlocked">
+          {{ 'is block' | translate }}
+          <p-sortIcon field="isBlocked"></p-sortIcon>
+        </th>
+        <th style="width: 120px; min-width: 120px">{{ 'action' | translate }}</th>
+      </tr>
+      <tr>
+        <th pFrozenColumn>
+          <p-columnFilter type="numeric" field="id" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th pFrozenColumn>
+          <p-columnFilter type="text" field="name" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="numeric" field="outingType" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="outingCategoryName" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th *ngIf="!isVendor()">
+          <p-columnFilter type="text" field="vendorName" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="numeric" field="miniPrice" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="date" field="startDate" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="numeric" field="rating" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="boolean" field="isActive" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="boolean" field="isBlocked" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-outing>
+      <tr>
+        <td pFrozenColumn>{{ outing.id }}</td>
+        <td pFrozenColumn>{{ outing.name }}</td>
+        <td>
+          <span [class.text-green-500]="outing.outingType === 1" [class.text-blue-500]="outing.outingType === 2">
+            {{ OutingType[outing.outingType] || '-' }}
+          </span>
+        </td>
+        <td>{{ outing.outingCategoryName || outing.outingCategory?.name || '-' }}</td>
+        <td *ngIf="!isVendor()">
+          <span class="cursor-pointer text-primary" (click)="goToCompany(outing.vendor.id)">
+            {{ outing.vendor.name }}
+          </span>
+        </td>
+        <td>{{ outing.miniPrice || 0 }} - {{ outing.maxPrice || 0 }}</td>
+        <td>{{ outing.startDate | date: 'mediumDate' }} - {{ outing.endDate | date: 'mediumDate' }}</td>
+        <td>{{ outing.rating ?? '-' }}</td>
+
+        <td>
+          <p-inputSwitch [(ngModel)]="outing.isActive" (onChange)="toggleOutingStatus(outing.id)" [disabled]="!isVendor() && !isAdmin()"></p-inputSwitch>
+        </td>
+        <td>
+          <p-inputSwitch [(ngModel)]="outing.isBlocked" (onChange)="toggleBlockStatus(outing.id)" [disabled]="isVendor()"></p-inputSwitch>
+        </td>
+
+        <td>
+          <div class="flex gap-1">
+            <p-button
+              icon="pi pi-eye"
+              severity="info"
+              [rounded]="true"
+              [text]="true"
+              (onClick)="view(outing.id)"
+              pTooltip="{{ 'view' | translate }}"
+              tooltipPosition="top"
+            ></p-button>
+            <p-button
+              *ngIf="isVendor() || isAdmin()"
+              icon="pi pi-pencil"
+              severity="success"
+              [rounded]="true"
+              [text]="true"
+              (onClick)="update(outing.id)"
+              pTooltip="{{ 'edit' | translate }}"
+              tooltipPosition="top"
+            ></p-button>
+            <p-button
+              icon="pi pi-trash"
+              severity="danger"
+              [rounded]="true"
+              [text]="true"
+              (click)="delete(outing.id)"
+              pTooltip="{{ 'delete' | translate }}"
+              tooltipPosition="top"
+            ></p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="11">
+          <div class="flex flex-column justify-content-center align-items-center py-5 w-full">
+            <i class="pi pi-inbox" style="font-size: 3rem; color: var(--gray-400)"></i>
+            <span class="mt-2 text-gray-500 font-medium">{{ 'No Data found' | translate }}</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

@@ -1,0 +1,79 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="id ? ('Edit Ad' | translate) : ('Add Ad' | translate)"
+    [mainSection]="'Ads' | translate"
+    [subSection]="id ? ('Edit' | translate) : ('Add' | translate)"
+  ></sub-header>
+
+  <div class="product-form shadow-3 p-4">
+    <form class="form-field" [formGroup]="addsForm" (ngSubmit)="submit()">
+      <h3 class="flex justify-content-between mb-3">
+        {{ 'Ad Information' | translate }}
+      </h3>
+
+      <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round mb-4">
+        <!-- Title -->
+        <div class="field col-12 col-md-6">
+          <label for="Title">{{ 'Title (EN)' | translate }}</label>
+          <input pInputText id="Title" formControlName="Title" />
+        </div>
+
+        <!-- TitleAr -->
+        <div class="field col-12 col-md-6">
+          <label for="TitleAr">{{ 'Title (AR)' | translate }}</label>
+          <input pInputText id="TitleAr" formControlName="TitleAr" />
+        </div>
+
+        <!-- Description -->
+        <!-- Description EN -->
+        <div class="field col-12">
+          <label for="Description">{{ 'Description (EN)' | translate }}</label>
+          <textarea pInputTextarea autoResize="true" rows="3" id="Description" class="w-full" formControlName="Description"></textarea>
+        </div>
+
+        <!-- Description AR -->
+        <div class="field col-12">
+          <label for="DescriptionAr">{{ 'Description (AR)' | translate }}</label>
+          <textarea pInputTextarea autoResize="true" rows="3" id="DescriptionAr" class="w-full" formControlName="DescriptionAr"></textarea>
+        </div>
+
+        <!-- LinkUrl -->
+        <div class="field col-12 col-md-6">
+          <label for="LinkUrl">{{ 'Link URL' | translate }}</label>
+          <input pInputText id="LinkUrl" formControlName="LinkUrl" />
+        </div>
+
+        <!-- ExpiryDate -->
+        <div class="field col-12 col-md-6">
+          <label for="ExpiryDate">{{ 'Expiry Date' | translate }}</label>
+          <p-calendar
+            
+            [iconDisplay]="'input'"
+            id="ExpiryDate"
+            formControlName="ExpiryDate"
+            [showTime]="true"
+            dateFormat="yy-mm-dd"
+            [showIcon]="true"
+          ></p-calendar>
+        </div>
+      </div>
+
+      <!-- Image uploader placeholder -->
+      <h3 class="mt-5 mb-3">{{ 'Ad Image' | translate }}</h3>
+
+      <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round mb-4">
+        <div class="col-md-12 mb-3">
+          <app-img-uploader [multiple]="false" [displayFile]="oldImage" (filesChanged)="onLogoFileSelect($event)"></app-img-uploader>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="buttons mt-3 text-end">
+        <p-button label="{{ 'Cancel' | translate }}" type="button" class="mx-1 shadow" severity="secondary"></p-button>
+
+        <p-button type="submit" label="{{ 'Save' | translate }}" severity="success" class="shadow" icon="pi pi-save"></p-button>
+      </div>
+    </form>
+  </div>
+</div>
+<p-toast></p-toast>

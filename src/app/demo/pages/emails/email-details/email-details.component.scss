@@ -1,0 +1,211 @@
+.details-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.email-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+// Email Information - Simplified
+.email-info-simple {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 0.5rem;
+}
+
+.email-title {
+  margin-bottom: 1rem;
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+  }
+
+  .email-address {
+    font-size: 0.9375rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    
+  }
+}
+
+.info-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.info-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+// Tabs
+.details-tabs {
+  ::ng-deep {
+    .p-tabview-nav {
+      background: #ffffff;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .p-tabview-panels {
+      background: #ffffff;
+      padding: 1.5rem;
+      border-radius: 0 0 8px 8px;
+    }
+  }
+}
+
+// Email Content
+.email-content-container {
+  min-height: 1200px;
+}
+
+.email-iframe {
+  width: 100%;
+  min-height: 1200px;
+  height: calc(75vh - 200px);
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.no-content {
+  text-align: center;
+  padding: 3rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+// Empty State
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: #6b7280;
+  gap: 1rem;
+}
+
+// Timeline
+::ng-deep {
+  .p-timeline {
+    .p-timeline-event-opposite {
+      display: none;
+    }
+
+    .p-timeline-event-content {
+      width: 100%;
+    }
+  }
+}
+
+.tracker-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  font-size: 1.25rem;
+
+  &.status-success {
+    background-color: #d1fae5;
+    color: #047857;
+  }
+
+  &.status-warning {
+    background-color: #fef3c7;
+    color: #d97706;
+  }
+
+  &.status-danger {
+    background-color: #fee2e2;
+    color: #dc2626;
+  }
+}
+
+.tracker-card {
+  ::ng-deep .p-card-body {
+    padding: 1rem;
+  }
+}
+
+.tracker-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tracker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+  }
+}
+
+.tracker-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+
+    i {
+      font-size: 0.875rem;
+      color: #9ca3af;
+    }
+  }
+}
+
+.view-snapshot-btn {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .email-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .details-header {
+    justify-content: stretch;
+
+    button {
+      width: 100%;
+    }
+  }
+}

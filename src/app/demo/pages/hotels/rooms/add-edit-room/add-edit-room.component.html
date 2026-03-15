@@ -1,0 +1,419 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="isEditing ? ('Edit Room' | translate) : ('Add Room' | translate)"
+    [mainSection]="'Rooms' | translate"
+    [subSection]="isEditing ? ('Edit' | translate) : ('Add' | translate)"
+  ></sub-header>
+
+  <div class="product-form shadow-3 p-4">
+    <form [formGroup]="roomForm" (ngSubmit)="onSubmit()">
+      <!-- Room Info Panel -->
+      <p-panel header="{{ 'Room Info' | translate }}" toggleable styleClass="custom-panel mt-3">
+        <div class="formgrid grid">
+          <h3 class="flex justify-content-between">
+            {{ 'Room Info' | translate }}
+          </h3>
+          <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+            <!-- Hotel Name -->
+            <div class="field col-12 col-md-4">
+              <label for="hotelName">
+                {{ 'hotel name' | translate }}
+              </label>
+              <p-dropdown
+                id="hotelName"
+                [options]="hotels"
+                formControlName="HotelId"
+                optionLabel="name"
+                optionValue="id"
+                [filter]="true"
+                (onFilter)="onHotelFilter($event)"
+                placeholder="{{ '-- Select --' | translate }}"
+                [showClear]="true"
+                class="w-full"
+                appendTo="body"
+              ></p-dropdown>
+              <div class="text-danger" *ngIf="shouldShowError('HotelId')">
+                {{ 'Please select a hotel' | translate }}
+              </div>
+            </div>
+
+            <!-- Room Name -->
+            <div class="field col-12 col-md-4">
+              <label for="roomName">
+                {{ 'room name' | translate }}
+              </label>
+              <input type="text" pInputText id="roomName" formControlName="Name" />
+              <div class="text-danger" *ngIf="shouldShowError('Name')">
+                {{ 'Please enter a room name' | translate }}
+              </div>
+            </div>
+
+            <!-- Boarding -->
+            <div class="field col-12 col-md-4">
+              <label for="boarding">{{ 'Boarding' | translate }}</label>
+              <!-- <input type="text" pInputText id="boarding" formControlName="Boarding" /> -->
+              <p-dropdown
+                [options]="boardingTypes"
+                formControlName="Boarding"
+                placeholder="Select a boarding Types"
+                [editable]="true"
+                optionLabel="nameEn"
+                optionValue="nameEn"
+              />
+              <div class="text-danger" *ngIf="shouldShowError('Boarding')">
+                {{ 'Please enter boarding' | translate }}
+              </div>
+            </div>
+
+            <!-- Room Features -->
+            <div class="field col-12 col-md-4">
+              <label for="features">
+                {{ 'Room Features' | translate }}
+              </label>
+              <p-multiSelect
+                id="features"
+                [options]="roomFeaturies"
+                optionLabel="name"
+                optionValue="id"
+                [filter]="true"
+                (onFilter)="onHotelFilter($event)"
+                placeholder="{{ 'Select Features' | translate }}"
+                formControlName="Features"
+                styleClass="w-100"
+              ></p-multiSelect>
+              <div *ngIf="shouldShowError('Features')" class="p-error mt-1">
+                {{ 'Please select at least one feature' | translate }}
+              </div>
+            </div>
+
+            <!-- Room Type -->
+            <div class="field col-12 col-md-4">
+              <label for="type">
+                {{ 'Room Type' | translate }}
+              </label>
+              <p-dropdown
+                id="type"
+                [options]="roomTybies"
+                formControlName="RoomTypeId"
+                optionLabel="name"
+                optionValue="id"
+                [filter]="true"
+                (onFilter)="onRoomTybeFilter($event)"
+                placeholder="{{ '-- Select --' | translate }}"
+                [showClear]="true"
+                class="w-full"
+              ></p-dropdown>
+              <div class="text-danger" *ngIf="shouldShowError('RoomTypeId')">
+                {{ 'Please select a room type' | translate }}
+              </div>
+            </div>
+
+            <!-- Room Size -->
+            <div class="field col-12 col-md-4 p-fluid">
+              <label for="roomSize">{{ 'Room Size' | translate }}</label>
+              <p-inputNumber
+                mode="decimal"
+                [showButtons]="true"
+                buttonLayout="horizontal"
+                incrementButtonIcon="pi pi-plus"
+                decrementButtonIcon="pi pi-minus"
+                decrementButtonClass="p-button-danger"
+                incrementButtonClass="p-button-success"
+                inputId="roomSize"
+                id="roomSize"
+                formControlName="Size"
+                placeholder="{{ 'Room size' | translate }}"
+                [min]="0"
+                suffix="m²"
+              />
+              <div class="text-danger" *ngIf="shouldShowError('Size')">
+                {{ 'Please enter room size' | translate }}
+              </div>
+            </div>
+
+            <!-- Bed Type -->
+            <div class="field col-12 col-md-6">
+              <label for="bedType">
+                {{ 'Bed Type' | translate }}
+              </label>
+              <p-dropdown
+                id="bedType"
+                [options]="bedTybies"
+                formControlName="BedTypeId"
+                optionLabel="name"
+                optionValue="id"
+                [filter]="true"
+                (onFilter)="onbedFilter($event)"
+                placeholder="{{ '-- Select --' | translate }}"
+                [showClear]="true"
+                class="w-full"
+              ></p-dropdown>
+              <div class="text-danger" *ngIf="shouldShowError('BedTypeId')">
+                {{ 'Please select a bed type' | translate }}
+              </div>
+            </div>
+
+            <!-- Bed Count -->
+            <div class="field col-12 col-md-6">
+              <label for="bedCount">
+                {{ 'Bed count' | translate }}
+              </label>
+              <p-inputNumber
+                mode="decimal"
+                [showButtons]="true"
+                buttonLayout="horizontal"
+                incrementButtonIcon="pi pi-plus"
+                decrementButtonIcon="pi pi-minus"
+                decrementButtonClass="p-button-danger"
+                incrementButtonClass="p-button-success"
+                inputId="bedCount"
+                id="bedCount"
+                formControlName="BedCount"
+                placeholder="{{ 'Bed No.' | translate }}"
+                [min]="1"
+                [max]="100"
+              />
+              <div class="text-danger" *ngIf="shouldShowError('BedCount')">
+                {{ 'Please enter bed count' | translate }}
+              </div>
+            </div>
+
+            <!-- Available From -->
+            <div class="field col-12 col-md-6">
+              <label for="availableFrom">
+                {{ 'Available From' | translate }}
+              </label>
+              <p-calendar
+                id="availableFrom"
+                showIcon="true"
+                dateFormat="dd-mm-yy"
+                formControlName="AvailableFrom"
+                [iconDisplay]="'input'"
+              />
+              <div class="text-danger" *ngIf="shouldShowError('AvailableFrom')">
+                {{ 'Please select available from date' | translate }}
+              </div>
+            </div>
+
+            <!-- Available To -->
+            <div class="field col-12 col-md-6">
+              <label for="availableTo">
+                {{ 'Available To' | translate }}
+              </label>
+              <p-calendar id="availableTo" formControlName="AvailableTo" showIcon="true" dateFormat="dd-mm-yy" [iconDisplay]="'input'" />
+              <div class="text-danger" *ngIf="shouldShowError('AvailableTo')">
+                {{ 'Please select available to date' | translate }}
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="field col-12">
+              <label for="Description">
+                {{ 'Description' | translate }}
+              </label>
+              <p-editor id="Description" formControlName="Description" [style]="{ height: '150px' }"></p-editor>
+              <div *ngIf="shouldShowError('Description')" class="text-danger">
+                {{ 'Please provide a description' | translate }}
+              </div>
+            </div>
+            <!-- Room Image -->
+            <div class="field col-12">
+              <label>{{ 'room imgs' | translate }}</label>
+              <app-img-uploader
+                [multiple]="true"
+                (filesChanged)="onOtherImagesUpload($event)"
+                [displayFiles]="displayFilesForUploader"
+              ></app-img-uploader>
+            </div>
+          </div>
+        </div>
+      </p-panel>
+
+      <!-- Pricing Panel -->
+      <p-panel header="{{ 'Pricing' | translate }}" toggleable styleClass="custom-panel mt-3">
+        <div class="formgrid grid">
+          <h3 class="flex justify-content-between w-100">
+            {{ 'pricing' | translate }}
+            <span class="flex align-items-center gap-2">
+              <label class="h6">{{ 'including vat' | translate }}</label>
+              <p-inputSwitch formControlName="IsIncludeVate"></p-inputSwitch>
+            </span>
+          </h3>
+          <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+            <!--base Price -->
+            <div class="field col-12 col-md-4">
+              <label for="price">
+                {{ 'base Price' | translate }}
+              </label>
+              <input id="Price" formControlName="Price" type="number" pInputText />
+              <div class="text-danger" *ngIf="shouldShowError('Price')">
+                {{ 'Please enter a price' | translate }}
+              </div>
+            </div>
+            <!--holiday Price -->
+            <div class="field col-12 col-md-4">
+              <label for="price">
+                {{ 'holiday Price' | translate }}
+              </label>
+              <input id="price" formControlName="HolidayPrice" type="number" pInputText />
+              <div class="text-danger" *ngIf="shouldShowError('HolidayPrice')">
+                {{ 'Please enter a price' | translate }}
+              </div>
+            </div>
+            <!--child Price -->
+            <div class="field col-12 col-md-4">
+              <label for="hotelStars">
+                {{ 'child price' | translate }}
+                <span class="p-error">*</span>
+              </label>
+              <input formControlName="ChildPrice" [min]="1" type="number" pInputText />
+            </div>
+            <!--Price Before -->
+            <div class="field col-12 col-md-4">
+              <label for="priceBefore">
+                {{ 'Price Before' | translate }}
+              </label>
+              <input formControlName="PriceBefore" [min]="0" type="number" pInputText />
+            </div>
+
+            <!-- custom price -->
+            <div formArrayName="CustomPrices" class="col-12">
+              <div
+                *ngFor="let priceGroup of customPrices.controls; let i = index"
+                [formGroupName]="i"
+                class="formgrid grid border p-3 mb-3"
+              >
+                <!-- Price -->
+                <div class="field col-12 col-md-4">
+                  <label for="price">{{ 'Custom Price' | translate }}</label>
+                  <p-inputNumber id="price" formControlName="price" inputId="customPrice{{ i }}" />
+                  <div class="text-danger" *ngIf="shouldShowError('customPrices', i, 'price')">
+                    {{ 'Please enter a price' | translate }}
+                  </div>
+                </div>
+
+                <!-- From -->
+                <div class="field col-12 col-md-4">
+                  <label for="availableFrom">{{ 'From' | translate }}</label>
+                  <p-calendar formControlName="from" dateFormat="dd-mm-yy" showIcon="true" [iconDisplay]="'input'"></p-calendar>
+                  <div class="text-danger" *ngIf="shouldShowError('customPrices', i, 'from')">
+                    {{ 'Please select available from date' | translate }}
+                  </div>
+                </div>
+
+                <!-- To -->
+                <div class="field col-12 col-md-4">
+                  <label for="availableTo">{{ 'To' | translate }}</label>
+                  <p-calendar dateFormat="dd-mm-yy" formControlName="to" showIcon="true" [iconDisplay]="'input'"></p-calendar>
+                  <div class="text-danger" *ngIf="shouldShowError('customPrices', i, 'to')">
+                    {{ 'Please select available to date' | translate }}
+                  </div>
+                </div>
+
+                <!-- Remove Button -->
+                <div class="col-12 text-end mt-2">
+                  <p-button
+                    label="{{ 'Remove' | translate }}"
+                    icon="pi pi-trash"
+                    class="p-button-danger"
+                    (onClick)="removeCustomPrice(i)"
+                    *ngIf="customPrices.length > 1"
+                  ></p-button>
+                </div>
+              </div>
+
+              <!-- Add New Custom Price -->
+              <div class="mt-3">
+                <p-button label="{{ 'Add Custom Price' | translate }}" icon="pi pi-plus" class="" (onClick)="addCustomPrice()"></p-button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-panel>
+
+      <!-- Policy Panel -->
+      <p-panel header="{{ 'policies' | translate }}" toggleable styleClass="custom-panel mt-3 w-full">
+        <!-- Refund Policy -->
+        <h3 class="flex justify-content-between align-items-center">
+          <span>{{ 'is refund enabled' | translate }}</span>
+          <span><p-inputSwitch formControlName="IsRefundable" /></span>
+        </h3>
+
+        <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round" *ngIf="roomForm.get('IsRefundable')?.value">
+          <div class="field col-12 col-md-6 mx-auto">
+            <label for="MinimumDaysToRefund">
+              {{ 'Minimum Days To Refund' | translate }}
+            </label>
+            <p-inputNumber
+              mode="decimal"
+              inputId="MinimumDaysToRefund"
+              id="MinimumDaysToRefund"
+              formControlName="MinimumDaysToRefund"
+              [min]="1"
+            />
+            <div class="text-danger" *ngIf="shouldShowError('MinimumDaysToRefund')">
+              {{ 'Please enter minimum days to refund' | translate }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Policy -->
+        <h3 class="flex justify-content-between align-items-center mt-4">
+          <span>{{ 'pay in hotel' | translate }}</span>
+          <span><p-inputSwitch formControlName="IsAllowPaymentUponArrival" /></span>
+        </h3>
+
+        <div
+          class="formgrid grid p-3 border-1 border-dashed surface-border border-round"
+          *ngIf="roomForm.get('IsAllowPaymentUponArrival')?.value"
+        >
+          <div class="field col-12 col-md-6 mx-auto">
+            <label for="depositRate">
+              {{ 'depositRate' | translate }}
+            </label>
+            <p-inputNumber
+              mode="decimal"
+              inputId="depositRate"
+              id="depositRate"
+              formControlName="depositRate"
+              [min]="0"
+              [max]="100"
+              suffix="%"
+            />
+            <div class="text-danger" *ngIf="shouldShowError('depositRate')">
+              {{ 'Please enter deposit rate (0-100%)' | translate }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Cancellation Policy -->
+        <h3 class="flex justify-content-between mt-4">
+          {{ 'Cancellation policies' | translate }}
+        </h3>
+        <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+          <div class="field col-12">
+            <label for="cancellationPolicy">
+              {{ 'Cancellation Policy' | translate }}
+            </label>
+            <p-editor id="cancellationPolicy" formControlName="CancellationPolicy" [style]="{ height: '150px' }"></p-editor>
+            <div *ngIf="shouldShowError('CancellationPolicy')" class="text-danger">
+              {{ 'Please provide cancellation policy' | translate }}
+            </div>
+          </div>
+        </div>
+      </p-panel>
+
+      <!-- Action Buttons -->
+      <div class="buttons mt-4 text-end">
+        <p-button label="{{ 'Cancel' | translate }}" class="mx-1" severity="secondary" (onClick)="onCancel()"></p-button>
+        <p-button label="{{ 'Save' | translate }}" severity="success" class="shadow" icon="pi pi-save" type="submit"></p-button>
+      </div>
+
+      <!-- Error Message -->
+      <!-- <div *ngIf="roomForm.invalid && submitted" class="alert alert-danger mt-3 p-3 border border-danger">
+        <strong>{{ 'Error' | translate }}:</strong>
+        {{ 'Please fill out all required fields correctly' | translate }}
+      </div> -->
+    </form>
+  </div>
+</div>

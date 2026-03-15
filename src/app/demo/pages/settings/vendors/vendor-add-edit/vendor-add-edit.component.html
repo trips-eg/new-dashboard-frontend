@@ -1,0 +1,246 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="vendorId ? ('Edit Vendor' | translate) : ('Add Vendor' | translate)"
+    [mainSection]="'Vendors' | translate"
+    [subSection]="vendorId ? ('Edit' | translate) : ('Add' | translate)"
+  ></sub-header>
+
+  <div class="product-form shadow-3 p-4">
+    <form class="form-field" [formGroup]="form">
+      <h3 class="flex justify-content-between mb-3">
+        {{ 'vendor Info' | translate }}
+      </h3>
+
+      <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round mb-4">
+        <div class="field col-12 col-md-6">
+          <label for="vendorName">
+            {{ 'Vendor Name' | translate }}
+          </label>
+          <input pInputText type="text" class="w-full" id="vendorName" formControlName="Name" required />
+          <div class="text-danger" *ngIf="form.get('Name')?.touched && form.get('Name')?.invalid">
+            {{ 'Vendor name is required' | translate }}
+          </div>
+        </div>
+
+        <div class="field col-12 col-md-6">
+          <label for="vendorMail">
+            {{ 'Email Address' | translate }}
+          </label>
+          <input pInputText type="email" class="w-full" id="vendorMail" formControlName="Email" placeholder="example@outlook.com" />
+          <div class="text-danger" *ngIf="form.get('Email')?.touched && form.get('Email')?.errors">
+            <span *ngIf="form.get('Email')?.errors['required']">{{ 'Email is required' | translate }}</span>
+            <span *ngIf="form.get('Email')?.errors['email']">{{ 'Invalid email format' | translate }}</span>
+          </div>
+        </div>
+
+        <div class="field col-12 col-md-4">
+          <label for="Phone">
+            {{ 'Phone' | translate }}
+          </label>
+          <input pInputText type="text" class="w-full" id="Phone" formControlName="Phone" placeholder="Phone number" />
+          <div class="text-danger" *ngIf="form.get('Phone')?.touched && form.get('Phone')?.invalid">
+            {{ 'Phone number is required' | translate }}
+          </div>
+        </div>
+
+        <div class="field col-12 col-md-4">
+          <label for="Address">
+            {{ 'Vendor Address' | translate }}
+          </label>
+          <input pInputText type="text" class="w-full" id="Address" formControlName="Address" />
+          <div class="text-danger" *ngIf="form.get('Address')?.touched && form.get('Address')?.invalid">
+            {{ 'Address is required' | translate }}
+          </div>
+        </div>
+        <div class="field col-12 col-md-4">
+          <label for="salesAgent">
+            {{ 'sales agent' | translate }}
+          </label>
+          <p-dropdown
+            id="salesAgent"
+            [options]="salesAgencies"
+            formControlName="SalesId"
+            optionLabel="name"
+            optionValue="id"
+            (onFilter)="onsalesAgentsFilter($event)"
+            [filter]="true"
+            placeholder="{{ '-- Select --' | translate }}"
+            [showClear]="true"
+            class="w-full"
+            appendTo="body"
+          ></p-dropdown>
+          <!-- <div class="text-danger" *ngIf="form.get('SalesId')?.touched && form.get('SalesId')?.invalid">
+            {{ 'Sales Agent is required' | translate }}
+          </div> -->
+        </div>
+
+        <div class="field col-12 col-md-12">
+          <label>{{ 'Description' | translate }}</label>
+          <textarea rows="3" class="w-full" pInputTextarea formControlName="Description"></textarea>
+          <div class="text-danger" *ngIf="form.get('Description')?.touched && form.get('Description')?.invalid">
+            {{ 'descreption is required' | translate }}
+          </div>
+        </div>
+      </div>
+
+<h3 class="mt-5 mb-3">{{ 'Vendor Business Activity' | translate }}</h3>
+
+<div class="formgrid grid px-3 py-2 border-1 border-dashed surface-border border-round mb-4">
+  <!-- Row 1: Hotel + Travel -->
+  <div class="field col-12 col-md-6 flex align-items-center justify-content-between mt-3 mb-3">
+    <div class="flex align-items-center">
+      <p-checkbox
+        formControlName="IsHotelCommission"
+        [(ngModel)]="isHotel"
+        [binary]="true"
+        inputId="hotel"
+        class="mr-2"
+      ></p-checkbox>
+      <label for="hotel" class="font-medium mb-0">{{ 'Hotel' | translate }}</label>
+    </div>
+
+    <p-inputNumber
+      *ngIf="isHotel"
+      prefix="%"
+      class="w-6rem"
+      mode="decimal"
+      [step]="0.25"
+      formControlName="HotelCommissionRate"
+      [required]="isHotel"
+    ></p-inputNumber>
+  </div>
+
+  <div class="field col-12 col-md-6 flex align-items-center justify-content-between mb-3">
+    <div class="flex align-items-center">
+      <p-checkbox
+        formControlName="IsTravelCommission"
+        [(ngModel)]="isTravel"
+        [binary]="true"
+        inputId="travel"
+        class="mr-2"
+      ></p-checkbox>
+      <label for="travel" class="font-medium mb-0">{{ 'Travel' | translate }}</label>
+    </div>
+
+    <p-inputNumber
+      *ngIf="isTravel"
+      prefix="%"
+      class="w-6rem"
+      mode="decimal"
+      [step]="0.25"
+      formControlName="TravelCommissionRate"
+      [required]="isTravel"
+    ></p-inputNumber>
+  </div>
+
+  <!-- Row 2: Hajj + Out -->
+  <div class="field col-12 col-md-6 flex align-items-center justify-content-between mb-3">
+    <div class="flex align-items-center">
+      <p-checkbox
+        formControlName="IsHajjCommission"
+        [(ngModel)]="isHajj"
+        [binary]="true"
+        inputId="hajj"
+        class="mr-2"
+      ></p-checkbox>
+      <label for="hajj" class="font-medium mb-0">{{ 'Hajj' | translate }}</label>
+    </div>
+
+    <p-inputNumber
+      *ngIf="isHajj"
+      class="w-6rem"
+      mode="decimal"
+      [step]="0.25"
+      formControlName="HajjCommissionRate"
+      [required]="isHajj"
+    ></p-inputNumber>
+  </div>
+
+  <div class="field col-12 col-md-6 flex align-items-center justify-content-between mb-3">
+    <div class="flex align-items-center">
+      <p-checkbox
+        formControlName="IsOutCommission"
+        [(ngModel)]="isOut"
+        [binary]="true"
+        inputId="out"
+        class="mr-2"
+      ></p-checkbox>
+      <label for="out" class="font-medium mb-0">{{ 'Out' | translate }}</label>
+    </div>
+
+    <p-inputNumber
+      *ngIf="isOut"
+      prefix="%"
+      class="w-6rem"
+      mode="decimal"
+      [step]="0.25"
+      formControlName="OutCommissionRate"
+      [required]="isOut"
+    ></p-inputNumber>
+  </div>
+</div>
+
+
+      <h3 class="mt-5 mb-3">
+        {{ 'Vendor logo' | translate }}
+      </h3>
+
+      <app-img-uploader
+        [multiple]="false"
+        [displayFile]="oldImage ? oldImage : null"
+        (filesChanged)="onLogoFileSelect($event)"
+      ></app-img-uploader>
+      <p class="text-danger" *ngIf="showLogoMessage && submitted">{{ 'Vendor logo is required' | translate }}</p>
+
+      <h3 class="mt-5 mb-3">{{ 'Licence Documents' | translate }}</h3>
+      <app-img-uploader
+        [displayFile]="oldlicenceFiles"
+        [multiple]="true"
+        (filesChanged)="onLicenceFilesSelect($event)"
+        (removeImgFromDBWithId)="removeCommercialImageFromDB($event)"
+      ></app-img-uploader>
+      <div *ngIf="showLicenceMessage" class="text-red-500 text-sm">
+        {{ 'Licence Documents is required' | translate }}
+      </div>
+
+      <h3 class="mt-5 mb-3">{{ 'Commercial Documents' | translate }}</h3>
+      <app-img-uploader
+        [displayFile]="oldcommercialFiles"
+        [multiple]="true"
+        (filesChanged)="onCommercialFilesSelect($event)"
+        (removeImgFromDBWithId)="removeCommercialImageFromDB($event)"
+      ></app-img-uploader>
+      <div *ngIf="showCommercialMessage" class="text-red-500 text-sm">
+        {{ 'Commercial Documents is required' | translate }}
+      </div>
+      <div class="buttons mt-3 text-end">
+        <p-button
+          label="{{ 'Cancel' | translate }}"
+          type="button"
+          class="mx-1 shadow"
+          severity="secondary"
+          (onClick)="onCancel()"
+        ></p-button>
+        <p-button
+          type="submit"
+          label="{{ 'save' | translate }}"
+          severity="success"
+          class="shadow"
+          icon="pi pi-save"
+          *ngIf="!vendorId"
+          (onClick)="addVendor()"
+        ></p-button>
+        <p-button
+          type="submit"
+          label="{{ 'save' | translate }}"
+          severity="success"
+          class="shadow"
+          icon="pi pi-save"
+          *ngIf="vendorId"
+          (onClick)="updateVendor()"
+        ></p-button>
+      </div>
+    </form>
+  </div>
+</div>
+<p-toast></p-toast>

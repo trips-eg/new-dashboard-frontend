@@ -1,0 +1,251 @@
+.upload-container {
+  font-family: Arial, sans-serif;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.dropzone {
+  border: 2px dashed #cccccc;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  background-color: #f8f9fa;
+  height: 300px;
+  overflow-y: auto;
+}
+
+.dropzone::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dropzone::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
+}
+
+.dropzone::-webkit-scrollbar-thumb:hover {
+  background-color: #aaa;
+}
+
+.dropzone.dragging {
+  border-color: #2196F3;
+  background-color: #e3f2fd;
+}
+
+.content-wrapper {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content-wrapper.has-files {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.upload-content {
+  text-align: center;
+  color: #666;
+  padding: 2rem;
+}
+
+.upload-content .upload-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.upload-content .browse-link {
+  color: #2196F3;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.upload-content .requirements {
+  font-size: 0.9rem;
+  color: #999;
+  margin-top: 0.5rem;
+}
+
+/* ⚙️ Fixed layout and alignment for multi upload */
+.preview-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  justify-items: center;
+  align-items: start;
+}
+
+/* 🖼️ Consistent item box */
+.preview-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: white;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 🖼️ Image containment */
+.preview-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  padding: 5px;
+}
+
+/* ➕ Plus card styling */
+.plus-card {
+  width: 150px;
+  height: 150px;
+  border: 2px dashed #cccccc;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  transition: all 0.2s ease;
+}
+
+.plus-card:hover {
+  border-color: #2196F3;
+  background-color: #e3f2fd;
+  cursor: pointer;
+}
+
+.plus-card .plus-icon {
+  font-size: 2rem;
+  color: #666;
+}
+
+.plus-card .space-info {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 5px;
+}
+
+.plus-card.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.plus-card.disabled .plus-icon {
+  filter: grayscale(100%);
+}
+
+.plus-card.disabled::after {
+  content: "Limit reached";
+  position: absolute;
+  bottom: 5px;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* ❌ Delete button */
+.delete-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.9;
+  transition: opacity 0.2s;
+}
+
+.delete-btn:hover {
+  opacity: 1;
+}
+
+.error-message {
+  color: #dc3545;
+  padding: 0.5rem;
+  margin-top: 1rem;
+  border-radius: 4px;
+  background-color: #f8d7da;
+}
+
+/* 🎯 Single mode layout */
+.preview-grid.single-mode {
+  grid-template-columns: 1fr;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.preview-grid.single-mode .preview-item {
+  max-width: 100%;
+  aspect-ratio: 16/9;
+  height: auto;
+}
+
+.preview-grid.single-mode .preview-image {
+  object-fit: contain;
+  height: auto;
+  max-height: 400px;
+}
+
+/* 📱 Responsive support */
+@media (max-width: 768px) {
+  .preview-grid.single-mode {
+    max-width: 100%;
+  }
+}
+
+
+
+
+/* 🎯 الحالة العامة */
+.preview-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  justify-content: center;
+  align-items: center;
+}
+
+/* 🖼️ صورة واحدة فقط → تملأ المساحة */
+.preview-grid.single-mode .preview-item {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  aspect-ratio: 16/9; /* تديك شكل مرتب */
+}
+
+.preview-grid.single-mode .preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* 📸 أكتر من صورة → يظهرو جمب بعض */
+.preview-grid.multi-mode .preview-item {
+  width: 150px;
+  height: 150px;
+}
+
+.preview-grid.multi-mode .preview-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  padding: 5px;
+}

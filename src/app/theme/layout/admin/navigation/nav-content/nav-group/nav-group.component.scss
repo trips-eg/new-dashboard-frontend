@@ -1,0 +1,8 @@
+.settings-title {
+  font-weight: bold;
+  font-size: 16px;
+  text-transform: uppercase; // يخليها CAPITAL لو حبيت
+}
+.settings-title i {
+  margin-inline-end: 8px; // هتشتغل صح مع العربي والانجليزي
+}

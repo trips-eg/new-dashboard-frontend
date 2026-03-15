@@ -1,0 +1,6 @@
+# Monafasa Route List
+# Generated: 2026-03-02 20:16:53
+# Command: php artisan route:list --columns=method,uri,name,middleware
+#======================================================================
+
+[Could not generate route list: Could not open input file: artisan]

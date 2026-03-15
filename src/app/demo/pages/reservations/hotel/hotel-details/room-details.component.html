@@ -1,0 +1,108 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'Room Details' | translate"
+    [mainSection]="'Rooms Management' | translate"
+    [subSection]="'Details' | translate"
+  ></sub-header>
+
+  <!-- Room Details Section -->
+  <div class="border-1 border-solid surface-border border-round mb-4 p-4">
+    <div class="grid">
+      <!-- Room Images -->
+      <div class="col-12 col-md-6">
+        <p-galleria
+          [value]="getRoomImages(room)"
+          [autoPlay]="true"
+          [circular]="true"
+          [showItemNavigators]="true"
+          [thumbnailsPosition]="'bottom'"
+          [responsiveOptions]="responsiveOptions"
+          [containerStyle]="{ 'max-width': '100%' }"
+          [numVisible]="4"
+        >
+          <ng-template pTemplate="item" let-item>
+            <img [src]="item" class="w-full h-20rem border-round" style="object-fit: cover; margin-bottom: 10px" />
+          </ng-template>
+          <ng-template pTemplate="thumbnail" let-item>
+            <div class="grid grid-nogutter justify-content-center">
+              <img [src]="item" class="w-7rem h-5rem border-round" style="object-fit: cover" />
+            </div>
+          </ng-template>
+        </p-galleria>
+      </div>
+
+      <!-- Room Info -->
+      <div class="col-12 col-md-6 pl-4">
+        <h2 class="text-3xl mb-2">{{ room.name }}</h2>
+        <h3 class="text-orange-500 text-2xl mb-3">{{ room.price  }}</h3>
+
+        <div class="flex align-items-center gap-3 mb-4">
+          <p-tag [value]="room.roomType" icon="pi pi-home" severity="info"></p-tag>
+          <p-tag [value]="room.boarding" severity="info"><i class="fa-solid fa-utensils me-1"></i></p-tag>
+          <p-tag [value]="room.bedType || 'N/A'" severity="success"><i class="fa-solid fa-bed me-1"></i></p-tag>
+        </div>
+
+        <p class="text-muted mb-3 line-height-3" [innerHTML]="room.description"></p>
+
+        <p class="text-muted mb-2">
+          <i class="pi pi-calendar mr-2"></i>
+          {{ 'Availability' | translate }}: {{ room.availableFrom | date: 'mediumDate' }} -
+          {{ room.availableTo | date: 'mediumDate' }}
+        </p>
+        <div class="border-top-1 surface-border pt-3" style="max-height: 180px; overflow: auto">
+          <p class="text-muted" [innerHTML]="room.cancellationPolicy">
+            <i class="fa-solid fa-stop"></i>
+          </p>
+        </div>
+      </div>
+    </div>
+    <!-- Features Section -->
+    <div class="mt-4 p-3 border-round surface-card">
+      <h4 class="text-xl mb-3">{{ 'Room Features' | translate }}</h4>
+      <div class="flex flex-wrap gap-2">
+        <p-tag *ngFor="let feature of room.features" [value]="feature.name" icon="pi pi-tag" styleClass="mr-2"></p-tag>
+      </div>
+    </div>
+  </div>
+
+  <!-- Room Specifications -->
+  <div class="p-card bg-light p-3 border-round">
+    <div class="grid">
+      <!-- Column 1 -->
+      <div class="col-12 col-md-6">
+        <div class="flex align-items-center justify-content-between py-3 border-bottom-1 surface-border">
+          <strong class="text-900">{{ 'Room Size' | translate }}</strong>
+          <p class="m-0">{{ room.size }} m²</p>
+        </div>
+
+        <div class="flex align-items-center justify-content-between py-3 border-bottom-1 surface-border">
+          <strong class="text-900">{{ 'Bed Count' | translate }}</strong>
+          <p class="m-0">{{ room.bedCount }}</p>
+        </div>
+
+        <div class="flex align-items-center justify-content-between py-3">
+          <strong class="text-900">{{ 'Deposit Rate' | translate }}</strong>
+          <p class="m-0">{{ room.depositRate | percent }}</p>
+        </div>
+      </div>
+
+      <!-- Column 2 -->
+      <div class="col-12 col-md-6">
+        <div class="flex align-items-center justify-content-between py-3 border-bottom-1 surface-border">
+          <strong class="text-900">{{ 'Payment on Arrival' | translate }}</strong>
+          <p class="m-0">{{ room.isAllowPaymentUponArrival }}</p>
+        </div>
+
+        <div class="flex align-items-center justify-content-between py-3 border-bottom-1 surface-border">
+          <strong class="text-900">{{ 'Boarding Type' | translate }}</strong>
+          <p class="m-0">{{ room.boarding }}</p>
+        </div>
+
+        <div class="flex align-items-center justify-content-between py-3">
+          <strong class="text-900">{{ 'Hotel' | translate }}</strong>
+          <p class="m-0">{{ room.hotel }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

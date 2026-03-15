@@ -1,0 +1,111 @@
+<p-confirmDialog></p-confirmDialog>
+<div class="card">
+  <p-toolbar styleClass="mb-4">
+    <ng-template pTemplate="right">
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" [placeholder]="'search' | translate" />
+      </span>
+    </ng-template>
+  </p-toolbar>
+  <p-table
+    #dt
+    [value]="coupons"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    [totalRecords]="totalRecords"
+    [loading]="isLoading"
+    [lazy]="true"
+    (onLazyLoad)="loadCoupons($event)"
+    [responsiveLayout]="'scroll'"
+    dataKey="id"
+    [showCurrentPageReport]="true"
+    [currentPageReportTemplate]="'showingEntries' | translate"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="Code">
+          {{ 'coupon name' | translate }}
+          <p-sortIcon field="Code"></p-sortIcon>
+        </th>
+        <th pSortableColumn="DiscountAmount">
+          {{ 'discount Amount' | translate }}
+          <p-sortIcon field="DiscountAmount"></p-sortIcon>
+        </th>
+        <th pSortableColumn="UsageNumber">
+          {{ 'users count' | translate }}
+          <p-sortIcon field="UsageNumber"></p-sortIcon>
+        </th>
+        <th pSortableColumn="StartDate">
+          {{ 'start Date' | translate }}
+          <p-sortIcon field="StartDate"></p-sortIcon>
+        </th>
+        <th pSortableColumn="EndDate">
+          {{ 'end Date' | translate }}
+          <p-sortIcon field="EndDate"></p-sortIcon>
+        </th>
+        <th pSortableColumn="UserLimit">
+          {{ 'limit of usage' | translate }}
+          <p-sortIcon field="UserLimit"></p-sortIcon>
+        </th>
+        <th>{{ 'actions' | translate }}</th>
+      </tr>
+      <tr>
+        <th>
+          <p-columnFilter type="text" field="Code" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="DiscountAmount" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="UsageNumber" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="date" field="StartDate" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="date" field="EndDate" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="UserLimit" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-coupon>
+      <tr>
+        <td>{{ coupon.code }}</td>
+        <td>{{ coupon.discountAmount }}</td>
+        <td>{{ coupon.usageNumber }}</td>
+        <td>{{ coupon.startDate | date: 'medium' }}</td>
+        <td>{{ coupon.endDate | date: 'medium' }}</td>
+        <td>{{ returnValueOFuserLimit(coupon.userLimit) }}</td>
+        <td>
+          <div class="flex gap-1">
+            <p-button
+              icon="pi pi-eye"
+              [rounded]="true"
+              (click)="openCouponDetails(coupon.id)"
+              pTooltip="View Details"
+              tooltipPosition="top"
+              severity="info"
+            ></p-button>
+            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" (click)="deleteCoupon(coupon.id)"></p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <!-- Empty Message -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7">
+          <div class="flex flex-column align-items-center justify-content-center py-5">
+            <i class="pi pi-inbox text-500 text-5xl mb-3"></i>
+            <span class="text-700 font-medium text-lg">{{ 'No Data found' | translate }}</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

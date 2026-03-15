@@ -1,0 +1,9 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'outing features' | translate"
+    [actionButtons]="[{ label: 'Add', action: 'add', icon: 'pi pi-plus' ,class: 'btn-primary'}]"
+    (actionClicked)="handleAction($event)"
+  ></sub-header>
+
+  <app-outing-features-list></app-outing-features-list>
+</div>

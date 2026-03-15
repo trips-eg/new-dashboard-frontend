@@ -1,0 +1,132 @@
+<div class="card">
+  <p-toolbar styleClass="mb-4">
+    <ng-template pTemplate="left">
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" [(ngModel)]="searchedWord" (input)="onSearch()" [placeholder]="'search' | translate" />
+      </span>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    [value]="vendors"
+    [rows]="10"
+    [paginator]="true"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [loading]="isLoading"
+    [lazy]="true"
+    [totalRecords]="totalRecords"
+    (onLazyLoad)="loadVendors($event)"
+    dataKey="id"
+    [showCurrentPageReport]="true"
+    [currentPageReportTemplate]="'showingEntries' | translate"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="Name">
+          {{ 'vendorName' | translate }}
+          <p-sortIcon field="Name"></p-sortIcon>
+        </th>
+        <th pSortableColumn="Email">
+          {{ 'email' | translate }}
+          <p-sortIcon field="Email"></p-sortIcon>
+        </th>
+        <th pSortableColumn="Phone">
+          {{ 'phone' | translate }}
+          <p-sortIcon field="Phone"></p-sortIcon>
+        </th>
+        <th pSortableColumn="IsBlocked">
+          {{ 'status' | translate }}
+          <p-sortIcon field="IsBlocked"></p-sortIcon>
+        </th>
+        <th>{{ 'action' | translate }}</th>
+      </tr>
+      <tr>
+        <th>
+          <p-columnFilter
+            type="text"
+            field="Name"
+            display="row"
+            [showMenu]="false"
+            [placeholder]="'Search by Name' | translate"
+          ></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter
+            type="text"
+            field="Email"
+            display="row"
+            [showMenu]="false"
+            [placeholder]="'Search by Email' | translate"
+          ></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter
+            type="text"
+            field="Phone"
+            display="row"
+            [showMenu]="false"
+            [placeholder]="'Search by Phone' | translate"
+          ></p-columnFilter>
+        </th>
+        <th></th>
+        <th></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-vendor>
+      <tr>
+        <td>{{ vendor.name }}</td>
+        <td>{{ vendor.email }}</td>
+        <td>{{ vendor.phone }}</td>
+        <td>
+          <p-inputSwitch [(ngModel)]="vendor.isBlocked" (onChange)="toggleVendorStatus(vendor.id)"></p-inputSwitch>
+        </td>
+        <td>
+          <div class="flex gap-2">
+            <button
+              pButton
+              icon="pi pi-eye"
+              class="p-button-rounded p-button-info p-button-text"
+              (click)="view(vendor.id)"
+              [pTooltip]="'viewDetails' | translate"
+              tooltipPosition="top"
+            ></button>
+            <button
+              pButton
+              icon="pi pi-pencil"
+              class="p-button-rounded p-button-success p-button-text"
+              (click)="update(vendor.id)"
+              [pTooltip]="'update' | translate"
+              tooltipPosition="top"
+            ></button>
+            <button
+              pButton
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-danger p-button-text"
+              (click)="delete(vendor.id)"
+              [pTooltip]="'delete' | translate"
+              tooltipPosition="top"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5">
+          <div class="flex flex-column align-items-center justify-content-center py-5">
+            <i class="pi pi-inbox text-500 text-5xl mb-3"></i>
+            <span class="text-700 font-medium text-lg">{{ 'No vendors found' | translate }}</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>

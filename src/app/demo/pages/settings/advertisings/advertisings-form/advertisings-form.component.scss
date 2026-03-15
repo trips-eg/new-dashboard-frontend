@@ -1,0 +1,7 @@
+input.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched,
+p-calendar.ng-invalid.ng-touched .p-inputtext,
+p-dropdown.ng-invalid.ng-touched .p-dropdown-label {
+  border: 1px solid #dc3545 !important;
+  box-shadow: 0 0 0 0.05rem rgba(220, 53, 69, 0.25) !important;
+}

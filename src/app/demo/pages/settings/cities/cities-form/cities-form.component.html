@@ -1,0 +1,77 @@
+<div class="p-4 mb-4">
+  <form [formGroup]="citiesForm" (ngSubmit)="onSubmit()">
+    <h3 class="flex justify-content-between">
+      {{ 'Add City' | translate }}
+      <span><p-inputSwitch formControlName="status" /></span>
+    </h3>
+    <div class="grid p-3">
+      <!-- قائمة الدول (بحث في الـ Backend) -->
+      <div class="col-12 md:col-6">
+        <label for="countryId">
+          {{ 'Country Name' | translate }}
+          <small *ngIf="citiesForm.get('countryId')?.touched && citiesForm.get('countryId')?.invalid" class="p-error">*</small>
+        </label>
+        <p-dropdown
+          formControlName="countryId"
+          [options]="countries"
+          optionLabel="enName"
+          optionValue="id"
+          placeholder="{{ 'Select a Country' | translate }}"
+          [filter]="true"
+          filterPlaceholder="{{ 'Search Countries' | translate }}"
+          (onFilter)="onCountryFilter($event)"
+          [showClear]="true"
+          styleClass="w-full"
+          appendTo="body"
+        ></p-dropdown>
+        <small *ngIf="citiesForm.get('countryId')?.touched && citiesForm.get('countryId')?.invalid" class="p-error">
+          {{ 'Country is required' | translate }}
+        </small>
+      </div>
+      <!-- قائمة المدن (بحث Client-side) -->
+      <div class="col-12 md:col-6">
+        <label for="city">
+          {{ 'City Name' | translate }}
+          <small *ngIf="citiesForm.get('city')?.touched && citiesForm.get('city')?.invalid" class="p-error">*</small>
+        </label>
+        <p-dropdown
+          formControlName="city"
+          [options]="cities"
+          optionLabel="name"
+          optionValue="name"
+          placeholder="{{ 'Select a City' | translate }}"
+          [filter]="true"
+          [lazy]="true"
+          (onFilter)="onCityFilter($event)"
+          filterPlaceholder="{{ 'Search Cities' | translate }}"
+          [disabled]="!cities.length || !selectedCountry?.isoCode"
+          [showClear]="true"
+          styleClass="w-full"
+          appendTo="body"
+        ></p-dropdown>
+        <small *ngIf="citiesForm.get('city')?.touched && citiesForm.get('city')?.invalid" class="p-error">
+          {{ 'City is required' | translate }}
+        </small>
+        <small *ngIf="!cities.length && selectedCountry && !selectedCountry.isoCode" class="p-text-warning">
+          {{ 'This country is not supported for city selection' | translate }}
+        </small>
+        <small *ngIf="!cities.length && selectedCountry && selectedCountry.isoCode" class="p-text-warning">
+          {{ 'No cities available for this country' | translate }}
+        </small>
+      </div>
+      <div class="field col-md-12">
+       <div class="flex flex-column gap-2">
+            <label for="username"> {{ 'city name in arabic' | translate }}</label>
+            <input pInputText id="username" aria-describedby="username-help" formControlName="name" />
+            <small id="username-help">{{'enter city name in arabic'|translate}}</small>
+          </div>
+       
+      
+      </div>
+    </div>
+    <div class="mt-3 text-end">
+      <p-button label="{{ 'Cancel' | translate }}" class="mx-1" severity="secondary" (onClick)="onCancel()"></p-button>
+      <p-button label="{{ 'Save' | translate }}" severity="success" icon="pi pi-save" type="submit"></p-button>
+    </div>
+  </form>
+</div>

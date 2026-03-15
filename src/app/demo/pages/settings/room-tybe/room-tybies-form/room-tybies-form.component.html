@@ -1,0 +1,54 @@
+<div class="product-form p-4 mb-4">
+
+  <div class="form-field">
+    <form [formGroup]="roomTybeForm" (ngSubmit)="onSubmit()">
+      <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+        <div class="field col-12 col-md-6">
+          <label for="name">
+            {{ 'room tybe' | translate }}
+            <small *ngIf="roomTybeForm.get('name')?.invalid && (roomTybeForm.get('name')?.touched || roomTybeForm.get('name')?.dirty)" class="text-danger">*</small>
+          </label>
+
+          <input type="text" pInputText id="name" formControlName="name" />
+
+          <!-- Error message for required field -->
+          <small class="error" *ngIf="roomTybeForm.get('name')?.hasError('required') && (roomTybeForm.get('name')?.touched || roomTybeForm.get('name')?.dirty)">
+            * {{ 'required' | translate }}
+          </small>
+        </div>
+        <div class="field col-12 col-md-6">
+          <label for="maxOccupancy">
+            {{ 'max Occupancy' | translate }}
+            <small *ngIf="roomTybeForm.get('maxOccupancy')?.invalid && (roomTybeForm.get('maxOccupancy')?.touched || roomTybeForm.get('maxOccupancy')?.dirty)" class="text-danger">*</small>
+          </label>
+
+          <input type="number" pInputText id="maxOccupancy" formControlName="maxOccupancy" />
+
+          <!-- Error message for required field -->
+          <small class="error" *ngIf="roomTybeForm.get('maxOccupancy')?.hasError('required') && (roomTybeForm.get('maxOccupancy')?.touched || roomTybeForm.get('maxOccupancy')?.dirty)">
+            * {{ 'required' | translate }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="buttons mt-3 text-end">
+        <p-button
+          label="{{ 'Cancel' | translate }}"
+          class="mx-1"
+          severity="secondary"
+          (onClick)="onCancel()"
+          [disabled]="isLoading"
+        ></p-button>
+        <p-button
+          type="submit"
+          label="{{ 'save' | translate }}"
+          severity="success"
+          icon="pi pi-save"
+          [disabled]="roomTybeForm.invalid || isLoading"
+          [loading]="isLoading"
+        ></p-button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,71 @@
+<form [formGroup]="formGroup" class="mt-2 mb-3" (ngSubmit)="onSubmit()">
+  <div class="grid pt-3 p-card m-0">
+    <div class="control-group col-12 col-md-3" *ngFor="let field of fields">
+      <ng-container [ngSwitch]="field.type">
+        <!-- Input Field -->
+         <input
+      *ngSwitchCase="'input'"
+      pInputText type="text"
+      [formControlName]="field.key"
+      [placeholder]="field.placeholder | translate"
+       />
+        <ng-container *ngSwitchCase="'select'">
+
+
+          <p-dropdown
+          id="inlineFormInputName"
+          appendTo="body"
+          [options]="field.options"
+          optionLabel="label"
+          [checkmark]="true"
+          [showClear]="true"
+          [filter]="field.filterable"
+          filterBy="label"
+          ngModel
+          [formControlName]="field.key"
+          [placeholder]="field.placeholder | translate" />
+
+        </ng-container>
+
+        <!-- Date Field -->
+        <ng-container *ngSwitchCase="'date'">
+          <!-- Date Field (From Date) -->
+          <p-calendar
+          [autoZIndex]="true"
+          class="w-100  "
+          [iconDisplay]="'input'"
+          [showIcon]="true"
+          appendTo="body"
+          *ngIf="field.key === 'from'"
+           [formControlName]="field.key"
+           [placeholder]="field.placeholder | translate"
+          (valueChange)="onFromDateChange($event)"
+                  />
+        <!-- Date Field (To Date) -->
+        <p-calendar
+        class="w-100"
+        [iconDisplay]="'input'"
+        [showIcon]="true"
+        appendTo="body"
+        *ngIf="field.key === 'to'"
+         [formControlName]="field.key"
+         [placeholder]="field.placeholder | translate"
+
+      />
+        </ng-container>
+
+      </ng-container>
+    </div>
+
+ <!-- Search Buttons -->
+    <div class="buttons col-12  mb-2 text-end">
+        <p-button type="submit" label="{{ 'search' | translate }}" severity="success" class="shadow" ></p-button>
+        <p-button label="{{ 'Cancel' | translate }}" type="button" class="mx-1 shadow" severity="secondary" (click)="onClear()"></p-button>
+
+
+      </div>
+
+  </div>
+
+
+</form>

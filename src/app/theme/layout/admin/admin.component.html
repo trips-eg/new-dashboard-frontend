@@ -1,0 +1,39 @@
+<app-navigation
+  class="coded-navbar  pc-sidebar pc-sidebar-{{'dir' | translate}}"
+  [ngClass]="{
+    'navbar-collapsed': navCollapsed,
+    'mob-open': navCollapsedMob
+  }"
+  (NavCollapsedMob)="navMobClick()"
+  [dir]="'dir' | translate" ></app-navigation>
+<app-nav-bar [dir]="'dir' | translate" (NavCollapse)="this.navCollapsed = !this.navCollapsed" (NavCollapsedMob)="navMobClick()"></app-nav-bar>
+<div class="pc-container" [dir]="'dir' | translate">
+  <div class="coded-wrapper"  [dir]="'dir' | translate">
+    <div class="coded-content" [dir]="'dir' | translate">
+      <div class="coded-inner-content" [dir]="'dir' | translate">
+      
+        <div class="main-body" [dir]="'dir' | translate">
+          <div class="page-wrapper" [dir]="'dir' | translate">
+            <router-outlet></router-outlet>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pc-menu-overlay" (click)="closeMenu()" (keydown)="handleKeyDown($event)" tabindex="0"></div>
+</div>
+<footer class="pc-footer"   [dir]="'dir' | translate">
+  <div class="footer-wrapper container-fluid">
+    <div class="row">
+      <div class="col my-1">
+        <p class="m-0">
+          Copyright &copy;
+          <a href="#" >Trips 2025</a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</footer>
+<ngx-spinner bdColor = "rgba(0, 0, 0, 0.8)" size = "medium" color = "#fff" type = "ball-grid-pulse" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
+<!-- <app-configuration  [dir]="'dir' | translate"></app-configuration> -->

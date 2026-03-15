@@ -1,0 +1,85 @@
+<div class="product-form p-4 mb-4">
+  <div class="form-field">
+    <form [formGroup]="OutingCategoryform" (ngSubmit)="onSubmit()">
+      <h3 class="flex justify-content-between">
+        {{ config.data ? ('edit outing category' | translate) : ('add outing category' | translate) }}
+      </h3>
+
+      <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+
+        <!-- Name -->
+        <div class="field col-md-12">
+          <div class="flex flex-column gap-2">
+            <label for="name">{{ 'outing category name' | translate }}</label>
+            <input
+              pInputText
+              id="name"
+              formControlName="Name"
+              [ngClass]="{'ng-invalid ng-dirty': nameCtrl?.invalid && (nameCtrl?.touched || nameCtrl?.dirty)}"
+            />
+            <small>{{ 'enter outing category name' | translate }}</small>
+          </div>
+          <small class="error" *ngIf="nameCtrl?.hasError('required') && (nameCtrl?.touched || nameCtrl?.dirty)">
+            * required
+          </small>
+          <small class="error" *ngIf="nameCtrl?.hasError('minlength')">
+            * must be at least 3 characters
+          </small>
+        </div>
+
+        <!-- Description -->
+        <div class="field col-md-12">
+          <div class="flex flex-column gap-2">
+            <label for="desc">{{ 'Description' | translate }}</label>
+            <textarea
+              pInputTextarea
+              id="desc"
+              formControlName="Description"
+              [ngClass]="{'ng-invalid ng-dirty': descCtrl?.invalid && (descCtrl?.touched || descCtrl?.dirty)}"
+            ></textarea>
+            <small>{{ 'enter Description' | translate }}</small>
+          </div>
+          <small class="error" *ngIf="descCtrl?.hasError('required') && (descCtrl?.touched || descCtrl?.dirty)">
+            * required
+          </small>
+          <small class="error" *ngIf="descCtrl?.hasError('minlength')">
+            * must be at least 5 characters
+          </small>
+        </div>
+
+        <!-- Image -->
+        <div class="field col-md-12">
+          <div class="flex flex-column gap-2">
+            <label>{{ 'bg image' | translate }}</label>
+            <app-img-uploader
+            [multiple]="false"
+              [displayFiles]="existingImages"
+              (filesChanged)="onImagesUpload($event)"
+            ></app-img-uploader>
+            <small>{{ 'enter background image' | translate }}</small>
+          </div>
+          <small class="error" *ngIf="showImageError">
+            * required
+          </small>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="buttons mt-3 text-end">
+        <p-button
+          label="{{ 'Cancel' | translate }}"
+          class="mx-1"
+          severity="secondary"
+          (onClick)="onCancel()"
+        ></p-button>
+
+        <p-button
+          label="{{ 'save' | translate }}"
+          severity="success"
+          icon="pi pi-save"
+          type="submit"
+        ></p-button>
+      </div>
+    </form>
+  </div>
+</div>

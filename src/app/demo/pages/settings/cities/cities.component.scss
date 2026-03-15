@@ -1,0 +1,31 @@
+.form-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.2 );
+  z-index: 100;
+}
+
+.form-popout {
+  position: relative;
+  z-index: 101;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+  padding: 1.5rem;
+  animation: elevate 0.2s ease;
+  margin-bottom: 1.55rem;
+}
+
+@keyframes elevate {
+  from {
+    transform: scale(0.98);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

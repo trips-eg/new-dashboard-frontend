@@ -1,0 +1,164 @@
+<div class="main">
+<sub-header
+  [mainHeader]="'Reservation Details'"
+  [mainSection]="'Reservations'"
+  [subSection]="'Reservation Details'"
+
+></sub-header>
+<p-card>
+  <div class="grid mx-0">
+    <!-- Order Information -->
+    <div class="md:col-6">
+      <p-panel [header]="'Reserve Information' |translate" class="">
+        <div class="col-md-12 row">
+
+         <div class="mb-2 d-flex justify-content-between" >
+              <strong>{{ 'Reserve Type' | translate }}: </strong>
+              <span class="ms-5">trips ,hotel</span>
+            </div>
+        <div class="mb-2 d-flex justify-content-between" >
+              <strong>{{ 'Reserve Number' | translate }}: </strong>
+              <span class="ms-5">ms-123</span>
+            </div>
+          <div class="mb-2 d-flex justify-content-between" >
+              <strong>{{ 'Reserve Status' | translate }}: </strong>
+              <span class="ms-5">
+                pending
+              </span>
+            </div>
+
+      <div class="mb-2 d-flex justify-content-between" >
+              <strong>{{ 'Reserve Date' | translate }}: </strong>
+              <span class="ms-5">
+               20 Dec 5
+              </span>
+            </div>
+
+        <div class="mb-2 d-flex justify-content-between" >
+              <strong>{{ 'Commission Status' | translate }}: </strong>
+              <span
+                class="ms-5"
+
+              >
+
+                  {{ 'transfered' | translate }}
+
+
+              </span>
+            </div>
+          </div>
+
+      </p-panel>
+    </div>
+
+    <!-- Invoice -->
+<div class="md:col-6">
+    <p-panel header="{{ 'Invoice' | translate }}" class="">
+      <div class="my-1">
+        <!-- Subtotal -->
+        <div class="mb-2 d-flex justify-content-between">
+          <strong>{{ 'SUB TOTAL' | translate }}</strong>
+          <span>
+           100 $
+
+          </span>
+        </div>
+
+
+
+        <!-- Total -->
+        <div class="mb-2 d-flex justify-content-between">
+          <strong>{{ 'TOTAL' | translate }}</strong>
+          <span>
+            120 $       </span>
+        </div>
+
+        <!-- Payment Fees -->
+        <div class="mb-2 d-flex justify-content-between" >
+          <strong>{{ 'Payment Fees' | translate }}</strong>
+          <span>
+            1.5$
+                 </span>
+        </div>
+
+        <!-- Commission Value -->
+        <div class="mb-2 d-flex justify-content-between" >
+          <strong>{{ 'Commission Value' | translate }}</strong>
+          <span>
+            10%
+                    </span>
+        </div>
+
+        <!-- Due Amount -->
+        <div class="mb-2 d-flex justify-content-between" >
+          <strong>{{ 'Due Amount' | translate }}</strong>
+          <span>
+           10 $
+          </span>
+        </div>
+
+        <!-- Card Type -->
+        <div class="mb-2 d-flex justify-content-between" >
+          <strong>{{ 'Payment Type' | translate }}</strong>
+          <span>Visa or  wallet</span>
+        </div>
+
+
+      </div>
+    </p-panel>
+</div>
+
+    <!-- Customer Info  -->
+    <div class="md:col-6">
+      <p-panel [header]="'Customer Info' |translate">
+        <div class="p-text-sm">
+        <div class="mb-2 d-flex justify-content-between" >
+            <strong>{{ 'Customer Name' | translate }}: </strong>
+            <span class="ms-5">Ahmed</span>
+          </div>
+        <div class="mb-2 d-flex justify-content-between" >
+            <strong>{{ 'Phone Number' | translate }}: </strong>
+            <span class="ms-5">01133445566</span>
+          </div>
+        <div class="mb-2 d-flex justify-content-between" >
+            <strong>{{ 'City' | translate }}: </strong>
+            <span class="ms-5">cairo</span>
+          </div>
+        <div class="mb-2 d-flex justify-content-between" >
+            <strong>{{ 'Email address' | translate }}: </strong>
+            <span class="ms-5">example gmail.com</span>
+          </div>
+
+        </div>
+      </p-panel>
+    </div>
+
+
+    <!-- Reservation History Table -->
+    <div class="col-md-12 mt-4">
+     <h4 class="mb-3 text-dark"><strong>{{ 'Reservation History' | translate }}</strong></h4>
+      <p-table [value]="" responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ '#' | translate }}</th>
+            <th>{{ 'Name' | translate }}</th>
+            <th>{{ 'Price' | translate }}</th>
+            <th>{{ 'Discount' | translate }}</th>
+            <th>{{ 'totalCost' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row let-i="rowIndex">
+          <tr>
+            <td>{{ i + 1 }}</td>
+            <td>{{ row.Name }}</td>
+
+            <td>{{ row.price }}</td>
+            <td>{{ row.discount }}</td>
+            <td>{{ row.totalPrice }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</p-card>
+</div>

@@ -1,0 +1,45 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'Travel Reservations'"
+    [actionButtons]="[{ label: 'Add', action: 'add', icon: 'pi pi-plus', class: 'btn-primary' }]"
+    (actionClicked)="handleAction($event)"
+  ></sub-header>
+ <p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+<div class="card">
+  <p-toolbar styleClass="">
+    <ng-template pTemplate="left">
+      <span [class]="'p-input-icon-' + (lang === 'ar' ? 'left' : 'right')">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text"  (input)="searchByName(searchedWord)" [(ngModel)]="searchedWord" placeholder="Search..." />
+      </span>
+    </ng-template>
+    <ng-template pTemplate="right">
+        <p-dropdown
+        id="type"
+        [options]="travelType"
+        optionLabel="{{ 'label' | translate }}"
+       optionValue="value"
+        placeholder="{{ '-- Select travel type --' | translate }}"
+        [showClear]="true"
+        class="w-full"
+        (onChange)="onSelectType($event)"
+      ></p-dropdown>
+
+    </ng-template>
+  </p-toolbar>
+  <app-table
+  [data]="travels"
+  [columns]="columns"
+  [btnAction]="btnAction"
+  [totalRecords]="totalRecords"
+  [rows]="pageSize"
+  [lazy]="true"
+  (eventEmitters)="handleTableAction($event)"
+  (onPageChange)="onPageChange($event)"
+></app-table>
+
+</div>
+
+</div>
+

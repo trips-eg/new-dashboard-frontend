@@ -1,0 +1,284 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'outing details' | translate"
+    [mainSection]="'outing Management' | translate"
+    [subSection]="'Details' | translate"
+  ></sub-header>
+
+  <div class="border-1 border-solid surface-border border-round mb-4 p-4 shadow-3" *ngIf="outing; else loading">
+    <div class="grid">
+      <div class="col-12 col-md-6">
+        <p-galleria
+          [value]="imgs"
+          [autoPlay]="false"
+          [circular]="true"
+          [showItemNavigators]="true"
+          [thumbnailsPosition]="'bottom'"
+          [responsiveOptions]="responsiveOptions"
+          [containerStyle]="{ 'max-width': '100%' }"
+          [numVisible]="4"
+        >
+          <ng-template pTemplate="item" let-item>
+            <img
+              [src]="item"
+              class="w-full h-20rem border-round"
+              style="object-fit: cover; margin-bottom: 10px"
+              (error)="onImageError($event)"
+              [alt]="outing?.name"
+            />
+          </ng-template>
+
+          <ng-template pTemplate="thumbnail" let-item>
+            <div class="grid grid-nogutter justify-content-center">
+              <img
+                [src]="item"
+                class="w-7rem h-5rem border-round"
+                style="object-fit: cover"
+                (error)="onImageError($event)"
+                [alt]="outing?.name"
+              />
+            </div>
+          </ng-template>
+        </p-galleria>
+      </div>
+
+      <div class="col-12 col-md-6 pl-4">
+        <h2 class="text-3xl mb-2">{{ outing.name }}</h2>
+
+        <div class="medium text-body-secondary mb-1">
+          <i class="fas fa-map-marker-alt me-1"></i>
+          {{ outing.location || 'N/A' }}
+        </div>
+
+        <div class="flex align-items-center gap-3 mb-4" *ngIf="outing.rating !== undefined">
+          <p-rating [(ngModel)]="outing.rating" [readonly]="true" [cancel]="false"></p-rating>
+          <span class="text-muted text-lg">({{ outing.rating }} / 5)</span>
+        </div>
+
+        <p class="text-muted mb-2">
+          <i class="fas fa-tag mr-2"></i>
+          {{ 'Price Range' | translate }}: {{ outing.miniPrice || 0 }} - {{ outing.maxPrice || 0 }}
+        </p>
+
+        <p class="text-muted mb-2">
+          <i class="fas fa-calendar-alt mr-2"></i>
+          {{ outing.startDate | date }} - {{ outing.endDate | date }}
+        </p>
+
+        <!-- <p class="text-muted mb-2">
+          <i class="fas fa-users mr-2"></i>
+          {{ 'Capacity' | translate }}: {{ outing.capacity || 0 }} ({{ outing.remainingSeats || 0 }} remaining)
+        </p> -->
+
+        <p class="text-muted mb-2">
+          <i class="fas fa-info-circle mr-2"></i>
+          {{ outing.description || '-' }}
+        </p>
+      </div>
+    </div>
+
+    <div class="shadow-3 bg-light p-3 border-round mt-4" *ngIf="outing.programs?.length">
+      <h3 class="text-xl mb-3">{{ 'programs' | translate }}</h3>
+      <p-timeline [value]="outing.programs" layout="vertical" align="right" class="customized-timeline">
+        <ng-template pTemplate="content" let-program>
+          <div [attr.dir]="currentLang === 'ar' ? 'rtl' : 'ltr'" class="p-3 border-1 surface-border surface-card border-round shadow-1">
+            <h4 class="text-primary mb-1">{{ program.title }}</h4>
+            <p class="mb-1">
+              <strong>{{ 'Details' | translate }}:</strong>
+              {{ program.details }}
+            </p>
+            <p class="mb-1">
+              <i class="fas fa-calendar-alt mr-1"></i>
+              {{ 'time' | translate }}: {{ program.time | date: 'short' }}
+            </p>
+            <div *ngIf="program.stepDescriptions?.length">
+              <strong class="block mb-1">{{ 'Steps' | translate }}:</strong>
+              <ul class="ml-3">
+                <li *ngFor="let step of program.stepDescriptions">{{ step.description }}</li>
+              </ul>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="opposite" let-program>
+          <small class="text-muted">{{ program.time | date: 'mediumDate' }}</small>
+        </ng-template>
+      </p-timeline>
+    </div>
+
+    <div class="grid mt-4">
+      <div class="col-12 md:col-6">
+        <h3 class="text-xl mb-2">{{ 'Tickets' | translate }}</h3>
+        <p-table [value]="outing.tickets || []">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'Type' | translate }}</th>
+              <th>{{ 'Price' | translate }}</th>
+              <th>{{ 'Available' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-t>
+            <tr>
+              <td>{{ t.ticketType }}</td>
+              <td>{{ t.price }}</td>
+              <td>{{ t.availableQuantity }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <div class="col-12 md:col-6">
+        <h3 class="text-xl mb-2">{{ 'Add-ons' | translate }}</h3>
+        <p-table [value]="outing.addOns || []">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'Name' | translate }}</th>
+              <th>{{ 'Price' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-a>
+            <tr>
+              <td>{{ a.name }}</td>
+              <td>{{ a.price }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <div class="grid mt-4" *ngIf="outing.branshes?.length">
+      <div class="col-12">
+        <h3 class="text-xl mb-2">{{ 'Branches' | translate }}</h3>
+        <p-table [value]="outing.branshes">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'ID' | translate }}</th>
+              <th>{{ 'Name' | translate }}</th>
+              <th>{{ 'Description' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-branch>
+            <tr>
+              <td>{{ branch.id }}</td>
+              <td>{{ branch.name }}</td>
+              <td>{{ branch.description }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <div class="grid mt-4" *ngIf="outing.outingSchedules?.length">
+      <div class="col-12">
+        <h3 class="text-xl mb-3">{{ 'Outing Schedules' | translate }}</h3>
+        <p-accordion [activeIndex]="0">
+          <p-accordionTab
+            *ngFor="let schedule of outing.outingSchedules; let i = index"
+            [header]="'Schedule ' + (i + 1) + ' - ' + getDayOfWeekName(schedule.dayOfWeek)"
+          >
+            <div class="grid">
+              <div class="col-12 md:col-6">
+                <div class="p-2 border-1 surface-border border-round">
+                  <h4 class="text-primary mb-2">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    {{ 'Schedule Information' | translate }}
+                  </h4>
+
+                  <div class="mb-2">
+                    <strong>
+                      <i class="fas fa-calendar-day mr-1"></i>
+                      {{ 'Day' | translate }}:
+                    </strong>
+                    <span class="ml-2">{{ getDayOfWeekName(schedule.dayOfWeek) }}</span>
+                  </div>
+
+                  <div class="mb-2">
+                    <strong>
+                      <i class="fas fa-clock mr-1"></i>
+                      {{ 'Time' | translate }}:
+                    </strong>
+                    <div class="ml-4" *ngFor="let time of schedule.times">
+                      {{ formatTime(time.startTime) }} - {{ formatTime(time.endTime) }}
+                    </div>
+                  </div>
+
+                  <div class="mb-2">
+                    <strong>
+                      <i class="fas fa-calendar-check mr-1"></i>
+                      {{ 'Valid Period' | translate }}:
+                    </strong>
+                    <span class="ml-2">{{ schedule.validFrom | date: 'mediumDate' }} - {{ schedule.validTo | date: 'mediumDate' }}</span>
+                  </div>
+
+                  <div>
+                    <strong>
+                      <i class="fas fa-hashtag mr-1"></i>
+                      {{ 'Total Days' | translate }}:
+                    </strong>
+                    <span class="ml-2">{{ schedule.days?.length || 0 }} {{ 'days' | translate }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6 mx-auto">
+                <div class="p-2 border-1 surface-border border-round">
+                  <h4 class="text-primary mb-2">
+                    <i class="fas fa-calendar-alt mr-2"></i>
+                    {{ 'Scheduled Days Calendar' | translate }}
+                  </h4>
+                  <p-calendar
+                    [ngModel]="scheduledDates[i]"
+                    [inline]="true"
+                    [showWeek]="true"
+                    styleClass="readonly-calendar"
+                    selectionMode="multiple"
+                    [numberOfMonths]="1"
+                    [minDate]="schedule.validFrom"
+                    [maxDate]="schedule.validTo"
+                    dateFormat="yy-mm-dd"
+                  ></p-calendar>
+                  <div class="mt-2 p-2 bg-blue-50 border-round">
+                    <small class="text-muted">
+                      <i class="fas fa-info-circle mr-1"></i>
+                      {{ 'Highlighted dates show all scheduled occurrences' | translate }}
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </p-accordionTab>
+        </p-accordion>
+      </div>
+    </div>
+
+    <div class="grid mt-4" *ngIf="outing.offers?.length">
+      <div class="col-12">
+        <h3 class="text-xl mb-3">{{ 'Offers' | translate }}</h3>
+        <p-table [value]="outing.offers">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'Title' | translate }}</th>
+              <th>{{ 'Discount %' | translate }}</th>
+              <th>{{ 'Discount Amount' | translate }}</th>
+              <th>{{ 'Valid' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-o>
+            <tr>
+              <td>{{ o.title }}</td>
+              <td>{{ o.discountPercentage }}</td>
+              <td>{{ o.discountAmount }}</td>
+              <td>{{ o.validFrom | date: 'mediumDate' }} - {{ o.validTo | date: 'mediumDate' }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #loading>
+    <div class="card p-4">
+      <p>{{ 'Loading...' | translate }}</p>
+    </div>
+  </ng-template>
+</div>

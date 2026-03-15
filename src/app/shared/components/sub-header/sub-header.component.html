@@ -1,0 +1,70 @@
+<div class="div">
+  <div class="grid align-items-center">
+    <div class="col-6 text-start">
+      <h1 class="flex flex-column">
+        <span class="mainHeader" *ngIf="mainHeader">{{ mainHeader | translate }} &nbsp;</span>
+        <span class="subHeader" *ngIf="subHeader">{{ subHeader | translate }}</span>
+      </h1>
+      <h6>
+        <span class="main-sec" (click)="goBack()" *ngIf="mainSection">{{ mainSection | translate }} &nbsp; > &nbsp;</span>
+        <span class="sub-sec" *ngIf="subSection">{{ subSection | translate }}</span>
+      </h6>
+    </div>
+    <div class="col-6 text-end">
+      <ng-container *ngFor="let btn of actionButtons">
+        <button class="btn" [ngClass]="btn.class" *ngIf="!btn.hidden" [disabled]="btn.disabled" (click)="onButtonClick(btn.action)">
+          <i *ngIf="btn.icon" class="{{ btn.icon }} me-1"></i>
+          {{ btn.label | translate }}
+        </button>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<!-- when use  -->
+<!-- <sub-header
+[mainHeader]="'Products'"
+
+[actionButtons]="[
+  { label: 'Add', action: 'add', icon: 'pi pi-plus', class: 'btn-primary' },
+  { label: 'Edit', action: 'edit', icon: 'pi pi-pen-to-square', class: 'btn-warning'},
+  { label: 'Delete', action: 'delete', icon: 'pi pi-trash', class: 'btn-danger' },
+  { label: 'Export', action: 'export', icon: 'pi pi-upload', class: 'btn-secondary' },
+  { label: 'Print', action: 'print', icon: 'pi pi-print', class: 'btn-info' }
+]"
+(actionClicked)="handleAction($event)"
+></sub-header>
+
+
+//in ts
+
+
+
+
+
+handleAction(event: { action: string }) {
+  switch (event.action) {
+    case 'add':
+     // this.openAddDialog();
+      break;
+    case 'edit':
+     // this.editSelected();
+      break;
+    case 'delete':
+      //this.confirmDelete();
+      break;
+    case 'export':
+      //this.exportData();
+      break;
+    case 'print':
+     // this.printView();
+      break;
+  }
+}
+
+
+
+
+
+
+-->

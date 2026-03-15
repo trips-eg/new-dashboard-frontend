@@ -1,0 +1,121 @@
+<div class="container mt-4">
+  <form [formGroup]="bankAccountForm" (ngSubmit)="onSubmit()" class="row g-3">
+    <div *ngIf="alertMessage" class="alert alert-warning">
+      {{ alertMessage }}
+    </div>
+    <!-- Account Number -->
+    <div class="col-md-4">
+      <label class="form-label">{{ 'Account Number' | translate }}</label>
+      <input pInputText formControlName="accountNumber" />
+      <div
+        class="text-danger small"
+        *ngIf="
+          bankAccountForm.get('accountNumber')?.invalid &&
+          (bankAccountForm.get('accountNumber')?.touched || bankAccountForm.get('accountNumber')?.dirty)
+        "
+      >
+        {{ 'Account Number is required' | translate }}
+      </div>
+    </div>
+
+    <!-- Account Name -->
+    <div class="col-md-4">
+      <label class="form-label">{{ 'Account Name' | translate }}</label>
+      <input pInputText formControlName="accountName" />
+      <div
+        class="text-danger small"
+        *ngIf="
+          bankAccountForm.get('accountName')?.invalid &&
+          (bankAccountForm.get('accountName')?.touched || bankAccountForm.get('accountName')?.dirty)
+        "
+      >
+        {{ 'Account Name is required' | translate }}
+      </div>
+    </div>
+
+    <!-- Bank Name -->
+    <div class="col-md-4">
+      <label class="form-label">{{ 'Bank Name' | translate }}</label>
+      <input pInputText formControlName="bankName" />
+      <div
+        class="text-danger small"
+        *ngIf="
+          bankAccountForm.get('bankName')?.invalid && (bankAccountForm.get('bankName')?.touched || bankAccountForm.get('bankName')?.dirty)
+        "
+      >
+        {{ 'Bank Name is required' | translate }}
+      </div>
+    </div>
+
+    <!-- Amount In -->
+    <div class="col-md-6">
+      <label class="form-label">{{ 'Amount In' | translate }}</label>
+      <input type="number" pInputText formControlName="amountIn" />
+      <div
+        class="text-danger small"
+        *ngIf="
+          bankAccountForm.get('amountIn')?.invalid && (bankAccountForm.get('amountIn')?.touched || bankAccountForm.get('amountIn')?.dirty)
+        "
+      >
+        {{ 'Amount In is required' | translate }}
+      </div>
+    </div>
+
+    <!-- Amount Out -->
+    <div class="col-md-6">
+      <label class="form-label">{{ 'Amount Out' | translate }}</label>
+      <input type="number" pInputText formControlName="amountOut" />
+      <div class="text-danger small" *ngIf="bankAccountForm.get('amountOut')?.errors?.['required']">
+        {{ 'Amount Out is required' | translate }}
+      </div>
+      <div class="text-danger small" *ngIf="bankAccountForm.get('amountOut')?.errors?.['min']">
+        {{ 'Amount cannot be negative' | translate }}
+      </div>
+      <div class="text-danger small" *ngIf="bankAccountForm.get('amountOut')?.errors?.['max']">
+        {{ 'Amount cannot exceed' | translate }} {{ bankAccountForm.get('amountIn')?.value }}
+      </div>
+    </div>
+
+    <!-- Created Date -->
+    <div class="col-md-4">
+      <label class="form-label">{{ 'Created Date' | translate }}</label>
+      <p-calendar formControlName="createdDate" dateFormat="yy-mm-dd" class="w-100"></p-calendar>
+      <div
+        class="text-danger small"
+        *ngIf="
+          bankAccountForm.get('createdDate')?.invalid &&
+          (bankAccountForm.get('createdDate')?.touched || bankAccountForm.get('createdDate')?.dirty)
+        "
+      >
+        {{ 'Created Date is required' | translate }}
+      </div>
+    </div>
+
+    <!-- From -->
+    <div class="col-md-4">
+      <label class="form-label">{{ 'From' | translate }}</label>
+      <p-calendar formControlName="from" dateFormat="yy-mm-dd" class="w-100"></p-calendar>
+    </div>
+
+    <!-- To -->
+    <div class="col-md-4">
+      <label class="form-label">{{ 'To' | translate }}</label>
+      <p-calendar formControlName="to" dateFormat="yy-mm-dd" class="w-100"></p-calendar>
+    </div>
+
+    <!-- Image -->
+    <div class="col-md-12">
+      <label class="form-label">{{ 'Image' | translate }}</label>
+      <app-img-uploader
+        [multiple]="false"
+        [displayFile]="oldImage ? oldImage : null"
+        (filesChanged)="onLogoFileSelect($event)"
+      ></app-img-uploader>
+    </div>
+
+    <!-- Submit -->
+    <div class="col-12 text-end">
+      <button pButton type="submit" [label]="'Save' | translate" [disabled]="bankAccountForm.invalid"></button>
+    </div>
+  </form>
+</div>

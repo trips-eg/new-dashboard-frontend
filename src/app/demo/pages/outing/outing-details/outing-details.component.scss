@@ -1,0 +1,11 @@
+:host ::ng-deep .readonly-calendar {
+  .p-datepicker {
+    table {
+      pointer-events: none;
+    }
+    // Ensure header remains clickable
+    .p-datepicker-header {
+      pointer-events: auto;
+    }
+  }
+}

@@ -1,0 +1,10 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'bed tybe' | translate"
+    [actionButtons]="[{ label: 'Add', action: 'add', icon: 'pi pi-plus', class: 'btn-primary' }]"
+    (actionClicked)="handleAction($event)"
+  ></sub-header>
+
+<app-bed-tybe-list></app-bed-tybe-list>
+
+</div>

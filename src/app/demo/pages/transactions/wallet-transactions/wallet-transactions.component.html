@@ -1,0 +1,102 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'Wallet Transactions' | translate"
+    [mainSection]="'Transactions' | translate"
+    [subSection]="'Wallet Transactions' | translate"
+  ></sub-header>
+
+  <div class="card">
+    <p-toolbar styleClass="">
+      <ng-template pTemplate="left">
+        <span class="p-input-icon-left">
+          <input
+            pInputText
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="onSearch()"
+            [placeholder]="'search' | translate"
+          />
+        </span>
+      </ng-template>
+    </p-toolbar>
+
+    <p-table
+      #dt
+      [value]="transactions"
+      [paginator]="true"
+      [rows]="rows"
+      [first]="first"
+      [lazy]="true"
+      [loading]="isLoading"
+      [totalRecords]="totalRecords"
+      [showCurrentPageReport]="true"
+      [tableStyle]="{ 'min-width': '50rem' }"
+      (onPage)="onPageChange($event)"
+      [currentPageReportTemplate]="'showingEntries' | translate"
+      [rowsPerPageOptions]="[10, 25, 50]"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'ID' | translate }}</th>
+          <th>{{ 'Transaction Type' | translate }}</th>
+          <th>{{ 'Amount In' | translate }}</th>
+          <th>{{ 'Amount Out' | translate }}</th>
+          <th>{{ 'Balance After' | translate }}</th>
+          <th>{{ 'Transaction Date' | translate }}</th>
+          <th>{{ 'Booking Reference' | translate }}</th>
+          <th>{{ 'Charge Reference' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-transaction>
+        <tr>
+          <td>{{ transaction.id }}</td>
+          <td>
+            <span class="badge" [ngClass]="{
+              'bg-success': transaction.amountIn > 0,
+              'bg-danger': transaction.amountOut > 0
+            }">
+              {{ transaction.transactionTypeName }}
+            </span>
+          </td>
+          <td>
+            <span *ngIf="transaction.amountIn > 0" class="text-success fw-bold">
+              +{{ transaction.amountIn | currency: 'EGP' }}
+            </span>
+            <span *ngIf="transaction.amountIn === 0">-</span>
+          </td>
+          <td>
+            <span *ngIf="transaction.amountOut > 0" class="text-danger fw-bold">
+              -{{ transaction.amountOut | currency: 'EGP' }}
+            </span>
+            <span *ngIf="transaction.amountOut === 0">-</span>
+          </td>
+          <td>
+            <span class="fw-bold">
+              {{ transaction.balanceAfterTransaction | currency: 'EGP' }}
+            </span>
+          </td>
+          <td>{{ transaction.transactionDate | date: 'short' }}</td>
+          <td>
+            <span 
+              *ngIf="transaction.bookingRefernce; else noBookingRef" 
+              class="text-primary fw-bold cursor-pointer text-decoration-underline"
+              (click)="navigateToPaymentInfo(transaction.bookingRefernce)"
+              role="button"
+              [title]="'View payment details' | translate">
+              {{ transaction.bookingRefernce }}
+            </span>
+            <ng-template #noBookingRef>-</ng-template>
+          </td>
+          <td>{{ transaction.chargeRefernce || '-' }}</td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8" class="text-center">{{ 'No transactions found' | translate }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

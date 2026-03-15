@@ -1,0 +1,124 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="card">
+  <p-toolbar styleClass="mb-4">
+    <ng-template pTemplate="left">
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+
+        <input pInputText type="text" [(ngModel)]="searchTerm" (input)="onSearch()" [placeholder]="'search' | translate" />
+      </span>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    [value]="rooms"
+    [paginator]="true"
+    [rows]="10"
+    [lazy]="true"
+    (onLazyLoad)="loadRooms($event)"
+    [totalRecords]="totalRecords"
+    [loading]="loading"
+    [showCurrentPageReport]="true"
+    [tableStyle]="{ 'min-width': '50rem' }"
+    [currentPageReportTemplate]="'showingEntries' | translate"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [globalFilterFields]="['name', 'id']"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="id">
+          {{ '#ID' | translate }}
+          <p-sortIcon field="id"></p-sortIcon>
+        </th>
+        <th pSortableColumn="name">
+          {{ 'roomName' | translate }}
+          <p-sortIcon field="name"></p-sortIcon>
+        </th>
+        <th pSortableColumn="hotel">{{ 'hotelName' | translate }}
+          <p-sortIcon field="hotel"></p-sortIcon>
+        </th>
+        <th *ngIf="!isVendor()">{{ 'vendorName' | translate }}</th>
+        <th pSortableColumn="availableFrom">
+          {{ 'availableFrom' | translate }}
+          <p-sortIcon field="availableFrom"></p-sortIcon>
+        </th>
+        <th pSortableColumn="availableTo">
+          {{ 'availableTo' | translate }}
+          <p-sortIcon field="availableTo"></p-sortIcon>
+        </th>
+        <th pSortableColumn="price">
+          {{ 'roomPrice' | translate }}
+          <p-sortIcon field="price"></p-sortIcon>
+        </th>
+        <th>{{ 'roomType' | translate }}</th>
+        <th>{{ 'bedType' | translate }}</th>
+        <th>{{ 'is block' | translate }}</th>
+        <th>{{ 'actions' | translate }}</th>
+      </tr>
+      <tr>
+        <th>
+          <p-columnFilter type="numeric" field="id" display="row" [showMenu]="false" [showButtons]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="name" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th> 
+          <p-columnFilter type="text" field="hotel.name" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th *ngIf="!isVendor()">
+          <p-columnFilter type="text" field="company.name" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="date" field="availableFrom" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="date" field="availableTo" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="price" display="row" [showMenu]="false" [showButtons]="false"></p-columnFilter>
+        </th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-room>
+      <tr>
+        <td class="no-wrap">{{ room.id }}</td>
+        <td class="no-wrap">{{ room.name }}</td>
+        <td class="no-wrap">{{ room.hotel }}</td>
+        <td class="no-wrap" *ngIf="!isVendor()">
+          <span class="cursor-pointer text-primary" (click)="goToCompany(room.companyDto.id)">
+            {{ room.companyDto.name }}
+          </span>
+        </td>
+        <td>{{ room.availableFrom | date: 'mediumDate' }}</td>
+        <td>{{ room.availableTo | date: 'mediumDate' }}</td>
+        <td>{{ room.price }}</td>
+        <td class="no-wrap">{{ room.roomType }}</td>
+        <td class="no-wrap">{{ room.bedType }}</td>
+        <td>
+          <p-inputSwitch [(ngModel)]="room.isBlocked" (onChange)="toggleBlockStatus(room.id)" [disabled]="isVendor()"></p-inputSwitch>
+        </td>
+        <td>
+          <p-menu #menu [popup]="true" [model]="room.actions" appendTo="body"></p-menu>
+          <button pButton type="button" icon="pi pi-ellipsis-v" class="p-button-text text-primary" (click)="menu.toggle($event)"></button>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="11">
+          <div class="flex flex-column justify-content-center align-items-center py-5 w-full">
+            <i class="pi pi-search" style="font-size: 3rem; color: var(--gray-400)"></i>
+            <span class="mt-2 text-gray-500 font-medium">{{ 'No Data found' | translate }}</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

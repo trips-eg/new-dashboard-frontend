@@ -1,0 +1,49 @@
+<div class="main">
+  <sub-header [mainHeader]="'Travel Reservations'" [mainSection]="'Travel Reservations'" [subSection]="'Reserve Trip'"></sub-header>
+  <app-search-dynamic [fields]="searchFields" (submitForm)="onSearchSubmit($event)" (clear)="onClearSearch()"></app-search-dynamic>
+  <div class="grid">
+    <div class="relative col-12 col-md-3" *ngFor="let trip of trips">
+      <div class="absolute top-0 right-0">
+        <!-- <p-tag [value]="trip.status ? 'Open' : 'Closed'" [severity]="trip.status ? 'success' : 'danger'"></p-tag> -->
+      </div>
+
+      <p-card class="w-full overflow-hidden shadow-4">
+        <ng-template pTemplate="header">
+          <img src="https://placehold.co/600x400?text=No+Image" alt="trip Image" class="w-full h-40 object-cover" />
+        </ng-template>
+
+        <div class="">
+          <div class="flex justify-content-between align-items-center mb-1">
+            <h2 class="text-lg font-semibold m-0">{{ trip.name }}</h2>
+            <div class="flex align-items-center gap-1 text-yellow-500">
+              <i class="pi pi-star-fill text-sm"></i>
+              <span class="text-sm text-color">{{ trip.rating }}</span>
+            </div>
+          </div>
+
+          <div class="text-sm text-gray-600 mb-2">
+            <i class="pi pi-map-marker mr-1"></i>
+            <!-- {{ trip.cityName }}, {{ trip.countryName }} -->
+          </div>
+          <!--
+          <p class="text-sm mb-0">{{ trip.description }}</p> -->
+        </div>
+
+        <ng-template pTemplate="footer">
+          <button class="btn w-full btn-primary" (onClick)="goToTripReservationForm()">
+            {{ 'Show Details' | translate }}
+          </button>
+        </ng-template>
+      </p-card>
+    </div>
+  </div>
+  <p-paginator
+    (onPageChange)="pageChange($event)"
+    [first]="first"
+    [rows]="rows"
+    [totalRecords]="totalRecords"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    [rowsPerPageOptions]="[10, 20, 50, 100]"
+  />
+</div>

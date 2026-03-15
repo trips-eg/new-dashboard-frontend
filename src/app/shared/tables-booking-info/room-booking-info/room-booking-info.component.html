@@ -1,0 +1,214 @@
+<p-contextMenu #cm [model]="items" appendTo="body" styleClass="w-auto" />
+
+<p-table
+  [value]="consumerRoomDetailReserved"
+  [scrollable]="true"
+  scrollDirection="both"
+  [(selection)]="selectedItemsId"
+  [contextMenu]="cm"
+  [paginator]="true"
+  [rows]="rows"
+  [first]="first"
+  [lazy]="true"
+  [totalRecords]="totalRecords"
+  [currentPageReportTemplate]="'showingEntries' | translate"
+  [rowsPerPageOptions]="[5, 10, 25, 50]"
+  [showCurrentPageReport]="true"
+  (onPage)="onPageChange($event)"
+  (onRowSelect)="onSelectionChange($event, true)"
+  (onRowUnselect)="onSelectionChange($event, false)"
+  (onContextMenuSelect)="onContextMenu($event.data)"
+>
+  <!-- ===================== Header ===================== -->
+  <ng-template pTemplate="header">
+    <tr>
+      <th *ngIf="!isVendor()" pFrozenColumn alignFrozen="left" style="width: 4rem"></th>
+
+      <th pFrozenColumn alignFrozen="left" style="min-width: 300px">{{ 'room' | translate }}</th>
+      <th style="min-width: 200px">{{ 'user' | translate }}</th>
+      <th style="min-width: 200px">{{ 'startDate' | translate }}</th>
+      <th style="min-width: 200px">{{ 'endDate' | translate }}</th>
+      <th style="min-width: 200px" *ngIf="showVendorColumn">{{ 'vendorName' | translate }}</th>
+
+      <th  style="min-width: 200px">{{ 'isVendorSettled' | translate }}</th>
+      <th style="min-width: 200px">{{ 'productPrice' | translate }}</th>
+      <th style="min-width: 200px">{{ 'isVatIncluded' | translate }}</th>
+      <th style="min-width: 200px">{{ 'salesTaxRate' | translate }}</th>
+      <th style="min-width: 200px">{{ 'salesTaxValue' | translate }}</th>
+      <th style="min-width: 200px">{{ 'priceAfterSalesTax' | translate }}</th>
+
+      <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'salesRate' | translate }}</th>
+      <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'salesRateValue' | translate }}</th>
+
+      <th style="min-width: 200px">{{ 'tripsRate' | translate }}</th>
+      <th style="min-width: 200px">{{ 'tripsValue' | translate }}</th>
+      <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'tripsCommissionVatRate' | translate }}</th>
+      <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'tripsCommissionVatValue' | translate }}</th>
+
+      <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'tripsProfitAfterCoupon' | translate }}</th>
+      <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'tripsProfitAfterSalesRate' | translate }}</th>
+
+      <th style="min-width: 200px">{{ 'vendorProfitBeforeCoupon' | translate }}</th>
+      <th style="min-width: 200px">{{ 'vendorProfitAfterCoupon' | translate }}</th>
+
+      <th style="min-width: 200px">{{ 'vendorRemainingFromTrips' | translate }}</th>
+      <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'clientPaid' | translate }}</th>
+
+      <th style="min-width: 200px">{{ 'couponCode' | translate }}</th>
+      <th style="min-width: 200px">{{ 'couponRate' | translate }}</th>
+      <th style="min-width: 200px">{{ 'couponValue' | translate }}</th>
+
+      <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'isSalesSettled' | translate }}</th>
+
+      <th style="min-width: 250px">{{ 'countDetails' | translate }}</th>
+      <th style="min-width: 150px">{{ 'status' | translate }}</th>
+      <th *ngIf="!isVendor()" style="min-width: 150px">{{ 'actions' | translate }}</th>
+    </tr>
+  </ng-template>
+
+  <!-- ===================== Body ===================== -->
+  <ng-template pTemplate="body" let-room>
+    <tr [ngClass]="getStatusClass(room.status)" [pContextMenuRow]="room">
+      <td *ngIf="!isVendor()" pFrozenColumn alignFrozen="left">
+        <p-tableCheckbox
+          [value]="room"
+          [disabled]="room.isVendorSettled || !room.allowedToSettlement"
+          [ngClass]="{
+            'checkbox-disabled-green': room.isVendorSettled,
+            'checkbox-disabled-red': !room.allowedToSettlement && !room.isVendorSettled
+          }"
+          [pTooltip]="room.isVendorSettled ? 'تمت تسويته' : !room.allowedToSettlement ? 'غير مسموح بالتسوية' : null"
+        />
+      </td>
+
+      <td pFrozenColumn alignFrozen="left">{{ room.room }}</td>
+      <td>
+        <span class="cursor-pointer text-primary" (click)="openUserDetails(room.userdto)">
+          {{ room.userdto?.name }}
+        </span>
+        <!-- <span class="cursor-pointer text-primary">
+          {{ room.user }}
+        </span> -->
+      </td>
+      <td>{{ room.startDate | date: 'shortDate' }}</td>
+      <td>{{ room.endDate | date: 'shortDate' }}</td>
+
+      <td *ngIf="showVendorColumn">
+        <span class="cursor-pointer text-primary" (click)="goToCompany(room.companyDto?.id)">
+          {{ room.companyDto?.name }}
+        </span>
+      </td>
+
+      <td >
+        <p-tag
+          [value]="room.isVendorSettled ? 'تم التسوية' : 'لم تُسوى '"
+          [severity]="room.isVendorSettled ? 'success' : 'warning'"
+        ></p-tag>
+      </td>
+      <td>{{ room.productPrice }}</td>
+
+      <td>
+        <p-tag
+          [value]="room.isVatIncluded ? 'شامل الضريبة' : 'غير شامل'"
+          [severity]="room.isVatIncluded ? 'success' : 'danger'"
+        ></p-tag>
+      </td>
+
+      <td>{{ room.salesTaxRate }}%</td>
+
+
+      <td>{{ room.salesTaxValue }}</td>
+      <td>{{ room.priceAfterSalesTax }}</td>
+
+      <td *ngIf="!isVendor()">{{ room.salesRate }}%</td>
+      <td *ngIf="!isVendor()">{{ room.salesRateValue }}</td>
+
+      <td>{{ room.tripsRate }}%</td>
+      <td>{{ room.tripsValue }}</td>
+
+      <td *ngIf="!isVendor()">{{ room.tripsCommissionVatRate }}%</td>
+      <td *ngIf="!isVendor()">{{ room.tripsCommissionVatValue }}</td>
+
+      <td *ngIf="!isVendor()">{{ room.tripsProfitAfterCoupon }}</td>
+      <td *ngIf="!isVendor()">{{ room.tripsProfitAfterSalesRate }}%</td>
+
+      <td>{{ room.vendorProfitBeforeCoupon }}</td>
+      <td>{{ room.vendorProfitAfterCoupon }}</td>
+
+      <td>{{ room.vendorRemainingFromTrips }}</td>
+      <td *ngIf="!isVendor()">{{ room.clientPaid }}</td>
+
+      <td>{{ room.couponCode ? room.couponCode : '--' }}</td>
+      <td>{{ room.couponRate }}%</td>
+      <td>{{ room.couponValue }}</td>
+
+      <td *ngIf="!isVendor()">{{ room.isSalesSettled }}</td>
+
+      <td>
+        <div class="flex gap-2">
+          <span class="badge bg-primary text-white px-2 py-1 rounded">
+            Adults: {{ room.adults || 0 }}
+          </span>
+          <span class="badge bg-info text-white px-2 py-1 rounded">
+            Childs: {{ room.childs || 0 }}
+          </span>
+          <span class="badge bg-success text-white px-2 py-1 rounded font-bold">
+            Total: {{ (room.adults || 0) + (room.childs || 0) + (room.infants || 0) }}
+          </span>
+        </div>
+      </td>
+
+      <td>
+        <span [ngClass]="getStatusClass(room.status)" class="status-badge">
+          {{ getStatusLabel(room.status) }}
+        </span>
+      </td>
+
+      <td *ngIf="!isVendor()" class="flex align-items-center gap-2">
+        <p-button label="refund"
+                  [text]="true"
+                  severity="warning"
+                  (onClick)="confirm(room)"
+                  [disabled]="!room.allowedToRefund" />
+        <p-button icon="pi pi-ban"
+                  [text]="true"
+                  severity="danger"
+                  (onClick)="cancelReservation(room)"
+                  [pTooltip]="'Cancel Booking' | translate"
+                  tooltipPosition="top"
+                  styleClass="p-button-rounded" />
+      </td>
+    </tr>
+  </ng-template>
+
+  <!-- ===================== Empty Message ===================== -->
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="100%">
+        <div class="d-flex justify-content-center align-items-center py-3 w-100">
+          <i class="pi pi-info-circle" style="font-size: 1rem; color: gray"></i>
+          <span class="ms-2" style="color: gray">{{ 'NoDataFound' | translate }}</span>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<!-- ===================== Confirm Dialog ===================== -->
+<div class="card flex justify-content-center">
+  <p-confirmDialog #cd>
+    <ng-template pTemplate="headless" let-message>
+      <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+        <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
+          <i class="pi pi-question text-5xl"></i>
+        </div>
+        <span class="font-bold text-2xl block mb-2 mt-4">{{ message.header }}</span>
+        <p class="mb-0">{{ message.message }}</p>
+        <div class="flex align-items-center gap-2 mt-4">
+          <button pButton label="Save" (click)="cd.accept()" class="w-8rem"></button>
+          <button pButton label="Cancel" (click)="cd.reject()" class="p-button-outlined w-8rem"></button>
+        </div>
+      </div>
+    </ng-template>
+  </p-confirmDialog>
+</div>

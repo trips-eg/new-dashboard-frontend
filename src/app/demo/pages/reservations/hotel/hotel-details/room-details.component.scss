@@ -1,0 +1,19 @@
+// تنسيقات مخصصة للصور
+.p-galleria-thumbnail-item {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+// تنسيقات التواريخ
+.availability-dates {
+  background-color: var(--surface-ground);
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+// تنسيقات القوائم
+.features-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}

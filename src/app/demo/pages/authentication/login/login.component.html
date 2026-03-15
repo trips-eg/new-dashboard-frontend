@@ -1,0 +1,101 @@
+<div class="login-wrapper">
+  <section class="grid mx-0">
+    <div class="login-content">
+      <div class="login-content__inner">
+        <div class="logo-box">
+          <img src="assets/images/logo_color.png" alt="App Logo" class="main-logo" />
+        </div>
+
+        <h2 class="login-title">{{ 'Welcome Back' | translate }}</h2>
+        <p class="login-subtitle">{{ 'Sign in to continue' | translate }}</p>
+
+        <form [formGroup]="signInForm" (ngSubmit)="onSubmit()">
+          <div class="input-group">
+            <label for="username">{{ 'user name' | translate }}</label>
+            <input
+              type="text"
+              id="username"
+              formControlName="username"
+              placeholder="your username"
+              [ngClass]="{
+                'p-invalid': (signInForm.controls['username'].invalid && signInForm.controls['username'].touched) || showErrorMsg
+              }"
+              pInputText
+            />
+            <small *ngIf="signInForm.controls['username'].invalid && signInForm.controls['username'].touched" class="p-error">
+              {{ 'username is required' | translate }}
+            </small>
+          </div>
+
+          <div class="input-group">
+            <label for="password">{{ 'Password' | translate }}</label>
+            <div class="p-password">
+              <input
+                type="password"
+                id="password"
+                formControlName="password"
+                placeholder="••••••••"
+                [ngClass]="{
+                  'p-invalid': (signInForm.controls['password'].invalid && signInForm.controls['password'].touched) || showErrorMsg
+                }"
+                pInputText
+              />
+              <i class="pi pi-eye password-toggle" (click)="togglePasswordVisibility()"></i>
+            </div>
+            <small *ngIf="signInForm.controls['password'].invalid && signInForm.controls['password'].touched" class="p-error">
+              {{ 'Password is required' | translate }}
+            </small>
+          </div>
+
+          <div class="remember-forgot">
+            <!-- <div class="remember-me">
+              <p-checkbox [binary]="true" formControlName="rememberMe"></p-checkbox>
+              <label>{{ 'Remember me' | translate }}</label>
+            </div> -->
+            <a class="forgot-password" routerLink="/forgot-password">
+              {{ 'Forgot Password?' | translate }}
+            </a>
+          </div>
+
+          <strong class="p-error text-center d-block" *ngIf="showErrorMsg">
+            {{ 'Invalid Username or Password' | translate }}
+          </strong>
+
+          <button type="submit" class="theme-btn" [disabled]="signInForm.invalid || isLoading">
+            <i class="btn-curve"></i>
+            <span class="btn-title">
+              <i *ngIf="isLoading" class="pi pi-spin pi-spinner"></i>
+              {{ 'Sign In' | translate }}
+            </span>
+          </button>
+
+          <!-- <div class="social-login">
+            <p>{{ 'Or sign in with' | translate }}</p>
+            <div class="social-icons">
+              <button type="button" class="social-btn google">
+                <i class="pi pi-google"></i>
+              </button>
+              <button type="button" class="social-btn facebook">
+                <i class="pi pi-facebook"></i>
+              </button>
+              <button type="button" class="social-btn twitter">
+                <i class="pi pi-twitter"></i>
+              </button>
+            </div>
+          </div> -->
+        </form>
+
+        <p class="signup-link">
+          {{ "Don't have an account?" | translate }}
+          <a routerLink="/register">{{ 'Sign Up' | translate }}</a>
+        </p>
+
+        <p class="copyright-text">© {{ currentYear }} {{ 'impact bussines sloutions All rights reserved' | translate }}</p>
+      </div>
+    </div>
+
+    <div class="login-bg image-bg">
+      <img src="assets/images/tripsCover.jpg" alt="Login Background" />
+    </div>
+  </section>
+</div>

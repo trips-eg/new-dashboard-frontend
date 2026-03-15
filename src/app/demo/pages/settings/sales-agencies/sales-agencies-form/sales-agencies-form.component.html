@@ -1,0 +1,97 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="id ? ('Edit Sales Agency' | translate) : ('Add Sales Agency' | translate)"
+    [mainSection]="'Agencies' | translate"
+    [subSection]="id ? ('Edit' | translate) : ('Add' | translate)"
+  ></sub-header>
+
+  <div class="product-form shadow-3 p-4">
+    <form class="form-field" [formGroup]="salesAgencyForm" (ngSubmit)="submit()">
+      <h3 class="flex justify-content-between mb-3">
+        {{ 'Agency Information' | translate }}
+      </h3>
+
+      <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round mb-4">
+        <!-- Name -->
+        <div class="field col-12 col-md-6">
+          <label for="Name">{{ 'Agency Name' | translate }}</label>
+          <input pInputText id="Name" formControlName="Name" />
+        </div>
+
+        <!-- Phone -->
+        <div class="field col-12 col-md-6">
+          <label for="Phone">{{ 'Phone' | translate }}</label>
+          <input pInputText id="Phone" formControlName="Phone" />
+        </div>
+
+        <!-- Email -->
+        <div class="field col-12 col-md-6">
+          <label for="Email">{{ 'Email' | translate }}</label>
+          <input pInputText id="Email" formControlName="Email" />
+        </div>
+
+        <!-- Address -->
+        <div class="field col-12 col-md-6">
+          <label for="Address">{{ 'Address' | translate }}</label>
+          <input pInputText id="Address" formControlName="Address" />
+        </div>
+
+        <!-- Travel Commission -->
+        <div class="field col-12 col-md-12">
+          <div class="flex align-items-center mb-2">
+            <p-inputSwitch formControlName="IsTravelCommission" inputId="IsTravelCommission"></p-inputSwitch>
+            <label for="IsTravelCommission" class="ml-2">{{ 'Has Travel Commission' | translate }}</label>
+          </div>
+
+          <!-- يظهر فقط لو السويتش true -->
+          <div class="mt-2" *ngIf="salesAgencyForm.get('IsTravelCommission')?.value">
+            <label for="TravelCommissionRate">{{ 'Travel Commission Rate (%)' | translate }}</label>
+            <input pInputText type="number" id="TravelCommissionRate" formControlName="TravelCommissionRate" />
+          </div>
+        </div>
+
+        <!-- Hotel Commission -->
+        <div class="field col-12 col-md-12">
+          <div class="flex align-items-center mb-2">
+            <p-inputSwitch formControlName="IsHotelCommission" inputId="IsHotelCommission"></p-inputSwitch>
+            <label for="IsHotelCommission" class="ml-2">{{ 'Has Hotel Commission' | translate }}</label>
+          </div>
+
+          <!-- يظهر فقط لو السويتش true -->
+          <div class="mt-2" *ngIf="salesAgencyForm.get('IsHotelCommission')?.value">
+            <label for="HotelCommissionRate">{{ 'Hotel Commission Rate (%)' | translate }}</label>
+            <input pInputText type="number" id="HotelCommissionRate" formControlName="HotelCommissionRate" />
+          </div>
+        </div>
+        <!-- Description -->
+        <div class="field col-12">
+          <label for="Description">{{ 'Description' | translate }}</label>
+          <textarea pInputTextarea autoResize="true" rows="2" id="Description" class="w-full" formControlName="Description"></textarea>
+        </div>
+      </div>
+
+      <!-- Logo uploader -->
+      <h3 class="mt-5 mb-3">{{ 'Agency Logo' | translate }}</h3>
+      <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round mb-4">
+        <div class="col-md-12 mb-3">
+          <app-img-uploader [multiple]="false" [displayFile]="oldImage" (filesChanged)="onLogoFileSelect($event)"></app-img-uploader>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="buttons mt-3 text-end">
+        <p-button label="{{ 'Cancel' | translate }}" type="button" class="mx-1 shadow" severity="secondary"></p-button>
+
+        <p-button
+          [disabled]="!salesAgencyForm.valid"
+          type="submit"
+          label="{{ 'Save' | translate }}"
+          severity="success"
+          class="shadow"
+          icon="pi pi-save"
+        ></p-button>
+      </div>
+    </form>
+  </div>
+</div>
+<p-toast></p-toast>

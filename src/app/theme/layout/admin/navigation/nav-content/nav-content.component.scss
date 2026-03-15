@@ -1,0 +1,39 @@
+/* styles.scss or component-specific SCSS */
+.navbar-content {
+  // background: linear-gradient(145deg, #fff6f0, #ffe3cb);
+  border-radius: 12px;
+  padding: 2.5rem 1rem;
+ // min-height: 100vh;
+}
+
+.nav.coded-inner-navbar {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li.nav-item {
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    transition: background 0.3s ease;
+
+    &:hover {
+      background-color: #ffefe0;
+    }
+
+    a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    i {
+      font-size: 16px;
+      color: #ff944d;
+    }
+  }
+}

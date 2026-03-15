@@ -1,0 +1,65 @@
+<div class="card">
+  <p-toolbar>
+    <ng-template pTemplate="right">
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" [(ngModel)]="search" (input)="onSearch()" [placeholder]="'search' | translate" />
+      </span>
+    </ng-template>
+  </p-toolbar>
+  <p-table
+    [value]="roomGroups"
+    [paginator]="true"
+    [lazy]="true"
+    [rows]="rowsPerPage"
+    [first]="first"
+    [totalRecords]="totalRecords"
+    [tableStyle]="{ 'min-width': '50rem' }"
+    [rowsPerPageOptions]="[5, 10, 20]"
+    (onLazyLoad)="pageChange($event)"
+    [currentPageReportTemplate]="'showingEntries' | translate"
+    [showCurrentPageReport]="true"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th >{{'group Name' | translate}}</th>
+        <th style="width: 10%;">{{'roomsCount' | translate}}</th>
+        <th >{{'Company'|translate}}</th>
+        <th >{{'hotel'|translate}}</th>
+        <th style="width: 10%;">{{'Actions'|translate}}</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-group>
+      <tr>
+        <td>{{ group.groupName }}</td>
+        <td>{{ group.roomsCount }}</td>
+        <td>vendor</td>
+        <td>hotel</td>
+        <td>
+           <p-button
+              [raised]="true"
+              icon="pi pi-pencil"
+              severity="success"
+              [rounded]="true"
+              (click)="editRoomGroup(group.id)"
+              pTooltip="{{ 'edit' | translate }}"
+              tooltipPosition="top"
+              appendTo="body"
+            ></p-button>
+        </td>
+
+      </tr>
+    </ng-template>
+    <!-- Empty Message -->
+      <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4">
+          <div class="d-flex justify-content-center align-items-center py-3 w-100">
+            <i class="pi pi-info-circle" style="font-size: 1rem; color: gray"></i>
+            <span class="ms-2" style="color: gray">{{ 'No Data found' | translate }}</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

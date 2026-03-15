@@ -1,0 +1,100 @@
+<div class="customer-profile-container">
+  <div class="card profile-card">
+    <div class="card-body p-0">
+      <!-- Header Section -->
+      <div class="profile-header text-center p-4">
+        <div class="profile-image-wrapper mb-3">
+          <img
+            [src]="getAvatar(data?.imageUrl)"
+            alt="User Image"
+            class="profile-image"
+            referrerpolicy="no-referrer" 
+          />
+        </div>
+        <h3 class="mb-1">{{ data?.name }}</h3>
+        <p class="text-muted mb-2">{{ '@' + data?.userName }}</p>
+        <span class="badge" [ngClass]="data?.iActive ? 'bg-success' : 'bg-danger'">
+          {{ (data?.iActive ? 'Active' : 'Inactive') | translate }}
+        </span>
+      </div>
+
+      <hr class="m-0" />
+
+      <!-- Details Section -->
+      <div class="profile-details p-4">
+        <h5 class="mb-4 text-muted text-uppercase text-xs font-weight-bolder spacing-wide">
+          {{ 'Contact Information' | translate }}
+        </h5>
+
+        <div class="row g-4">
+          <!-- Email -->
+          <div class="col-md-6">
+            <div class="detail-item d-flex align-items-center">
+              <div class="icon-box bg-light-primary text-primary me-3">
+                <i class="pi pi-envelope"></i>
+              </div>
+              <div class="detail-content">
+                <small class="text-muted d-block mb-1">{{ 'Email Address' | translate }}</small>
+                <span class="fw-bold text-dark">{{ data?.email || 'N/A' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Phone -->
+          <div class="col-md-6">
+            <div class="detail-item d-flex align-items-center">
+              <div class="icon-box bg-light-info text-info me-3">
+                <i class="pi pi-phone"></i>
+              </div>
+              <div class="detail-content">
+                <small class="text-muted d-block mb-1">{{ 'Phone Number' | translate }}</small>
+                <span class="fw-bold text-dark">{{ data?.phoneNumber || 'N/A' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nationality -->
+          <div class="col-md-6">
+            <div class="detail-item d-flex align-items-center">
+              <div class="icon-box bg-light-warning text-warning me-3">
+                <i class="pi pi-flag"></i>
+              </div>
+              <div class="detail-content">
+                <small class="text-muted d-block mb-1">{{ 'Nationality' | translate }}</small>
+                <span class="fw-bold text-dark">{{ data?.nationality || 'N/A' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Device Token (Optional/Truncated) -->
+          <!-- <div class="col-md-6" *ngIf="data?.deviceToken">
+            <div class="detail-item d-flex align-items-center">
+              <div class="icon-box bg-light-secondary text-secondary me-3">
+                <i class="pi pi-mobile"></i>
+              </div>
+              <div class="detail-content">
+                <small class="text-muted d-block mb-1">{{ 'Device Token' | translate }}</small>
+                <span class="fw-bold text-dark text-truncate d-block" style="max-width: 200px" [pTooltip]="data?.deviceToken">
+                  {{ data?.deviceToken }}
+                </span>
+              </div>
+            </div>
+          </div> -->
+
+          <!-- ID -->
+          <div class="col-md-6">
+            <div class="detail-item d-flex align-items-center">
+              <div class="icon-box bg-light-success text-success me-3">
+                <i class="pi pi-id-card"></i>
+              </div>
+              <div class="detail-content">
+                <small class="text-muted d-block mb-1">{{ 'Customer ID' | translate }}</small>
+                <span class="fw-bold text-dark">#{{ data?.id }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

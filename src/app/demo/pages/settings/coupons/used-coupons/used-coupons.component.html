@@ -1,0 +1,97 @@
+<div class="main">
+  <sub-header [mainHeader]="'used coupons'"></sub-header>
+  <div class="card">
+    <p-table
+      #dt
+      [value]="usedCoupons"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [totalRecords]="totalRecords"
+      [loading]="loading"
+      [lazy]="true"
+      (onLazyLoad)="loadUsedCoupons($event)"
+      [responsiveLayout]="'scroll'"
+      dataKey="id"
+      [showCurrentPageReport]="true"
+      [currentPageReportTemplate]="'showingEntries' | translate"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="User.Name">
+            User Name
+            <p-sortIcon field="User.Name"></p-sortIcon>
+          </th>
+          <th pSortableColumn="User.Email">
+            User Email
+            <p-sortIcon field="User.Email"></p-sortIcon>
+          </th>
+          <th pSortableColumn="User.PhoneNumber">
+            User Phone
+            <p-sortIcon field="User.PhoneNumber"></p-sortIcon>
+          </th>
+          <th pSortableColumn="Coupons.Code">
+            Coupon Code
+            <p-sortIcon field="Coupons.Code"></p-sortIcon>
+          </th>
+          <th pSortableColumn="Coupons.DiscountAmount">
+            Discount Amount
+            <p-sortIcon field="Coupons.DiscountAmount"></p-sortIcon>
+          </th>
+          <th pSortableColumn="UsedDate">
+            Used Date
+            <p-sortIcon field="UsedDate"></p-sortIcon>
+          </th>
+        </tr>
+        <tr>
+          <th>
+            <p-columnFilter type="text" field="User.Name" display="row" [showMenu]="false"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="User.Email" display="row" [showMenu]="false"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="User.PhoneNumber" display="row" [showMenu]="false"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="Coupons.Code" display="row" [showMenu]="false"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="text" field="Coupons.DiscountAmount" display="row" [showMenu]="false"></p-columnFilter>
+          </th>
+          <th>
+            <p-columnFilter type="date" field="UsedDate" display="row" [showMenu]="false"></p-columnFilter>
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>{{ item.user?.name }}</td>
+          <td>{{ item.user?.email }}</td>
+          <td>{{ item.user?.phoneNumber }}</td>
+          <td>
+            <span
+              class="text-primary fw-bold cursor-pointer text-decoration-underline"
+              (click)="openCouponDetails(item.coupons?.id)"
+              style="cursor: pointer; color: #007bff; text-decoration: underline"
+            >
+              {{ item.coupons?.code }}
+            </span>
+          </td>
+          <td>{{ item.coupons?.discountAmount }}</td>
+          <td>{{ item.usedDate | date: 'dd MMM yyyy' }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center">
+            <div class="flex flex-column align-items-center justify-content-center py-5">
+              <i class="pi pi-inbox text-500 text-5xl mb-3"></i>
+              <span class="text-700 font-medium text-lg">{{ 'No Data found' | translate }}</span>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

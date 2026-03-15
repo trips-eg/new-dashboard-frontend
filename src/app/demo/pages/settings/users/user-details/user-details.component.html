@@ -1,0 +1,57 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'User Details' | translate"
+    [mainSection]="'Users' | translate"
+    [subSection]="'Details' | translate"
+   >
+  </sub-header>
+
+  <div class="p-card bg-light p-3">
+    <div class="row">
+      <div class="col-12 col-md-6">
+        <div class="flex align-items-center gap-5">
+          <strong>{{ 'Username' | translate }}</strong>
+          <p>{{ user.username || 'N/A' }}</p>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <div class="flex align-items-center gap-5">
+          <strong>{{ 'Name' | translate }}</strong>
+          <p>{{ user.firstName || 'N/A' }}</p>
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="flex align-items-center gap-5">
+          <strong>{{ 'Email' | translate }}</strong>
+          <p>{{ user.email || 'N/A' }}</p>
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="flex align-items-center gap-5">
+          <strong>{{ 'Phone Number' | translate }}</strong>
+          <p>{{ user.phoneNumber || 'N/A' }}</p>
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="flex align-items-center gap-5">
+          <strong>{{ 'Role' | translate }}</strong>
+          <p>
+            <span *ngFor="let role of user.roles">
+              {{ role.name }}
+            </span>
+            <span *ngIf="!user.roles || user.roles.length === 0">N/A</span>
+          </p>
+        </div>
+      </div>
+      <!-- <div class="col-12 col-md-6">
+        <div class="flex align-items-center gap-5">
+          <strong>{{ 'Status' | translate }}</strong>
+          <p>
+            <p-inputSwitch [ngModel]="true" [disabled]="true" /> 
+          </p>
+        </div>
+      </div> -->
+    </div>
+  </div>
+</div>

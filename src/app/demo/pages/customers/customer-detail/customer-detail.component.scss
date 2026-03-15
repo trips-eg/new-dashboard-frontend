@@ -1,0 +1,222 @@
+// Hero Card Styling
+// Hero Card Styling
+.hero-card {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  color: #495057;
+  border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+
+  .card-body {
+    padding: 2rem;
+  }
+}
+
+.customer-avatar-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.customer-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.customer-name {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0;
+  color: #2c3e50;
+}
+
+.customer-username {
+  font-size: 1.1rem;
+  opacity: 0.8;
+  color: #6c757d;
+
+  .pi {
+    opacity: 0.8;
+  }
+}
+
+// Wallet Balance Card
+.wallet-balance-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.wallet-icon {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 152, 0, 0.15);
+  color: #f57c00;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.wallet-label {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  margin: 0;
+  color: #6c757d;
+}
+
+.wallet-amount {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  color: #2c3e50;
+}
+
+// Information Cards
+.info-card {
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    color: #495057;
+    border-bottom: none;
+    padding: 1rem 1.5rem;
+
+    h5 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0;
+    }
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  &:first-child {
+    padding-top: 0;
+  }
+}
+
+.info-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #ffb74d 0%, #ff9800 100%);
+  color: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.info-content {
+  flex: 1;
+
+  label {
+    display: block;
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+    color: #212529;
+    font-weight: 500;
+  }
+}
+
+// Badges
+.badge {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+
+  .pi {
+    font-size: 0.875rem;
+    margin-right: 0.25rem;
+  }
+
+  &.badge-sm {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+// Cursor pointer
+.cursor-pointer {
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+// Transaction Table Improvements
+::ng-deep {
+  .p-datatable {
+    .p-datatable-header {
+      background: #f8f9fa;
+      border: none;
+    }
+
+   
+
+    .p-datatable-tbody > tr {
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #f8f9fa;
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 767px) {
+  .customer-name {
+    font-size: 1.5rem;
+  }
+
+  .wallet-balance-card {
+    margin-top: 1rem;
+  }
+
+  .info-item {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

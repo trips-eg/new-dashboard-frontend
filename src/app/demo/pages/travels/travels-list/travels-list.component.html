@@ -1,0 +1,212 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+<div class="card">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <div>
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" [(ngModel)]="searchedWord" (ngModelChange)="onSearch()" [placeholder]="'search' | translate" />
+      </span>
+    </div>
+    <div>
+      <p-dropdown
+        id="type"
+        [options]="travelType"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="{{ '-- Select travel type --' | translate }}"
+        [showClear]="true"
+        (onChange)="onSelectType($event)"
+      ></p-dropdown>
+    </div>
+  </div>
+
+  <p-table
+    #dt
+    [value]="travels"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 20, 50]"
+    [totalRecords]="totalRecords"
+    [loading]="isLoading"
+    [lazy]="true"
+    (onLazyLoad)="loadTravels($event)"
+    [scrollable]="true"
+    scrollDirection="horizontal"
+    dataKey="id"
+    [showCurrentPageReport]="true"
+    [currentPageReportTemplate]="'showingEntries' | translate"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="Id" style="width: 100px" pFrozenColumn>
+          {{ '#ID' | translate }}
+          <p-sortIcon field="Id"></p-sortIcon>
+        </th>
+        <th pSortableColumn="Name" style="width: 220px" pFrozenColumn>
+          {{ 'travel Name' | translate }}
+          <p-sortIcon field="Name"></p-sortIcon>
+        </th>
+        <th *ngIf="!isVendor()" pSortableColumn="CompanyDto.Name" style="width: 200px" pFrozenColumn>
+          {{ 'vendor Name' | translate }}
+          <p-sortIcon field="CompanyDto.Name"></p-sortIcon>
+        </th>
+        <th pSortableColumn="Country.Name" style="width: 200px">
+          {{ 'Country' | translate }}
+          <p-sortIcon field="Country.Name"></p-sortIcon>
+        </th>
+        <th pSortableColumn="City.Name" style="width: 200px">
+          {{ 'City' | translate }}
+          <p-sortIcon field="City.Name"></p-sortIcon>
+        </th>
+        <th pSortableColumn="NumberOfDays" style="width: 150px">
+          {{ 'Days' | translate }}
+          <p-sortIcon field="NumberOfDays"></p-sortIcon>
+        </th>
+        <th pSortableColumn="Capacity" style="width: 150px">
+          {{ 'Seats' | translate }}
+          <p-sortIcon field="Capacity"></p-sortIcon>
+        </th>
+        <!-- <th pSortableColumn="RemainingSeats">
+          {{ 'Remaining Seats' | translate }}
+          <p-sortIcon field="RemainingSeats"></p-sortIcon>
+        </th> -->
+        <th pSortableColumn="StartDate" style="width: 140px">
+          {{ 'Check In' | translate }}
+          <p-sortIcon field="StartDate"></p-sortIcon>
+        </th>
+        <th pSortableColumn="EndDate" style="width: 140px">
+          {{ 'Check Out' | translate }}
+          <p-sortIcon field="EndDate"></p-sortIcon>
+        </th>
+        <th pSortableColumn="Price" style="width: 120px">
+          {{ 'Price' | translate }}
+          <p-sortIcon field="Price"></p-sortIcon>
+        </th>
+        <th pSortableColumn="IsActive" style="width: 100px">
+          {{ 'status' | translate }}
+          <p-sortIcon field="IsActive"></p-sortIcon>
+        </th>
+        <th pSortableColumn="IsBlocked" style="width: 120px">
+          {{ 'is block' | translate }}
+          <p-sortIcon field="IsBlocked"></p-sortIcon>
+        </th>
+        <th style="width: 150px"></th>
+      </tr>
+      <tr>
+        <th pFrozenColumn>
+          <p-columnFilter type="text" field="Id" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th pFrozenColumn>
+          <p-columnFilter type="text" field="Name" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th *ngIf="!isVendor()" pFrozenColumn>
+          <p-columnFilter type="text" field="CompanyDto.Name" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="Country.Name" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="City.Name" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="NumberOfDays" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th></th>
+        <!-- <th>
+          <p-columnFilter type="text" field="RemainingSeats" display="row" [showMenu]="false"></p-columnFilter>
+        </th> -->
+        <th>
+          <p-columnFilter type="date" field="StartDate" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="date" field="EndDate" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="Price" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-travel>
+      <tr [ngClass]="{ 'old-travel-row': isOldTravel(travel) }">
+        <td class="no-wrap" pFrozenColumn>{{ travel.id }}</td>
+        <td class="no-wrap" [pTooltip]="travel.name" pFrozenColumn>{{ travel.name }}</td>
+        <td class="no-wrap" *ngIf="!isVendor()" pFrozenColumn>
+          <span class="cursor-pointer text-primary" (click)="goToCompany(travel.companyDto?.id)">
+            {{ travel.companyDto?.name || '-' }}
+          </span>
+        </td>
+        <td class="no-wrap">{{ travel.country?.name || '-' }}</td>
+        <td class="no-wrap">{{ travel.city?.name || '-' }}</td>
+        <td class="no-wrap">{{ travel.numberOfDays }}</td>
+        <td class="no-wrap">{{ travel.capacity }}</td>
+        <!-- <td class="no-wrap">{{ travel.remainingSeats }}</td> -->
+        <td>{{ travel.startDate | date: 'mediumDate' }}</td>
+        <td>{{ travel.endDate | date: 'mediumDate' }}</td>
+        <td>{{ travel.price }}</td>
+        <td>
+          <p-inputSwitch
+            [(ngModel)]="travel.isActive"
+            (onChange)="toggleTravelStatus(travel.id, travel.isActive)"
+            [disabled]="!isVendor() && !isAdmin()"
+          ></p-inputSwitch>
+        </td>
+        <td>
+          <p-inputSwitch [(ngModel)]="travel.isBlocked" (onChange)="toggleBlockStatus(travel.id)" [disabled]="isVendor()"></p-inputSwitch>
+        </td>
+        <td>
+          <div class="flex gap-1">
+            <p-button
+              [raised]="true"
+              icon="pi pi-eye"
+              severity="info"
+              [rounded]="true"
+              (onClick)="view(travel.id)"
+              pTooltip="{{ 'view' | translate }}"
+              tooltipPosition="top"
+              appendTo="body"
+            ></p-button>
+
+            <!-- ✅ UPDATED: زر التعديل يظهر للـ Vendor (رحلاته فقط) وللـ Admin (كل الرحلات) -->
+            <p-button
+              *ngIf="isVendor() || isAdmin()"
+              [raised]="true"
+              icon="pi pi-pencil"
+              severity="success"
+              [rounded]="true"
+              (onClick)="update(travel.id)"
+              pTooltip="{{ 'edit' | translate }}"
+              tooltipPosition="top"
+              appendTo="body"
+            ></p-button>
+
+            <p-button
+              [raised]="true"
+              icon="pi pi-trash"
+              severity="danger"
+              [rounded]="true"
+              pTooltip="{{ 'delete' | translate }}"
+              tooltipPosition="top"
+              appendTo="body"
+              (click)="delete(travel.id)"
+            ></p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="14">
+          <div class="flex flex-column align-items-center justify-content-center py-5">
+            <i class="pi pi-inbox text-500 text-5xl mb-3"></i>
+            <span class="text-700 font-medium text-lg">{{ 'No Data found' | translate }}</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

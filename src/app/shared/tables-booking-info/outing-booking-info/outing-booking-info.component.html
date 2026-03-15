@@ -1,0 +1,209 @@
+<p-contextMenu #cm [model]="items" appendTo="body" styleClass="w-auto" />
+
+<p-table
+  [value]="consumerOutingDetailReserved"
+  [scrollable]="true"
+  scrollDirection="both"
+  [(selection)]="selectedItemsId"
+  [contextMenu]="cm"
+  [paginator]="true"
+  [rows]="rows"
+  [first]="first"
+  [lazy]="true"
+  [totalRecords]="totalRecords"
+  [currentPageReportTemplate]="'showingEntries' | translate"
+  [rowsPerPageOptions]="[5, 10, 25, 50]"
+  [showCurrentPageReport]="true"
+  (onPage)="onPageChange($event)"
+  (onRowSelect)="onSelectionChange($event, true)"
+  (onRowUnselect)="onSelectionChange($event, false)"
+  (onContextMenuSelect)="onContextMenu($event.data)"
+>
+  <ng-template pTemplate="header">
+    <tr>
+      <th *ngIf="!isVendor()" pFrozenColumn alignFrozen="left" style="width: 4rem"></th>
+
+      <th pFrozenColumn alignFrozen="left" style="min-width: 300px">
+        {{ 'outingName' | translate }}
+      </th>
+      <th style="min-width: 200px">{{ 'customer' | translate }}</th>
+      <th style="min-width: 200px">{{ 'reservationDate' | translate }}</th>
+      <th style="min-width: 150px">{{ 'from' | translate }}</th>
+      <th style="min-width: 150px">{{ 'to' | translate }}</th>
+      <th style="min-width: 120px">{{ 'startTime' | translate }}</th>
+      <th style="min-width: 120px">{{ 'endTime' | translate }}</th>
+      <th style="min-width: 200px" *ngIf="showVendorColumn">{{ 'vendorName' | translate }}</th>
+
+      <th style="min-width: 200px">{{ 'isVendorSettled' | translate }}</th>
+      <th style="min-width: 200px">{{ 'productPrice' | translate }}</th>
+      <th style="min-width: 200px">{{ 'isVatIncluded' | translate }}</th>
+      <th style="min-width: 200px">{{ 'salesTaxRate' | translate }}</th>
+      <th style="min-width: 200px">{{ 'salesTaxValue' | translate }}</th>
+      <th style="min-width: 200px">{{ 'priceAfterSalesTax' | translate }}</th>
+
+      <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'salesRate' | translate }}</th>
+      <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'salesRateValue' | translate }}</th>
+
+      <th style="min-width: 200px">{{ 'tripsRate' | translate }}</th>
+      <th style="min-width: 200px">{{ 'tripsValue' | translate }}</th>
+      <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'tripsCommissionVatRate' | translate }}</th>
+      <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'tripsCommissionVatValue' | translate }}</th>
+
+      <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'tripsProfitAfterCoupon' | translate }}</th>
+      <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'tripsProfitAfterSalesRate' | translate }}</th>
+
+      <th style="min-width: 200px">{{ 'vendorProfitBeforeCoupon' | translate }}</th>
+      <th style="min-width: 200px">{{ 'vendorProfitAfterCoupon' | translate }}</th>
+
+      <th style="min-width: 200px">{{ 'vendorRemainingFromTrips' | translate }}</th>
+      <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'clientPaid' | translate }}</th>
+
+      <th style="min-width: 200px">{{ 'couponCode' | translate }}</th>
+      <th style="min-width: 200px">{{ 'couponRate' | translate }}</th>
+      <th style="min-width: 200px">{{ 'couponValue' | translate }}</th>
+
+      <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'isSalesSettled' | translate }}</th>
+
+      <th style="min-width: 250px">{{ 'countDetails' | translate }}</th>
+      <th style="min-width: 150px">{{ 'status' | translate }}</th>
+      <th *ngIf="!isVendor()" style="min-width: 150px">{{ 'actions' | translate }}</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-outing>
+    <tr [ngClass]="getStatusClass(outing.status)" [pContextMenuRow]="outing">
+      <td *ngIf="!isVendor()" pFrozenColumn alignFrozen="left">
+        <p-tableCheckbox
+          [value]="outing"
+          [disabled]="outing.isVendorSettled || !outing.allowedToSettlement"
+          [ngClass]="{
+            'checkbox-disabled-green': outing.isVendorSettled,
+            'checkbox-disabled-red': !outing.allowedToSettlement && !outing.isVendorSettled
+          }"
+          [pTooltip]="outing.isVendorSettled ? 'تمت تسويته' : !outing.allowedToSettlement ? 'غير مسموح بالتسوية' : null"
+        />
+      </td>
+
+      <td pFrozenColumn alignFrozen="left" style="min-width: 200px">
+        {{ outing.outing?.name || '' }}
+      </td>
+      <td>
+        <span class="cursor-pointer text-primary" (click)="openUserDetails(outing.user)">
+          {{ outing.user?.name }}
+        </span>
+      </td>
+      <td>{{ outing.reservationDate | date: 'short' }}</td>
+      <td>{{ outing.from | date: 'mediumDate' }}</td>
+      <td>{{ outing.to | date: 'mediumDate' }}</td>
+      <td>{{ outing.startTime || '--' }}</td>
+      <td>{{ outing.endTime || '--' }}</td>
+
+      <td class="no-wrap" *ngIf="showVendorColumn">
+        <span class="cursor-pointer text-primary" (click)="goToCompany(outing.companyDto.id)">
+          {{ outing.companyDto?.name }}
+        </span>
+      </td>
+      <td>
+        <p-tag
+          [value]="outing.isVendorSettled ? 'تم التسوية' : 'لم تُسوى '"
+          [severity]="outing.isVendorSettled ? 'success' : 'warning'"
+        ></p-tag>
+      </td>
+
+      <td>{{ outing.productPrice }}</td>
+      <td>
+        <p-tag
+          [value]="outing.isVatIncluded ? 'شامل الضريبة' : 'غير شامل'"
+          [severity]="outing.isVatIncluded ? 'success' : 'danger'"
+        ></p-tag>
+      </td>
+      <td>{{ outing.salesTaxRate }}%</td>
+      <td>{{ outing.salesTaxValue }}</td>
+      <td>{{ outing.priceAfterSalesTax }}</td>
+
+      <td *ngIf="!isVendor()">{{ outing.salesRate }}%</td>
+      <td *ngIf="!isVendor()">{{ outing.salesRateValue }}</td>
+
+      <td>{{ outing.tripsRate }}%</td>
+      <td>{{ outing.tripsValue }}</td>
+      <td *ngIf="!isVendor()">{{ outing.tripsCommissionVatRate }}%</td>
+      <td *ngIf="!isVendor()">{{ outing.tripsCommissionVatValue }}</td>
+
+      <td *ngIf="!isVendor()">{{ outing.tripsProfitAfterCoupon }}</td>
+      <td *ngIf="!isVendor()">{{ outing.tripsProfitAfterSalesRate }}%</td>
+
+      <td>{{ outing.vendorProfitBeforeCoupon }}</td>
+      <td>{{ outing.vendorProfitAfterCoupon }}</td>
+
+      <td>{{ outing.vendorRemainingFromTrips }}</td>
+      <td *ngIf="!isVendor()">{{ outing.clientPaid }}</td>
+
+      <td>{{ outing.couponCode ? outing.couponCode : '--' }}</td>
+      <td>{{ outing.couponRate }}%</td>
+      <td>{{ outing.couponValue }}</td>
+
+      <td *ngIf="!isVendor()">{{ outing.isSalesSettled }}</td>
+
+      <td>
+        <div class="flex gap-2">
+          <span class="badge bg-primary text-white px-2 py-1 rounded">Adults: {{ outing.countDetails?.adults || 0 }}</span>
+          <span class="badge bg-info text-white px-2 py-1 rounded">Childs: {{ outing.countDetails?.childs || 0 }}</span>
+          <span class="badge bg-success text-white px-2 py-1 rounded font-bold">Total: {{ outing.countDetails?.total || 0 }}</span>
+        </div>
+      </td>
+
+      <td>
+        <span [ngClass]="getStatusClass(outing.status)" class="status-badge">
+          {{ getStatusLabel(outing.status) }}
+        </span>
+      </td>
+
+      <td *ngIf="!isVendor()" class="flex align-items-center gap-2">
+        <p-button label="refund"
+                  [text]="true"
+                  severity="warning"
+                  (onClick)="confirm(outing)"
+                  [disabled]="!outing.allowedToRefund" />
+        <p-button icon="pi pi-ban"
+                  [text]="true"
+                  severity="danger"
+                  (onClick)="cancelReservation(outing)"
+                  [pTooltip]="'Cancel Booking' | translate"
+                  tooltipPosition="top"
+                  styleClass="p-button-rounded" />
+      </td>
+    </tr>
+  </ng-template>
+
+  <!-- Empty Message -->
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="100%">
+        <div class="d-flex justify-content-center align-items-center py-3 w-100">
+          <i class="pi pi-info-circle" style="font-size: 1rem; color: gray"></i>
+          <span class="ms-2" style="color: gray">{{ 'NoDataFound' | translate }}</span>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<div class="card flex justify-content-center">
+  <p-confirmDialog #cd>
+    <ng-template pTemplate="headless" let-message>
+      <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+        <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem">
+          <i class="pi pi-question text-5xl"></i>
+        </div>
+        <span class="font-bold text-2xl block mb-2 mt-4">
+          {{ message.header }}
+        </span>
+        <p class="mb-0">{{ message.message }}</p>
+        <div class="flex align-items-center gap-2 mt-4">
+          <button pButton label="Save" (click)="cd.accept()" class="w-8rem"></button>
+          <button pButton label="Cancel" (click)="cd.reject()" class="p-button-outlined w-8rem"></button>
+        </div>
+      </div>
+    </ng-template>
+  </p-confirmDialog>
+</div>

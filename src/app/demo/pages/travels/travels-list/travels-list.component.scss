@@ -1,0 +1,159 @@
+// :host ::ng-deep {
+//   .custom-toggle {
+//       .p-inputswitch-slider {
+//           background: #e0e0e0;
+//           transition: all 0.3s ease;
+
+//           &::before {
+//               background: #ffffff;
+//               box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+//           }
+//       }
+
+//       &.p-inputswitch-checked .p-inputswitch-slider {
+//           background: #4CAF50;
+//       }
+
+//       .slider-icon {
+//           display: flex;
+//           align-items: center;
+//           justify-content: center;
+//           height: 100%;
+
+//           i {
+//               color: white;
+//               font-size: 0.75rem;
+//               margin-left: 0.5rem;
+//               margin-right: 0.5rem;
+//           }
+//       }
+//   }
+
+//   .status-label {
+//       font-weight: 500;
+//       color: #4a4a4a;
+//       min-width: 80px;
+//   }
+// }
+
+// :host ::ng-deep .p-dialog .product-image {
+//   width: 150px;
+//   margin: 0 auto 2rem auto;
+//   display: block;}
+.no-wrap {
+  white-space: nowrap; /* Prevents text from wrapping */
+  overflow: hidden; /* Hides overflowed text */
+  text-overflow: ellipsis; /* Adds ellipsis for truncated text */
+  max-width: 150px; /* Adjust this value based on your design */
+}
+
+::ng-deep .p-splitbutton {
+  border-radius: 1.5rem !important; // يخليه rounded
+  font-size: 0.8rem !important; // يصغره
+  height: 2.2rem !important; // تصغير الارتفاع لو حبيت
+}
+
+::ng-deep .p-splitbutton .p-button {
+  padding: 0.3rem 0.6rem !important; // تصغير البادينج الداخلي
+  min-width: unset !important;
+}
+
+::ng-deep .p-splitbutton .p-splitbutton-menubutton {
+  padding: 0.3rem 0.5rem !important;
+}
+::ng-deep .p-menuitem {
+  cursor: pointer;
+}
+
+::ng-deep .p-menuitem:hover {
+  background-color: #e0e0e0 !important; // لون أغمق شوية عند hover
+}
+
+::ng-deep .p-menuitem-link:hover {
+  background-color: #d0d0d0 !important; // لو عايز التأثير يظهر على اللينك كله
+}
+/* إخفاء الزر الافتراضي في SplitButton */
+::ng-deep .no-default-button .p-splitbutton-defaultbutton {
+  display: none !important;
+}
+
+/* تعديل المظهر ليكون أنيقًا */
+::ng-deep .no-default-button .p-splitbutton-menubutton {
+  border-top-left-radius: 6px !important;
+  border-bottom-left-radius: 6px !important;
+}
+
+// للتأكد من أن المسافة تظهر بشكل صحيح
+::ng-deep .p-menuitem-link {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+}
+// Table styling - compact size
+:host ::ng-deep .p-datatable-table {
+  width: 100%;
+  min-width: 2000px;
+  table-layout: fixed;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
+  padding: 0.4rem 0.5rem !important;
+  font-size: 13px;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  padding: 0.5rem 0.5rem !important;
+  font-size: 14px;
+}
+
+// Align table headings to left
+:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
+  text-align: left !important;
+}
+
+// Compact filter row styling
+:host ::ng-deep .p-datatable .p-datatable-thead > tr:nth-child(2) > th {
+  padding: 0.25rem 0.5rem !important;
+  background: #f8f9fa;
+}
+
+:host ::ng-deep .p-datatable .p-column-filter-row {
+  padding: 0 !important;
+}
+:host ::ng-deep .p-datatable .p-column-filter-element {
+  width: 100%;
+}
+
+:host ::ng-deep .p-datatable .p-column-filter-row .p-inputtext {
+  padding: 0.35rem 0.5rem !important;
+  font-size: 13px;
+}
+
+:host ::ng-deep .p-datatable .p-column-filter-row .p-column-filter-menu-button,
+:host ::ng-deep .p-datatable .p-column-filter-row .p-column-filter-clear-button {
+  width: 1.75rem !important;
+  height: 1.75rem !important;
+}
+
+// Hide increase/decrease spinner buttons on numeric filters
+:host ::ng-deep .p-datatable .p-inputnumber-button-group {
+  display: none !important;
+}
+
+:host ::ng-deep .p-datatable .p-inputnumber-buttons-stacked .p-inputnumber-input {
+  border-radius: 6px !important;
+}
+
+// Old travel row styling (past check-in date)
+:host ::ng-deep .p-datatable .old-travel-row {
+  background-color: #f5f5f5 !important;
+  color: #888 !important;
+
+  td {
+    color: #888 !important;
+  }
+
+  &:hover {
+    background-color: #ebebeb !important;
+  }
+}

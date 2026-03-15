@@ -1,0 +1,70 @@
+<!-- reservation-room-form.component.html -->
+<div class="main">
+  <sub-header [mainHeader]="'Available Rooms'" [mainSection]="'Available Hotels'" [subSection]="'Rooms'"></sub-header>
+
+  <div class="container-fluid p-2">
+    <div class="row g-4">
+      <div *ngFor="let room of hotelRooms" class="col-12 col-md-4">
+        <div class="card m-2">
+          <!-- Header Image -->
+          <img
+            alt="Room image"
+            [src]="room.images?.length ? room.images[0] : 'https://placehold.co/600x400?text=No+Image'"
+            class="card-img-top"
+            style="height: 200px; object-fit: cover"
+          />
+
+          <!-- Card Body -->
+          <div class="card-body">
+            <h5 class="card-title">{{ room.hotel }}</h5>
+
+            <div class="row">
+              <div class="col-12">
+                <h3 class="fs-5 fw-bold mb-2">{{ room.name }}</h3>
+
+                <div class="mb-3">
+                  <p class="mb-2">
+                    <i class="pi pi-home me-2"></i>
+                    {{ room.roomType }} ({{ room.size }} m²)
+                  </p>
+                  <p class="mb-2">
+                    <i class="fas fa-bed me-2"></i>
+                    {{ room.bedCount }} Beds · {{ room.bedType || 'N/A' }}
+                  </p>
+                  <p class="mb-2">
+                    <i class="pi pi-calendar me-2"></i>
+                    {{ room.availableFrom | date: 'mediumDate' }} - {{ room.availableTo | date: 'mediumDate' }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Footer -->
+          <div class="card-footer">
+            <!-- Price & Booking Section -->
+            <div class="col-12 border-start ps-3">
+              <div class="d-flex flex-column h-100 justify-content-between">
+                <div>
+                  <span class="fs-3 fw-bold text-primary">
+                    {{ room.price }}
+                  </span>
+                  <small class="d-block text-muted mb-3">per night</small>
+                </div>
+
+                <div>
+                  <button class="btn btn-primary w-100 mb-2"  (click)="bookRoom(room.id)">
+                    <i class="pi pi-check me-2"></i>
+                    Book Now
+                  </button>
+
+                  <small class="text-muted d-block">Includes: {{ room.boarding }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

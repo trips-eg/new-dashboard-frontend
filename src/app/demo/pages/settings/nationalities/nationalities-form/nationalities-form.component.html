@@ -1,0 +1,51 @@
+<div class="product-form p-4 mb-4">
+  <div class="form-field">
+    <form [formGroup]="nationalitiesForm" (ngSubmit)="onSubmit()">
+      <h3 class="flex justify-content-between">
+{{ config.data ? ('edit nationality' | translate) : ('add nationality' | translate) }}
+        <!-- Always show "add" -->
+      </h3>
+      <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+        <div class="field col-md-12">
+          <div class="flex flex-column gap-2">
+            <label for="">
+              {{ 'nationality in arabic' | translate }}
+            </label>
+            <input pInputText id="username" aria-describedby="username-help" formControlName="nameAr" />
+            <small id="username-help">{{'enter nationality in arabic'|translate}}</small>
+          </div>
+          <!-- رسالة الخطأ إذا لم يتم اختيار دولة -->
+          <small
+            class="error"
+            *ngIf="
+              nationalitiesForm.get('nameAr').errors && (nationalitiesForm.get('nameAr').touched || nationalitiesForm.get('nameAr').dirty)
+            "
+          >
+            * required
+          </small>
+        </div>
+        <div class="field col-md-12">
+          <div class="flex flex-column gap-2">
+            <label for="username">{{ 'nationality in english' | translate }}</label>
+            <input pInputText id="username" aria-describedby="username-help" formControlName="name" />
+            <small id="username-help">{{'enter nationality in english'|translate}}</small>
+          </div>
+
+          <!-- رسالة الخطأ إذا لم يتم اختيار دولة -->
+          <small
+            class="error"
+            *ngIf="nationalitiesForm.get('name').errors && (nationalitiesForm.get('name').touched || nationalitiesForm.get('name').dirty)"
+          >
+            * required
+          </small>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Buttons -->
+  <div class="buttons mt-3 text-end">
+    <p-button label="{{ 'Cancel' | translate }}" class="mx-1" severity="secondary" (onClick)="onCancel()"></p-button>
+    <p-button label="{{ 'save' | translate }}" severity="success" icon="pi pi-save" (onClick)="onSubmit()"></p-button>
+  </div>
+</div>

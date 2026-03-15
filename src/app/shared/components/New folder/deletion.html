@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trips — Data Deletion Instructions</title>
+  <style>
+    body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial;line-height:1.5;color:#222;margin:0;padding:0;background:#f6f7fb}
+    .container{max-width:760px;margin:40px auto;padding:28px;background:#fff;border-radius:10px;box-shadow:0 8px 30px rgba(30,30,60,0.06)}
+    h1{margin:0 0 8px;font-size:22px}
+    p.lead{margin:0 0 18px;color:#445}
+    h2{font-size:16px;margin-top:22px}
+    ol{margin-left:18px}
+    pre{background:#f3f4f8;padding:12px;border-radius:6px;overflow:auto}
+    .note{background:#fff7e6;padding:12px;border-left:4px solid #ffd45a;margin:12px 0;border-radius:6px}
+    a{color:#0b63d6}
+    footer{margin-top:26px;color:#666;font-size:13px}
+    .btn{display:inline-block;padding:8px 12px;background:#0b63d6;color:#fff;border-radius:6px;text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Trips — Data Deletion Instructions</h1>
+    <p class="lead">This page explains how users can request deletion of personal data associated with the <strong>Trips</strong> mobile app. Add this URL to your Facebook App's <em>"User data deletion"</em> field so reviewers and users can see how to delete data.</p>
+
+    <h2>How to request deletion</h2>
+    <p>To request deletion of your personal data, please contact our support team using the details below. Include the information listed in the sample email so we can find and remove your account quickly.</p>
+
+    <h3>Contact</h3>
+    <p><strong>Email:</strong> <a href="mailto:seyam.ayoub@impact.eg">seyam.ayoub@impact.eg</a></p>
+    <p><strong>Or send a request using this template:</strong></p>
+
+    <pre>Subject: Data Deletion Request — Trips
+
+Hello Trips team,
+
+Please delete all personal data associated with my account.
+
+Full name: [Your full name]
+Email (used in app): [your-email@example.com]
+Phone (optional): [phone number]
+Username / User ID (if known): [your-username-or-id]
+Reason (optional): [optional reason]
+
+Please confirm when deletion is complete.
+
+Thank you,
+[Your name]
+</pre>
+
+    <h2>What we'll remove</h2>
+    <ol>
+      <li>User profile information (name, email, profile picture) stored by Trips.</li>
+      <li>Bookings, reservations, or other records tied to your account (unless legally required to retain some records).</li>
+      <li>Personal preferences and app-specific metadata.</li>
+    </ol>
+
+    <div class="note">
+      <strong>Important:</strong> We will remove personal data from our active systems, but some data (for example, anonymized analytics, cached backups, or records we are legally required to keep) may remain for a short time. We will delete data from backups according to our retention policy.
+    </div>
+
+    <h2>Third-party data & revoking access</h2>
+    <p>If you signed in with a third-party account (for example, Facebook), you should also revoke app access from your third-party account settings. For Facebook, go to <a href="https://www.facebook.com/settings?tab=applications" target="_blank" rel="noopener">Facebook Settings → Apps and Websites</a> and remove <strong>Trips</strong> from the list.</p>
+
+    <h2>Timeframe & confirmation</h2>
+    <p>We will acknowledge your request within <strong>5 business days</strong> and aim to complete deletion within <strong>30 days</strong>. After deletion is finished we will send a confirmation email to the address you provided in the request.</p>
+
+    <h2>Data protection officer / contact</h2>
+    <p>If you have questions about this process or need additional assistance, contact our data protection representative:</p>
+    <p><strong>Email:</strong> <a href="mailto:seyam.ayoub@impact.eg">seyam.ayoub@impact.eg</a></p>
+
+    <h2>Hosting this file on GitHub Pages (step-by-step)</h2>
+    <ol>
+      <li>Create a new GitHub repository (public is fine) — e.g. <code>trips-privacy</code>.</li>
+      <li>Create a new file named <code>deletion.html</code> in the repo root and paste the contents of this file into it. Commit the change.</li>
+      <li>Go to the repository <strong>Settings → Pages</strong>. Under <em>Source</em> choose the branch (usually <code>main</code>) and folder <code>/ (root)</code>, then click <strong>Save</strong>.</li>
+      <li>Wait a minute. Your page will be available at:
+        <br><code>https://&lt;your-github-username&gt;.github.io/trips-privacy/deletion.html</code>
+      </li>
+      <li>Copy that URL and paste it into Facebook Developers → your app → <strong>Settings → Basic → User data deletion</strong> (Data deletion instructions URL field).</li>
+    </ol>
+
+    <h2>Things to customize</h2>
+    <ul>
+      
+      <li>Adjust the expected timeframes (5 business days / 30 days) to reflect your real operation policy.</li>
+      <li>If you have a deletion API endpoint (e.g. <code>/api/delete-account</code>), add instructions and a secure link/form for verified users.</li>
+    </ul>
+
+    <footer>
+      <p>Generated for <strong>Trips</strong>. Update the contact email and timeframe before publishing. If you want, I can create the GitHub repo and commit this file for you — tell me your GitHub username or give me permission to create the repo.</p>
+    </footer>
+  </div>
+</body>
+</html>

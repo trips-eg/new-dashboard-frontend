@@ -1,0 +1,194 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="card">
+  <!-- Sidebar Type Selector -->
+  <div class="flex justify-content-center mb-3">
+    <p-selectButton
+      [options]="sidebarTypeOptions"
+      [(ngModel)]="sidebarType"
+      (onChange)="onSidebarTypeChange()"
+      optionLabel="label"
+      optionValue="value"
+    ></p-selectButton>
+  </div>
+
+  <p-toolbar styleClass="mb-4">
+    <ng-template pTemplate="right">
+      <span class="p-input-icon-left">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" [(ngModel)]="search" (ngModelChange)="onSearch()" placeholder="{{ 'Search...' | translate }}" />
+      </span>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    [value]="sideBars"
+    [rows]="10"
+    [paginator]="true"
+    [totalRecords]="totalRecords"
+    [lazy]="true"
+    (onLazyLoad)="loadSideBars($event)"
+    [rowHover]="true"
+    styleClass="p-datatable-gridlines"
+    [loading]="loading"
+    [rowsPerPageOptions]="[10, 20, 30]"
+    responsiveLayout="scroll"
+    [showCurrentPageReport]="true"
+    [currentPageReportTemplate]="'showingEntries' | translate"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="id">
+          {{ 'ID' | translate }}
+          <p-sortIcon field="id"></p-sortIcon>
+        </th>
+        <th pSortableColumn="Title">
+          {{ 'Title' | translate }}
+          <p-sortIcon field="Title"></p-sortIcon>
+        </th>
+        <th pSortableColumn="squence">
+          {{ 'Sequence' | translate }}
+          <p-sortIcon field="squence"></p-sortIcon>
+        </th>
+        <th pSortableColumn="color">
+          {{ 'Color' | translate }}
+          <p-sortIcon field="color"></p-sortIcon>
+        </th>
+        <th pSortableColumn="isActive">
+          {{ 'Status' | translate }}
+          <p-sortIcon field="isActive"></p-sortIcon>
+        </th>
+        <th>{{ 'Actions' | translate }}</th>
+      </tr>
+      <tr>
+        <th>
+          <p-columnFilter type="text" field="id" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="Title" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="squence" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="color" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th></th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-sidebar>
+      <tr>
+        <td>{{ sidebar.id }}</td>
+        <td>{{ sidebar.title }}</td>
+        <td>{{ sidebar.squence }}</td>
+        <td>
+          <div class="flex align-items-center justify-content-center gap-2">
+            <div [style.background-color]="sidebar.color" class="w-2rem h-2rem border-circle border-1 border-300"></div>
+            <span>{{ sidebar.color }}</span>
+          </div>
+        </td>
+        <td>
+          <span [class]="'product-badge status-' + (sidebar.isActive ? 'instock' : 'outofstock')">
+            {{ (sidebar.isActive ? 'Active' : 'Inactive') | translate }}
+          </span>
+        </td>
+        <td>
+          <div class="flex gap-1 justify-content-center">
+            <button
+              pButton
+              pRipple
+              icon="pi pi-pencil"
+              severity="success"
+              class="p-button-rounded mr-2"
+              (click)="edit(sidebar)"
+              pTooltip="{{ 'Edit' | translate }}"
+            ></button>
+            <button
+              pButton
+              pRipple
+              icon="pi pi-eye"
+              severity="info"
+              class="p-button-rounded mr-2"
+              pTooltip="{{ 'View' | translate }}"
+              (click)="view(sidebar.id)"
+            ></button>
+            <button
+              pButton
+              pRipple
+              icon="pi pi-trash"
+              severity="danger"
+              class="p-button-rounded"
+              (click)="delete(sidebar.id)"
+              pTooltip="{{ 'Delete' | translate }}"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="text-center p-4">
+          <div class="flex flex-column align-items-center">
+            <i class="pi pi-inbox text-500 text-3xl mb-3"></i>
+            <span>{{ 'No Records Found' | translate }}</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Coupon Sidebar Edit Dialog -->
+<p-dialog
+  header="{{ 'Edit Coupon Sidebar' | translate }}"
+  [(visible)]="couponDialogVisible"
+  [modal]="true"
+  [style]="{ width: '450px' }"
+  [closable]="true"
+  (onHide)="closeCouponDialog()"
+>
+  <form [formGroup]="couponForm">
+    <div class="formgrid grid">
+      <div class="field col-12">
+        <label for="couponTitle">{{ 'Title' | translate }}</label>
+        <input pInputText id="couponTitle" formControlName="title" class="w-full" />
+        <small class="p-error" *ngIf="couponForm.get('title')?.dirty && couponForm.get('title')?.invalid">
+          {{ 'Title is required' | translate }}
+        </small>
+      </div>
+
+      <div class="field col-12">
+        <label for="couponSquence">{{ 'Sequence' | translate }}</label>
+        <p-inputNumber id="couponSquence" formControlName="squence" styleClass="w-full" class="w-full"></p-inputNumber>
+      </div>
+
+      <div class="field col-12">
+        <label class="block mb-2">{{ 'Color' | translate }}</label>
+        <div class="flex align-items-center gap-2">
+          <p-colorPicker formControlName="color" appendTo="body"></p-colorPicker>
+          <span>{{ couponForm.get('color')?.value }}</span>
+        </div>
+      </div>
+
+      <div class="field col-12">
+        <div class="flex align-items-center gap-2">
+          <p-inputSwitch formControlName="isActive" inputId="couponIsActive"></p-inputSwitch>
+          <label for="couponIsActive">{{ 'Is Active' | translate }}</label>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button label="{{ 'Cancel' | translate }}" severity="secondary" (onClick)="closeCouponDialog()"></p-button>
+    <p-button
+      label="{{ 'Save' | translate }}"
+      (onClick)="saveCouponSidebar()"
+      [loading]="savingCoupon"
+      [disabled]="couponForm.invalid"
+    ></p-button>
+  </ng-template>
+</p-dialog>

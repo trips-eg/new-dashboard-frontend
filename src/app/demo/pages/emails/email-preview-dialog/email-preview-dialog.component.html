@@ -1,0 +1,24 @@
+<div class="email-preview-container">
+  <div class="email-header">
+    <h3>{{ emailData?.name }}</h3>
+    <div class="email-meta">
+      <span>
+        <strong>{{ 'email' | translate }}:</strong>
+        {{ emailData?.email }}
+      </span>
+      <span>
+        <strong>{{ 'purpose' | translate }}:</strong>
+        {{ emailData?.purposeName }}
+      </span>
+    </div>
+  </div>
+
+  <div class="email-content">
+    <h4>{{ 'email' | translate }} {{ 'preview' | translate }}</h4>
+    <iframe *ngIf="emailBlobUrl" class="email-iframe" [src]="emailBlobUrl" frameborder="0"></iframe>
+  </div>
+
+  <div class="dialog-footer">
+    <button pButton type="button" [label]="'close' | translate" icon="pi pi-times" (click)="close()" class="p-button-text"></button>
+  </div>
+</div>

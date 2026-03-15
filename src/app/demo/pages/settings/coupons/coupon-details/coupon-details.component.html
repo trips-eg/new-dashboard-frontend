@@ -1,0 +1,132 @@
+<div class="main-container">
+  <!-- <sub-header [mainHeader]="'Coupon Details'" [mainSection]="'Settings'" [subSection]="'Coupons'"></sub-header> -->
+
+  <div class="content-wrapper" *ngIf="coupon">
+    <!-- Gradient Card -->
+    <div class="coupon-card">
+      <div class="card-top">
+        <div class="discount-info">
+          <i class="pi pi-tag icon"></i>
+          <h3>{{ 'Save' | translate }} {{ coupon.discountAmount }} {{ '% on your purchases!' | translate }}</h3>
+        </div>
+      </div>
+
+      <div class="dotted-line"></div>
+
+      <div class="card-bottom">
+        <div class="code-section">
+          <span class="label">{{ 'Code' | translate }}:</span>
+          <span class="code">{{ coupon.code }}</span>
+        </div>
+        <button class="copy-btn" (click)="copyCode(coupon.code)">
+          <i class="pi pi-copy"></i>
+          {{ 'Copy Code' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Info Section -->
+    <div class="info-card">
+      <div class="info-group">
+        <h4>
+          <i class="fa fa-calendar"></i>
+          {{ 'Validity Period' | translate }}
+        </h4>
+        <div class="date-row">
+          <span>{{ 'From' | translate }}: {{ coupon.startDate | date: 'dd MMMM yyyy - h:mm a' }}</span>
+        </div>
+        <div class="date-row">
+          <span>{{ 'To' | translate }}: {{ coupon.endDate | date: 'dd MMMM yyyy - h:mm a' }}</span>
+        </div>
+        <div class="status-row">
+          <span class="status-badge" [ngClass]="{ expired: getRemainingDays(coupon.endDate) === 'Expired' }">
+            ({{ getRemainingDays(coupon.endDate) }})
+          </span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="info-group">
+        <h4>
+          <i class="fa fa-info-circle"></i>
+          {{ 'Usage Terms' | translate }}
+        </h4>
+        <div class="condition-item">
+          <i class="pi pi-user"></i>
+          <span>{{ 'Maximum per user' | translate }}: {{ getUserLimitLabel(coupon.userLimit) }}.</span>
+        </div>
+        <div class="condition-item">
+          <i class="pi pi-chart-bar"></i>
+          <span>{{ 'Total usage count' | translate }}: {{ coupon.usageNumber }}</span>
+        </div>
+        <div class="condition-item">
+          <i class="pi pi-globe"></i>
+          <span>
+            {{
+              coupon.isGenral ? ('This coupon is general and applies to the store' | translate) : ('This coupon is private and applies to the items listed below' | translate)
+            }}.
+          </span>
+        </div>
+        <div class="condition-item" *ngIf="coupon.description">
+          <i class="pi pi-info-circle"></i>
+          <span>{{ coupon.description }}</span>
+        </div>
+      </div>
+
+      <div class="divider" *ngIf="!coupon.isGenral"></div>
+
+      <div class="info-group" *ngIf="!coupon.isGenral">
+        <h4>
+          <i class="pi pi-list"></i>
+          {{ 'Items' | translate }}
+        </h4>
+
+        <!-- Trips -->
+        <div class="items-category" *ngIf="coupon.trip?.length">
+          <h5 class="category-title">{{ 'Trips' | translate }}</h5>
+          <div class="item-grid">
+            <span *ngFor="let item of coupon.trip" class="clickable-item" (click)="navigateTo('trip', item.id)">
+              {{ item.name }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Outings -->
+        <div class="items-category" *ngIf="coupon.outing?.length">
+          <h5 class="category-title">{{ 'Outings' | translate }}</h5>
+          <div class="item-grid">
+            <span *ngFor="let item of coupon.outing" class="clickable-item" (click)="navigateTo('outing', item.id)">
+              {{ item.name }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Rooms -->
+        <div class="items-category" *ngIf="coupon.room?.length">
+          <h5 class="category-title">{{ 'Rooms' | translate }}</h5>
+          <div class="item-grid">
+            <span *ngFor="let item of coupon.room" class="clickable-item" (click)="navigateTo('room', item.id)">
+              {{ item.name }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Hajj -->
+        <div class="items-category" *ngIf="coupon.hajj?.length">
+          <h5 class="category-title">{{ 'Hajj/Umrah' | translate }}</h5>
+          <div class="item-grid">
+            <span *ngFor="let item of coupon.hajj" class="clickable-item" (click)="navigateTo('hajj', item.id)">
+              {{ item.name }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!coupon" class="loading-state">
+    <i class="pi pi-spin pi-spinner"></i>
+    <p>{{ 'Loading coupon details...' | translate }}</p>
+  </div>
+</div>

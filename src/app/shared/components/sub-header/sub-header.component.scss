@@ -1,0 +1,52 @@
+.div {
+  padding: 15px 20px;
+  margin: 19px 0;
+  border-radius: 5px;
+
+  box-shadow: 1px 2px 5px #d4cfcf;
+}
+
+h1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: start;
+}
+.mainHeader {
+  color: var(--font-color);
+  text-transform: capitalize;
+}
+.subHeader {
+  color: #333;
+  font-weight: normal;
+  font-size: 1.2rem;
+}
+p {
+  font-size: 14px;
+  font-weight: 500;
+  color: #707a8a;
+  text-align: start;
+  width: 80%;
+  word-wrap: break-word;
+}
+.navigate {
+  color: #8e9194;
+  font-size: 16px;
+  display: block;
+  margin-bottom: 11px;
+  font-weight: 400;
+}
+.navigate:hover {
+  cursor: pointer;
+}
+
+.sub-sec {
+  color: var(--thm-blue);
+  text-transform: capitalize;
+}
+.main-sec {
+  color: var(--grey-color);
+  text-transform: capitalize;
+}
+.main-sec:hover {
+  cursor: pointer;
+}

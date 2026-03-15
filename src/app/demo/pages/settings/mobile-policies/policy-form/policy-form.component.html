@@ -1,0 +1,43 @@
+<form [formGroup]="policiesForm" >
+<div class="formgrid grid p-3 border-1 border-dashed surface-border border-round gap-3">
+  <div class="field col">
+    <label for="policyPragraph">
+      {{ 'policy Pragraph' | translate }}
+    </label>
+    <p-editor
+      id="Description1"
+      formControlName="policyPragraph"
+      [readonly]="!isEditMode"
+      [style]="{ height: '350px' }">
+    </p-editor>
+  </div>
+  <div class="field col">
+    <label for="enPolicyPragraph">
+      {{ 'enPolicy Pragraph' | translate }}
+    </label>
+    <p-editor
+      id="enPolicyPragraph"
+      formControlName="enPolicyPragraph"
+      [readonly]="!isEditMode"
+      [style]="{ height: '350px' }">
+    </p-editor>
+  </div>
+</div>
+
+<div class="buttons mt-3 text-end">
+  <ng-container *ngIf="!isEditMode">
+<p-button 
+  label="{{ 'Edit' | translate }}" 
+  icon="fa fa-edit" 
+  [iconPos]="translateService.currentLang === 'ar' ? 'right' : 'left'" 
+  class="p-button-rounded p-button-outlined p-button-sm" 
+  (onClick)="onEdit()">
+</p-button>
+  </ng-container>
+
+  <ng-container *ngIf="isEditMode">
+    <p-button label="{{ 'Cancel' | translate }}" class="mx-1" severity="secondary" (onClick)="onCancel()"></p-button>
+    <p-button label="{{ 'Save' | translate }}" severity="success" icon="pi pi-save" type="submit" (onClick)="onSave()"></p-button>
+  </ng-container>
+</div>
+</form>

@@ -1,0 +1,24 @@
+<div>
+    <input 
+      type="text" 
+      [(ngModel)]="searchQuery" 
+      (input)="onSearch(searchQuery)" 
+      [placeholder]="'Search'|translate" 
+      class="search-input" 
+    />
+  </div>
+  
+  <!-- Display suggestion list if there are filtered items -->
+  <div *ngIf="filteredItems.length > 0 && searchQuery" class="suggestions-list">
+    <ul>
+      <li *ngFor="let item of filteredItems" (click)="onNavigate(item.url)">
+        {{ item.title}}
+      </li>
+    </ul>
+  </div>
+  
+  <!-- Display message when no suggestions match -->
+  <div *ngIf="filteredItems.length === 0 && searchQuery" class="no-suggestions">
+    {{'No results found' |translate }}
+  </div>
+  

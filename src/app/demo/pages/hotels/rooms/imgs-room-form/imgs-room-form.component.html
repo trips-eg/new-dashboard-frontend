@@ -1,0 +1,27 @@
+<div class="main">
+  <sub-header [mainHeader]="'add room images' | translate"></sub-header>
+  <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round mb-4">
+    <div class="col-md-12 mb-3">
+      <app-img-uploader
+        [multiple]="true"
+        (filesChanged)="onImagesUpload($event)"
+        [displayFiles]="displayFilesForUploader"
+        (removeImgFromDB)="onImageRemoved($event)"
+      >
+        >
+      </app-img-uploader>
+      <!-- Buttons -->
+      <div class="buttons mt-3 text-end">
+        <p-button label="{{ 'Cancel' | translate }}" class="mx-1" severity="secondary" icon="pi pi-times" (onClick)="oncansel()"></p-button>
+        <p-button
+          label="{{ 'Save' | translate }}"
+          severity="success"
+          class="shadow"
+          icon="pi pi-save"
+          type="submit"
+          (onClick)="onSave()"
+        ></p-button>
+      </div>
+    </div>
+  </div>
+</div>

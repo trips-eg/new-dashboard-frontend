@@ -1,0 +1,234 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'QR Code Scanner'"
+    [actionButtons]="[{ label: 'Scan New Code', action: 'add', icon: 'pi pi-camera', class: 'btn-primary' }]"
+    (actionClicked)="showDialog()"
+  />
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Manual Entry Section -->
+  <div class="card mb-3 p-3">
+    <div class="row">
+      <div class="col-md-6 offset-md-3">
+        <div class="p-inputgroup">
+          <input
+            #bookingInput
+            type="text"
+            pInputText
+            placeholder="Enter Booking ID manually..."
+            [(ngModel)]="manualBookingId"
+            (keydown.enter)="onManualSubmit()"
+            autofocus
+          />
+          <button
+            type="button"
+            pButton
+            label="Validate"
+            icon="pi pi-check"
+            [raised]="true"
+            severity="primary"
+            (click)="onManualSubmit()"
+          ></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div *ngIf="isLoading" class="loading-overlay">
+    <i class="pi pi-spin pi-spinner" style="font-size: 3rem"></i>
+    <p>Loading ticket details...</p>
+  </div>
+
+  <!-- History Table -->
+  <div class="history-table">
+    <p-table [value]="scannedCodes" [tableStyle]="{ 'min-width': '50rem' }" styleClass="p-datatable-striped">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Booking ID</th>
+          <th>Scanned Time</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-code>
+        <tr>
+          <td>{{ code.code }}</td>
+          <td>{{ code.timestamp | date: 'medium' }}</td>
+          <td>
+            <span *ngIf="code.ticketData" class="badge bg-success">Loaded</span>
+            <span *ngIf="!code.ticketData" class="badge bg-warning">No Data</span>
+          </td>
+          <td>
+            <button
+              pButton
+              icon="pi pi-eye"
+              class="p-button-rounded p-button-text"
+              (click)="viewTicketDetails(code)"
+              [disabled]="!code.ticketData"
+              pTooltip="View Details"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4" class="text-center p-4">No scanned codes found</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Scanner Dialog -->
+  <p-dialog
+    header="Scan QR Code"
+    [(visible)]="visible"
+    [modal]="true"
+    [style]="{ width: '400px', maxWidth: '90vw' }"
+    (onHide)="closeDialog()"
+  >
+    <div class="scanner-wrapper d-flex justify-content-center">
+      <ngx-scanner-qrcode
+        #scanner
+        class="scanner-box"
+        [config]="{
+          fps: 30,
+          vibrate: 200,
+          isBeep: true
+        }"
+        (event)="onScanSuccess($event)"
+        (error)="onScanError($event)"
+      ></ngx-scanner-qrcode>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button pButton label="Close" icon="pi pi-times" class="p-button-text" (click)="closeDialog()"></button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Ticket Details Dialog -->
+  <p-dialog
+    header="Ticket Details"
+    [(visible)]="showTicketDialog"
+    [modal]="true"
+    [style]="{ width: '600px', maxWidth: '95vw' }"
+    (onHide)="closeTicketDialog()"
+  >
+    <div *ngIf="selectedTicket" class="ticket-details">
+      <!-- Ticket Information Card -->
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title mb-3">
+            <i class="pi pi-ticket me-2"></i>
+            {{ selectedTicket.ticketType }}
+          </h5>
+
+          <div class="ticket-info">
+            <!-- Description -->
+            <div class="info-row mb-3">
+              <label class="fw-bold">Description:</label>
+              <p class="mb-0">{{ selectedTicket.description }}</p>
+            </div>
+
+            <!-- Status -->
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <div class="info-item">
+                  <i
+                    class="pi pi-check-circle me-2"
+                    [class.text-success]="selectedTicket.isActive"
+                    [class.text-danger]="!selectedTicket.isActive"
+                  ></i>
+                  <label class="fw-bold">Status:</label>
+                  <span class="ms-2 badge" [class.bg-success]="selectedTicket.isActive" [class.bg-danger]="!selectedTicket.isActive">
+                    {{ selectedTicket.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Serial Numbers Section -->
+            <div class="serial-numbers-section" *ngIf="selectedTicket.outingTicketSerialNumbers?.length > 0">
+              <hr class="my-3" />
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0">
+                  <i class="pi pi-qrcode me-2"></i>
+                  Entry Tickets (Serial Numbers)
+                  <span class="badge bg-primary ms-2">{{ selectedTicket.outingTicketSerialNumbers.length }} Total</span>
+                </h6>
+                <button
+                  *ngIf="getUnusedSerialNumbers(selectedTicket).length > 0"
+                  pButton
+                  label="Mark as Used"
+                  icon="pi pi-check-circle"
+                  class="p-button-sm p-button-success"
+                  (click)="markAllSerialsAsUsed()"
+                ></button>
+              </div>
+
+              <p class="text-muted mb-3">
+                <i class="pi pi-info-circle me-2"></i>
+                Each serial number represents one entry ticket. Mark tickets as used when entry is granted.
+              </p>
+
+              <!-- Serial Numbers Table -->
+              <p-table
+                [value]="selectedTicket.outingTicketSerialNumbers"
+                styleClass="p-datatable-sm"
+                [tableStyle]="{ 'min-width': '100%' }"
+              >
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th style="width: 70%">Serial Number</th>
+                    <th style="width: 30%">Status</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-serial>
+                  <tr>
+                    <td>
+                      <span class="serial-number-text">{{ serial.serialNumber }}</span>
+                    </td>
+                    <td>
+                      <span class="badge" [class.bg-success]="!serial.isUsed" [class.bg-danger]="serial.isUsed">
+                        <i class="pi me-1" [class.pi-check]="!serial.isUsed" [class.pi-times]="serial.isUsed"></i>
+                        {{ serial.isUsed ? 'Used' : 'Available' }}
+                      </span>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+
+              <!-- Summary -->
+              <div class="alert alert-info mt-3 d-flex justify-content-between align-items-center">
+                <div>
+                  <i class="pi pi-info-circle me-2"></i>
+                  <strong>Summary:</strong>
+                </div>
+                <div>
+                  <span class="badge bg-success me-2">
+                    <i class="pi pi-check me-1"></i>
+                    {{ getUnusedSerialNumbers(selectedTicket).length }} Available
+                  </span>
+                  <span class="badge bg-danger">
+                    <i class="pi pi-times me-1"></i>
+                    {{ getUsedSerialNumbers(selectedTicket).length }} Used
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!selectedTicket" class="alert alert-warning">
+      <i class="pi pi-exclamation-triangle me-2"></i>
+      No ticket data available
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button pButton label="Close" icon="pi pi-times" class="p-button-text" (click)="closeTicketDialog()"></button>
+    </ng-template>
+  </p-dialog>
+</div>

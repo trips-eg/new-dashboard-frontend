@@ -1,0 +1,30 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="' Reservations'"
+
+  ></sub-header>
+
+<div class="card">
+  <p-toolbar styleClass="">
+    <ng-template pTemplate="left">
+      <span [class]="'p-input-icon-' + (lang === 'ar' ? 'left' : 'right')">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text"  (input)="searchByName(searchedWord)" [(ngModel)]="searchedWord" placeholder="Search..." />
+      </span>
+    </ng-template>
+
+  </p-toolbar>
+  <!-- <app-table
+  [data]="travels"
+  [columns]="columns"
+  [btnAction]="btnAction"
+  [totalRecords]="totalRecords"
+  [rows]="pageSize"
+  [lazy]="true"
+  (eventEmitters)="handleTableAction($event)"
+  (onPageChange)="onPageChange($event)"
+></app-table> -->
+
+</div>
+
+</div>

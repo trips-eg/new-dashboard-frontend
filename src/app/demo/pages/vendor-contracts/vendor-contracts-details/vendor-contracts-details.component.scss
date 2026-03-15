@@ -1,0 +1,15 @@
+:host ::ng-deep .description-text {
+  max-height: 120px;     /* أقصى ارتفاع */
+  overflow-y: auto;      /* Scroll داخلي */
+  word-wrap: break-word; /* يكسر الكلمة الطويلة */
+  white-space: pre-wrap; /* يحافظ على الفورمات */
+  padding-right: 4px;    /* عشان يبان السكرول */
+}
+
+:host ::ng-deep .description-text::-webkit-scrollbar {
+  width: 6px;
+}
+:host ::ng-deep .description-text::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 4px;
+}

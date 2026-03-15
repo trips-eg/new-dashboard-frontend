@@ -1,0 +1,8 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'roles'"
+    [actionButtons]="!isVendor()?[{ label: 'Add', action: 'add', icon: 'pi pi-plus', class: 'btn-primary' }]:[]"
+    (actionClicked)="handleAction($event)"
+  ></sub-header>
+  <app-roles-list></app-roles-list>
+</div>

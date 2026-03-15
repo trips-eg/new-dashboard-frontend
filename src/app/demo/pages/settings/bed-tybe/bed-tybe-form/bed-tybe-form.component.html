@@ -1,0 +1,42 @@
+<div class="product-form p-4 mb-4">
+  <p-toast></p-toast> <!-- Add toast for success/error messages -->
+
+  <div class="form-field">
+    <form [formGroup]="bedTybeForm" (ngSubmit)="onSubmit()">
+      <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+        <div class="field col">
+          <label for="name">
+            {{ 'bed tybe' | translate }}
+            <small *ngIf="bedTybeForm.get('name')?.invalid && (bedTybeForm.get('name')?.touched || bedTybeForm.get('name')?.dirty)" class="text-danger">*</small>
+          </label>
+
+          <input type="text" pInputText id="name" formControlName="name" />
+
+          <!-- Error message for required field -->
+          <small class="error" *ngIf="bedTybeForm.get('name')?.hasError('required') && (bedTybeForm.get('name')?.touched || bedTybeForm.get('name')?.dirty)">
+            * {{ 'required' | translate }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="buttons mt-3 text-end">
+        <p-button
+          label="{{ 'Cancel' | translate }}"
+          class="mx-1"
+          severity="secondary"
+          (onClick)="onCancel()"
+          [disabled]="isLoading"
+        ></p-button>
+        <p-button
+          type="submit"
+          label="{{ 'save' | translate }}"
+          severity="success"
+          icon="pi pi-save"
+          [disabled]="bedTybeForm.invalid || isLoading"
+          [loading]="isLoading"
+        ></p-button>
+      </div>
+    </form>
+  </div>
+</div>

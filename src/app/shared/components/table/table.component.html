@@ -1,0 +1,150 @@
+<!-- <p-toast></p-toast> -->
+
+<div class="card">
+  <p-table
+    [value]="data"
+    [rows]="rows"
+    [paginator]="data?.length > 0 ? true : false"
+    [(selection)]="selectedItems"
+    [rowHover]="true"
+    dataKey="id"
+    [totalRecords]="totalRecords"
+    (onPage)="onPage($event)"
+    [scrollable]="true"
+    scrollwidth="2000px"
+    [rowsPerPageOptions]="[5, 10, 20]"
+    [lazy]="lazy"
+    emptyMessage="'No data available'"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <ng-container *ngFor="let col of columns">
+          <th [pSortableColumn]="col.sort ? col.field : null" [style.width.px]="col.width" class="justify-content-center">
+            <p-sortIcon *ngIf="col.sort" [field]="col.field"></p-sortIcon>
+
+            {{ col.header | translate }}
+          </th>
+        </ng-container>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item>
+      <tr>
+        <ng-container *ngFor="let col of columns">
+          <td [style.width.px]="col.width" class="justify-content-center">
+            <!-- If the column type is 'image', display an image -->
+            <ng-container *ngIf="col.header === 'Image'">
+              <!-- imgUrl +  -->
+              <img [src]="item[col.field]" alt="{{ col.field }}" class="product-image" *ngIf="item[col.field]" />
+            </ng-container>
+            <ng-container *ngIf="col.isCustomField && col.field === 'duration'">
+              {{ item[col.fromDate] | date: 'dd MMM yyyy' }} : {{ item[col.toDate] | date: 'dd MMM yyyy' }}
+            </ng-container>
+            <ng-container *ngIf="col.isDate">
+              {{ item[col.field] ? (item[col.field] | date: 'dd MMM yyyy') : '_' }}
+            </ng-container>
+            <ng-container *ngIf="col.isTime">
+              {{ item[col.field] ? (item[col.field] | date: 'HH:mm:ss') : '_' }}
+            </ng-container>
+
+            <!-- If the column type is not 'image', display regular data -->
+            <ng-container *ngIf="col.isData">
+              <!-- Handle non-link fields -->
+              <ng-container *ngIf="!col.isLink">
+                {{ getNestedValue(item, col.field) || '_' }}
+                <!-- {{ (item[col.field]?.length > 25 ? (item[col.field] | slice:0:25) + '...': item[col.field] ) || '_'}} -->
+                <!-- <span
+              [pTooltip]="item[col.field] || '_'"
+              tooltipPosition="top"
+            >
+              {{
+                item[col.field]?.length > 25
+                  ? (item[col.field] | slice: 0: 25) + '...'
+                  : item[col.field] || '_'
+              }}
+            </span> -->
+              </ng-container>
+              <ng-container *ngIf="col.isLink">
+                <!-- <span class="link" (click)="emitEvent('Download Resume', item[col.field])">
+                  <span *ngIf="item[col.field]"><i class="pi pi-file"></i></span>
+                </span> -->
+
+                <span [routerLink]="[col.link, col.id]">{{ item[col.field] }}</span>
+              </ng-container>
+
+              <!--handel status fiels in tabel   -->
+              <ng-container *ngIf="col?.isStatus">
+                <!-- <span [ngClass]="StatusClassMapping[col.mapping][item[col.field]]">
+                {{ item[col.field] | translate }}
+              </span> -->
+                <!-- <p-tag
+
+              [value]="item[col?.field]"
+              [ngClass]="StatusClassMapping[col.mapping][item[col.field]]" /> -->
+                <button
+                  *ngIf="col?.canEdit"
+                  [hidden]="!canEditStatus(item, col.field)"
+                  (click)="emitEvent('editStatus', item)"
+                  pTooltip="{{ col.tooltip | translate }}"
+                >
+                  <i class="pi pi-pen-to-square">edit</i>
+                </button>
+              </ng-container>
+
+              <ng-container *ngIf="col.isLink && col.dynamicIdField && col.isEvent">
+                <button [routerLink]="[col.link, item[col.dynamicIdField]]" [queryParams]="{ productName: item[col.param] }" class="specs">
+                  <span class="">{{ col.header | translate }}</span>
+                </button>
+              </ng-container>
+            </ng-container>
+            <ng-container *ngIf="col?.isRating">
+              <p-rating [(ngModel)]="item[col?.field]" [readonly]="true" />
+            </ng-container>
+
+            <ng-container *ngIf="col.isStatus">
+              <!-- <span [ngClass]="StatusClassMapping[col.mapping][item[col.field]]">
+              {{ item[col.field]}}
+            </span> -->
+            </ng-container>
+
+            <!--handel status fiels in tabel   -->
+            <ng-container *ngIf="col?.isFileDownload">
+              <span class="link" (click)="onDownload(item, col.field)">
+                <i class="pi pi-file-arrow-up text-primary"></i>
+              </span>
+            </ng-container>
+
+            <ng-container *ngIf="col.isCrudAction">
+              <ng-container *ngIf="btnAction?.length">
+                <div class="action-buttons">
+                  <ng-container *ngFor="let action of btnAction">
+                    <p-button
+                      [raised]="true"
+                      [icon]="action.icon"
+                      [severity]="action.styleClass"
+                      [rounded]="true"
+                      (onClick)="handleButtonClick(action.name, item)"
+                      [pTooltip]="action.name"
+                    ></p-button>
+                  </ng-container>
+                </div>
+              </ng-container>
+            </ng-container>
+          </td>
+        </ng-container>
+      </tr>
+    </ng-template>
+
+    <!-- Empty Message -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="columns?.length" class="text-center">
+          <div class="py-3">
+            <i class="pi pi-info-circle" style="font-size: 1rem; color: gray"></i>
+            <span class="ms-2" style="color: gray">{{ 'No Data found' | translate }}</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

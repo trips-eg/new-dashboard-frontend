@@ -1,0 +1,302 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="isEditMode ? ('Edit Sidebar' | translate) : ('Create Sidebar' | translate)"
+    [mainSection]="'Settings' | translate"
+    [subSection]="isEditMode ? ('Edit' | translate) : ('Create' | translate)"
+  ></sub-header>
+
+  <div class="card p-4">
+    <form [formGroup]="sideBarForm" (ngSubmit)="onSave()">
+      <!-- Sidebar Info Section -->
+      <h3 class="flex justify-content-between align-items-center">
+        {{ 'Sidebar Info' | translate }}
+        <span class="flex align-items-center gap-2">
+          <label for="isActive">{{ 'Is Active' | translate }}</label>
+          <p-inputSwitch formControlName="isActive" inputId="isActive"></p-inputSwitch>
+        </span>
+      </h3>
+
+      <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round mb-4">
+        <div class="field col-12 col-md-6">
+          <label for="title">{{ 'Title' | translate }}</label>
+          <input pInputText id="title" formControlName="title" class="w-full" />
+          <small class="p-error" *ngIf="sideBarForm.get('title')?.dirty && sideBarForm.get('title')?.invalid">
+            {{ 'Title is required' | translate }}
+          </small>
+        </div>
+
+        <div class="field col-12 col-md-6">
+          <label for="squence">{{ 'Sequence' | translate }}</label>
+          <p-inputNumber id="squence" formControlName="squence" styleClass="w-full" class="w-full"></p-inputNumber>
+        </div>
+
+        <div class="field col-12 col-md-6">
+          <label class="block mb-2">{{ 'Color' | translate }}</label>
+          <div class="flex align-items-center gap-2">
+            <p-colorPicker formControlName="color"></p-colorPicker>
+            <span>{{ sideBarForm.get('color')?.value }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Items Management Section -->
+      <h3>{{ 'Items Management' | translate }}</h3>
+      <div class="card mt-3" style="min-height: 500px">
+        <p-splitter [style]="{ height: '100%' }">
+          <!-- Left Pane: Available Items -->
+          <ng-template pTemplate>
+            <div class="col-12 h-full flex flex-column overflow-auto">
+              <h5 class="mb-3 p-3">{{ 'Available Items' | translate }}</h5>
+
+              <p-tabView (onChange)="onTabChange($event)" class="flex-1">
+                <p-tabPanel header="Room">
+                  <ng-container *ngTemplateOutlet="itemsGrid; context: { $implicit: SideBarItemType.Room }"></ng-container>
+                </p-tabPanel>
+                <p-tabPanel header="Outing">
+                  <ng-container *ngTemplateOutlet="itemsGrid; context: { $implicit: SideBarItemType.Outing }"></ng-container>
+                </p-tabPanel>
+                <p-tabPanel header="Hajj">
+                  <ng-container *ngTemplateOutlet="itemsGrid; context: { $implicit: SideBarItemType.Hajj }"></ng-container>
+                </p-tabPanel>
+                <p-tabPanel header="Trip">
+                  <ng-container *ngTemplateOutlet="itemsGrid; context: { $implicit: SideBarItemType.Trip }"></ng-container>
+                </p-tabPanel>
+              </p-tabView>
+            </div>
+          </ng-template>
+
+          <!-- Right Pane: Selected Items -->
+          <ng-template pTemplate>
+            <div class="col-12 h-full overflow-auto">
+              <h5 class="mb-3 p-3 flex align-items-center justify-content-between">
+                <span>{{ 'Selected Items' | translate }}</span>
+                <p-tag [value]="selectedItems.length.toString()" [rounded]="true" severity="info"></p-tag>
+              </h5>
+
+              <div class="flex flex-column gap-2 px-3 pb-3">
+                <div
+                  *ngFor="let item of selectedItems; let i = index"
+                  class="selected-card"
+                  [ngClass]="{
+                    'selected-card--room': item.sideBarItemType === SideBarItemType.Room,
+                    'selected-card--outing': item.sideBarItemType === SideBarItemType.Outing,
+                    'selected-card--hajj': item.sideBarItemType === SideBarItemType.Hajj,
+                    'selected-card--trip': item.sideBarItemType === SideBarItemType.Trip
+                  }"
+                >
+                  <!-- Top Row: Order + Name + Type + Delete -->
+                  <div class="flex align-items-center justify-content-between">
+                    <div class="flex align-items-center gap-2 flex-1" style="min-width: 0">
+                      <span class="selected-card__order">{{ i + 1 }}</span>
+                      <span class="selected-card__name">{{ getItemName(item) }}</span>
+                      <p-tag
+                        [value]="SideBarItemType[item.sideBarItemType]"
+                        [severity]="
+                          item.sideBarItemType === SideBarItemType.Room
+                            ? 'info'
+                            : item.sideBarItemType === SideBarItemType.Outing
+                              ? 'success'
+                              : item.sideBarItemType === SideBarItemType.Hajj
+                                ? 'warning'
+                                : 'danger'
+                        "
+                        [rounded]="true"
+                        styleClass="text-xs"
+                      ></p-tag>
+                    </div>
+                    <p-button
+                      icon="pi pi-trash"
+                      severity="danger"
+                      [text]="true"
+                      [rounded]="true"
+                      size="small"
+                      (onClick)="removeItem(i)"
+                      pTooltip="{{ 'Remove' | translate }}"
+                      tooltipPosition="left"
+                    ></p-button>
+                  </div>
+
+                  <!-- Details Row (from _displayItem) -->
+                  <div class="selected-card__details" *ngIf="item['_displayItem'] as d">
+                    <!-- Description -->
+                    <div class="selected-card__desc" *ngIf="d.description">
+                      {{ d.description.length > 60 ? (d.description | slice: 0 : 60) + '...' : d.description }}
+                    </div>
+
+                    <!-- Meta: Price + Vendor + Location -->
+                    <div class="selected-card__meta">
+                      <span class="selected-card__price" *ngIf="getItemPrice(d) !== 'N/A'">
+                        <i class="pi pi-wallet"></i>
+                        {{ getItemPrice(d) }}
+                      </span>
+                      <span class="selected-card__vendor" *ngIf="getVendorName(d)">
+                        <i class="pi pi-building"></i>
+                        {{ getVendorName(d) }}
+                      </span>
+                      <span class="selected-card__location" *ngIf="d.location">
+                        <i class="pi pi-map-marker"></i>
+                        {{ d.location }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Empty State -->
+                <div class="selected-card__empty" *ngIf="selectedItems.length === 0">
+                  <i class="pi pi-arrow-left" style="font-size: 2rem; color: var(--text-color-secondary)"></i>
+                  <p class="text-500 m-0 mt-2">{{ 'No items selected. Select items from the left.' | translate }}</p>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </p-splitter>
+      </div>
+
+      <div class="flex justify-content-end gap-2 mt-5">
+        <p-button label="{{ 'Back' | translate }}" severity="secondary" (onClick)="onBack()"></p-button>
+        <p-button label="{{ 'Save' | translate }}" type="submit" [loading]="saving"></p-button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<ng-template #itemsGrid let-type>
+  <div class="flex flex-column h-full">
+    <!-- Search Bar -->
+    <div class="px-3 mb-3">
+      <span class="p-input-icon-left w-full">
+        <i class="pi pi-search"></i>
+        <input
+          type="text"
+          pInputText
+          [value]="sectorStates[type].filter.Search"
+          placeholder="{{ 'Search items...' | translate }}"
+          (input)="onSearch($event, type)"
+          class="w-full"
+        />
+      </span>
+    </div>
+
+    <!-- Items List -->
+    <div class="flex flex-column gap-3 px-3" *ngIf="!sectorStates[type].loading; else loadingTemplate">
+      <div
+        *ngFor="let item of sectorStates[type].items"
+        class="item-card"
+        [ngClass]="{
+          'item-card--room': type === SideBarItemType.Room,
+          'item-card--outing': type === SideBarItemType.Outing,
+          'item-card--hajj': type === SideBarItemType.Hajj,
+          'item-card--trip': type === SideBarItemType.Trip
+        }"
+      >
+        <!-- Card Header: Name + Price -->
+        <div class="flex justify-content-between align-items-start mb-2">
+          <div class="flex align-items-center gap-2">
+            <span class="item-card__name">{{ item.name || item.title || 'Item #' + item.id }}</span>
+            <p-tag
+              [value]="SideBarItemType[type]"
+              [severity]="
+                type === SideBarItemType.Room
+                  ? 'info'
+                  : type === SideBarItemType.Outing
+                    ? 'success'
+                    : type === SideBarItemType.Hajj
+                      ? 'warning'
+                      : 'danger'
+              "
+              [rounded]="true"
+              styleClass="text-xs"
+            ></p-tag>
+          </div>
+          <span class="item-card__price" *ngIf="getItemPrice(item) !== 'N/A'">
+            {{ getItemPrice(item) }}
+          </span>
+          <span class="item-card__price item-card__price--na" *ngIf="getItemPrice(item) === 'N/A'">N/A</span>
+        </div>
+
+        <!-- Description -->
+        <div class="item-card__desc" *ngIf="item.description">
+          {{ item.description.length > 80 ? (item.description | slice: 0 : 80) + '...' : item.description }}
+        </div>
+
+        <!-- Location -->
+        <div class="item-card__meta" *ngIf="item.location">
+          <i class="pi pi-map-marker"></i>
+          {{ item.location }}
+        </div>
+
+        <!-- Outing Tickets Section -->
+        <div class="item-card__tickets" *ngIf="item.tickets?.length > 0">
+          <div class="item-card__tickets-toggle" (click)="item._showTickets = !item._showTickets">
+            <i class="pi" [ngClass]="item._showTickets ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+            <span>{{ 'Tickets' | translate }} ({{ item.tickets.length }})</span>
+          </div>
+
+          <div class="item-card__tickets-list" *ngIf="item._showTickets">
+            <div
+              *ngFor="let ticket of item.tickets"
+              class="item-card__ticket"
+              [ngClass]="{ 'item-card__ticket--inactive': !ticket.isActive }"
+            >
+              <div class="item-card__ticket-info">
+                <span class="item-card__ticket-type">{{ ticket.ticketType }}</span>
+                <p-tag *ngIf="!ticket.isActive" value="Inactive" severity="danger" [rounded]="true" styleClass="text-xs"></p-tag>
+              </div>
+              <div class="item-card__ticket-details">
+                <span class="item-card__ticket-price">{{ ticket.price | number }}</span>
+                <span class="item-card__ticket-qty" *ngIf="ticket.availableQuantity">
+                  <i class="pi pi-ticket"></i>
+                  {{ ticket.availableQuantity }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer: Vendor + Add Button -->
+        <div class="flex justify-content-between align-items-center mt-2">
+          <div class="flex align-items-center gap-2">
+            <span class="item-card__vendor" *ngIf="getVendorName(item)">
+              <i class="pi pi-building"></i>
+              {{ getVendorName(item) }}
+            </span>
+            <span class="item-card__id">#{{ item.id }}</span>
+          </div>
+          <p-button
+            icon="pi pi-plus"
+            (onClick)="addItem(item)"
+            size="small"
+            [rounded]="true"
+            [outlined]="true"
+            pTooltip="{{ 'Add' | translate }}"
+            tooltipPosition="left"
+          ></p-button>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="text-center py-5 surface-100 border-round" *ngIf="sectorStates[type].items.length === 0">
+        <i class="pi pi-inbox text-4xl text-400 mb-3" style="display: block"></i>
+        <p class="text-500 m-0">{{ 'No items found' | translate }}</p>
+      </div>
+
+      <!-- Paginator -->
+      <div class="mt-3">
+        <p-paginator
+          [rows]="sectorStates[type].filter.pageSize"
+          [totalRecords]="sectorStates[type].totalRecords"
+          [first]="(sectorStates[type].filter.pageIndex - 1) * sectorStates[type].filter.pageSize"
+          (onPageChange)="onPageChange($event, type)"
+        ></p-paginator>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #loadingTemplate>
+  <div class="grid">
+    <div class="col-12 md:col-6" *ngFor="let i of [1, 2, 3, 4]">
+      <p-skeleton height="100px" styleClass="mb-2"></p-skeleton>
+    </div>
+  </div>
+</ng-template>

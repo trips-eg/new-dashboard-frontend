@@ -1,0 +1,66 @@
+<div class="main">
+  <sub-header [mainHeader]="'all Reservations'"></sub-header>
+
+  @if (!isVendor()) {
+    <app-reservation-list></app-reservation-list>
+  } @else {
+    <p-panel header="{{ 'Reservation History' | translate }}" [toggleable]="true" class="mt-4">
+      @if (!permissionsLoaded) {
+        <div class="text-center py-5">
+          <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+          <p class="mt-3">{{ 'Loading permissions...' | translate }}</p>
+        </div>
+      } @else {
+        <p-tabView>
+          @if (hasTravelPermission) {
+            <p-tabPanel [header]="'Travel' | translate">
+              <ng-template pTemplate="content">
+                <app-travel-booking-info
+                  [totalRecords]="totalRecorsOfTravel"
+                  [consumerTravelDetailReserved]="travelList"
+                  (pageChange)="loadTravelData($event)"
+                />
+              </ng-template>
+            </p-tabPanel>
+          }
+
+          @if (hasRoomPermission) {
+            <p-tabPanel [header]="'Room' | translate">
+              <ng-template pTemplate="content">
+                <app-room-booking-info
+                  [consumerRoomDetailReserved]="roomsList"
+                  [totalRecords]="totalRecorsOfRooms"
+                  (pageChange)="loadRoomData($event)"
+                />
+              </ng-template>
+            </p-tabPanel>
+          }
+
+          @if (hasOutingPermission) {
+            <p-tabPanel [header]="'outing' | translate">
+              <ng-template pTemplate="content">
+                <app-outing-booking-info
+                  [consumerOutingDetailReserved]="outingsList"
+                  [totalRecords]="totalRecorsOfOutings"
+                  (pageChange)="loadOutingData($event)"
+                />
+              </ng-template>
+            </p-tabPanel>
+          }
+
+          @if (hasManasikPermission) {
+            <p-tabPanel [header]="'hajj-ummrah' | translate">
+              <ng-template pTemplate="content">
+                <app-manasik-booking-info
+                  [consumerHajjDetailReserved]="manasikList"
+                  [totalRecords]="totalRecorsOfManasik"
+                  (pageChange)="loadManasikData($event)"
+                />
+              </ng-template>
+            </p-tabPanel>
+          }
+        </p-tabView>
+      }
+    </p-panel>
+  }
+</div>

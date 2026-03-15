@@ -1,0 +1,65 @@
+<div class="main">
+  <sub-header [mainHeader]="'reservation'" [mainSection]="'reservations'" [subSection]="'reserve hotel'"></sub-header>
+
+  <app-hotel-filter (filterChanged)="onFilterChanged($event)"></app-hotel-filter>
+
+  <div class="container-fluid p-4">
+    <div class="row g-4">
+      <div class="col-12 col-md-3" *ngFor="let hotel of hotels">
+        <div class="card h-100 shadow position-relative">
+          <!-- تاج الحالة -->
+          <span class="position-absolute top-0 end-0 mt-2 me-2 badge"
+                [ngClass]="hotel.status ? 'bg-success' : 'bg-danger'">
+            {{ hotel.status ? 'Open' : 'Closed' }}
+          </span>
+
+          <!-- الصورة -->
+          <img [src]=" 'https://placehold.co/600x400?text=No+Image'"
+               class="card-img-top object-fit-cover"
+               alt="Hotel Image"
+               style="height: 200px">
+
+          <!-- محتوى الكارد -->
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <h2 class="h3 fw-bold mb-0">{{ hotel.name }}</h2>
+              <div class="d-flex align-items-center text-warning">
+                <i class="fas fa-star fa-xs me-1"></i>
+                <span class="medium text-body-secondary">{{ hotel.rating }}</span>
+              </div>
+            </div>
+
+            <div class="medium text-body-secondary mb-1">
+              <i class="fas fa-map-marker-alt me-1"></i>
+              {{ hotel.cityName }}, {{ hotel.countryName }}
+            </div>
+
+            <p class="card-text small mb-0">{{ hotel.description }}</p>
+          </div>
+
+          <div class="card-footer bg-white border-top-0 mt-1">
+            <button class="btn btn-primary w-100"
+                    (click)="goToRoomlReservationForm(hotel.id)">
+              Show Rooms
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PrimeNG Paginator -->
+    <div class="d-flex justify-content-center mt-4">
+      <p-paginator
+        (onPageChange)="pageChange($event)"
+        [first]="first"
+        [rows]="rows"
+        [totalRecords]="totalRecords"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [rowsPerPageOptions]="[10, 20,50,100]"
+        styleClass="p-paginator"
+        [dropdownAppendTo]="'body'">
+      </p-paginator>
+    </div>
+  </div>
+</div>

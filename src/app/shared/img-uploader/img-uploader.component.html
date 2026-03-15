@@ -1,0 +1,59 @@
+<div class="upload-container">
+  <div
+    class="dropzone"
+    [class.dragging]="isDragging"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onFileDrop($event)"
+  >
+    <input
+      type="file"
+      (change)="onFileSelect($event)"
+      accept="image/*"
+      hidden
+      #fileInput
+      [multiple]="multiple"
+    >
+
+    <div class="content-wrapper" [class.has-files]="files.length > 0 || previews.length > 0">
+      <!-- Initial upload content -->
+      <div *ngIf="(files.length + previews.length) === 0" class="upload-content">
+        <span class="upload-icon">📁</span>
+        <p>Drag & drop images or <span class="browse-link" (click)="triggerFileInput()">browse</span></p>
+        <p class="requirements">(JPEG, PNG, GIF, WEBP up to {{ maxFileSizeMB }}MB)</p>
+      </div>
+
+      <!-- Preview grid with plus card -->
+      <div *ngIf="previews.length > 0" class="preview-grid" [class.single-mode]="!multiple">
+        <div *ngFor="let preview of previews; let i = index" class="preview-item">
+          <img
+            [src]="preview.file"
+            alt="Upload preview"
+            class="preview-image"
+          >
+          <button
+            class="delete-btn"
+            (click)="removeFile(i)"
+          >×</button>
+        </div>
+
+        <!-- Plus card with remaining space display -->
+        <div
+          *ngIf="multiple"
+          class="plus-card"
+          [class.disabled]="remainingSpaceMB <= 0"
+          (click)="remainingSpaceMB > 0 ? triggerFileInput() : null"
+        >
+          <span class="plus-icon">+</span>
+          <div class="space-info">
+            {{ remainingSpaceMB > 0 ? (remainingSpaceMB.toFixed(1) + 'MB left') : 'Storage full' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    ⚠ {{ errorMessage }}
+  </div>
+</div>

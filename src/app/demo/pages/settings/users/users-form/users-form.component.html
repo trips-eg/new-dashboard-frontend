@@ -1,0 +1,155 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="userlId ? ('Edit user' | translate) : ('Add user' | translate)"
+    [mainSection]="'users' | translate"
+    [subSection]="userlId ? ('Edit' | translate) : ('Add' | translate)"
+  ></sub-header>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="product-form shadow-3 p-4">
+    <!-- User Info -->
+    <div class="form-field">
+      <h3 class="flex justify-content-between">
+        {{ 'User Info' | translate }}
+        <!-- <span><p-inputSwitch /></span> -->
+      </h3>
+      <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+        <div class="field col">
+          <label for="username">
+            {{ 'Username' | translate }}
+          </label>
+          <input pInputText id="username" [readonly]="isEditMode" formControlName="Username" type="text" />
+          <small class="error" *ngIf="form.get('Username')?.invalid && form.get('Username')?.touched">
+            * {{ 'this field is required' | translate }}
+          </small>
+          <small class="error" *ngIf="form.get('Username')?.hasError('hasSpaces')">
+            * {{ 'Username cannot contain spaces' | translate }}
+          </small>
+        </div>
+
+        <div class="field col" *ngIf="!isEditMode">
+          <label for="password">
+            {{ 'Password' | translate }}
+          </label>
+          <p-password id="password" formControlName="Password" class="w-full" [toggleMask]="true" />
+          <small class="error" *ngIf="form.get('Password')?.invalid && form.get('Password')?.touched">
+            * {{ 'this field is required' | translate }}
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Other Info -->
+    <div class="form-field mt-4">
+      <h3>{{ 'Other Info.' | translate }}</h3>
+      <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+        <div class="field col-12 col-md-2">
+          <label for="name">
+            {{ 'Name' | translate }}
+          </label>
+          <input pInputText id="name" formControlName="FirstName" type="text" />
+          <small class="error" *ngIf="form.get('FirstName')?.invalid && form.get('FirstName')?.touched">
+            * {{ 'this field is required' | translate }}
+          </small>
+        </div>
+        <div class="field col-12 col-md-2">
+          <label for="lastName">
+            {{ 'last Name' | translate }}
+          </label>
+          <input pInputText id="lastName" formControlName="LastName" type="text" />
+          <small class="error" *ngIf="form.get('LastName')?.invalid && form.get('LastName')?.touched">
+            * {{ 'this field is required' | translate }}
+          </small>
+        </div>
+
+        <div class="field col-12 col-md-4">
+          <label for="email">
+            {{ 'Email' | translate }}
+          </label>
+          <input pInputText id="email" formControlName="Email" type="text" />
+          <small class="error" *ngIf="form.get('Email')?.invalid && form.get('Email')?.touched">
+            * {{ 'valid email required' | translate }}
+          </small>
+        </div>
+
+        <div class="field col-12 col-md-2">
+          <label for="phone">
+            {{ 'Phone Number' | translate }}
+          </label>
+          <input pInputText id="phone" formControlName="PhoneNumber" type="text" />
+          <small class="error" *ngIf="form.get('PhoneNumber')?.invalid && form.get('PhoneNumber')?.touched">
+            * {{ 'this field is required' | translate }}
+          </small>
+        </div>
+        <div class="field col-12 col-md-2">
+          <label for="gender">
+            {{ 'Gender' | translate }}
+          </label>
+          <p-dropdown
+            id="gender"
+            formControlName="Gender"
+            [options]="genderOptions"
+            optionLabel="label"
+            optionValue="value"
+            [showClear]="true"
+            class="w-full"
+          ></p-dropdown>
+          <small class="error text-danger" *ngIf="form.get('Gender')?.invalid && form.get('Gender')?.touched">
+            * {{ 'this field is required' | translate }}
+          </small>
+        </div>
+
+        <div class="field" [ngClass]="selectedRole?.roleType === 2 ? 'col-12 col-md-6' : 'col-12'">
+          <label>
+            {{ 'Role' | translate }}
+          </label>
+          <p-dropdown
+            formControlName="Roles"
+            [options]="roles"
+            optionLabel="name"
+            [showClear]="true"
+            class="w-full"
+            (onChange)="onRoleChange($event.value)"
+          ></p-dropdown>
+          <small class="error text-danger" *ngIf="form.get('Roles')?.invalid && form.get('Roles')?.touched">
+            * {{ 'this field is required' | translate }}
+          </small>
+        </div>
+
+        <div *ngIf="selectedRole?.roleType === 2" class="field col-12 col-md-6">
+          <label for="CompanyId">{{ 'Vendor' | translate }}</label>
+          <p-dropdown
+            formControlName="CompanyId"
+            [options]="vendors"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            [virtualScroll]="true"
+            [lazy]="true"
+            [virtualScrollItemSize]="35"
+            (onFilter)="onVendorSearch($event)"
+            [loading]="loadingVendors"
+            class="w-full"
+          ></p-dropdown>
+        </div>
+
+        <div class="field col-md-12 mb-3">
+          <label class="">
+            {{ 'user image' | translate }}
+          </label>
+          <app-img-uploader
+            [multiple]="false"
+            [displayFile]="oldImage ? oldImage : null"
+            (filesChanged)="onUserFileSelect($event)"
+          ></app-img-uploader>
+          <p class="text-danger mt-1" *ngIf="showUserImgMessage">* {{ 'user img is required' | translate }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="buttons mt-3 text-end">
+      <p-button type="submit" [label]="'save' | translate" severity="success" icon="pi pi-save"></p-button>
+      <p-button [label]="'Cancel' | translate" class="mx-1" severity="secondary" (onClick)="onCansel()"></p-button>
+    </div>
+  </form>
+</div>

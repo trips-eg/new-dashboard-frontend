@@ -1,0 +1,127 @@
+<div class="card">
+  <p-toolbar *ngIf="showSearch" styleClass="">
+    <ng-template pTemplate="left">
+      <span class="p-input-icon-left">
+        <input pInputText type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" [placeholder]="'search' | translate" />
+      </span>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    [value]="emails"
+    [loading]="loading"
+    [paginator]="true"
+    [rows]="10"
+    [totalRecords]="totalRecords"
+    [lazy]="true"
+    (onLazyLoad)="loadEmails($event)"
+    [showCurrentPageReport]="true"
+    [currentPageReportTemplate]="'showingEntries' | translate"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    styleClass="p-datatable-gridlines"
+    [tableStyle]="{ 'min-width': '50rem' }"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="id" style="width: 80px">
+          {{ 'id' | translate }}
+          <p-sortIcon field="id"></p-sortIcon>
+        </th>
+        <th pSortableColumn="name">
+          {{ 'name' | translate }}
+          <p-sortIcon field="name"></p-sortIcon>
+        </th>
+        <th pSortableColumn="email">
+          {{ 'email' | translate }}
+          <p-sortIcon field="email"></p-sortIcon>
+        </th>
+        <th pSortableColumn="purpose">
+          {{ 'purpose' | translate }}
+          <p-sortIcon field="purpose"></p-sortIcon>
+        </th>
+        <th style="width: 200px">{{ 'content' | translate }}</th>
+        <th pSortableColumn="isSend" style="width: 100px; text-align: center">
+          {{ 'status' | translate }}
+          <p-sortIcon field="isSend"></p-sortIcon>
+        </th>
+        <th pSortableColumn="createdDate" style="width: 150px; text-align: center">
+          {{ 'createdDate' | translate }}
+          <p-sortIcon field="createdDate"></p-sortIcon>
+        </th>
+        <th style="width: 120px; text-align: center">{{ 'actions' | translate }}</th>
+      </tr>
+      <tr>
+        <th>
+          <p-columnFilter type="text" field="id" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="name" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="email" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="text" field="purpose" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th></th>
+        <th>
+          <p-columnFilter type="boolean" field="isSend" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th>
+          <p-columnFilter type="date" field="createdDate" display="row" [showMenu]="false"></p-columnFilter>
+        </th>
+        <th></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-email>
+      <tr>
+        <td>{{ email.id }}</td>
+        <td>{{ email.name }}</td>
+        <td>{{ email.email }}</td>
+
+        <td>
+          <p-tag [value]="getPurposeName(email.purpose) | translate" [severity]="getPurposeSeverity(email.purpose)"></p-tag>
+        </td>
+        <td>
+          <span [title]="email.handlebars" class="template-preview clickable" (click)="showEmailPreview(email)">
+            {{ 'click to preview' | translate }}
+          </span>
+        </td>
+        <td style="text-align: center">
+          <i
+            [class]="email.isSend ? 'pi pi-check-circle text-success' : 'pi pi-times-circle text-danger'"
+            [title]="email.isSend ? 'Sent' : 'Not Sent'"
+            style="font-size: 1.2rem"
+          ></i>
+        </td>
+        <td style="text-align: center">
+          {{ email.createdDate | date: 'dd/MM/yyyy' }}
+        </td>
+        <td style="text-align: center">
+          <button
+            pButton
+            pRipple
+            type="button"
+            severity="info"
+            [raised]="true"
+            [rounded]="true"
+            icon="pi pi-eye"
+            (click)="viewEmailDetails(email.id)"
+            [pTooltip]="'view details' | translate"
+            tooltipPosition="top"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" style="text-align: center">
+          {{ 'no_data_found' | translate }}
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

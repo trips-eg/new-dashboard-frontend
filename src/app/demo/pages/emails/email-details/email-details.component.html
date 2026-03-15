@@ -1,0 +1,115 @@
+<div class="main">
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Header with Back Button and Resend -->
+  <sub-header [mainHeader]="'email details' | translate" [mainSection]="'emails' | translate" [subSection]="emailDetail?.name"></sub-header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+
+  <!-- Email Details -->
+  <div *ngIf="!loading && emailDetail" class="email-container">
+    <!-- Email Information - Simplified -->
+    <div class="email-info-simple">
+      <div class="email-title">
+        <h3>{{ emailDetail.name }}</h3>
+        <span class="email-address">{{ emailDetail.email }}</span>
+      </div>
+      <div class="info-badge-group">
+        <span class="info-label">{{ 'purpose' | translate }}:</span>
+        <p-tag
+          icon="pi pi-tag"
+          [value]="getPurposeName(emailDetail.purpose) | translate"
+          [severity]="getPurposeSeverity(emailDetail.purpose)"
+        ></p-tag>
+
+        <span class="info-label">{{ 'status' | translate }}:</span>
+        <p-tag
+          [icon]="emailDetail.isSend ? 'pi pi-check-circle' : 'pi pi-times-circle'"
+          [value]="emailDetail.isSend ? ('sent' | translate) : ('failed' | translate)"
+          [severity]="emailDetail.isSend ? 'success' : 'danger'"
+        ></p-tag>
+      </div>
+    </div>
+    <!-- button of resend email -->
+    <div class="details-header">
+      <button
+        pButton
+        pRipple
+        type="button"
+        [label]="'resend_email' | translate"
+        icon="pi pi-send"
+        (click)="resendEmail()"
+        class="p-button-primary"
+      ></button>
+    </div>
+
+    <!-- Tabs for Content and Tracking -->
+    <p-tabView styleClass="details-tabs">
+      <!-- Email Content Tab -->
+      <p-tabPanel [header]="'email_content' | translate">
+        <div class="email-content-container">
+          <iframe *ngIf="emailBlobUrl" class="email-iframe" [src]="emailBlobUrl" frameborder="0"></iframe>
+          <p *ngIf="!emailBlobUrl" class="no-content">
+            {{ 'no_email_content' | translate }}
+          </p>
+        </div>
+      </p-tabPanel>
+
+      <!-- Tracking History Tab -->
+      <p-tabPanel [header]="'tracking_history' | translate">
+        <div *ngIf="trackersLoading" class="loading-container">
+          <p-progressSpinner></p-progressSpinner>
+        </div>
+
+        <div *ngIf="!trackersLoading && trackers.length === 0" class="empty-state">
+          <i class="pi pi-info-circle" style="font-size: 3rem; color: #9ca3af"></i>
+          <p>{{ 'no_tracking_history' | translate }}</p>
+        </div>
+
+        <p-timeline *ngIf="!trackersLoading && trackers.length > 0" [value]="trackers" align="left">
+          <ng-template pTemplate="marker" let-tracker>
+            <span class="tracker-marker" [ngClass]="getStatusClass(tracker)">
+              <i [class]="getStatusIcon(tracker)"></i>
+            </span>
+          </ng-template>
+
+          <ng-template pTemplate="content" let-tracker>
+            <p-card styleClass="tracker-card mb-3">
+              <div class="tracker-content">
+                <div class="tracker-header">
+                  <h4>{{ getStatusText(tracker) }}</h4>
+                  <p-tag [value]="getStatusText(tracker)" [severity]="getStatusSeverity(tracker)"></p-tag>
+                </div>
+                <div class="tracker-meta">
+                  <span>
+                    <i class="pi pi-calendar"></i>
+                    {{ tracker.dateCreated | date: 'medium' }}
+                  </span>
+                  <span *ngIf="tracker.fromEmail">
+                    <i class="pi pi-envelope"></i>
+                    {{ tracker.fromEmail }}
+                  </span>
+                  <span>
+                    <i class="pi pi-send"></i>
+                    {{ tracker.toEmail }}
+                  </span>
+                </div>
+                <button
+                  *ngIf="tracker.context"
+                  pButton
+                  [label]="'view_snapshot' | translate"
+                  icon="pi pi-eye"
+                  (click)="viewSnapshot(tracker)"
+                  class="p-button-text p-button-sm view-snapshot-btn"
+                ></button>
+              </div>
+            </p-card>
+          </ng-template>
+        </p-timeline>
+      </p-tabPanel>
+    </p-tabView>
+  </div>
+</div>

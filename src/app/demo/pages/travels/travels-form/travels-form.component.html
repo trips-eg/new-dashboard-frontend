@@ -1,0 +1,744 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="travelId ? ('Edit travel' | translate) : ('Add travel' | translate)"
+    [mainSection]="'travels' | translate"
+    [subSection]="travelId ? ('Edit' | translate) : ('Add' | translate)"
+  ></sub-header>
+  <div class="product-form shadow-3 p-4">
+    <p-stepper [linear]="travelId ? false : true">
+      <p-stepperPanel [header]="'Travel Information' | translate">
+        <ng-template pTemplate="content" let-nextCallback="nextCallback" let-index="index">
+          <form class="form-field" [formGroup]="travelForm">
+            <div class="formgrid grid">
+              <div class="field col-12 col-md-12">
+                <label>{{ 'Travel Type' | translate }}</label>
+
+                <div class="formgrid flex flex-wrap gap-3 p-3 border-1 border-solid surface-border border-round">
+                  <p-radioButton
+                    [value]="false"
+                    inputId="internal"
+                    formControlName="IsExternallTrip"
+                    (onChange)="onTravelTypeChange(false)"
+                  ></p-radioButton>
+
+                  <label for="internal" class="mx-2">{{ 'Internal' | translate }}</label>
+                  <p-radioButton
+                    [value]="true"
+                    inputId="external"
+                    formControlName="IsExternallTrip"
+                    (onChange)="onTravelTypeChange(true)"
+                  ></p-radioButton>
+                  <label for="external" class="mx-2">{{ 'External' | translate }}</label>
+                </div>
+              </div>
+              <div class="field col-12 col-md-4" *ngIf="travelForm.get('IsExternallTrip').value">
+                <label for="type">
+                  {{ 'Country' | translate }}
+                </label>
+                <p-dropdown
+                  id="type"
+                  [options]="countryList"
+                  formControlName="CountryId"
+                  (onFilter)="filterCountry($event)"
+                  (onChange)="getCitiesByCountryId($event.value)"
+                  filter="true"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="{{ '-- Select --' | translate }}"
+                  [showClear]="true"
+                  class="w-full"
+                ></p-dropdown>
+              </div>
+              <div class="field col-12 col-md-4">
+                <label for="type">
+                  {{ 'City' | translate }}
+                </label>
+                <p-dropdown
+                  id="type"
+                  [options]="cityList"
+                  filter="true"
+                  formControlName="CityId"
+                  placeholder="{{ '-- Select --' | translate }}"
+                  [showClear]="true"
+                  class="w-full"
+                ></p-dropdown>
+                <small class="p-error" *ngIf="shouldShowError('CityId')">
+                  {{ 'This field is required' | translate }}
+                </small>
+              </div>
+
+              <div class="field col-12 col-md-4">
+                <label for="type">
+                  {{ 'Location From' | translate }}
+                </label>
+                <input type="text" pInputText formControlName="FromLocation" [placeholder]="'From' | translate" />
+                <small class="p-error" *ngIf="shouldShowError('FromLocation')">
+                  {{ 'This field is required' | translate }}
+                </small>
+              </div>
+              <div class="field col-12 col-md-4">
+                <label for="type">
+                  {{ 'Location To' | translate }}
+                </label>
+                <input type="text" pInputText formControlName="ToLocation" [placeholder]="'To' | translate" />
+                <small class="p-error" *ngIf="shouldShowError('ToLocation')">
+                  {{ 'This field is required' | translate }}
+                </small>
+              </div>
+              <div class="field col-4">
+                <label for="type">
+                  {{ 'Gathering Point Address' | translate }}
+                </label>
+                <input type="text" pInputText formControlName="Address" />
+                <small class="p-error" *ngIf="shouldShowError('Address')">
+                  {{ 'This field is required' | translate }}
+                </small>
+              </div>
+              <div class="field col-4">
+                <label for="type">
+                  {{ 'External Link' | translate }}
+                </label>
+                <input type="text" pInputText formControlName="ExternalLink" />
+                <small class="p-error" *ngIf="shouldShowError('Address')">
+                  {{ 'This field is required' | translate }}
+                </small>
+              </div>
+
+              <!-- Travel Section -->
+              <div class="form-field mt-5">
+                <div class="formgrid col-md-12 mb-3 flex flex-wrap gap-3 p-3 border-1 border-solid surface-border border-round">
+                  <div class="flex align-items-center gap-2">
+                    <p-inputSwitch formControlName="IsRecommended" />
+                  </div>
+                  <label for="internal" class="mx-2">{{ 'is recomended' | translate }}</label>
+                  <div class="flex align-items-center gap-2">
+                    <p-inputSwitch formControlName="IsFake" />
+                  </div>
+                  <label for="internal" class="mx-2">{{ 'Is Fake' | translate }}</label>
+                  <!-- <div class="flex align-items-center gap-2">
+                    <p-inputSwitch formControlName="IsBlocked" />
+                  </div>
+                  <label for="internal" class="mx-2">{{ 'Is Blocked' | translate }}</label> -->
+                  <div class="flex align-items-center gap-2">
+                    <p-inputSwitch formControlName="IsIncludeVat" />
+                  </div>
+                  <label for="internal" class="mx-2">{{ 'Is included vat' | translate }}</label>
+                </div>
+                <h3 class="flex justify-content-between align-items-center">
+                  {{ 'Travel Information' | translate }}
+
+                  <!-- <div class="flex align-items-center gap-2">
+                    <label class="font-normal text-sm m-0">
+                      {{ 'is recomended' | translate }}
+                    </label>
+                    <p-inputSwitch formControlName="IsRecommended" />
+                  </div> -->
+                </h3>
+
+                <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+                  <div class="field col-12 col-md-4">
+                    <label for="type">
+                      {{ 'Travel Name' | translate }}
+                    </label>
+                    <input type="text" pInputText formControlName="Name" />
+                    <small class="p-error" *ngIf="shouldShowError('Name')">
+                      {{ 'This field is required' | translate }}
+                    </small>
+                  </div>
+                  <div class="field col-12 col-md-4">
+                    <label for="hotelName">
+                      {{ 'Days No.' | translate }}
+                    </label>
+
+                    <input
+                      type="number"
+                      pInputText
+                      mode="decimal"
+                      inputId="minmax-buttons"
+                      id="hotelName"
+                      formControlName="NumberOfDays"
+                      [min]="1"
+                    />
+                    <small class="p-error" *ngIf="shouldShowError('NumberOfDays')">
+                      {{ 'This field is required' | translate }}
+                    </small>
+                  </div>
+                  <div class="field col-12 col-md-4">
+                    <label for="hotelStars">{{ 'Star Rating' | translate }}</label>
+                    <p-dropdown
+                      id="hotelStars"
+                      formControlName="Rating"
+                      [options]="starRatings"
+                      placeholder="{{ 'Select rating' | translate }}"
+                      class="w-full"
+                    ></p-dropdown>
+                    <small class="p-error" *ngIf="shouldShowError('Rating')">
+                      {{ 'This field is required' | translate }}
+                    </small>
+                  </div>
+                  <div class="field col-12 col-md-3">
+                    <label for="hotelName">
+                      {{ 'Seats' | translate }}
+                    </label>
+                    <input type="number" pInputText mode="decimal" id="hotelName" formControlName="Capacity" [min]="1" />
+                    <small class="p-error" *ngIf="shouldShowError('Capacity')">
+                      {{ 'This field is required' | translate }}
+                    </small>
+                  </div>
+                  <div class="field col-12 col-md-3">
+                    <label for="hotelStars">
+                      {{ 'price' | translate }}
+                    </label>
+                    <input
+                      type="number"
+                      pInputText
+                      formControlName="Price"
+                      buttonLayout="horizontal"
+                      inputId="horizontal"
+                      spinnerMode="horizontal"
+                      decrementButtonClass="p-button-danger"
+                      incrementButtonClass="p-button-success"
+                      [min]="1"
+                      locale="en-US"
+                    />
+                    <small class="p-error" *ngIf="shouldShowError('Price')">
+                      {{ 'This field is required' | translate }}
+                    </small>
+                  </div>
+                  <div class="field col-12 col-md-3">
+                    <label for="hotelStars">
+                      {{ 'child price' | translate }}
+                    </label>
+                    <input type="number" pInputText formControlName="ChildPrice" [min]="1" locale="en-US" />
+                    <small class="p-error" *ngIf="shouldShowError('ChildPrice')">
+                      {{ 'This field is required' | translate }}
+                    </small>
+                  </div>
+                  <div class="field col-12 col-md-3">
+                    <label for="price before">
+                      {{ 'Price Before' | translate }}
+                    </label>
+                    <p-inputNumber type="number" formControlName="PriceBefore" [min]="0" locale="en-US" />
+                  </div>
+                  <!-- <div class="field col-12 col-md-2">
+                    <label>{{ 'including vat' | translate }}</label>
+                    <div>
+                      <p-inputSwitch formControlName="IsIncludeVate"></p-inputSwitch>
+                    </div>
+                  </div> -->
+                  <!-- Travel Type -->
+                  <!-- Travel Type -->
+                  <div class="field col-md-4" [ngClass]="{ 'col-6': mode === 'edit' }">
+                    <label>{{ 'Travel Type' | translate }}</label>
+                    <p-dropdown
+                      formControlName="TripType"
+                      [options]="tripTybe"
+                      optionLabel="nameEn"
+                      optionValue="value"
+                      placeholder="{{ 'Select type' | translate }}"
+                      class="w-full"
+                      appendTo="body"
+                    >
+                      <ng-template let-option pTemplate="item">
+                        <div
+                          pTooltip="{{ getTooltipOfTripType(option.value) }}"
+                          tooltipPosition="top"
+                          appendTo="body"
+                          tooltipZIndex="9999"
+                          class="w-auto"
+                          tooltipStyleClass="trip-tooltip"
+                        >
+                          {{ option.nameEn }}
+                        </div>
+                      </ng-template>
+                    </p-dropdown>
+
+                    <small class="p-error" *ngIf="shouldShowError('TripType')">
+                      {{ 'This field is required' | translate }}
+                    </small>
+                  </div>
+
+                  <!-- Add Date Button -->
+                  <div
+                    class="field col-12 col-md-4 flex align-items-end gap-2"
+                    *ngIf="travelForm.get('TripType')?.value && mode !== 'edit'"
+                  >
+                    <button type="button" pButton icon="pi pi-plus" label="Add Date" (click)="addTripDate()" style="padding: 10px"></button>
+
+                    <!-- Hint Text -->
+                    <small class="form-text text-info mb-2" *ngIf="tripDatesArray.length === 0">
+                      {{ 'You must add at least one period' | translate }}
+                    </small>
+                  </div>
+
+                  <!-- Date Range Section -->
+                  <div class="field col-12" *ngIf="travelForm.get('TripType')?.value">
+                    <div formArrayName="TripDates" class="row g-3">
+                      <ng-container *ngFor="let group of tripDatesArray.controls; let i = index">
+                        <div [formGroupName]="i" class="col-12 col-md-4">
+                          <!-- غلاف عمودي عشان الرسالة تبقى تحت الحقل -->
+                          <div class="d-flex flex-column gap-2">
+                            <div class="d-flex align-items-start gap-2">
+                              <!-- Start Date -->
+                              <div class="flex-grow-1">
+                                <p-calendar
+                                  formControlName="startDate"
+                                  placeholder="{{ 'Start Date' | translate }}"
+                                  [showIcon]="true"
+                                  dateFormat="dd-mm-yy"
+                                  [showTime]="false"
+                                  [minDate]="today"
+                                  [iconDisplay]="'input'"
+                                  class="w-100"
+                                  (onSelect)="onStartDateChange(group)"
+                                ></p-calendar>
+                                <small
+                                  class="p-error d-block mt-1"
+                                  *ngIf="group.get('startDate')?.invalid && group.get('startDate')?.touched"
+                                >
+                                  {{ 'This field is required' | translate }}
+                                </small>
+                              </div>
+
+                              <!-- End Date -->
+                              <div
+                                class="flex-grow-1"
+                                *ngIf="travelForm.get('TripType')?.value === 1 || travelForm.get('TripType')?.value === 2"
+                              >
+                                <p-calendar
+                                  formControlName="endDate"
+                                  placeholder="{{ 'End Date' | translate }}"
+                                  [showIcon]="true"
+                                  [hourFormat]="'24'"
+                                  [iconDisplay]="'input'"
+                                  dateFormat="dd-mm-yy"
+                                  class="w-100"
+                                  [minDate]="group.get('minEndDate')?.value || today"
+                                  [maxDate]="group.get('maxEndDate')?.value"
+                                ></p-calendar>
+                                <small class="p-error d-block mt-1" *ngIf="group.get('endDate')?.invalid && group.get('endDate')?.touched">
+                                  {{ 'This field is required' | translate }}
+                                </small>
+                              </div>
+
+                              <!-- Delete -->
+                              <button
+                                *ngIf="mode !== 'edit'"
+                                type="button"
+                                pButton
+                                icon="pi pi-trash"
+                                [text]="true"
+                                (click)="removeTripDate(i)"
+                                class="p-button-danger"
+                              ></button>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+
+                  <div class="field col-12">
+                    <label for="hotelDescription">
+                      {{ 'Instructions' | translate }}
+                    </label>
+                    <div formArrayName="Descriptions">
+                      <div
+                        class="mb-3 flex align-items-center gap-2"
+                        *ngFor="let description of descriptions.controls; let i = index"
+                        [formGroupName]="i"
+                      >
+                        <textarea formControlName="description" rows="2" style="width: 95%"></textarea>
+                        <button
+                          type="button"
+                          pButton
+                          type="button"
+                          icon="pi pi-trash"
+                          class="p-button-danger"
+                          [text]="true"
+                          (click)="removeDescription(i)"
+                        ></button>
+                      </div>
+                      <p-button type="button" label="{{ 'Add ' | translate }}" icon="pi pi-plus" (onClick)="addDescription()"></p-button>
+                    </div>
+                    <small class="p-error" *ngIf="shouldShowError('Descriptions')">
+                      {{ 'This field is required' | translate }}
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Policies Section -->
+            <p-panel header="{{ 'policies' | translate }}" toggleable styleClass="custom-panel mt-3 col-12 w-full ">
+              <!-- Refund Policy -->
+              <h3 class="flex justify-content-between align-items-center">
+                <span>{{ 'is refund enabled' | translate }}</span>
+                <span><p-inputSwitch formControlName="IsRefundable" /></span>
+              </h3>
+
+              <div
+                class="formgrid grid p-3 border-1 border-dashed surface-border border-round"
+                *ngIf="travelForm.get('IsRefundable')?.value"
+              >
+                <div class="field col-12 col-md-6 mx-auto">
+                  <label for="MinimumDaysToRefund">
+                    {{ 'Minimum Days To Refund' | translate }}
+                  </label>
+                  <p-inputNumber
+                    mode="decimal"
+                    inputId="MinimumDaysToRefund"
+                    id="MinimumDaysToRefund"
+                    formControlName="MinimumDaysToRefund"
+                    [min]="1"
+                  />
+                  <div class="text-danger" *ngIf="shouldShowError('MinimumDaysToRefund')">
+                    {{ 'Please enter minimum days to refund' | translate }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Payment Policy -->
+              <h3 class="flex justify-content-between align-items-center mt-4">
+                <span>{{ 'Deposit Rate' | translate }}</span>
+                <span><p-inputSwitch formControlName="IsAllowPaymentUponArrival" /></span>
+              </h3>
+
+              <div
+                class="formgrid grid p-3 border-1 border-dashed surface-border border-round"
+                *ngIf="travelForm.get('IsAllowPaymentUponArrival')?.value"
+              >
+                <div class="field col-12 col-md-6 mx-auto">
+                  <label for="depositRate">
+                    {{ 'depositRate' | translate }}
+                  </label>
+                  <p-inputNumber
+                    mode="decimal"
+                    inputId="depositRate"
+                    id="depositRate"
+                    formControlName="depositRate"
+                    [min]="0"
+                    [max]="100"
+                    suffix="%"
+                  />
+                  <div class="text-danger" *ngIf="shouldShowError('depositRate')">
+                    {{ 'Please enter deposit rate (0-100%)' | translate }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cancellation Policy -->
+              <h3 class="flex justify-content-between mt-4">
+                {{ 'Cancellation policies' | translate }}
+              </h3>
+              <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+                <div class="field col-12">
+                  <label for="cancellationPolicy">
+                    {{ 'Cancellation Policy' | translate }}
+                  </label>
+                  <p-editor id="cancellationPolicy" formControlName="CancellationPolicy" [style]="{ height: '150px' }"></p-editor>
+                  <div *ngIf="shouldShowError('CancellationPolicy')" class="text-danger">
+                    {{ 'Please provide cancellation policy' | translate }}
+                  </div>
+                </div>
+              </div>
+            </p-panel>
+            <div class="form-field mt-5">
+              <!-- Travel Gallery Section -->
+              <h3 class="flex justify-content-between">
+                {{ 'Travel Gallery' | translate }}
+              </h3>
+
+              <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round mb-4">
+                <div class="col-md-12 mb-3">
+                  <app-img-uploader
+                    [multiple]="true"
+                    (filesChanged)="onLogoFileSelect($event)"
+                    [displayFiles]="oldImages"
+                    (removeImgFromDBWithId)="removeImageFromDB($event)"
+                  ></app-img-uploader>
+                  <!-- <div class="text-danger" *ngIf="showLogoMessage && submitted">{{'Room image is required.' | translate}}</div> -->
+                </div>
+                <div class="buttonsm col-md-12 mt-3 text-end">
+                  <p-button
+                    label="{{ 'Cancel' | translate }}"
+                    class="mx-1"
+                    severity="secondary"
+                    type="button"
+                    (click)="onCancel()"
+                  ></p-button>
+
+                  <p-button
+                    label="{{ 'Next' | translate }}"
+                    *ngIf="!travelId"
+                    severity="success"
+                    class="shadow"
+                    type="button"
+                    (click)="addTravel(nextCallback)"
+                  ></p-button>
+                  <p-button
+                    label="{{ 'Update' | translate }}"
+                    *ngIf="travelId"
+                    severity="success"
+                    class="shadow"
+                    type="button"
+                    (click)="updateTravel(nextCallback)"
+                  ></p-button>
+                  <p-button
+                    label="{{ 'Next' | translate }}"
+                    *ngIf="travelId"
+                    severity="info"
+                    class="shadow mx-1"
+                    type="button"
+                    (onClick)="nextCallback.emit()"
+                  ></p-button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </ng-template>
+      </p-stepperPanel>
+
+      <p-stepperPanel [header]="'Programs' | translate">
+        <ng-template pTemplate="content" let-nextCallback="nextCallback" let-prevCallback="prevCallback">
+          <form [formGroup]="tripForm">
+            <p-accordion [multiple]="true" formArrayName="steps">
+              <p-accordionTab *ngFor="let step of steps.controls; let i = index" [formGroupName]="i">
+                <ng-template pTemplate="header">
+                  <div class="flex justify-content-between align-items-center w-full">
+                    <span>{{ 'day' | translate }} {{ i + 1 }}</span>
+
+                    <button
+                      *ngIf="!step.get('id').value"
+                      pButton
+                      type="button"
+                      icon="pi pi-trash"
+                      class="p-button-rounded p-button-text p-button-danger"
+                      (click)="removeStep(i, $event)"
+                    ></button>
+                    <button
+                      *ngIf="step.get('id').value"
+                      pButton
+                      type="button"
+                      icon="pi pi-trash"
+                      class="p-button-rounded p-button-text p-button-danger"
+                      (click)="removeStepDB(i, step.get('id').value, $event)"
+                    ></button>
+                  </div>
+                </ng-template>
+
+                <div class="formgrid grid">
+                  <div class="field col-12 col-md-4">
+                    <label>
+                      {{ 'Type' | translate }}
+                    </label>
+                    <p-dropdown
+                      id="type"
+                      [options]="programTypeList"
+                      formControlName="type"
+                      placeholder="{{ '-- Select --' | translate }}"
+                      [showClear]="true"
+                      class="w-full"
+                    ></p-dropdown>
+                    <small class="p-error" *ngIf="isInvalid('type', i)">
+                      {{ 'This field is required' | translate }}
+                    </small>
+                  </div>
+
+                  <div class="field col-12 col-md-4">
+                    <label>
+                      {{ 'Title' | translate }}
+                    </label>
+                    <input pInputText formControlName="title" class="w-full" />
+                    <small class="p-error" *ngIf="isInvalid('title', i)">
+                      {{ 'This field is required' | translate }}
+                    </small>
+                  </div>
+                  <div class="field col-12 col-md-4">
+                    <label>
+                      {{ 'Date' | translate }}
+                    </label>
+                    <p-calendar
+                      [iconDisplay]="'input'"
+                      formControlName="time"
+                      [minDate]="today"
+                      placeholder="Select a date"
+                      [showIcon]="true"
+                      class="w-full"
+                    ></p-calendar>
+                    <!-- <small class="p-error" *ngIf="isInvalid('time', i)">
+                      {{ 'This field is required' | translate }}
+                    </small> -->
+                  </div>
+
+                  <!-- <div class="field col-12 col-md-12">
+                    <label>
+                      {{ 'Details' | translate }}
+                    </label>
+                    <textarea pInputTextarea formControlName="details" rows="3" class="w-full"></textarea>
+                    <small class="p-error" *ngIf="isInvalid('details', i)">
+                      {{ 'This field is required' | translate }}
+                    </small>
+                  </div> -->
+
+                  <!-- <div class="field col-12 col-md-6">
+                    <label>
+                      {{ 'Location From' | translate }}
+                      
+                    </label>
+                    <input pInputText formControlName="fromLocation" class="w-full" />
+                  </div>
+
+                  <div class="field col-12 col-md-6">
+                    <label>
+                      {{ 'Location To' | translate }}
+                      
+                    </label>
+                    <input pInputText formControlName="toLocation" class="w-full" />
+                  </div>
+
+                  <div class="field col-12 col-md-6">
+                    <label>{{ 'Latitude' | translate }}</label>
+                    <input pInputText formControlName="latitude" class="w-full" />
+                  </div>
+
+                  <div class="field col-12 col-md-6">
+                    <label>{{ 'Longitude' | translate }}</label>
+                    <input pInputText formControlName="longitude" class="w-full" />
+                  </div> -->
+
+                  <!-- <div class="field col-12 col-md-4">
+                    <label>
+                      {{ 'From' | translate }}
+                    </label>
+                    <p-calendar
+                      formControlName="fromTime"
+                      [showIcon]="true"
+                      hourFormat="12"
+                      [timeOnly]="true"
+                      [iconDisplay]="'input'"
+                      class="w-full"
+                    >
+                      <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                        <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                      </ng-template>
+                    </p-calendar>
+                  </div>
+
+                  <div class="field col-12 col-md-4">
+                    <label>
+                      {{ 'To' | translate }}
+                    </label>
+                    <p-calendar
+                      formControlName="toTime"
+                      [showIcon]="true"
+                      hourFormat="12"
+                      [minDate]="tripForm.get('fromTime')?.value"
+                      [timeOnly]="true"
+                      [iconDisplay]="'input'"
+                      class="w-full"
+                    >
+                      <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                        <i class="pi pi-clock pointer-events-none" (click)="clickCallBack($event)"></i>
+                      </ng-template>
+                    </p-calendar>
+                  </div> -->
+
+                  <div class="field col-12">
+                    <h3>{{ 'Program Instructions' | translate }}</h3>
+                    <div formArrayName="stepDescriptions" class="p-3 border-1 border-dashed surface-border border-round mb-4">
+                      <div *ngFor="let desc of getStepDescriptions(i).controls; let j = index" [formGroupName]="j" class="mb-3">
+                        <div class="flex align-items-center">
+                          <input pInputText formControlName="description" class="w-full" />
+                          <button
+                            type="button"
+                            pButton
+                            icon="pi pi-trash"
+                            class="p-button-rounded p-button-danger p-button-text ml-2"
+                            (click)="removeDescriptionStep(i, j)"
+                          ></button>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        pButton
+                        label="{{ 'Add Description' | translate }}"
+                        icon="pi pi-plus"
+                        class="p-button-text mt-2"
+                        (click)="addDescriptionStep(i)"
+                      ></button>
+                    </div>
+                  </div>
+                </div>
+              </p-accordionTab>
+            </p-accordion>
+
+            <div class="mt-3">
+              <button type="button" pButton label="Add Step" icon="pi pi-plus" (click)="addStep()"></button>
+            </div>
+
+            <div class="buttonsm col-md-12 mt-3 text-end">
+              <p-button
+                label="{{ 'Back' | translate }}"
+                class="mx-1"
+                severity="secondary"
+                type="button"
+                (onClick)="prevCallback.emit()"
+              ></p-button>
+              <p-button
+                label="{{ 'Next' | translate }}"
+                *ngIf="!travelId"
+                severity="success"
+                class="shadow"
+                type="button"
+                (click)="addProgramToTravel(nextCallback)"
+              ></p-button>
+
+              <p-button
+                label="{{ 'Cancel' | translate }}"
+                *ngIf="travelId"
+                class="mx-1"
+                severity="secondary"
+                type="button"
+                (click)="onCancel()"
+              ></p-button>
+
+              <p-button
+                label="{{ 'Update' | translate }}"
+                *ngIf="travelId"
+                severity="success"
+                class="shadow"
+                type="button"
+                (click)="updateProgramToTravel(nextCallback)"
+              ></p-button>
+            </div>
+          </form>
+        </ng-template>
+      </p-stepperPanel>
+
+      <!-- Step 3: Confirmation -->
+      <p-stepperPanel [header]="'Finish' | translate">
+        <ng-template pTemplate="content" let-prevCallback="prevCallback">
+          <h3 class="my-5 text-center text-success" *ngIf="!travelId">
+            <i class="pi pi-check-circle mx-2"></i>
+            {{ 'Congratulation Your Travel Trip Created Successfully' | translate }}
+          </h3>
+          <h3 class="my-5 text-center text-success" *ngIf="travelId">
+            <i class="pi pi-check-circle mx-2"></i>
+            {{ 'Congratulation Your Travel Trip Updated Successfully' | translate }}
+          </h3>
+
+          <div class="buttonsm col-md-12 mt-3 text-end">
+            <p-button
+              label="{{ 'Finish' | translate }}"
+              icon="pi pi-check"
+              severity="success"
+              class="shadow"
+              type="button"
+              (click)="onCancel()"
+            ></p-button>
+          </div>
+        </ng-template>
+      </p-stepperPanel>
+    </p-stepper>
+  </div>
+</div>

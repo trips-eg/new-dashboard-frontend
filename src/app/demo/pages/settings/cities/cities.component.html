@@ -1,0 +1,11 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'cities'"
+    [actionButtons]="[{ label: 'Add', action: 'add', icon: 'pi pi-plus', class: 'btn-primary' }]"
+    (actionClicked)="handleAction($event)"
+  ></sub-header>
+
+
+
+  <app-cities-list></app-cities-list>
+</div>

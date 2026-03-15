@@ -1,0 +1,45 @@
+.item-card {
+  transition: all 0.3s ease;
+  min-height: 420px;
+}
+
+.item-card:hover {
+  transform: translateY(-5px);
+}
+
+.item-type-badge {
+  display: inline-flex;
+  align-items: center;
+}
+
+.item-image {
+  position: relative;
+  overflow: hidden;
+}
+
+.item-image img {
+  transition: transform 0.3s ease;
+}
+
+.item-card:hover .item-image img {
+  transform: scale(1.05);
+}
+
+.info-box {
+  transition: all 0.3s ease;
+}
+
+.info-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+::ng-deep .p-carousel-indicators {
+  padding: 1rem;
+}
+
+::ng-deep .p-carousel-indicator button {
+  width: 2rem;
+  height: 0.5rem;
+  border-radius: 0.25rem;
+}

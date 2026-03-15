@@ -1,0 +1,607 @@
+// Modern Color Palette
+$flight-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$hotel-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+$transport-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+$tour-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+$meal-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+$default-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+
+// RTL Support Mixins
+@mixin margin-inline-end($value) {
+  margin-inline-end: $value;
+  
+  [dir="rtl"] & {
+    margin-left: 0;
+    margin-right: $value;
+  }
+  
+  [dir="ltr"] & {
+    margin-right: 0;
+    margin-left: $value;
+  }
+}
+
+@mixin margin-inline-start($value) {
+  margin-inline-start: $value;
+  
+  [dir="rtl"] & {
+    margin-right: 0;
+    margin-left: $value;
+  }
+  
+  [dir="ltr"] & {
+    margin-left: 0;
+    margin-right: $value;
+  }
+}
+
+// Accommodation Cards RTL Support
+.accommodation-header-icon {
+  @include margin-inline-end(0.75rem);
+}
+
+.accommodation-card {
+  direction: inherit;
+  
+  .accommodation-icon-wrapper {
+    width: 3.5rem;
+    height: 3.5rem;
+    flex-shrink: 0;
+    @include margin-inline-end(1.25rem);
+  }
+  
+  .accommodation-title-section {
+    h5 {
+      margin-bottom: 0.5rem;
+    }
+  }
+  
+  .accommodation-text-icon {
+    @include margin-inline-end(0.625rem);
+    flex-shrink: 0;
+  }
+  
+  .accommodation-description {
+    margin-top: 0.5rem;
+  }
+  
+  .accommodation-building-icon {
+    @include margin-inline-end(0.875rem);
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+    font-size: 1.125rem;
+  }
+}
+
+// Timeline Customization
+.customized-timeline {
+  ::ng-deep {
+    .p-timeline-event-opposite {
+      flex: 0.3;
+
+    }
+    
+    .p-timeline-event-content {
+      flex: 0.7;
+    }
+
+    // Modern timeline connector
+    .p-timeline-event-connector {
+      background: linear-gradient(to bottom, #e2e8f0, #cbd5e1);
+      width: 3px;
+    }
+  }
+}
+
+// Segment Markers with Modern Gradients
+.segment-marker-flight {
+  background: $flight-gradient;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.segment-marker-hotel {
+  background: $hotel-gradient;
+  box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+}
+
+.segment-marker-transport {
+  background: $transport-gradient;
+  box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+}
+
+.segment-marker-tour {
+  background: $tour-gradient;
+  box-shadow: 0 4px 15px rgba(67, 233, 123, 0.4);
+}
+
+.segment-marker-meal {
+  background: $meal-gradient;
+  box-shadow: 0 4px 15px rgba(250, 112, 154, 0.4);
+}
+
+.segment-marker-default {
+  background: $default-gradient;
+  box-shadow: 0 4px 15px rgba(168, 237, 234, 0.4);
+}
+
+// Segment Cards with Color-Matched Borders and Accents
+.segment-card {
+  background: #ffffff;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+  direction: inherit;
+  margin-bottom: 20px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    height: 4px;
+    opacity: 0.8;
+  }
+  
+  // RTL Support for top border
+  [dir="ltr"] &::before {
+    left: 0;
+    right: 0;
+  }
+  
+  [dir="rtl"] &::before {
+    right: 0;
+    left: 0;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+// Segment Header RTL Support
+.segment-header {
+  direction: inherit;
+}
+
+// Inline Icons RTL Support
+.segment-inline-icon {
+  @include margin-inline-end(0.5rem);
+}
+
+// Segment Meta Value Spacing
+.segment-meta-value {
+  @include margin-inline-start(0.5rem);
+}
+
+// Steps List RTL Support
+.segment-steps-list {
+  @include margin-inline-start(0.75rem);
+  
+  [dir="rtl"] & {
+    margin-left: 0;
+  }
+  
+  [dir="ltr"] & {
+    margin-right: 0;
+  }
+}
+
+.segment-step-item {
+  direction: inherit;
+  
+  .segment-step-number {
+    @include margin-inline-end(0.5rem);
+  }
+  
+  .segment-step-text {
+    text-align: start;
+  }
+}
+
+.segment-card-flight {
+  border-color: rgba(102, 126, 234, 0.2);
+  
+  &::before {
+    background: $flight-gradient;
+  }
+
+  .segment-title {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .segment-subtitle {
+    color: #8b5cf6;
+  }
+
+  .segment-info-box {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    direction: inherit;
+  }
+  
+  // RTL Support for left border
+  [dir="ltr"] .segment-info-box {
+    border-left: 3px solid #667eea;
+    border-right: none;
+  }
+  
+  [dir="rtl"] .segment-info-box {
+    border-right: 3px solid #667eea;
+    border-left: none;
+  }
+
+  .segment-info-title {
+    color: #667eea;
+  }
+
+  .segment-divider {
+    height: 2px;
+    background: linear-gradient(to right, #667eea, #764ba2, transparent);
+  }
+
+  .segment-step-number {
+    background: $flight-gradient;
+  }
+
+  .segment-map-link {
+    color: #667eea;
+    font-weight: 600;
+    
+    &:hover {
+      color: #764ba2;
+    }
+  }
+}
+
+.segment-card-hotel {
+  border-color: rgba(240, 147, 251, 0.2);
+  
+  &::before {
+    background: $hotel-gradient;
+  }
+
+  .segment-title {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .segment-subtitle {
+    color: #ec4899;
+  }
+
+  .segment-info-box {
+    background: linear-gradient(135deg, rgba(240, 147, 251, 0.05), rgba(245, 87, 108, 0.05));
+    direction: inherit;
+  }
+  
+  // RTL Support for left border
+  [dir="ltr"] .segment-info-box {
+    border-left: 3px solid #f093fb;
+    border-right: none;
+  }
+  
+  [dir="rtl"] .segment-info-box {
+    border-right: 3px solid #f093fb;
+    border-left: none;
+  }
+
+  .segment-info-title {
+    color: #f093fb;
+  }
+
+  .segment-divider {
+    height: 2px;
+    background: linear-gradient(to right, #f093fb, #f5576c, transparent);
+  }
+
+  .segment-step-number {
+    background: $hotel-gradient;
+  }
+
+  .segment-map-link {
+    color: #f093fb;
+    font-weight: 600;
+    
+    &:hover {
+      color: #f5576c;
+    }
+  }
+}
+
+.segment-card-transport {
+  border-color: rgba(79, 172, 254, 0.2);
+  
+  &::before {
+    background: $transport-gradient;
+  }
+
+  .segment-title {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .segment-subtitle {
+    color: #06b6d4;
+  }
+
+  .segment-info-box {
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.05), rgba(0, 242, 254, 0.05));
+    direction: inherit;
+  }
+  
+  // RTL Support for left border
+  [dir="ltr"] .segment-info-box {
+    border-left: 3px solid #4facfe;
+    border-right: none;
+  }
+  
+  [dir="rtl"] .segment-info-box {
+    border-right: 3px solid #4facfe;
+    border-left: none;
+  }
+
+  .segment-info-title {
+    color: #4facfe;
+  }
+
+  .segment-divider {
+    height: 2px;
+    background: linear-gradient(to right, #4facfe, #00f2fe, transparent);
+  }
+
+  .segment-step-number {
+    background: $transport-gradient;
+  }
+
+  .segment-map-link {
+    color: #4facfe;
+    font-weight: 600;
+    
+    &:hover {
+      color: #00f2fe;
+    }
+  }
+}
+
+.segment-card-tour {
+  border-color: rgba(67, 233, 123, 0.2);
+  
+  &::before {
+    background: $tour-gradient;
+  }
+
+  .segment-title {
+    background: linear-gradient(135deg, #43e97b, #38f9d7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .segment-subtitle {
+    color: #10b981;
+  }
+
+  .segment-info-box {
+    background: linear-gradient(135deg, rgba(67, 233, 123, 0.05), rgba(56, 249, 215, 0.05));
+    direction: inherit;
+  }
+  
+  // RTL Support for left border
+  [dir="ltr"] .segment-info-box {
+    border-left: 3px solid #43e97b;
+    border-right: none;
+  }
+  
+  [dir="rtl"] .segment-info-box {
+    border-right: 3px solid #43e97b;
+    border-left: none;
+  }
+
+  .segment-info-title {
+    color: #43e97b;
+  }
+
+  .segment-divider {
+    height: 2px;
+    background: linear-gradient(to right, #43e97b, #38f9d7, transparent);
+  }
+
+  .segment-step-number {
+    background: $tour-gradient;
+  }
+
+  .segment-map-link {
+    color: #43e97b;
+    font-weight: 600;
+    
+    &:hover {
+      color: #38f9d7;
+    }
+  }
+}
+
+.segment-card-meal {
+  border-color: rgba(250, 112, 154, 0.2);
+  
+  &::before {
+    background: $meal-gradient;
+  }
+
+  .segment-title {
+    background: linear-gradient(135deg, #fa709a, #fee140);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .segment-subtitle {
+    color: #f59e0b;
+  }
+
+  .segment-info-box {
+    background: linear-gradient(135deg, rgba(250, 112, 154, 0.05), rgba(254, 225, 64, 0.05));
+    direction: inherit;
+  }
+  
+  // RTL Support for left border
+  [dir="ltr"] .segment-info-box {
+    border-left: 3px solid #fa709a;
+    border-right: none;
+  }
+  
+  [dir="rtl"] .segment-info-box {
+    border-right: 3px solid #fa709a;
+    border-left: none;
+  }
+
+  .segment-info-title {
+    color: #fa709a;
+  }
+
+  .segment-divider {
+    height: 2px;
+    background: linear-gradient(to right, #fa709a, #fee140, transparent);
+  }
+
+  .segment-step-number {
+    background: $meal-gradient;
+  }
+
+  .segment-map-link {
+    color: #fa709a;
+    font-weight: 600;
+    
+    &:hover {
+      color: #fee140;
+    }
+  }
+}
+
+.segment-card-default {
+  border-color: rgba(168, 237, 234, 0.2);
+  
+  &::before {
+    background: $default-gradient;
+  }
+
+  .segment-title {
+    background: linear-gradient(135deg, #a8edea, #fed6e3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .segment-subtitle {
+    color: #64748b;
+  }
+
+  .segment-info-box {
+    background: linear-gradient(135deg, rgba(168, 237, 234, 0.05), rgba(254, 214, 227, 0.05));
+    direction: inherit;
+  }
+  
+  // RTL Support for left border
+  [dir="ltr"] .segment-info-box {
+    border-left: 3px solid #a8edea;
+    border-right: none;
+  }
+  
+  [dir="rtl"] .segment-info-box {
+    border-right: 3px solid #a8edea;
+    border-left: none;
+  }
+
+  .segment-info-title {
+    color: #06b6d4;
+  }
+
+  .segment-divider {
+    height: 2px;
+    background: linear-gradient(to right, #a8edea, #fed6e3, transparent);
+  }
+
+  .segment-step-number {
+    background: $default-gradient;
+  }
+
+  .segment-map-link {
+    color: #06b6d4;
+    font-weight: 600;
+    
+    &:hover {
+      color: #ec4899;
+    }
+  }
+}
+
+// Common Segment Styles
+.segment-info-text {
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.segment-meta {
+  color: #475569;
+  
+  strong {
+    color: #1e293b;
+  }
+}
+
+.segment-steps-title {
+  color: #1e293b;
+  font-size: 0.95rem;
+}
+
+.segment-step-item {
+  &:hover {
+    background: rgba(0, 0, 0, 0.02);
+  }
+}
+
+.segment-step-text {
+  color: #475569;
+  line-height: 1.5;
+}
+
+// Responsive Adjustments
+@media (max-width: 768px) {
+  .customized-timeline {
+    ::ng-deep {
+      .p-timeline-event-opposite {
+        display: none;
+      }
+      
+      .p-timeline-event-content {
+        flex: 1;
+      }
+    }
+  }
+}
+
+// Animation for smooth transitions
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.segment-card {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+// ✈️ Flight: Purple gradient (#667eea → #764ba2)
+// 🏨 Hotel: Pink gradient (#f093fb → #f5576c)
+// 🚌 Transport: Cyan gradient (#4facfe → #00f2fe)
+// 🗺️ Tour: Green gradient (#43e97b → #38f9d7)
+// 🍽️ Meal: Pink-yellow gradient (#fa709a → #fee140)

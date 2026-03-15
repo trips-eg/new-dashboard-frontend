@@ -1,0 +1,238 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="hotelId ? ('Edit Hotel' | translate) : ('Add Hotel' | translate)"
+    [mainSection]="'Hotels' | translate"
+    [subSection]="hotelId ? ('Edit' | translate) : ('Add' | translate)"
+  ></sub-header>
+
+  <div *ngIf="!isLoading" class="product-form shadow-3 p-4">
+    <form class="form-field" [formGroup]="hotelForm" (ngSubmit)="onSubmit()">
+      <!-- Hotel Info Section -->
+      <h3 class="flex justify-content-between">
+        {{ 'Hotel Info' | translate }}
+        <span><p-inputSwitch formControlName="Status" /></span>
+      </h3>
+
+      <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+        <div class="field col-12 col-md-6">
+          <label for="hotelName">{{ 'Hotel Name' | translate }}</label>
+          <input type="text" pInputText id="hotelName" formControlName="Name" placeholder="{{ 'Hotel name' | translate }}" />
+          <div class="text-danger" *ngIf="shouldShowError('Name')">
+            <span *ngIf="hotelForm.get('Name')?.errors?.['required']">
+              {{ 'Hotel name is required' | translate }}
+            </span>
+            <span *ngIf="hotelForm.get('Name')?.errors?.['maxlength']">
+              {{ 'Hotel name cannot exceed 100 characters' | translate }}
+            </span>
+          </div>
+        </div>
+        <div class="field col-12 col-md-6">
+          <label for="hotelStars">{{ 'Star Rating' | translate }}</label>
+          <p-dropdown
+            id="hotelStars"
+            formControlName="Rating"
+            [options]="starRatings"
+            placeholder="{{ 'Select rating' | translate }}"
+            class="w-full"
+          ></p-dropdown>
+          <div class="text-danger" *ngIf="shouldShowError('Rating')">
+            {{ 'Please select star rating' | translate }}
+          </div>
+        </div>
+
+        <div class="field col-12 col-md-6">
+          <label for="hotelCountry">{{ 'Country' | translate }}</label>
+          <p-dropdown
+            id="hotelCountry"
+            [options]="countries"
+            formControlName="CountryId"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            (onFilter)="onCountryFilter($event)"
+            placeholder="{{ 'Select country' | translate }}"
+            [showClear]="true"
+            class="w-full"
+          ></p-dropdown>
+          <div class="text-danger" *ngIf="shouldShowError('CountryId')">
+            {{ 'Please select a country' | translate }}
+          </div>
+        </div>
+        <div class="field col-12 col-md-6">
+          <label for="hotelCity">{{ 'City' | translate }}</label>
+          <p-dropdown
+            id="hotelCity"
+            [options]="cities"
+            formControlName="CityId"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="{{ 'Select city' | translate }}"
+            [showClear]="true"
+            class="w-full"
+          ></p-dropdown>
+          <div class="text-danger" *ngIf="shouldShowError('CityId')">
+            {{ 'Please select a city' | translate }}
+          </div>
+        </div>
+
+        <div class="field col-12 col-md-6">
+          <label for="hotelPhone">{{ 'Phone' | translate }}</label>
+          <input type="text" pInputText id="hotelPhone" formControlName="Phone" placeholder="{{ 'Phone number' | translate }}" />
+          <div class="text-danger" *ngIf="shouldShowError('Phone')">
+            <span *ngIf="hotelForm.get('Phone')?.errors?.['required']">
+              {{ 'Phone number is required' | translate }}
+            </span>
+            <span *ngIf="hotelForm.get('Phone')?.errors?.['pattern']">
+              {{ 'Phone number must be 10-15 digits, optionally starting with +' | translate }}
+            </span>
+          </div>
+        </div>
+
+        <div class="field col-12 col-md-6">
+          <label for="hotelAddress">{{ 'Address' | translate }}</label>
+          <input type="text" pInputText id="hotelAddress" formControlName="Address" placeholder="{{ 'Hotel address' | translate }}" />
+          <div class="text-danger" *ngIf="shouldShowError('Address')">
+            <span *ngIf="hotelForm.get('Address')?.errors?.['required']">
+              {{ 'Address is required' | translate }}
+            </span>
+            <span *ngIf="hotelForm.get('Address')?.errors?.['maxlength']">
+              {{ 'Address cannot exceed 200 characters' | translate }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Other Info Section -->
+      <div class="form-field mt-4">
+        <h3>{{ 'Other Info' | translate }}</h3>
+
+        <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+          <!-- Description -->
+          <div class="field col-12">
+            <label for="hotelDescription">{{ 'Description' | translate }}</label>
+            <p-editor formControlName="Description" [style]="{ height: '150px' }"></p-editor>
+            <div class="text-danger" *ngIf="shouldShowError('Description')">
+              <span *ngIf="hotelForm.get('Description')?.errors?.['required']">
+                {{ 'Description is required' | translate }}
+              </span>
+              <span *ngIf="hotelForm.get('Description')?.errors?.['maxlength']">
+                {{ 'Description cannot exceed 500 characters' | translate }}
+              </span>
+            </div>
+          </div>
+          <div class="field col-12">
+            <label for="ShortDescription">{{ 'ShortDescription' | translate }}</label>
+            <textarea rows="5" formControlName="ShortDescription" class="w-full"></textarea>
+            <div class="text-danger" *ngIf="shouldShowError('ShortDescription')">
+              <span *ngIf="hotelForm.get('ShortDescription')?.errors?.['required']">
+                {{ 'ShortDescription is required' | translate }}
+              </span>
+              <span *ngIf="hotelForm.get('ShortDescription')?.errors?.['maxlength']">
+                {{ 'ShortDescription cannot exceed 70 characters' | translate }}
+              </span>
+            </div>
+          </div>
+          <!-- Policies Section -->
+          <div class="field mt-4 col-12">
+            <label>{{ 'Policies' | translate }}</label>
+
+            <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+              <!-- Allow Pets Switch -->
+              <div class="field col-12 col-md-2 d-flex flex-column align-items-center">
+                <label class="font-medium d-block mb-2 text-center">
+                  {{ 'Allow Pets' | translate }}
+                </label>
+                <p-inputSwitch formControlName="AllowPets" />
+                <!-- <div class="text-danger text-center mt-2" *ngIf="shouldShowError('AllowPets')">
+                  {{ 'Please specify if pets are allowed' | translate }}
+                </div> -->
+              </div>
+              <!-- is recomended -->
+
+              <div class="field col-12 col-md-2 d-flex flex-column align-items-center">
+                <label class="font-medium d-block mb-2 text-center">
+                  {{ 'is recomended' | translate }}
+                </label>
+                <p-inputSwitch formControlName="IsRecommended" />
+                <!-- <div class="text-danger text-center mt-2" *ngIf="shouldShowError('IsRecommended')">
+                  {{ 'Please specify if pets are allowed' | translate }}
+                </div> -->
+              </div>
+              <!-- <div class="field col-12 col-md-2 d-flex flex-column align-items-center">
+                <label class="font-medium d-block mb-2 text-center">
+                  {{ 'Is Fake' | translate }}
+                </label>
+                    <p-inputSwitch formControlName="IsFake" />
+                <div class="text-danger text-center mt-2" *ngIf="shouldShowError('IsRecommended')">
+                  {{ 'Please specify if pets are allowed' | translate }}
+                </div>
+              </div> -->
+
+              <!-- Max Child Age Input -->
+              <div class="field col-12 col-md-2">
+                <label for="MaxChildAge">{{ 'Max Child Age' | translate }}</label>
+                <p-inputNumber inputId="MaxChildAge" formControlName="MaxChildAge" mode="decimal" class="w-full" />
+                <!-- <div class="text-danger" *ngIf="shouldShowError('MaxChildAge')">
+                  {{ 'Please enter valid max child age' | translate }}
+                </div> -->
+                <div class="text-danger" *ngIf="shouldShowError('MaxChildAge') && hotelForm.get('MaxChildAge')?.value === null">
+                  {{ 'Please fill max child age' | translate }}
+                </div>
+              </div>
+
+              <!-- Min Adult Age Input -->
+              <div class="field col-12 col-md-2">
+                <label for="MinAdultAge">{{ 'Min Adult Age' | translate }}</label>
+                <p-inputNumber inputId="MinAdultAge" formControlName="MinAdultAge" mode="decimal" class="w-full" />
+                <!-- <div class="text-danger" *ngIf="shouldShowError('MinAdultAge')">
+                  {{ 'Please enter valid min adult age' | translate }}
+                </div> -->
+                <div class="text-danger" *ngIf="shouldShowError('MinAdultAge') && hotelForm.get('MinAdultAge')?.value === null">
+                  {{ 'Please fill min adult age' | translate }}
+                </div>
+              </div>
+              <!-- Reserve Number Fake -->
+              <div class="field col-12 col-md-2">
+                <label for="ReserveNumberFake">{{ 'numper of reservations' | translate }}</label>
+                <p-inputNumber inputId="MinAdultAge" formControlName="ReserveNumberFake" mode="decimal" [min]="18" class="w-full" />
+
+                <div class="text-danger" *ngIf="shouldShowError('ReserveNumberFake') && hotelForm.get('ReserveNumberFake')?.value === null">
+                  {{ 'Please fill numper of reservations' | translate }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Image Uploaders -->
+          <div class="field col-12">
+            <div class="formgrid grid">
+              <div class="field col-12 md:col-6">
+                <label>{{ 'Images' | translate }}</label>
+                <app-img-uploader
+                  [multiple]="true"
+                  [displayFiles]="existingImages"
+                  (filesChanged)="onImagesUpload($event)"
+                  (removeImgFromDB)="onImageRemoved($event)"
+                ></app-img-uploader>
+                <div class="text-danger" *ngIf="showImageError && submitted">
+                  {{ 'At least one image is required' | translate }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Error -->
+      <div *ngIf="hotelForm.invalid && submitted" class="alert alert-danger mt-3">
+        {{ 'Please fill out all required fields correctly' | translate }}
+      </div>
+
+      <!-- Buttons -->
+      <div class="buttons mt-3 text-end">
+        <p-button label="{{ 'Cancel' | translate }}" class="mx-1" severity="secondary" (onClick)="onCancel()"></p-button>
+        <p-button label="{{ 'Save' | translate }}" severity="success" icon="pi pi-save" type="submit" [disabled]="isLoading"></p-button>
+      </div>
+    </form>
+  </div>
+</div>

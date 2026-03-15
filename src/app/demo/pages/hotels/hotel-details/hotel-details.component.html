@@ -1,0 +1,128 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'Hotel Details' | translate"
+    [mainSection]="'Hotels Management' | translate"
+    [subSection]="'Details' | translate"
+  ></sub-header>
+
+  <div class="border-1 border-solid surface-border border-round mb-4 p-4 shadow-3">
+    <div class="grid">
+      <div class="col-12 col-md-6">
+        <!-- [value]="hotelGalleryImages.length ? hotelGalleryImages : ['https://placehold.co/600x400?text=No+Image']" -->
+        <p-galleria
+          [value]="hotel.images.length ? imgs : ['https://placehold.co/600x400?text=No+Image']"
+          [autoPlay]="true"
+          [circular]="true"
+          [showItemNavigators]="true"
+          [thumbnailsPosition]="'bottom'"
+          [responsiveOptions]="responsiveOptions"
+          [containerStyle]="{ 'max-width': '100%' }"
+          [numVisible]="4"
+        >
+          <ng-template pTemplate="item" let-item>
+            <img [src]="item" class="w-full h-20rem border-round" style="object-fit: cover; margin-bottom: 10px" />
+          </ng-template>
+          <ng-template pTemplate="thumbnail" let-item>
+            <div class="grid grid-nogutter justify-content-center">
+              <img [src]="item" class="w-7rem h-5rem border-round" style="object-fit: cover" />
+            </div>
+          </ng-template>
+        </p-galleria>
+      </div>
+
+      <div class="col-12 col-md-6 pl-4">
+        <h2 class="text-3xl mb-2">{{ hotel.name }}</h2>
+        <div class="medium text-body-secondary mb-1">
+          <i class="fas fa-map-marker-alt me-1"></i>
+          {{ hotel.cityName }}, {{ hotel.countryName }}
+        </div>
+        <div class="flex align-items-center gap-3 mb-4">
+          <p-rating [(ngModel)]="hotel.rating" [readonly]="true" [cancel]="false"></p-rating>
+          <span class="text-muted text-lg">({{ hotel.rating }} / 5)</span>
+        </div>
+
+        <p class="text-muted mb-3 line-height-3" [innerHTML]="hotel.description"></p>
+
+        <p class="text-muted mb-2">
+          <i class="pi pi-phone mr-2"></i>
+          {{ 'Phone' | translate }}: {{ hotel.phone }}
+        </p>
+        <p class="text-muted mb-2">
+          <i class="fa-solid fa-map-location-dot mr-2"></i>
+          {{ 'Address' | translate }}: {{ hotel.address }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  ---
+
+  <div class="shadow-3 bg-light p-3 border-round mt-4">
+    <h3 class="text-xl mb-3">{{ 'Available Rooms' | translate }}</h3>
+    <div class="grid">
+      <div class="col-12 col-md-4" *ngFor="let room of hotel.rooms">
+        <p-card styleClass="p-card-shadow mb-3">
+          <ng-template pTemplate="header">
+            <!-- <img
+              [src]="room.images.length ? room.images[0] : 'https://placehold.co/600x400?text=No+Spacefic+Images'"
+              alt="{{ room.name }}"
+              class="w-full h-15rem object-fit-cover border-round-top"
+            /> -->
+            <p-galleria
+              [value]="getRoomImages(room)"
+              [autoPlay]="true"
+              [circular]="true"
+              [showItemNavigators]="true"
+              [thumbnailsPosition]="'bottom'"
+              [responsiveOptions]="responsiveOptions"
+              [containerStyle]="{ 'max-width': '100%' }"
+              [numVisible]="4"
+            >
+              <ng-template pTemplate="item" let-item>
+                <img [src]="item" class="w-full h-20rem border-round" style="object-fit: cover; margin-bottom: 10px" />
+              </ng-template>
+            </p-galleria>
+          </ng-template>
+          <ng-template pTemplate="title">
+            <div class="flex flex-wrap align-items-center justify-content-between mb-2">
+              <h4 class="mb-0 text-truncate" style="flex-grow: 2">{{ room.name }}</h4>
+
+              <div class="flex align-items-center gap-3 text-sm">
+                <span>
+                  <i class="pi pi-bed mr-1"></i>
+                  {{ room.bedCount }} {{ 'Beds' | translate }}
+                </span>
+                <span>
+                  <i class="pi pi-arrows-alt mr-1"></i>
+                  {{ room.size }} m²
+                </span>
+              </div>
+            </div>
+
+            <span class="text-orange-500 text-lg">{{ room.price  }}</span>
+          </ng-template>
+          <ng-template pTemplate="subtitle">
+            <div class="flex align-items-center gap-2 mb-2">
+              <p-tag [value]="room.roomType" icon="pi pi-home" severity="info" class="mr-1"></p-tag>
+              <p-tag [value]="room.bedType || 'N/A'" icon="fa-solid fa-bed" severity="success"></p-tag>
+            </div>
+          </ng-template>
+          <!-- <ng-template pTemplate="content">
+            <p class="text-muted text-sm line-height-2 overflow-hidden text-overflow-ellipsis white-space-nowrap" style="max-height: 40px">
+              {{ room.description }}
+            </p>
+          </ng-template> -->
+          <ng-template pTemplate="footer">
+            <button
+              pButton
+              label="{{ 'View Details' | translate }}"
+              icon="pi pi-info-circle"
+              class="btn btn-primary w-100"
+              (click)="goToRoomlReservationForm(room.id)"
+            ></button>
+          </ng-template>
+        </p-card>
+      </div>
+    </div>
+  </div>
+</div>

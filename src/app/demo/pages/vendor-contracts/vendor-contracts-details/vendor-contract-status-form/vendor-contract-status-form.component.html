@@ -1,0 +1,34 @@
+<div class="p-fluid" [formGroup]="form">
+  <!-- Vendor Status -->
+  <div class="mb-3">
+    <label for="status" class="block mb-2 font-semibold">Vendor Status</label>
+    <p-dropdown
+      id="status"
+      [options]="vendorStatuses"
+      optionLabel="nameEn"
+      optionValue="value"
+      formControlName="vendorStatus"
+      placeholder="Select status"
+      class="w-full"
+    ></p-dropdown>
+    <small *ngIf="form.get('vendorStatus')?.invalid && form.get('vendorStatus')?.touched" class="text-red-500">Status is required</small>
+  </div>
+
+  <!-- Description -->
+  <div class="mb-3">
+    <label for="desc" class="block mb-2 font-semibold">Description</label>
+    <textarea id="desc" rows="4" pInputTextarea formControlName="descriptions" class="w-full"></textarea>
+    <small *ngIf="form.get('descriptions')?.invalid && form.get('descriptions')?.touched" class="text-red-500">
+      Description is required (min 3 chars)
+    </small>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex justify-content-end gap-2 mt-4 mb-4">
+    <button pButton type="button" label="{{ 'Cancel' | translate }}" class="p-button-outlined p-button-secondary" (click)="ref.close()">
+      
+    </button>
+
+    <button pButton type="submit" label="{{ 'Save' | translate }}" icon="pi pi-save" class="p-button-success" (click)="submit()"></button>
+  </div>
+</div>
