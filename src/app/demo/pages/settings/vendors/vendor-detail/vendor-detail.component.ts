@@ -199,21 +199,22 @@ export class VendorDetailComponent {
       (error) => {}
     );
   }
-  createvendorSectorStatisticsForm() {
+createvendorSectorStatisticsForm() {
     const today = new Date();
+    const startOfYear = new Date(today.getFullYear(), 0, 1);
     if (this.vendorId) {
       return (this.vendorSectorStatisticsForm = this.fb.group({
         companyId: [this.vendorId, Validators.required],
-        from: [today, Validators.required],
+        from: [startOfYear, Validators.required],
         to: [today, Validators.required]
       }));
     } else {
       return (this.vendorSectorStatisticsForm = this.fb.group({
-        from: [today, Validators.required],
+        from: [startOfYear, Validators.required],
         to: [today, Validators.required]
       }));
     }
-  }
+}
   getVendorTravelStatistics(data) {
     this.vendorService.getVendorTravelStatistics(data).subscribe(
       (response) => {

@@ -180,7 +180,10 @@ export class CouponsFormComponent implements OnInit {
     const trimmedValue = {
       ...formValue,
       code: formValue.code?.trim() || '',
-      description: formValue.description?.trim() || ''
+      description: formValue.description?.trim() || '',
+			buyQuantity: formValue.buyQuantity ?? 0,
+			getQuantity: formValue.getQuantity ?? 0,
+			maxFreeQuantity: formValue.maxFreeQuantity ?? 0
     };
 
     console.log(trimmedValue);

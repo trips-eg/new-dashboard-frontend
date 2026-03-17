@@ -83,15 +83,11 @@
           <div>
             <h4>
               {{ 'Total Outing Reservation' | translate }}
-              <i
-                class="pi pi-exclamation-triangle text-orange-500 text-sm ml-1"
-                pTooltip="Backend needs to return this value in GetDashboardInfo"
-                tooltipPosition="top"
-              ></i>
+            
             </h4>
 
             <h4 class="text-success">
-              {{ VendorStatistics?.totalOutingReservation ?? '—' }}
+              {{ VendorStatistics?.totalOutingReservation }}
             </h4>
           </div>
           <i class="pi pi-compass text-cyan-500 text-4xl"></i>
@@ -105,15 +101,11 @@
           <div>
             <h4>
               {{ 'Total Hajj Reservation' | translate }}
-              <i
-                class="pi pi-exclamation-triangle text-orange-500 text-sm ml-1"
-                pTooltip="Backend needs to return this value in GetDashboardInfo"
-                tooltipPosition="top"
-              ></i>
+              
             </h4>
 
             <h4 class="text-success">
-              {{ VendorStatistics?.totalHajjReservation ?? '—' }}
+              {{ VendorStatistics?.totalHajjReservation }}
             </h4>
           </div>
           <i class="pi pi-moon text-indigo-500 text-4xl"></i>
@@ -173,21 +165,55 @@
         </div>
       </p-card>
     </div> -->
-    <div class="col-12 col-md-4" *ngIf="!isVendor()">
-      <p-card class="stat">
-        <div class="flex align-items-center justify-content-between">
-          <div>
-            <h4>{{ 'Total Customers' | translate }}</h4>
-
-            <p class="text-success">
-              {{ VendorStatistics?.customerCount }}
-            </p>
-          </div>
-          <i class="pi pi-users text-purple-500 text-4xl"></i>
-        </div>
-      </p-card>
+<!-- Total Customers -->
+<div class="col-12 col-md-4" *ngIf="!isVendor()">
+  <p-card class="stat">
+    <div class="flex align-items-center justify-content-between">
+      <div>
+        <h4>{{ 'Total Customers' | translate }}</h4>
+        <p class="text-success">
+          {{ VendorStatistics?.customerCount }}
+        </p>
+      </div>
+      <i class="pi pi-users text-purple-500 text-4xl"></i>
     </div>
-  </div>
+  </p-card>
+</div>
+
+<!-- Total Vendors — جديد -->
+<div class="col-12 col-md-4" *ngIf="!isVendor()">
+  <p-card class="stat">
+    <div class="flex align-items-center justify-content-between">
+      <div>
+        <h4>{{ 'Total Vendors' | translate }}</h4>
+        <p class="text-success">
+          {{ VendorStatistics?.vendorCount }}
+        </p>
+      </div>
+      <i class="pi pi-building text-blue-500 text-4xl"></i>
+    </div>
+  </p-card>
+</div>
+
+<!-- Total Completed Reservations — جديد -->
+<div class="col-12 col-md-4" *ngIf="!isVendor()">
+  <p-card class="stat">
+    <div class="flex align-items-center justify-content-between">
+      <div>
+        <h4>{{ 'Total Reservations' | translate }}</h4>
+        <p class="text-success">
+          {{ VendorStatistics?.totalCompletedReservations }}
+        </p>
+        <small class="text-500">
+          {{ 'Today' | translate }}: {{ VendorStatistics?.totalReservationsToday }}
+        </small>
+      </div>
+      <i class="pi pi-calendar-check text-green-500 text-4xl"></i>
+    </div>
+  </p-card>
+</div>
+
+</div> 
 
   <!-- store Order status Section -->
   <!--
