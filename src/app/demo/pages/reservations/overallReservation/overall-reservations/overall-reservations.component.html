@@ -1,30 +1,162 @@
 <div class="main">
-  <sub-header
-    [mainHeader]="' Reservations'"
+  <sub-header [mainHeader]="'Customer Bookings' | translate"></sub-header>
 
-  ></sub-header>
+  <div class="card">
+    <p-toolbar>
+      <ng-template pTemplate="left">
+        <span [class]="'p-input-icon-' + (lang === 'ar' ? 'right' : 'left')">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            [(ngModel)]="searchedWord"
+            (input)="searchByName(searchedWord)"
+            [placeholder]="'Search...' | translate"
+          />
+        </span>
+      </ng-template>
+    </p-toolbar>
 
-<div class="card">
-  <p-toolbar styleClass="">
-    <ng-template pTemplate="left">
-      <span [class]="'p-input-icon-' + (lang === 'ar' ? 'left' : 'right')">
-        <i class="pi pi-search"></i>
-        <input pInputText type="text"  (input)="searchByName(searchedWord)" [(ngModel)]="searchedWord" placeholder="Search..." />
-      </span>
-    </ng-template>
+    <p-table
+      [value]="bookings"
+      [paginator]="true"
+      [rows]="rows"
+      [first]="first"
+      [lazy]="true"
+      [loading]="isLoading"
+      [totalRecords]="totalRecords"
+      [showCurrentPageReport]="true"
+      [tableStyle]="{ 'min-width': '80rem' }"
+      (onPage)="onPageChange($event)"
+      [currentPageReportTemplate]="'showingEntries' | translate"
+      [rowsPerPageOptions]="[10, 25, 50]"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'ID' | translate }}</th>
+          <th>{{ 'Reference' | translate }}</th>
+          <th>{{ 'Date' | translate }}</th>
+          <th>{{ 'Total Price' | translate }}</th>
+          <th>{{ 'Payment Method' | translate }}</th>
+          <th>{{ 'Payment Image' | translate }}</th>
+          <th>{{ 'Status' | translate }}</th>
+          <th>{{ 'Actions' | translate }}</th>
+        </tr>
+      </ng-template>
 
-  </p-toolbar>
-  <!-- <app-table
-  [data]="travels"
-  [columns]="columns"
-  [btnAction]="btnAction"
-  [totalRecords]="totalRecords"
-  [rows]="pageSize"
-  [lazy]="true"
-  (eventEmitters)="handleTableAction($event)"
-  (onPageChange)="onPageChange($event)"
-></app-table> -->
+      <ng-template pTemplate="body" let-booking>
+        <tr>
+          <!-- ID -->
+          <td>{{ booking.id }}</td>
 
-</div>
+          <!-- Booking Reference -->
+          <td>
+            <span
+              class="text-primary fw-bold cursor-pointer text-decoration-underline"
+              (click)="viewBookingDetails(booking.id)"
+              role="button"
+            >
+              {{ booking.bookingRefernce || '-' }}
+            </span>
+          </td>
 
+          <!-- Date -->
+          <td>{{ booking.createdDate | date: 'dd/MM/yyyy' }}</td>
+
+          <!-- Total Price -->
+          <td>
+            <span class="fw-bold">{{ booking.totalPrice | currency: 'EGP' }}</span>
+            <!-- Bonus breakdown (shown only if bonus was used) -->
+            <div *ngIf="booking.totalPaidFromBonus > 0" class="mt-1">
+              <small class="text-warning d-block">
+                <i class="pi pi-gift"></i>
+                {{ 'Bonus' | translate }}: {{ booking.totalPaidFromBonus | currency: 'EGP' }}
+              </small>
+              <small class="text-muted d-block">
+                {{ 'Cash' | translate }}: {{ booking.totalPaidFromCurrentBalance | currency: 'EGP' }}
+              </small>
+            </div>
+          </td>
+
+          <!-- Payment Method -->
+          <td>
+            <span
+              class="badge"
+              [ngClass]="isInstaPay(booking.paymentMethod) ? 'bg-info' : 'bg-secondary'"
+            >
+              {{ getPayMethodLabel(booking.paymentMethod) }}
+            </span>
+          </td>
+
+          <!-- Payment Image (InstaPay only) -->
+          <td>
+            <ng-container *ngIf="isInstaPay(booking.paymentMethod) && booking.paymentProofImageUrl; else noImage">
+              <a
+                [href]="booking.paymentProofImageUrl"
+                target="_blank"
+                class="btn btn-sm btn-outline-primary"
+                [title]="'View Payment Proof' | translate"
+              >
+                <i class="pi pi-image me-1"></i>
+                {{ 'View' | translate }}
+              </a>
+            </ng-container>
+            <ng-template #noImage>
+              <span class="text-muted">-</span>
+            </ng-template>
+          </td>
+
+          <!-- Status -->
+          <td>
+            <span class="badge" [ngClass]="getStatusClass(booking.sataus)">
+              {{ getStatusLabel(booking.sataus) }}
+            </span>
+          </td>
+
+          <!-- Actions -->
+          <td>
+            <div class="d-flex gap-2">
+              <!-- View Details -->
+              <button
+                pButton pRipple
+                type="button"
+                icon="pi pi-eye"
+                class="p-button-rounded p-button-text p-button-info"
+                [title]="'View Details' | translate"
+                (click)="viewBookingDetails(booking.id)"
+              ></button>
+
+              <!-- InstaPay Confirm (only for InstaPending) -->
+              <button
+                *ngIf="isInstaPending(booking.sataus)"
+                pButton pRipple
+                type="button"
+                icon="pi pi-check"
+                class="p-button-rounded p-button-text p-button-success"
+                [title]="'Confirm InstaPay' | translate"
+                (click)="confirmInstaPayBooking(booking)"
+              ></button>
+
+              <!-- InstaPay Cancel (only for InstaPending) -->
+              <button
+                *ngIf="isInstaPending(booking.sataus)"
+                pButton pRipple
+                type="button"
+                icon="pi pi-times"
+                class="p-button-rounded p-button-text p-button-danger"
+                [title]="'Cancel InstaPay' | translate"
+                (click)="cancelInstaPayBooking(booking)"
+              ></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8" class="text-center">{{ 'No bookings found' | translate }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
 </div>

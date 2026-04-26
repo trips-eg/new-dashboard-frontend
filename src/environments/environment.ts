@@ -6,8 +6,8 @@ import packageInfo from '../../package.json';
 
 export const environment = {
   appVersion: packageInfo.version,
-apiUrl: 'http://164.90.180.200:8090/api/',
-imgUrl: 'http://164.90.180.200:8090/',
+apiUrl: 'https://web-api.trips.eg/api/',
+imgUrl: 'https://web-api.trips.eg/',
   production: false
 };
 

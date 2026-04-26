@@ -57,6 +57,10 @@
           {{ 'Date' | translate }}
           <p-sortIcon field="createdDate"></p-sortIcon>
         </th>
+        <!-- ── NEW: Payment Method ── -->
+        <th>{{ 'Payment Method' | translate }}</th>
+        <!-- ── NEW: Payment Image ── -->
+        <th>{{ 'Payment Image' | translate }}</th>
         <th>{{ 'Details' | translate }}</th>
       </tr>
       <tr>
@@ -104,6 +108,9 @@
         <th>
           <p-columnFilter type="date" field="createdDate" display="row" [showMenu]="false"></p-columnFilter>
         </th>
+        <!-- ── NEW: empty filter cells for new columns ── -->
+        <th></th>
+        <th></th>
         <th></th>
       </tr>
     </ng-template>
@@ -137,30 +144,88 @@
         </td>
         <td class="font-bold">{{ payment.bookingRefernce }}</td>
         <td>{{ payment.bookingDate || payment.createdDate | date: 'dd MMM yyyy, h:mm a' }}</td>
+
+        <!-- ── NEW: Payment Method ── -->
         <td>
-          <button
-            pButton
-            icon="pi pi-eye"
-            class="p-button-rounded p-button-text p-button-info"
-            (click)="goToInfo(payment.id)"
-            [pTooltip]="'View Details' | translate"
-            tooltipPosition="top"
-          ></button>
-          <button
-            pButton
-            icon="pi pi-ban"
-            class="p-button-rounded p-button-text p-button-danger"
-            (click)="cancelReservation(payment)"
-            [pTooltip]="'Cancel Booking' | translate"
-            tooltipPosition="top"
-          ></button>
+          <span
+            class="badge"
+            [ngClass]="isInstaPay(payment.paymentMethod) ? 'bg-info' : 'bg-secondary'"
+          >
+            {{ getPayMethodLabel(payment.paymentMethod) }}
+          </span>
+        </td>
+
+        <!-- ── NEW: Payment Image (InstaPay only) ── -->
+        <td>
+          <ng-container *ngIf="isInstaPay(payment.paymentMethod) && payment.paymentProofImageUrl; else noImage">
+            <a
+              [href]="imgUrl + payment.paymentProofImageUrl"
+              target="_blank"
+              class="btn btn-sm btn-outline-primary"
+              [title]="'View Payment Proof' | translate"
+            >
+              <i class="pi pi-image me-1"></i>
+              {{ 'View' | translate }}
+            </a>
+          </ng-container>
+          <ng-template #noImage>
+            <span class="text-muted">-</span>
+          </ng-template>
+        </td>
+
+        <!-- Details + InstaPay Actions -->
+        <td>
+          <div class="flex gap-1 align-items-center">
+            <!-- View Details -->
+            <button
+              pButton
+              icon="pi pi-eye"
+              class="p-button-rounded p-button-text p-button-info"
+              (click)="goToInfo(payment.id)"
+              [pTooltip]="'View Details' | translate"
+              tooltipPosition="top"
+            ></button>
+
+            <!-- Cancel Booking -->
+            <button
+              pButton
+              icon="pi pi-ban"
+              class="p-button-rounded p-button-text p-button-danger"
+              (click)="cancelReservation(payment)"
+              [pTooltip]="'Cancel Booking' | translate"
+              tooltipPosition="top"
+            ></button>
+
+            <!-- ── NEW: Confirm InstaPay (InstaPending only) ── -->
+            <button
+              *ngIf="isInstaPending(payment.bookingStatus || payment.sataus)"
+              pButton
+              icon="pi pi-check"
+              class="p-button-rounded p-button-text p-button-success"
+              (click)="confirmInstaPayBooking(payment)"
+              [pTooltip]="'Confirm InstaPay' | translate"
+              tooltipPosition="top"
+            ></button>
+
+            <!-- ── NEW: Cancel InstaPay (InstaPending only) ── -->
+            <button
+              *ngIf="isInstaPending(payment.bookingStatus || payment.sataus)"
+              pButton
+              icon="pi pi-times"
+              class="p-button-rounded p-button-text p-button-warning"
+              (click)="cancelInstaPayBooking(payment)"
+              [pTooltip]="'Cancel InstaPay' | translate"
+              tooltipPosition="top"
+            ></button>
+          </div>
         </td>
       </tr>
     </ng-template>
 
+    <!-- rowexpansion colspan updated from 10 to 12 -->
     <ng-template pTemplate="rowexpansion" let-payment>
       <tr>
-        <td colspan="10">
+        <td colspan="12">
           <div class="p-3">
             <div *ngIf="payment.tripReservations?.length" class="mb-3">
               <h5>{{ 'Trip Reservations' | translate }}</h5>
@@ -344,7 +409,7 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="10">
+        <td colspan="12">
           <div class="flex flex-column align-items-center justify-content-center py-5">
             <i class="pi pi-inbox text-500 text-5xl mb-3"></i>
             <span class="text-700 font-medium text-lg">{{ 'No bookings found' | translate }}</span>

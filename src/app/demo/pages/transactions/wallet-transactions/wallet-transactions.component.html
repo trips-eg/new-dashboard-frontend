@@ -30,7 +30,7 @@
       [loading]="isLoading"
       [totalRecords]="totalRecords"
       [showCurrentPageReport]="true"
-      [tableStyle]="{ 'min-width': '50rem' }"
+      [tableStyle]="{ 'min-width': '70rem' }"
       (onPage)="onPageChange($event)"
       [currentPageReportTemplate]="'showingEntries' | translate"
       [rowsPerPageOptions]="[10, 25, 50]"
@@ -42,6 +42,8 @@
           <th>{{ 'Amount In' | translate }}</th>
           <th>{{ 'Amount Out' | translate }}</th>
           <th>{{ 'Balance After' | translate }}</th>
+          <th>{{ 'Bonus Used' | translate }}</th>
+          <th>{{ 'Paid From Balance' | translate }}</th>
           <th>{{ 'Transaction Date' | translate }}</th>
           <th>{{ 'Booking Reference' | translate }}</th>
           <th>{{ 'Charge Reference' | translate }}</th>
@@ -51,50 +53,74 @@
       <ng-template pTemplate="body" let-transaction>
         <tr>
           <td>{{ transaction.id }}</td>
+
           <td>
             <span class="badge" [ngClass]="{
               'bg-success': transaction.amountIn > 0,
-              'bg-danger': transaction.amountOut > 0
+              'bg-danger':  transaction.amountOut > 0
             }">
               {{ transaction.transactionTypeName }}
             </span>
           </td>
+
           <td>
             <span *ngIf="transaction.amountIn > 0" class="text-success fw-bold">
               +{{ transaction.amountIn | currency: 'EGP' }}
             </span>
             <span *ngIf="transaction.amountIn === 0">-</span>
           </td>
+
           <td>
             <span *ngIf="transaction.amountOut > 0" class="text-danger fw-bold">
               -{{ transaction.amountOut | currency: 'EGP' }}
             </span>
             <span *ngIf="transaction.amountOut === 0">-</span>
           </td>
+
           <td>
             <span class="fw-bold">
               {{ transaction.balanceAfterTransaction | currency: 'EGP' }}
             </span>
           </td>
-          <td>{{ transaction.transactionDate | date: 'short' }}</td>
+
+          <!-- Bonus Amount Used -->
           <td>
-            <span 
-              *ngIf="transaction.bookingRefernce; else noBookingRef" 
+            <span *ngIf="transaction.bonusAmountUsed > 0" class="text-warning fw-bold">
+              {{ transaction.bonusAmountUsed | currency: 'EGP' }}
+            </span>
+            <span *ngIf="!transaction.bonusAmountUsed || transaction.bonusAmountUsed === 0">-</span>
+          </td>
+
+          <!-- Paid From Current Balance -->
+          <td>
+            <span *ngIf="transaction.paidFromCurrentBalance > 0" class="text-info fw-bold">
+              {{ transaction.paidFromCurrentBalance | currency: 'EGP' }}
+            </span>
+            <span *ngIf="!transaction.paidFromCurrentBalance || transaction.paidFromCurrentBalance === 0">-</span>
+          </td>
+
+          <td>{{ transaction.transactionDate | date: 'short' }}</td>
+
+          <td>
+            <span
+              *ngIf="transaction.bookingRefernce; else noBookingRef"
               class="text-primary fw-bold cursor-pointer text-decoration-underline"
               (click)="navigateToPaymentInfo(transaction.bookingRefernce)"
               role="button"
-              [title]="'View payment details' | translate">
+              [title]="'View payment details' | translate"
+            >
               {{ transaction.bookingRefernce }}
             </span>
             <ng-template #noBookingRef>-</ng-template>
           </td>
+
           <td>{{ transaction.chargeRefernce || '-' }}</td>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="8" class="text-center">{{ 'No transactions found' | translate }}</td>
+          <td colspan="10" class="text-center">{{ 'No transactions found' | translate }}</td>
         </tr>
       </ng-template>
     </p-table>

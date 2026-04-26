@@ -8,6 +8,33 @@ import { EnumsService } from 'src/app/shared/services/enums.service';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 import { TableRequestBuilder } from 'src/app/shared/utils/table-request-builder';
 import { Table, TableLazyLoadEvent } from 'primeng/table';
+import { ToastrService } from 'ngx-toastr';
+import { environment } from 'src/environments/environment';
+
+
+// ── BookingStatus Enum (matches backend) ──
+enum BookingStatus {
+  Pending        = 1,
+  Confirmed      = 2,
+  Cancelled      = 3,
+  Completed      = 4,
+  Refunded       = 5,
+  InstaPending   = 6,
+  InstaCompleted = 7,
+  InstaCancelled = 8
+}
+
+// ── PayMethod Enum (matches backend) ──
+enum PayMethod {
+  BankCard        = 1,
+  ReferenceCode   = 2,
+  Shahry          = 3,
+  VALU            = 4,
+  MWALLET         = 5,
+  BankInstallment = 6,
+  VodafoneCash    = 7,
+  InstaPay        = 8
+}
 
 @Component({
   selector: 'app-reservation-list',
@@ -17,6 +44,7 @@ import { Table, TableLazyLoadEvent } from 'primeng/table';
   styleUrl: './reservation-list.component.scss'
 })
 export class ReservationListComponent implements OnInit {
+	imgUrl = environment.imgUrl;
   @ViewChild('dt') dt!: Table;
 
   // ✅ Pagination & Filters
@@ -31,13 +59,14 @@ export class ReservationListComponent implements OnInit {
   paymentStatus: any[] = [];
   lang: string = 'en';
 
-constructor(
+  constructor(
     private router: Router,
     private bookingService: BookingService,
     private enumsService: EnumsService,
     private translate: TranslateService,
     private route: ActivatedRoute,
-    private reservationsService: ReservationsService
+    private reservationsService: ReservationsService,
+    private toastrService: ToastrService
   ) {
     this.translate.onLangChange.subscribe((event) => {
       this.lang = event.lang;
@@ -46,7 +75,6 @@ constructor(
   }
 
   ngOnInit(): void {
-    // Initial load is handled by the table's lazy load event trigger
     this.loadPaymentStatus();
   }
 
@@ -97,17 +125,27 @@ constructor(
       '2': 'status-confirmed',
       '3': 'status-cancelled',
       '4': 'status-completed',
-      '5': 'status-refunded'
+      '5': 'status-refunded',
+      '6': 'status-pending',   // InstaPending → same yellow as Pending
+      '7': 'status-confirmed', // InstaCompleted → same green as Confirmed
+      '8': 'status-cancelled'  // InstaCancelled → same red as Cancelled
     };
-
     return classes[value.toString()] || 'status-unknown';
   }
 
   // ✅ Label for status
   getStatusLabel(value: number | string): string {
     const status = this.paymentStatus.find((s) => s.value == value);
-    const lang = this.translate.currentLang;
-    return status ? (lang === 'ar' ? status.nameAr : status.nameEn) : lang === 'ar' ? 'غير معروف' : 'Unknown';
+    if (status) {
+      return this.lang === 'ar' ? status.nameAr : status.nameEn;
+    }
+    // Fallback for InstaPay statuses not in enum API
+    const fallback: Record<string, string> = {
+      '6': 'Insta Pending',
+      '7': 'Insta Completed',
+      '8': 'Insta Cancelled'
+    };
+    return fallback[value.toString()] ?? (this.lang === 'ar' ? 'غير معروف' : 'Unknown');
   }
 
   // ✅ Check if booking has reservations
@@ -118,8 +156,9 @@ constructor(
       (booking.roomBookings && booking.roomBookings.length > 0) ||
       (booking.hajjReservations && booking.hajjReservations.length > 0)
     );
-}
+  }
 
+  // ✅ Cancel booking (manual)
   cancelReservation(booking: any): void {
     const customerName = booking.user?.name || 'Customer';
     const confirmed = confirm(
@@ -136,5 +175,56 @@ constructor(
       });
     }
   }
+
+  // ── NEW: PayMethod helpers ──
+  getPayMethodLabel(method: number): string {
+    const map: Record<number, string> = {
+      1: 'Bank Card',
+      2: 'Reference Code',
+      3: 'Shahry',
+      4: 'Valu',
+      5: 'Mobile Wallet',
+      6: 'Bank Installment',
+      7: 'Vodafone Cash',
+      8: 'InstaPay'
+    };
+    return map[method] ?? '-';
   }
-  
+
+  isInstaPay(method: number): boolean {
+    return method === PayMethod.InstaPay;
+  }
+
+  // ── NEW: InstaPending check ──
+  isInstaPending(status: number | string): boolean {
+    return Number(status) === BookingStatus.InstaPending;
+  }
+
+  // ── NEW: Confirm InstaPay ──
+  confirmInstaPayBooking(booking: any): void {
+    this.reservationsService.confirmInstaPayBooking(booking.id).subscribe({
+      next: () => {
+        this.toastrService.success('InstaPay booking confirmed successfully', 'Success');
+        booking.sataus = BookingStatus.InstaCompleted;
+        booking.bookingStatus = BookingStatus.InstaCompleted;
+      },
+      error: () => {
+        this.toastrService.error('Failed to confirm InstaPay booking', 'Error');
+      }
+    });
+  }
+
+  // ── NEW: Cancel InstaPay ──
+  cancelInstaPayBooking(booking: any): void {
+    this.reservationsService.cancelInstaPayBooking(booking.id).subscribe({
+      next: () => {
+        this.toastrService.success('InstaPay booking cancelled successfully', 'Success');
+        booking.sataus = BookingStatus.InstaCancelled;
+        booking.bookingStatus = BookingStatus.InstaCancelled;
+      },
+      error: () => {
+        this.toastrService.error('Failed to cancel InstaPay booking', 'Error');
+      }
+    });
+  }
+}

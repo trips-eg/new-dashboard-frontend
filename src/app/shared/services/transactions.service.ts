@@ -10,34 +10,35 @@ import { FilterMap } from '../mapping/filterMap';
 export class TransactionsService {
   endPoints = APIs.transactions;
 
+  constructor(private _apiCaller: ApiCallerService) {}
 
-  constructor(private _apiCaller: ApiCallerService) { }
   getTransactions(filterMap?: FilterMap): Observable<any> {
-    const queryParams = [
-      filterMap?.pageIndex ? `pageIndex=${filterMap.pageIndex}` : null,
-      filterMap?.pageSize ? `pageSize=${filterMap.pageSize}` : null,
-      filterMap?.sort ? `sort=${filterMap.sort}` : null,
-      filterMap?.UserId ? `UserId=${filterMap.UserId}` : null,
-      filterMap?.search ? `search=${filterMap.search}` : null
-    ]
-      .filter((param) => param !== null)
-      .join('&');
-
-    const query = queryParams ? `?${queryParams}` : '';
+    const query = this.buildQuery(filterMap);
     return this._apiCaller.get(`${this.endPoints.getTransactions}${query}`);
   }
+
   getWalletChargeTransaction(filterMap?: FilterMap): Observable<any> {
-    const queryParams = [
+    const query = this.buildQuery(filterMap);
+    return this._apiCaller.get(`${this.endPoints.getWalletChargeTransaction}${query}`);
+  }
+
+  // ── Wallets list (admin — includes bonus details) ──
+  getAllWallets(filterMap?: FilterMap): Observable<any> {
+    const query = this.buildQuery(filterMap);
+    return this._apiCaller.get(`${this.endPoints.getAllWallets}${query}`);
+  }
+
+  private buildQuery(filterMap?: FilterMap): string {
+    const params = [
       filterMap?.pageIndex ? `pageIndex=${filterMap.pageIndex}` : null,
-      filterMap?.pageSize ? `pageSize=${filterMap.pageSize}` : null,
-      filterMap?.sort ? `sort=${filterMap.sort}` : null,
-      filterMap?.UserId ? `UserId=${filterMap.UserId}` : null,
-      filterMap?.search ? `search=${filterMap.search}` : null
+      filterMap?.pageSize  ? `pageSize=${filterMap.pageSize}`   : null,
+      filterMap?.sort      ? `sort=${filterMap.sort}`           : null,
+      filterMap?.UserId    ? `UserId=${filterMap.UserId}`       : null,
+      filterMap?.search    ? `search=${filterMap.search}`       : null
     ]
-      .filter((param) => param !== null)
+      .filter((p) => p !== null)
       .join('&');
 
-    const query = queryParams ? `?${queryParams}` : '';
-    return this._apiCaller.get(`${this.endPoints.getWalletChargeTransaction}${query}`);
+    return params ? `?${params}` : '';
   }
 }

@@ -23,12 +23,12 @@ import { environment } from 'src/environments/environment';
 export class TravelsFormComponent implements OnInit {
   travelId: string | null = null;
   tripId: string | null = null;
-  tripForm: FormGroup;
+  tripForm: FormGroup = this.fb.group({});
   oldImages = [];
   programTypeList: { label: string; value: any }[] = [];
   cityList: { label: string; value: any }[] = [];
   countryList: { label: string; value: any }[] = [];
-  travelForm: FormGroup;
+  travelForm: FormGroup = this.fb.group({});
   selectedImages: File[] = [];
   filterparams?: FilterMap = {};
   lang: string;
@@ -859,18 +859,16 @@ export class TravelsFormComponent implements OnInit {
     this.steps.removeAt(index);
   }
   removeStepDB(index, dbIndex, event) {
-    event.stopPropagation();
-    debugger;
-    this.travelService.deleteProgramStep(dbIndex).subscribe(
-      (response) => {
-        this.steps.removeAt(index);
-      },
-      (error) => {
-        debugger;
-        this.toast.error(error.error.message);
-      }
-    );
-  }
+  event.stopPropagation();
+  this.travelService.deleteProgramStep(dbIndex).subscribe(
+    (response) => {
+      this.steps.removeAt(index);
+    },
+    (error) => {
+      this.toast.error(error.error.message);
+    }
+  );
+}
 
   getStepDescriptions(index: number): FormArray {
     return this.steps.at(index).get('stepDescriptions') as FormArray;
@@ -900,11 +898,11 @@ export class TravelsFormComponent implements OnInit {
   }
 
   addProgramToTravel(nextCallback?: EventEmitter<void>) {
-    debugger;
-    if (this.tripForm.invalid) {
-      this.steps.markAllAsTouched();
-    }
-    const tripFormValue = this.tripForm.value;
+  if (this.tripForm.invalid) {
+  this.steps.markAllAsTouched();
+  return;  // ← إضافة return
+}
+const tripFormValue = this.tripForm.value;
 
     const formattedData = {
       tripIds: this.tripId,

@@ -1,10 +1,22 @@
-<div class="card">
-  <p-table [value]="financialSettingsList" dataKey="id" editMode="row" [tableStyle]="{ 'min-width': '50rem' }">
+<!-- ══════════════════════════════════════════════════════
+     Financial Settings Table
+═══════════════════════════════════════════════════════ -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h5 class="mb-0">{{ 'Financial Settings' | translate }}</h5>
+  </div>
+
+  <p-table
+    [value]="financialSettingsList"
+    dataKey="id"
+    editMode="row"
+    [tableStyle]="{ 'min-width': '50rem' }"
+  >
     <ng-template pTemplate="header">
       <tr>
         <th style="width: 20%">ID</th>
-        <th style="width: 20%">Type</th>
-        <th style="width: 20%">Value</th>
+        <th style="width: 40%">{{ 'Type' | translate }}</th>
+        <th style="width: 20%">{{ 'Value' | translate }}</th>
         <th style="width: 20%"></th>
       </tr>
     </ng-template>
@@ -13,47 +25,37 @@
       <tr [pEditableRow]="product">
         <td>{{ product.id }}</td>
         <td>{{ product.settingType }}</td>
-
         <td>
           <p-cellEditor>
             <ng-template pTemplate="input">
-              <input type="number" pInputText mode="decimal" [(ngModel)]="product.value" />
+              <input type="number" pInputText [(ngModel)]="product.value" />
             </ng-template>
-            <ng-template pTemplate="output">{{ product.value }} </ng-template>
+            <ng-template pTemplate="output">{{ product.value }}</ng-template>
           </p-cellEditor>
         </td>
-
         <td>
           <div class="flex align-items-center justify-content-center gap-2">
-            <!-- زرار Edit -->
             <button
               *ngIf="!editing"
-              pButton
-              pRipple
+              pButton pRipple
               type="button"
               pInitEditableRow
               icon="pi pi-pencil"
               (click)="onRowEditInit(product)"
               class="p-button-rounded p-button-text"
             ></button>
-
-            <!-- زرار Save -->
             <button
               *ngIf="editing"
-              pButton
-              pRipple
+              pButton pRipple
               type="button"
               pSaveEditableRow
               icon="pi pi-check"
               (click)="onRowEditSave(product)"
               class="p-button-rounded p-button-text p-button-success mr-2"
             ></button>
-
-            <!-- زرار Cancel -->
             <button
               *ngIf="editing"
-              pButton
-              pRipple
+              pButton pRipple
               type="button"
               pCancelEditableRow
               icon="pi pi-times"
@@ -65,4 +67,109 @@
       </tr>
     </ng-template>
   </p-table>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     User / Bonus Settings Table
+═══════════════════════════════════════════════════════ -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h5 class="mb-0">
+      <i class="pi pi-gift me-2 text-warning"></i>
+      {{ 'Registration Bonus Settings' | translate }}
+    </h5>
+    <small class="text-muted">
+      {{ 'Configure the welcome bonus given to new users upon registration' | translate }}
+    </small>
+  </div>
+
+  <p-table
+    [value]="userSettingsList"
+    dataKey="id"
+    editMode="row"
+    [tableStyle]="{ 'min-width': '50rem' }"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 20%">ID</th>
+        <th style="width: 40%">{{ 'Type' | translate }}</th>
+        <th style="width: 20%">{{ 'Value' | translate }}</th>
+        <th style="width: 20%"></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-setting let-editing="editing" let-ri="rowIndex">
+      <tr [pEditableRow]="setting">
+        <td>{{ setting.id }}</td>
+        <td>{{ setting.settingType }}</td>
+        <td>
+          <p-cellEditor>
+            <ng-template pTemplate="input">
+              <input type="number" pInputText [(ngModel)]="setting.value" />
+            </ng-template>
+            <ng-template pTemplate="output">{{ setting.value }}</ng-template>
+          </p-cellEditor>
+        </td>
+        <td>
+          <div class="flex align-items-center justify-content-center gap-2">
+            <button
+              *ngIf="!editing"
+              pButton pRipple
+              type="button"
+              pInitEditableRow
+              icon="pi pi-pencil"
+              (click)="onUserRowEditInit(setting)"
+              class="p-button-rounded p-button-text"
+            ></button>
+            <button
+              *ngIf="editing"
+              pButton pRipple
+              type="button"
+              pSaveEditableRow
+              icon="pi pi-check"
+              (click)="onUserRowEditSave(setting)"
+              class="p-button-rounded p-button-text p-button-success mr-2"
+            ></button>
+            <button
+              *ngIf="editing"
+              pButton pRipple
+              type="button"
+              pCancelEditableRow
+              icon="pi pi-times"
+              (click)="onUserRowEditCancel(setting, ri)"
+              class="p-button-rounded p-button-text p-button-danger"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4" class="text-center">{{ 'No settings found' | translate }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     InstaPay Details Card
+═══════════════════════════════════════════════════════ -->
+<div class="card" *ngIf="instaPayDetails">
+  <div class="card-header">
+    <h5 class="mb-0">
+      <i class="pi pi-credit-card me-2 text-primary"></i>
+      {{ 'InstaPay Details' | translate }}
+    </h5>
+  </div>
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-6" *ngFor="let key of instaPayDetails | keyvalue">
+        <div class="border rounded p-3">
+          <small class="text-muted d-block mb-1">{{ key.key }}</small>
+          <span class="fw-bold">{{ key.value }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

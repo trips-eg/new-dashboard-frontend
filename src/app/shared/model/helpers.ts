@@ -91,7 +91,12 @@ export class APIs {
   };
   public static financialSettings = {
     getAllFinancialSettings: 'Financial/GetAllFinancialSetting',
-    editFinancialSettings: 'Financial/UpdateFinancialSetting'
+    editFinancialSettings: 'Financial/UpdateFinancialSetting',
+    // ── User / Bonus Settings ──
+    getUserSettings: 'Settings/UserSettings',
+    updateUserSettings: 'Settings/UserSettings',
+    // ── InstaPay Details ──
+    getInstaPayDetails: 'Financial/InstaPayDetails'
   };
   public static salesAgancies = {
     getsalesAgancies: 'SalesAgency/GetAllSalesAgencies',
@@ -133,7 +138,9 @@ export class APIs {
   };
   public static transactions = {
     getTransactions: 'Wallet/GetWalletTransaction',
-    getWalletChargeTransaction: 'Wallet/GetWalletChargeTransaction'
+    getWalletChargeTransaction: 'Wallet/GetWalletChargeTransaction',
+    // ── Wallets list (admin) ──
+    getAllWallets: 'Wallet/GetAllWallets'
   };
 
   public static reservations = {
@@ -151,7 +158,10 @@ export class APIs {
     getRoomReservationForVendor: 'Booking/GetAllBooking',
     getTravelReservationForVendor: 'TripReservations/GetAllTripReservation',
     getOutingReservationForVendor: 'OutingBooking/GetAllOutingBooking',
-    getManasikReservationForVendor: 'HajjReservations/GetAllHajjReservation'
+    getManasikReservationForVendor: 'HajjReservations/GetAllHajjReservation',
+    // ── InstaPay Admin Actions ──
+    confirmInstaPayBooking: 'CustomerBooking/ConfirmInstaPayBooking?id=',
+    cancelInstaPayBooking: 'CustomerBooking/CancelInstaPayBooking?id='
   };
   public static useries = {
     createUser: 'Users/CreateUser',
@@ -225,7 +235,7 @@ export class APIs {
     addCompany: 'Company/AddCompany',
     updateCompany: 'Company/UpdateCompany',
     deleteCompany: 'Company/DeleteCompany?id=',
-    getStatistics: 'Dashboard/GetDashboardInfo?CompanyId',
+    getStatistics: 'Dashboard/GetDashboardInfo',
     getTravelStatistics: 'Dashboard/GetAccountTripInfo',
     getRoomStatistics: 'Dashboard/GetAccountRoomInfo',
     getOutingStatistics: 'Dashboard/GetAccountOutingInfo',
@@ -249,15 +259,12 @@ export class APIs {
     deleteProgramStep: 'Travels/DeleteProgramStep?id=',
     getProgramStepType: 'ProgramStep/ProgramStep/Type',
 
-    ////////////////Travel trips reservation /////////////
-
     getAllTripReservation: 'TripReservations/GetAllTripReservation',
     addTripReservation: 'TripReservations/AddTripReservation',
     deleteReservation: 'TripReservations/DeleteReservation?id='
   };
 
   public static Hotel = {
-    //////////Hotel  /////////////////
     getAllHotels: 'Hotel/GetAllHotelsWeb',
     getHotelById: 'Hotel/GetHotelById?id=',
     addHotel: 'Hotel/AddHotel',
@@ -265,14 +272,12 @@ export class APIs {
     updateHotelStatus: 'Hotel/UpdateHotelStatus',
     deleteHotel: 'Hotel/DeleteHotel?id=',
 
-    //////////Hotel Address/////////////////
     getAllHotelAddresses: 'HotelAddress/GetAllHotelAddresses',
     getHotelAddressById: 'HotelAddress/GetHotelAddressById?id=',
     addHotelAddress: 'HotelAddress/AddHotelAddress',
     updateHotelAddress: 'HotelAddress/UpdateHotelAddress',
     deleteHotelAddress: 'HotelAddress/DeleteHotelAddress?id=',
 
-    //////////Hotel Features /////////////////
     getAllHotelFeatures: 'HotelFeatures/GetAllHotelFeatures',
     getHotelFeatureById: 'HotelFeatures/GetHotelFeatureById?id=',
     addHotelFeature: 'HotelFeatures/AddHotelFeature',
@@ -280,14 +285,12 @@ export class APIs {
     deleteHotelFeature: 'HotelFeatures/DeleteHotelFeature?id='
   };
   public static Room = {
-    //////////Room  Types /////////////////
     getAllRoomTypes: 'RoomTypes/GetAllRoomTypes',
     getRoomTypeById: 'RoomTypes/GetRoomTypeById?id=',
     addRoomType: 'RoomTypes/AddRoomType',
     updateRoomType: 'RoomTypes/UpdateRoomType',
     deleteRoomType: 'RoomTypes/DeleteRoomType?id=',
 
-    //////////Room  /////////////////
     getAllRooms: 'Room/GetAllRooms',
     getRoomById: 'Room/GetRoomById?id=',
     addRoom: 'Room/AddRoom',
@@ -295,21 +298,18 @@ export class APIs {
     deleteRoom: 'Room/DeleteRoom?id=',
     toggleBlockRoom: 'Room/BlockUnBlockRoom?id=',
 
-    //////////Room  Images /////////////////
     getAllRoomImages: 'RoomImages/GetAllRoomImages',
     getRoomImageById: 'RoomImages/GetRoomImageById?id=',
     addRoomImage: 'RoomImages/AddRoomImage',
     updateRoomImage: 'RoomImages/UpdateRoomImage',
     deleteRoomImage: 'RoomImages/DeleteRoomImage?id=',
 
-    //////////Room Features /////////////////
     getAllRoomFeatures: 'RoomFeature/GetAllRoomFeatures',
     getRoomFeatureById: 'RoomFeature/GetRoomFeatureById?id=',
     addRoomFeature: 'RoomFeature/AddRoomFeature',
     updateRoomFeature: 'RoomFeature/UpdateRoomFeature',
     deleteRoomFeature: 'RoomFeature/DeleteRoomFeature?id=',
 
-    //////////Room Features Mapping/////////////////
     getAllRoomFeaturesMapping: 'RoomFeatureMapping/GetAllRoomFeaturesMapping',
     getRoomFeatureMappingById: 'RoomFeatureMapping/GetRoomFeatureMappingById?id=',
     addRoomFeatureMapping: 'RoomFeatureMapping/AddRoomFeatureMapping',
