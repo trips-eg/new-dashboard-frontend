@@ -31,6 +31,9 @@
   &--trip {
     border-left-color: #ef4444; // red
   }
+  &--company {
+    border-left-color: #64748b; // slate
+  }
 
   // Card Name
   &__name {
@@ -38,6 +41,16 @@
     font-weight: 600;
     color: var(--text-color);
     line-height: 1.4;
+  }
+
+  &__logo {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid var(--surface-border);
+    background: var(--surface-100);
+    flex-shrink: 0;
   }
 
   // Price Badge
@@ -102,6 +115,53 @@
       font-size: 0.75rem;
       color: var(--primary-color);
     }
+  }
+
+  &__company-panel {
+    margin-top: 0.75rem;
+    padding: 0.85rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    background: var(--surface-50);
+  }
+
+  &__company-contact,
+  &__company-docs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    color: var(--text-color-secondary);
+    font-size: 0.8rem;
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      min-width: 0;
+    }
+
+    i {
+      color: #64748b;
+      font-size: 0.75rem;
+    }
+  }
+
+  &__company-commissions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.75rem 0;
+  }
+
+  &__commission {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.2rem 0.55rem;
+    background: #eef2ff;
+    color: #3730a3;
+    font-size: 0.75rem;
+    font-weight: 600;
   }
 
   // =============================================
@@ -233,6 +293,9 @@
   &--trip {
     border-left-color: #ef4444;
   }
+  &--company {
+    border-left-color: #64748b;
+  }
 
   &__order {
     display: flex;
@@ -261,6 +324,40 @@
     margin-top: 0.4rem;
     padding-top: 0.4rem;
     border-top: 1px dashed var(--surface-border);
+  }
+
+  &__company {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.4rem;
+  }
+
+  &__company-logo {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 7px;
+    object-fit: cover;
+    border: 1px solid var(--surface-border);
+    flex-shrink: 0;
+  }
+
+  &__company-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    color: var(--text-color-secondary);
+    font-size: 0.75rem;
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    i {
+      font-size: 0.7rem;
+    }
   }
 
   &__desc {

@@ -69,6 +69,8 @@ export class MobSideBarDetailsComponent implements OnInit {
     if (item.hajj) return item.hajj.name;
     if (item.trip) return item.trip.name || item.trip.title;
     if (item.room) return item.room.name;
+    if (item.company) return item.company.name || item.company.title;
+    if (item.companyDto) return item.companyDto.name || item.companyDto.title;
     return 'Unknown Item';
   }
 
@@ -82,6 +84,8 @@ export class MobSideBarDetailsComponent implements OnInit {
         return 'bg-purple-100 text-purple-700';
       case SideBarItemType.Trip:
         return 'bg-orange-100 text-orange-700';
+      case SideBarItemType.Company:
+        return 'bg-gray-100 text-gray-700';
       default:
         return 'bg-gray-100 text-gray-700';
     }
@@ -97,6 +101,8 @@ export class MobSideBarDetailsComponent implements OnInit {
         return 'pi pi-building';
       case SideBarItemType.Trip:
         return 'pi pi-globe';
+      case SideBarItemType.Company:
+        return 'pi pi-briefcase';
       default:
         return 'pi pi-tag';
     }
@@ -107,6 +113,8 @@ export class MobSideBarDetailsComponent implements OnInit {
     if (item.hajj?.images?.[0]) return this.baseImageUrl + item.hajj.images[0].imageUrl || item.hajj.images[0];
     if (item.trip?.images?.[0]) return this.baseImageUrl + item.trip.images[0].imageUrl || item.trip.images[0];
     if (item.room?.images?.[0]) return this.baseImageUrl + item.room.images[0].imageUrl || item.room.images[0];
+    if (item.company?.images?.[0]) return this.baseImageUrl + item.company.images[0].imageUrl || item.company.images[0];
+    if (item.companyDto?.images?.[0]) return this.baseImageUrl + item.companyDto.images[0].imageUrl || item.companyDto.images[0];
     return null;
   }
 }

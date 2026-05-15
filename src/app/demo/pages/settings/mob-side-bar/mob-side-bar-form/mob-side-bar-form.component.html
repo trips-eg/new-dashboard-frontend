@@ -61,6 +61,9 @@
                 <p-tabPanel header="Trip">
                   <ng-container *ngTemplateOutlet="itemsGrid; context: { $implicit: SideBarItemType.Trip }"></ng-container>
                 </p-tabPanel>
+                <p-tabPanel header="Company">
+                  <ng-container *ngTemplateOutlet="itemsGrid; context: { $implicit: SideBarItemType.Company }"></ng-container>
+                </p-tabPanel>
               </p-tabView>
             </div>
           </ng-template>
@@ -81,7 +84,8 @@
                     'selected-card--room': item.sideBarItemType === SideBarItemType.Room,
                     'selected-card--outing': item.sideBarItemType === SideBarItemType.Outing,
                     'selected-card--hajj': item.sideBarItemType === SideBarItemType.Hajj,
-                    'selected-card--trip': item.sideBarItemType === SideBarItemType.Trip
+                    'selected-card--trip': item.sideBarItemType === SideBarItemType.Trip,
+                    'selected-card--company': item.sideBarItemType === SideBarItemType.Company
                   }"
                 >
                   <!-- Top Row: Order + Name + Type + Delete -->
@@ -98,7 +102,9 @@
                               ? 'success'
                               : item.sideBarItemType === SideBarItemType.Hajj
                                 ? 'warning'
-                                : 'danger'
+                                : item.sideBarItemType === SideBarItemType.Trip
+                                  ? 'danger'
+                                  : 'secondary'
                         "
                         [rounded]="true"
                         styleClass="text-xs"
@@ -121,6 +127,29 @@
                     <!-- Description -->
                     <div class="selected-card__desc" *ngIf="d.description">
                       {{ d.description.length > 60 ? (d.description | slice: 0 : 60) + '...' : d.description }}
+                    </div>
+
+                    <div class="selected-card__company" *ngIf="item.sideBarItemType === SideBarItemType.Company">
+                      <img
+                        *ngIf="getCompanyLogoUrl(d)"
+                        [src]="getCompanyLogoUrl(d)"
+                        [alt]="getItemName(item)"
+                        class="selected-card__company-logo"
+                      />
+                      <div class="selected-card__company-info">
+                        <span *ngIf="getCompanyContact(d)">
+                          <i class="pi pi-envelope"></i>
+                          {{ getCompanyContact(d) }}
+                        </span>
+                        <span *ngIf="d.address">
+                          <i class="pi pi-map-marker"></i>
+                          {{ d.address }}
+                        </span>
+                        <span>
+                          <i class="pi pi-file"></i>
+                          {{ getCompanyDocumentsCount(d) }} {{ 'Documents' | translate }}
+                        </span>
+                      </div>
                     </div>
 
                     <!-- Meta: Price + Vendor + Location -->
@@ -186,12 +215,19 @@
           'item-card--room': type === SideBarItemType.Room,
           'item-card--outing': type === SideBarItemType.Outing,
           'item-card--hajj': type === SideBarItemType.Hajj,
-          'item-card--trip': type === SideBarItemType.Trip
+          'item-card--trip': type === SideBarItemType.Trip,
+          'item-card--company': type === SideBarItemType.Company
         }"
       >
         <!-- Card Header: Name + Price -->
         <div class="flex justify-content-between align-items-start mb-2">
           <div class="flex align-items-center gap-2">
+            <img
+              *ngIf="type === SideBarItemType.Company && getCompanyLogoUrl(item)"
+              [src]="getCompanyLogoUrl(item)"
+              [alt]="item.name || item.title"
+              class="item-card__logo"
+            />
             <span class="item-card__name">{{ item.name || item.title || 'Item #' + item.id }}</span>
             <p-tag
               [value]="SideBarItemType[type]"
@@ -202,8 +238,17 @@
                     ? 'success'
                     : type === SideBarItemType.Hajj
                       ? 'warning'
-                      : 'danger'
+                      : type === SideBarItemType.Trip
+                        ? 'danger'
+                        : 'secondary'
               "
+              [rounded]="true"
+              styleClass="text-xs"
+            ></p-tag>
+            <p-tag
+              *ngIf="type === SideBarItemType.Company"
+              [value]="item.isBlocked ? ('Blocked' | translate) : ('Active' | translate)"
+              [severity]="item.isBlocked ? 'danger' : 'success'"
               [rounded]="true"
               styleClass="text-xs"
             ></p-tag>
@@ -211,7 +256,7 @@
           <span class="item-card__price" *ngIf="getItemPrice(item) !== 'N/A'">
             {{ getItemPrice(item) }}
           </span>
-          <span class="item-card__price item-card__price--na" *ngIf="getItemPrice(item) === 'N/A'">N/A</span>
+          <span class="item-card__price item-card__price--na" *ngIf="type !== SideBarItemType.Company && getItemPrice(item) === 'N/A'">N/A</span>
         </div>
 
         <!-- Description -->
@@ -223,6 +268,41 @@
         <div class="item-card__meta" *ngIf="item.location">
           <i class="pi pi-map-marker"></i>
           {{ item.location }}
+        </div>
+
+        <!-- Company Details -->
+        <div class="item-card__company-panel" *ngIf="type === SideBarItemType.Company">
+          <div class="item-card__company-contact">
+            <span *ngIf="item.email">
+              <i class="pi pi-envelope"></i>
+              {{ item.email }}
+            </span>
+            <span *ngIf="item.phone || item.phoneNumber">
+              <i class="pi pi-phone"></i>
+              {{ item.phone || item.phoneNumber }}
+            </span>
+            <span *ngIf="item.address">
+              <i class="pi pi-map-marker"></i>
+              {{ item.address }}
+            </span>
+          </div>
+
+          <div class="item-card__company-commissions" *ngIf="getCompanyCommissions(item).length > 0">
+            <span class="item-card__commission" *ngFor="let commission of getCompanyCommissions(item)">
+              {{ commission }}
+            </span>
+          </div>
+
+          <div class="item-card__company-docs">
+            <span>
+              <i class="pi pi-id-card"></i>
+              {{ item.licenceDocuments?.length || 0 }} {{ 'Licence' | translate }}
+            </span>
+            <span>
+              <i class="pi pi-briefcase"></i>
+              {{ item.commercialDocuments?.length || 0 }} {{ 'Commercial' | translate }}
+            </span>
+          </div>
         </div>
 
         <!-- Outing Tickets Section -->
@@ -260,6 +340,10 @@
               <i class="pi pi-building"></i>
               {{ getVendorName(item) }}
             </span>
+            <span class="item-card__vendor" *ngIf="type === SideBarItemType.Company && getCompanyDocumentsCount(item) > 0">
+              <i class="pi pi-file-check"></i>
+              {{ getCompanyDocumentsCount(item) }} {{ 'Documents' | translate }}
+            </span>
             <span class="item-card__id">#{{ item.id }}</span>
           </div>
           <p-button
@@ -268,6 +352,7 @@
             size="small"
             [rounded]="true"
             [outlined]="true"
+            [disabled]="hasCompanySelectionConflict(type)"
             pTooltip="{{ 'Add' | translate }}"
             tooltipPosition="left"
           ></p-button>

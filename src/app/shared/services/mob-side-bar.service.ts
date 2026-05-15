@@ -7,7 +7,8 @@ export enum SideBarItemType {
   Room = 1,
   Outing = 2,
   Hajj = 3,
-  Trip = 4
+  Trip = 4,
+  Company = 5
 }
 
 export interface MobSideBarItem {
@@ -18,11 +19,14 @@ export interface MobSideBarItem {
   hajjId?: number;
   tripId?: number;
   roomId?: number;
+  companyId?: number;
   // Nested item details returned by the API
   outing?: any;
   hajj?: any;
   trip?: any;
   room?: any;
+  company?: any;
+  companyDto?: any;
 }
 
 export interface MobSideBar {

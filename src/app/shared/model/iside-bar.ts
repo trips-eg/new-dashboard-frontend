@@ -16,6 +16,8 @@ export interface SideBarItem {
   hajj?: Hajj
   trip: any
   room?: Room
+  company?: any
+  companyDto?: any
 }
 
 export interface Outing {

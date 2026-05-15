@@ -7,10 +7,12 @@ import { OutingService } from 'src/app/shared/services/outing.service';
 import { HajjUmmrahService } from 'src/app/shared/services/hajj-ummrah.service';
 import { TravelTripsService } from 'src/app/shared/services/travel-trips.service';
 import { RoomService } from 'src/app/shared/services/room.service';
+import { VendorService } from 'src/app/shared/services/vendor.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FilterMap, FilterTravelMap } from 'src/app/shared/mapping/filterMap';
 import { MessageService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
+import { environment } from 'src/environments/environment';
 
 interface SectorState {
   items: any[];
@@ -39,12 +41,14 @@ export class MobSideBarFormComponent implements OnInit {
     [SideBarItemType.Room]: { items: [], totalRecords: 0, loading: false, filter: { pageIndex: 1, pageSize: 6, Search: '' } },
     [SideBarItemType.Outing]: { items: [], totalRecords: 0, loading: false, filter: { pageIndex: 1, pageSize: 6, Search: '' } },
     [SideBarItemType.Hajj]: { items: [], totalRecords: 0, loading: false, filter: { pageIndex: 1, pageSize: 6, Search: '' } },
-    [SideBarItemType.Trip]: { items: [], totalRecords: 0, loading: false, filter: { pageIndex: 1, pageSize: 6, Search: '' } }
+    [SideBarItemType.Trip]: { items: [], totalRecords: 0, loading: false, filter: { pageIndex: 1, pageSize: 6, Search: '' } },
+    [SideBarItemType.Company]: { items: [], totalRecords: 0, loading: false, filter: { pageIndex: 1, pageSize: 6, Search: '' } }
   };
 
   selectedItems: MobSideBarItem[] = [];
   selectedType: SideBarItemType = SideBarItemType.Room; // Default to match first tab
   saving = false;
+  baseImageUrl = environment.imgUrl;
 
   constructor(
     private fb: FormBuilder,
@@ -53,6 +57,7 @@ export class MobSideBarFormComponent implements OnInit {
     private hajjService: HajjUmmrahService,
     private tripService: TravelTripsService,
     private roomService: RoomService,
+    private vendorService: VendorService,
     private router: Router,
     private route: ActivatedRoute,
     private toaster: ToastrService,
@@ -93,7 +98,7 @@ export class MobSideBarFormComponent implements OnInit {
         });
         // Map selected items and populate _displayItem from nested objects
         this.selectedItems = (data.sideBarItems || []).map((item: any) => {
-          const displayItem = item.outing || item.room || item.trip || item.hajj || null;
+          const displayItem = item.outing || item.room || item.trip || item.hajj || item.company || item.companyDto || null;
           if (displayItem) {
             item._displayItem = displayItem;
           }
@@ -118,6 +123,9 @@ export class MobSideBarFormComponent implements OnInit {
         break;
       case 3:
         newType = SideBarItemType.Trip;
+        break;
+      case 4:
+        newType = SideBarItemType.Company;
         break;
       default:
         newType = SideBarItemType.Room;
@@ -172,11 +180,54 @@ export class MobSideBarFormComponent implements OnInit {
       case SideBarItemType.Room:
         this.roomService.getAllRooms(state.filter).subscribe({ next: onSuccess, error: onError });
         break;
+      case SideBarItemType.Company:
+        this.vendorService.getAllVendors(state.filter).subscribe({ next: onSuccess, error: onError });
+        break;
     }
   }
 
   getVendorName(item: any): string {
     return item.vendor?.name || item.companyDto?.name || '';
+  }
+
+  getCompanyLogoUrl(item: any): string | null {
+    const logoUrl = item.logoUrl || item.imageUrl || null;
+    if (!logoUrl) {
+      return null;
+    }
+
+    if (logoUrl.startsWith('http://') || logoUrl.startsWith('https://')) {
+      return logoUrl;
+    }
+
+    return `${this.baseImageUrl.replace(/\/$/, '')}/${logoUrl.replace(/^\//, '')}`;
+  }
+
+  getCompanyContact(item: any): string {
+    return item.email || item.phone || item.phoneNumber || '';
+  }
+
+  getCompanyDocumentsCount(item: any): number {
+    return (item.licenceDocuments?.length || 0) + (item.commercialDocuments?.length || 0);
+  }
+
+  getCompanyCommissions(item: any): string[] {
+    const commissions: string[] = [];
+
+    if (item.isHotelCommission) {
+      commissions.push(`Hotel ${item.hotelCommissionRate || 0}%`);
+    }
+    if (item.isTravelCommission) {
+      commissions.push(`Travel ${item.travelCommissionRate || 0}%`);
+    }
+    if (item.isHajjCommission) {
+      commissions.push(`Hajj ${item.hajjCommissionRate || 0}%`);
+    }
+    if (item.isOutCommission) {
+      commissions.push(`Outing ${item.outCommissionRate || 0}%`);
+    }
+
+    return commissions;
   }
 
   getItemPrice(item: any): string {
@@ -197,13 +248,19 @@ export class MobSideBarFormComponent implements OnInit {
   }
 
   addItem(item: any) {
+    if (this.hasCompanySelectionConflict(this.selectedType)) {
+      this.toaster.warning('Company cannot be selected with rooms, outings, hajj, or trips', 'Warning');
+      return;
+    }
+
     // Check if checks already exists
     const exists = this.selectedItems.some(
       (existing) =>
         (existing.outingId === item.id && this.selectedType === SideBarItemType.Outing) ||
         (existing.hajjId === item.id && this.selectedType === SideBarItemType.Hajj) ||
         (existing.tripId === item.id && this.selectedType === SideBarItemType.Trip) ||
-        (existing.roomId === item.id && this.selectedType === SideBarItemType.Room)
+        (existing.roomId === item.id && this.selectedType === SideBarItemType.Room) ||
+        (existing.companyId === item.id && this.selectedType === SideBarItemType.Company)
     );
 
     if (exists) {
@@ -217,7 +274,8 @@ export class MobSideBarFormComponent implements OnInit {
       outingId: this.selectedType === SideBarItemType.Outing ? item.id : 0,
       hajjId: this.selectedType === SideBarItemType.Hajj ? item.id : 0,
       tripId: this.selectedType === SideBarItemType.Trip ? item.id : 0,
-      roomId: this.selectedType === SideBarItemType.Room ? item.id : 0
+      roomId: this.selectedType === SideBarItemType.Room ? item.id : 0,
+      companyId: this.selectedType === SideBarItemType.Company ? item.id : 0
     };
 
     // Store a reference to the original item for display purposes (name, etc)
@@ -225,6 +283,20 @@ export class MobSideBarFormComponent implements OnInit {
     (newItem as any)._displayItem = item;
 
     this.selectedItems.push(newItem);
+  }
+
+  hasCompanySelectionConflict(type: SideBarItemType): boolean {
+    const hasCompany = this.selectedItems.some((item) => item.sideBarItemType === SideBarItemType.Company);
+    const hasSectorItem = this.selectedItems.some((item) => item.sideBarItemType !== SideBarItemType.Company);
+
+    return (type === SideBarItemType.Company && hasSectorItem) || (type !== SideBarItemType.Company && hasCompany);
+  }
+
+  hasInvalidCompanyMix(): boolean {
+    const hasCompany = this.selectedItems.some((item) => item.sideBarItemType === SideBarItemType.Company);
+    const hasSectorItem = this.selectedItems.some((item) => item.sideBarItemType !== SideBarItemType.Company);
+
+    return hasCompany && hasSectorItem;
   }
 
   removedItems: number[] = [];
@@ -246,7 +318,7 @@ export class MobSideBarFormComponent implements OnInit {
       return (item as any)._displayItem.name || (item as any)._displayItem.title || 'Unknown';
     }
     // Fallback: check nested objects directly on the item
-    const nested = (item as any).outing || (item as any).room || (item as any).trip || (item as any).hajj;
+    const nested = (item as any).outing || (item as any).room || (item as any).trip || (item as any).hajj || (item as any).company || (item as any).companyDto;
     if (nested) {
       return nested.name || nested.title || 'Unknown';
     }
@@ -263,6 +335,11 @@ export class MobSideBarFormComponent implements OnInit {
           console.error(`Control ${key} is invalid`, control.errors);
         }
       });
+      return;
+    }
+
+    if (this.hasInvalidCompanyMix()) {
+      this.toaster.warning('Company cannot be saved with rooms, outings, hajj, or trips', 'Warning');
       return;
     }
 
@@ -292,6 +369,9 @@ export class MobSideBarFormComponent implements OnInit {
             break;
           case SideBarItemType.Room:
             itemPayload.roomId = item.roomId;
+            break;
+          case SideBarItemType.Company:
+            itemPayload.companyId = item.companyId;
             break;
         }
 
