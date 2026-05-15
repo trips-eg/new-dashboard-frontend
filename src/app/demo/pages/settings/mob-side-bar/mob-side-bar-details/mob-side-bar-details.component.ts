@@ -69,9 +69,27 @@ export class MobSideBarDetailsComponent implements OnInit {
     if (item.hajj) return item.hajj.name;
     if (item.trip) return item.trip.name || item.trip.title;
     if (item.room) return item.room.name;
-    if (item.company) return item.company.name || item.company.title;
-    if (item.companyDto) return item.companyDto.name || item.companyDto.title;
+    const company = this.getCompanyItem(item);
+    if (company) return company.name || company.title;
+    if (item.sideBarItemType === SideBarItemType.Company) return `Company #${this.getItemId(item)}`;
     return 'Unknown Item';
+  }
+
+  getItemId(item: SideBarItem): number | string {
+    return (
+      item.outing?.id ||
+      item.hajj?.id ||
+      item.trip?.id ||
+      item.room?.id ||
+      this.getCompanyItem(item)?.id ||
+      (item as any).companyId ||
+      item.id ||
+      '-'
+    );
+  }
+
+  getCompanyItem(item: SideBarItem): any {
+    return item.company || item.companyDto || null;
   }
 
   getItemTypeClass(type: number): string {
@@ -109,12 +127,60 @@ export class MobSideBarDetailsComponent implements OnInit {
   }
 
   getItemImage(item: SideBarItem): string | null {
-    if (item.outing?.images?.[0]) return this.baseImageUrl + item.outing.images[0].imageUrl || item.outing.images[0];
-    if (item.hajj?.images?.[0]) return this.baseImageUrl + item.hajj.images[0].imageUrl || item.hajj.images[0];
-    if (item.trip?.images?.[0]) return this.baseImageUrl + item.trip.images[0].imageUrl || item.trip.images[0];
-    if (item.room?.images?.[0]) return this.baseImageUrl + item.room.images[0].imageUrl || item.room.images[0];
-    if (item.company?.images?.[0]) return this.baseImageUrl + item.company.images[0].imageUrl || item.company.images[0];
-    if (item.companyDto?.images?.[0]) return this.baseImageUrl + item.companyDto.images[0].imageUrl || item.companyDto.images[0];
+    const imageValue =
+      this.extractImageValue(item.outing) ||
+      this.extractImageValue(item.hajj) ||
+      this.extractImageValue(item.trip) ||
+      this.extractImageValue(item.room) ||
+      this.extractImageValue(this.getCompanyItem(item));
+
+    if (imageValue) {
+      return this.toImageUrl(imageValue);
+    }
+
     return null;
+  }
+
+  getCompanyContact(item: SideBarItem): string {
+    const company = this.getCompanyItem(item);
+    return company?.email || company?.phone || company?.phoneNumber || '';
+  }
+
+  getCompanyAddress(item: SideBarItem): string {
+    return this.getCompanyItem(item)?.address || '';
+  }
+
+  getCompanyDocumentsCount(item: SideBarItem): number {
+    const company = this.getCompanyItem(item);
+    return (company?.licenceDocuments?.length || 0) + (company?.commercialDocuments?.length || 0);
+  }
+
+  getCompanyCommissions(item: SideBarItem): string[] {
+    const company = this.getCompanyItem(item);
+    if (!company) return [];
+
+    const commissions: string[] = [];
+
+    if (company.isHotelCommission) commissions.push(`Hotel ${company.hotelCommissionRate || 0}%`);
+    if (company.isTravelCommission) commissions.push(`Travel ${company.travelCommissionRate || 0}%`);
+    if (company.isHajjCommission) commissions.push(`Hajj ${company.hajjCommissionRate || 0}%`);
+    if (company.isOutCommission) commissions.push(`Outing ${company.outCommissionRate || 0}%`);
+
+    return commissions;
+  }
+
+  private extractImageValue(item: any): string | null {
+    if (!item) return null;
+
+    const image = item.images?.[0];
+    return item.logoUrl || item.imageUrl || image?.imageUrl || (typeof image === 'string' ? image : null);
+  }
+
+  private toImageUrl(imageValue: string): string {
+    if (imageValue.startsWith('http://') || imageValue.startsWith('https://')) {
+      return imageValue;
+    }
+
+    return `${this.baseImageUrl.replace(/\/$/, '')}/${imageValue.replace(/^\//, '')}`;
   }
 }

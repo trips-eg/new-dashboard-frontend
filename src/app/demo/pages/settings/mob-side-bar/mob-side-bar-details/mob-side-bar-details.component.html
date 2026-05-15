@@ -102,7 +102,7 @@
                   <div class="flex align-items-center gap-2 mb-2 text-600">
                     <i class="pi pi-tag text-sm"></i>
                     <span class="text-sm">
-                      ID: {{ item.outing?.id || item.hajj?.id || item.trip?.id || item.room?.id || item.company?.id || item.companyDto?.id }}
+                      ID: {{ getItemId(item) }}
                     </span>
                   </div>
 
@@ -147,25 +147,27 @@
                     </div>
                   </div>
 
-                  <div *ngIf="item.company" class="text-sm text-600">
+                  <div *ngIf="getCompanyItem(item)" class="text-sm text-600">
                     <div class="flex align-items-center gap-2 mb-1">
                       <i class="pi pi-briefcase"></i>
-                      <span>{{ item.company.name || item.company.title }}</span>
+                      <span>{{ getItemName(item) }}</span>
                     </div>
-                    <div class="flex align-items-center gap-2" *ngIf="item.company.email || item.company.phoneNumber">
+                    <div class="flex align-items-center gap-2 mb-1" *ngIf="getCompanyContact(item)">
                       <i class="pi pi-envelope"></i>
-                      <span>{{ item.company.email || item.company.phoneNumber }}</span>
+                      <span>{{ getCompanyContact(item) }}</span>
                     </div>
-                  </div>
-
-                  <div *ngIf="item.companyDto" class="text-sm text-600">
+                    <div class="flex align-items-center gap-2 mb-1" *ngIf="getCompanyAddress(item)">
+                      <i class="pi pi-map-marker"></i>
+                      <span>{{ getCompanyAddress(item) }}</span>
+                    </div>
                     <div class="flex align-items-center gap-2 mb-1">
-                      <i class="pi pi-briefcase"></i>
-                      <span>{{ item.companyDto.name || item.companyDto.title }}</span>
+                      <i class="pi pi-file"></i>
+                      <span>{{ getCompanyDocumentsCount(item) }} Documents</span>
                     </div>
-                    <div class="flex align-items-center gap-2" *ngIf="item.companyDto.email || item.companyDto.phoneNumber">
-                      <i class="pi pi-envelope"></i>
-                      <span>{{ item.companyDto.email || item.companyDto.phoneNumber }}</span>
+                    <div class="flex flex-wrap gap-1 mt-2" *ngIf="getCompanyCommissions(item).length > 0">
+                      <span class="customer-badge status-qualified" *ngFor="let commission of getCompanyCommissions(item)">
+                        {{ commission }}
+                      </span>
                     </div>
                   </div>
                 </div>

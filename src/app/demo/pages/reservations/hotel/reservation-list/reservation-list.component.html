@@ -1,17 +1,27 @@
 <div class="card">
   <p-toolbar styleClass="mb-4">
     <ng-template pTemplate="left">
-      <span class="p-input-icon-left">
-        <i class="pi pi-search"></i>
-        <input pInputText type="text" [(ngModel)]="searchedWord" (input)="onSearch()" [placeholder]="'search' | translate" />
-      </span>
+      <div class="flex flex-wrap gap-2">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" [(ngModel)]="searchedWord" (input)="onSearch()" [placeholder]="'search' | translate" />
+        </span>
+        <span class="p-input-icon-left">
+          <i class="pi pi-phone"></i>
+          <input pInputText type="text" [(ngModel)]="phoneNumber" (input)="onSearch()" [placeholder]="'Phone Number' | translate" />
+        </span>
+      </div>
     </ng-template>
   </p-toolbar>
 
   <p-table
     #dt
+    styleClass="reservation-table reservation-table--compact"
     [value]="bookings"
     dataKey="id"
+    [scrollable]="true"
+    scrollDirection="horizontal"
+    [tableStyle]="{ 'table-layout': 'fixed', width: '100%' }"
     [paginator]="true"
     [rows]="10"
     [rowsPerPageOptions]="[10, 25, 50]"

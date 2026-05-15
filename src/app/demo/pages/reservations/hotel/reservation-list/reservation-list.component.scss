@@ -90,3 +90,133 @@
 :host ::ng-deep .p-datatable .p-inputnumber-buttons-stacked .p-inputnumber-input {
   border-radius: 6px !important;
 }
+
+:host ::ng-deep .reservation-table--compact {
+  font-size: 12px;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-wrapper {
+  overflow-x: auto;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-table {
+  min-width: 1120px;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-thead > tr > th,
+:host ::ng-deep .reservation-table--compact .p-datatable-tbody > tr > td {
+  padding: 0.55rem 0.45rem !important;
+  line-height: 1.25;
+  vertical-align: middle;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-thead > tr > th {
+  white-space: normal;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-tbody > tr > td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-tbody > tr > td:nth-child(3),
+:host ::ng-deep .reservation-table--compact .p-datatable-tbody > tr > td:nth-child(8),
+:host ::ng-deep .reservation-table--compact .p-datatable-tbody > tr > td:nth-child(9) {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-thead > tr > th:nth-child(1),
+:host ::ng-deep .reservation-table--compact .p-datatable-tbody > tr > td:nth-child(1) {
+  width: 42px;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-thead > tr > th:nth-child(2),
+:host ::ng-deep .reservation-table--compact .p-datatable-tbody > tr > td:nth-child(2) {
+  width: 58px;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-thead > tr > th:nth-child(3),
+:host ::ng-deep .reservation-table--compact .p-datatable-tbody > tr > td:nth-child(3) {
+  width: 112px;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-thead > tr > th:nth-child(4),
+:host ::ng-deep .reservation-table--compact .p-datatable-tbody > tr > td:nth-child(4) {
+  width: 126px;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-thead > tr > th:nth-child(5),
+:host ::ng-deep .reservation-table--compact .p-datatable-tbody > tr > td:nth-child(5) {
+  width: 78px;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-thead > tr > th:nth-child(6),
+:host ::ng-deep .reservation-table--compact .p-datatable-tbody > tr > td:nth-child(6) {
+  width: 66px;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-thead > tr > th:nth-child(7),
+:host ::ng-deep .reservation-table--compact .p-datatable-tbody > tr > td:nth-child(7) {
+  width: 112px;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-thead > tr > th:nth-child(8),
+:host ::ng-deep .reservation-table--compact .p-datatable-tbody > tr > td:nth-child(8) {
+  width: 156px;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-thead > tr > th:nth-child(9),
+:host ::ng-deep .reservation-table--compact .p-datatable-tbody > tr > td:nth-child(9) {
+  width: 104px;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-thead > tr > th:nth-child(10),
+:host ::ng-deep .reservation-table--compact .p-datatable-tbody > tr > td:nth-child(10) {
+  width: 94px;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-thead > tr > th:nth-child(11),
+:host ::ng-deep .reservation-table--compact .p-datatable-tbody > tr > td:nth-child(11) {
+  width: 72px;
+}
+
+:host ::ng-deep .reservation-table--compact .p-datatable-thead > tr > th:nth-child(12),
+:host ::ng-deep .reservation-table--compact .p-datatable-tbody > tr > td:nth-child(12) {
+  width: 92px;
+}
+
+:host ::ng-deep .reservation-table--compact .p-column-filter-row .p-inputtext,
+:host ::ng-deep .reservation-table--compact .p-dropdown {
+  width: 100%;
+  min-width: 0;
+  font-size: 12px;
+}
+
+:host ::ng-deep .reservation-table--compact .p-dropdown .p-dropdown-label {
+  padding: 0.35rem 0.4rem;
+}
+
+:host ::ng-deep .reservation-table--compact .status-badge,
+:host ::ng-deep .reservation-table--compact .badge {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.45rem;
+  font-size: 11px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+:host ::ng-deep .reservation-table--compact .p-button.p-button-icon-only {
+  width: 1.9rem;
+  height: 1.9rem;
+}
+
+@media (min-width: 1280px) {
+  :host ::ng-deep .reservation-table--compact .p-datatable-table {
+    min-width: 100%;
+  }
+}

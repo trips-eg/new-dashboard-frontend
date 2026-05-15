@@ -53,6 +53,7 @@ export class ReservationListComponent implements OnInit {
 
   // Search global
   searchedWord: string = '';
+  phoneNumber: string = '';
 
   // ✅ Data
   bookings: Ibookings[] = [];
@@ -81,7 +82,13 @@ export class ReservationListComponent implements OnInit {
   // ✅ Load bookings using Builder
   loadBookings(event: TableLazyLoadEvent): void {
     this.isLoading = true;
-    const payload = TableRequestBuilder.build(event, this.searchedWord);
+    const payload: any = TableRequestBuilder.build(event, this.searchedWord);
+    const phoneNumber = this.getPhoneNumberFilter(payload).trim();
+
+    if (phoneNumber) {
+      payload.phoneNumber = phoneNumber;
+      payload.filters = (payload.filters ?? []).filter((filter: any) => filter.column !== 'User.PhoneNumber');
+    }
 
     this.bookingService.getAllBooking(payload).subscribe({
       next: (res) => {
@@ -99,6 +106,11 @@ export class ReservationListComponent implements OnInit {
   // ✅ Search action (Global)
   onSearch(): void {
     this.dt.reset();
+  }
+
+  private getPhoneNumberFilter(payload: any): string {
+    const phoneColumnFilter = payload.filters?.find((filter: any) => filter.column === 'User.PhoneNumber')?.value;
+    return (phoneColumnFilter ?? this.phoneNumber ?? '').toString();
   }
 
   // ✅ Navigate to details
