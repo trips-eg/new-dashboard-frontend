@@ -1,0 +1,347 @@
+<div class="main">
+<div class="analytics-container">
+  <!-- Header -->
+  <sub-header [mainHeader]="'Customer Analytics'"></sub-header>
+
+  <!-- Filter Card -->
+  <div class="filter-card card mb-4">
+    <div class="card-body">
+      <div class="filter-header mb-3">
+        <h5 class="m-0">
+          <i class="fas fa-filter me-2 text-primary"></i>
+          {{ 'Date Range' | translate }}
+        </h5>
+      </div>
+
+      <form [formGroup]="filterForm" class="filter-form">
+        <div class="row align-items-end">
+          <!-- From Date -->
+          <div class="col-12 col-md-4 col-lg-3">
+            <div class="field">
+              <label for="analyticsFromDate" class="font-medium">
+                {{ 'From Date' | translate }}
+                <span class="text-danger">*</span>
+              </label>
+              <p-calendar
+                id="analyticsFromDate"
+                formControlName="fromDate"
+                [showIcon]="true"
+                  [iconDisplay]="'input'"
+                [showButtonBar]="true"
+                dateFormat="dd/mm/yy"
+                [style]="{ width: '100%' }"
+                [inputStyle]="{ width: '100%' }"
+                placeholder="{{ 'Select date' | translate }}"
+                appendTo="body"
+              ></p-calendar>
+            </div>
+          </div>
+
+          <!-- To Date -->
+          <div class="col-12 col-md-4 col-lg-3">
+            <div class="field">
+              <label for="analyticsToDate" class="font-medium">
+                {{ 'To Date' | translate }}
+                <span class="text-danger">*</span>
+              </label>
+              <p-calendar
+                id="analyticsToDate"
+                formControlName="toDate"
+                [showIcon]="true"
+                                  [iconDisplay]="'input'"
+
+                [showButtonBar]="true"
+                dateFormat="dd/mm/yy"
+                [style]="{ width: '100%' }"
+                [inputStyle]="{ width: '100%' }"
+                placeholder="{{ 'Select date' | translate }}"
+                appendTo="body"
+              ></p-calendar>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="col-12 col-md-4 col-lg-6">
+            <div class="d-flex gap-2 justify-content-end">
+              <button type="button" pButton class="p-button-outlined p-button-secondary" (click)="onReset()">
+                <i class="fas fa-redo me-2"></i>
+                {{ 'Reset' | translate }}
+              </button>
+              <button type="button" pButton class="p-button-primary" [loading]="isLoading" (click)="loadAnalytics()">
+                <i class="fas fa-search me-2"></i>
+                {{ 'Search' | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="text-center py-5" *ngIf="isLoading">
+    <p-progressSpinner strokeWidth="4"></p-progressSpinner>
+    <p class="mt-3 text-muted">{{ 'Loading analytics...' | translate }}</p>
+  </div>
+
+  <!-- Analytics Content -->
+  <div *ngIf="!isLoading && analyticsData">
+
+    <!-- ═══════════ FUNNEL SECTION ═══════════ -->
+    <div class="funnel-section mb-4">
+      <div class="section-title mb-3">
+        <h5>
+          <i class="fas fa-filter me-2"></i>
+          {{ 'Customer Journey Funnel' | translate }}
+        </h5>
+        <p class="text-muted mb-0">{{ 'Click any step to see customer details' | translate }}</p>
+      </div>
+
+      <div class="funnel-flow">
+        <ng-container *ngFor="let step of funnelSteps; let i = index; let last = last">
+          <div class="funnel-step {{ step.colorClass }}" (click)="openCustomerDialog(step)" pTooltip="Click to view {{ step.label }} customers" tooltipPosition="top">
+            <div class="step-icon-wrapper">
+              <i [class]="step.icon"></i>
+            </div>
+            <div class="step-count">{{ step.count | number }}</div>
+            <div class="step-label">{{ step.label | translate }}</div>
+            <div class="step-glow"></div>
+          </div>
+
+          <!-- Arrow between steps -->
+          <div class="funnel-arrow" *ngIf="!last">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- ═══════════ LAST 7 DAYS QUICK STATS (static) ═══════════ -->
+    <div class="row mb-4">
+      <div class="col-12 col-md-6">
+        <div class="quick-stat-card card static">
+          <div class="card-body d-flex align-items-center gap-3">
+            <div class="quick-stat-icon bg-bookings">
+              <i class="fas fa-calendar-week"></i>
+            </div>
+            <div class="quick-stat-info">
+              <span class="quick-stat-value">{{ bookingsLast7Days | number }}</span>
+              <span class="quick-stat-label">{{ 'Bookings Last 7 Days' | translate }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <div class="quick-stat-card card static">
+          <div class="card-body d-flex align-items-center gap-3">
+            <div class="quick-stat-icon bg-paid">
+              <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="quick-stat-info">
+              <span class="quick-stat-value">{{ bookingsLast7DaysPaid | number }}</span>
+              <span class="quick-stat-label">{{ 'Paid Last 7 Days' | translate }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ CONVERSION METRICS ═══════════ -->
+    <div class="row mb-4">
+      <div class="col-12 col-md-6">
+        <div class="conversion-card card">
+          <div class="card-body d-flex align-items-center gap-4">
+            <div class="conversion-ring">
+              <svg viewBox="0 0 120 120">
+                <circle class="ring-bg" cx="60" cy="60" r="54" />
+                <circle
+                  class="ring-fill ring-fill-blue"
+                  cx="60" cy="60" r="54"
+                  [attr.stroke-dasharray]="getCircleDashArray(registeredToBookedPct)"
+                  stroke-dashoffset="0"
+                />
+                <text x="60" y="60" class="ring-text" dominant-baseline="central" text-anchor="middle">
+                  {{ registeredToBookedPct | number:'1.1-1' }}%
+                </text>
+              </svg>
+            </div>
+            <div class="conversion-info">
+              <h6 class="conversion-title">{{ 'Registered → Booked' | translate }}</h6>
+              <p class="text-muted mb-0">{{ 'Conversion rate from registration to booking' | translate }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <div class="conversion-card card">
+          <div class="card-body d-flex align-items-center gap-4">
+            <div class="conversion-ring">
+              <svg viewBox="0 0 120 120">
+                <circle class="ring-bg" cx="60" cy="60" r="54" />
+                <circle
+                  class="ring-fill ring-fill-green"
+                  cx="60" cy="60" r="54"
+                  [attr.stroke-dasharray]="getCircleDashArray(bookedToPaidPct)"
+                  stroke-dashoffset="0"
+                />
+                <text x="60" y="60" class="ring-text" dominant-baseline="central" text-anchor="middle">
+                  {{ bookedToPaidPct | number:'1.1-1' }}%
+                </text>
+              </svg>
+            </div>
+            <div class="conversion-info">
+              <h6 class="conversion-title">{{ 'Booked → Paid' | translate }}</h6>
+              <p class="text-muted mb-0">{{ 'Conversion rate from booking to payment' | translate }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state card" *ngIf="!isLoading && !analyticsData">
+    <div class="card-body text-center py-5">
+      <i class="fas fa-chart-line fa-4x text-muted mb-3"></i>
+      <h5>{{ 'No Analytics Data' | translate }}</h5>
+      <p class="text-muted">{{ 'Select a date range and click Search to load customer analytics' | translate }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ CUSTOMER DETAIL DIALOG ═══════════ -->
+<p-dialog
+  [header]="dialogTitle"
+  [(visible)]="dialogVisible"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '90vw', maxWidth: '1100px' }"
+  styleClass="customer-dialog"
+>
+  <!-- Dialog Loading -->
+  <div class="text-center py-4" *ngIf="dialogLoading">
+    <p-progressSpinner strokeWidth="4"></p-progressSpinner>
+  </div>
+
+  <!-- Dialog Table -->
+  <div *ngIf="!dialogLoading">
+    <p-table
+      [value]="dialogCustomers"
+      [tableStyle]="{ 'min-width': '100%' }"
+      styleClass="p-datatable-striped p-datatable-sm"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 60px">{{ 'Avatar' | translate }}</th>
+          <th>{{ 'Name' | translate }}</th>
+          <th>{{ 'Email' | translate }}</th>
+          <th>{{ 'Phone' | translate }}</th>
+          <th>{{ 'Gender' | translate }}</th>
+          <th class="text-end">{{ 'Wallet Balance' | translate }}</th>
+          <th class="text-center">{{ 'Reservations' | translate }}</th>
+          <th style="width: 100px" class="text-center">{{ 'Action' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-customer>
+        <tr>
+          <!-- Avatar -->
+          <td>
+            <div class="customer-avatar-wrapper">
+              <img
+                *ngIf="getCustomerAvatar(customer)"
+                [src]="getCustomerAvatar(customer)"
+                class="customer-avatar"
+                alt="avatar"
+                referrerpolicy="no-referrer"
+              />
+              <div *ngIf="!getCustomerAvatar(customer)" class="customer-initials">
+                {{ getCustomerInitials(customer.name) }}
+              </div>
+            </div>
+          </td>
+
+          <!-- Name -->
+          <td>
+            <div class="customer-name">{{ customer.name }}</div>
+            <small class="text-muted">#{{ customer.id }}</small>
+          </td>
+
+          <!-- Email -->
+          <td>
+            <small>{{ customer.email }}</small>
+          </td>
+
+          <!-- Phone -->
+          <td>
+            <span *ngIf="customer.phoneNumber">{{ customer.phoneNumber }}</span>
+            <span *ngIf="!customer.phoneNumber" class="text-muted">—</span>
+          </td>
+
+          <!-- Gender -->
+          <td>
+            <p-tag
+              *ngIf="customer.gender"
+              [value]="customer.gender"
+              [severity]="customer.gender === 'Male' ? 'info' : 'warning'"
+              [rounded]="true"
+            ></p-tag>
+            <span *ngIf="!customer.gender" class="text-muted">—</span>
+          </td>
+
+          <!-- Wallet Balance -->
+          <td class="text-end">
+            <span class="fw-bold" [class.text-success]="customer.wallet?.effectiveTotal > 0">
+              {{ (customer.wallet?.effectiveTotal || 0) | number:'1.0-0' }}
+              <small>EGP</small>
+            </span>
+          </td>
+
+          <!-- Reservations -->
+          <td class="text-center">
+            <span class="badge bg-primary rounded-pill">
+              {{ customer.totalCompletedReservations }}
+            </span>
+          </td>
+
+          <!-- Action -->
+          <td class="text-center">
+            <button
+              pButton
+              type="button"
+              class="p-button-text p-button-sm p-button-primary"
+              icon="fas fa-external-link-alt"
+              pTooltip="View Profile"
+              tooltipPosition="top"
+              (click)="viewCustomerProfile(customer.id)"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="empty">
+        <tr>
+          <td colspan="8" class="text-center py-4 text-muted">
+            <i class="fas fa-users fa-2x mb-2 d-block"></i>
+            {{ 'No customers found for this category' | translate }}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <!-- Paginator -->
+    <p-paginator
+      *ngIf="dialogTotalRecords > 0"
+      [first]="dialogFirst"
+      [rows]="dialogPageSize"
+      [totalRecords]="dialogTotalRecords"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} customers"
+      (onPageChange)="onDialogPageChange($event)"
+    ></p-paginator>
+  </div>
+</p-dialog>

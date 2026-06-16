@@ -288,6 +288,9 @@
   "Name": "Name",
   "Total Pay": "Total Pay",
   "Total Tax": "Total Tax",
+  "totalPaidFromBonus": "Total Paid From Bonus",
+  "totalPayAfterBonus": "Total Pay After Bonus",
+  "totalCompletedReservations": "Total Completed Reservations",
   "Status": "Status",
 
   "View Details": "View Details",

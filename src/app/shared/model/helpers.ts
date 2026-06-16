@@ -323,4 +323,9 @@ export class APIs {
     getHotelSummary: 'Reports/GetRoomSummary',
     getHajjSummary: 'Reports/GetHajjSummary'
   };
+
+  public static CustomerAnalytics = {
+    getCustomerAnalytics: 'Dashboard/GetCustomerAnalytics',
+    getCustomersByAnalyticsType: 'Dashboard/GetCustomersByAnalyticsType'
+  };
 }

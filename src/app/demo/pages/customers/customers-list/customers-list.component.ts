@@ -23,12 +23,23 @@ export class CustomersListComponent implements OnInit {
   totalRecords = 0;
   loading: boolean = false;
   searchTerm: string = '';
+  sortField: string | null | undefined = undefined;
+  sortOrder: number = 1;
+  private lastSortField: string | null | undefined = undefined;
 
   ngOnInit(): void {
     // Initial load is handled by the table's lazy load event
   }
 
   loadCustomers(event: TableLazyLoadEvent) {
+    const sortFieldStr = Array.isArray(event.sortField) ? event.sortField[0] : event.sortField;
+    if (sortFieldStr === 'totalCompletedReservations' && this.lastSortField !== 'totalCompletedReservations') {
+      event.sortOrder = -1;
+      this.sortOrder = -1;
+      this.sortField = 'totalCompletedReservations';
+    }
+    this.lastSortField = sortFieldStr;
+
     this.loading = true;
     const payload = TableRequestBuilder.build(event, this.searchTerm);
 

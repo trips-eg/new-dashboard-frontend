@@ -49,13 +49,17 @@ export class CustomerDetailComponent implements OnInit {
   }
 
   getAvatar(url?: string): string {
-    const fallback = `${this.baseUrl}/Default/avatar.png`;
+    const base = this.baseUrl.endsWith('/') ? this.baseUrl : `${this.baseUrl}/`;
+    const fallback = `${base}Default/avatar.png`;
 
-    if (!url || url === 'NULL') return fallback;
+    if (!url) return fallback;
+    url = url.trim();
+    
+    if (url === 'NULL' || url.includes('Default/avatar')) return fallback;
 
     if (url.startsWith('http')) return url;
 
-    return `${this.baseUrl}${url}`;
+    return `${base}${url.startsWith('/') ? url.substring(1) : url}`;
   }
 
   getcustomerId() {

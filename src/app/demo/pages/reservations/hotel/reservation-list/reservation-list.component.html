@@ -1,19 +1,151 @@
-<div class="card">
-  <p-toolbar styleClass="mb-4">
-    <ng-template pTemplate="left">
-      <div class="flex flex-wrap gap-2">
-        <span class="p-input-icon-left">
-          <i class="pi pi-search"></i>
-          <input pInputText type="text" [(ngModel)]="searchedWord" (input)="onSearch()" [placeholder]="'search' | translate" />
-        </span>
-        <span class="p-input-icon-left">
-          <i class="pi pi-phone"></i>
-          <input pInputText type="text" [(ngModel)]="phoneNumber" (input)="onSearch()" [placeholder]="'Phone Number' | translate" />
+<div class="card mb-4 border-0 shadow-sm rounded-4 overflow-hidden filter-card">
+  <div class="filter-card__header p-3 d-flex justify-content-between align-items-center">
+    <h5 class="m-0 fw-semibold d-flex align-items-center gap-2 filter-card__title">
+      <i class="pi pi-filter filter-card__icon"></i>
+      {{ 'Advanced Search & Filters' | translate }}
+    </h5>
+    <button pButton pRipple type="button" icon="pi pi-refresh" label="{{ 'Reset' | translate }}" class="p-button-outlined p-button-secondary p-button-sm filter-card__reset" (click)="resetFilters()"></button>
+  </div>
+  <div class="p-4 bg-white">
+    <div class="row">
+      <!-- Search Input -->
+      <div class="col-12 col-md-4 mb-4 mb-md-0">
+        <label class="text-secondary fw-medium mb-2 d-block">{{ 'Search' | translate }}</label>
+        <span [class]="'p-input-icon-' + (lang === 'ar' ? 'right' : 'left') + ' w-100'">
+          <i class="pi pi-search text-secondary"></i>
+          <input
+            pInputText
+            type="text"
+            [(ngModel)]="searchedWord"
+            (ngModelChange)="onSearchChange($event)"
+            [placeholder]="'Search by reference or phone...' | translate"
+            class="w-100 p-inputtext-lg"
+          />
         </span>
       </div>
-    </ng-template>
-  </p-toolbar>
 
+      <!-- Status Dropdown -->
+      <div class="col-12 col-md-4 mb-4 mb-md-0">
+        <label class="text-secondary fw-medium mb-2 d-block">{{ 'Status' | translate }}</label>
+        <p-dropdown 
+          [options]="paymentStatus" 
+          [(ngModel)]="filterStatus" 
+          (onChange)="onFilterChange()" 
+          [placeholder]="'All Statuses' | translate" 
+          [showClear]="true" 
+          optionValue="value" 
+          [appendTo]="'body'"
+          styleClass="w-100 p-inputtext-lg">
+          <ng-template let-option pTemplate="item">
+            <div class="d-flex align-items-center gap-2">
+              <span [class]="'status-badge ' + getStatusClass(option.value)"></span>
+              <span>{{ lang === 'ar' ? option.nameAr : option.nameEn }}</span>
+            </div>
+          </ng-template>
+          <ng-template let-selectedOption pTemplate="selectedItem">
+            <div class="d-flex align-items-center gap-2" *ngIf="selectedOption">
+              <span [class]="'status-badge ' + getStatusClass(selectedOption.value)"></span>
+              <span>{{ lang === 'ar' ? selectedOption.nameAr : selectedOption.nameEn }}</span>
+            </div>
+          </ng-template>
+        </p-dropdown>
+      </div>
+
+      <!-- Payment Method Dropdown -->
+      <div class="col-12 col-md-4 mb-4 mb-md-0">
+        <label class="text-secondary fw-medium mb-2 d-block">{{ 'Payment Method' | translate }}</label>
+        <p-dropdown 
+          [options]="payMethodOptions" 
+          [(ngModel)]="filterPayMethod" 
+          (onChange)="onFilterChange()" 
+          [placeholder]="'All Methods' | translate" 
+          [showClear]="true" 
+          [appendTo]="'body'"
+          optionValue="value" 
+          styleClass="w-100 p-inputtext-lg">
+          <ng-template let-option pTemplate="item">
+            <div class="d-flex align-items-center gap-2">
+              <i class="pi pi-wallet text-secondary"></i>
+              <span>{{ option.label | translate }}</span>
+            </div>
+          </ng-template>
+          <ng-template let-selectedOption pTemplate="selectedItem">
+            <div class="d-flex align-items-center gap-2" *ngIf="selectedOption">
+              <i class="pi pi-wallet text-secondary"></i>
+              <span>{{ selectedOption.label | translate }}</span>
+            </div>
+          </ng-template>
+        </p-dropdown>
+      </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <div class="row">
+      <div class="col-12 col-md-6 col-lg-4">
+        <label class="text-secondary fw-medium mb-2 d-block">{{ 'Date From' | translate }}</label>
+        <p-calendar 
+          [(ngModel)]="filterDateFrom" 
+          (onSelect)="onFilterChange()" 
+          (onClear)="onFilterChange()"
+          [showIcon]="true" 
+          [showClear]="true"
+          [placeholder]="'Date From' | translate" 
+          styleClass="w-100 p-inputtext-lg"
+          iconDisplay="input"
+          appendTo="body"
+          dateFormat="yy-mm-dd">
+        </p-calendar>
+      </div>
+      <div class="col-12 col-md-6 col-lg-4">
+        <label class="text-secondary fw-medium mb-2 d-block">{{ 'Date To' | translate }}</label>
+        <p-calendar 
+          [(ngModel)]="filterDateTo" 
+          (onSelect)="onFilterChange()" 
+          (onClear)="onFilterChange()"
+          [showIcon]="true" 
+          [showClear]="true"
+          [placeholder]="'Date To' | translate" 
+          styleClass="w-100 p-inputtext-lg"
+          iconDisplay="input"
+          appendTo="body"
+          dateFormat="yy-mm-dd">
+        </p-calendar>
+      </div>
+    </div>
+
+    <!-- Active Filter Chips -->
+    <div class="d-flex flex-wrap gap-2 mt-4 pt-3 border-top" *ngIf="searchedWord || filterStatus !== null || filterPayMethod !== null || filterDateFrom || filterDateTo">
+      <span class="filter-chip filter-chip--search" *ngIf="searchedWord">
+        <i class="pi pi-search filter-chip__icon"></i>
+        {{ 'Search' | translate }}: {{ searchedWord }}
+        <i class="pi pi-times filter-chip__remove" (click)="searchedWord = ''; onFilterChange()"></i>
+      </span>
+      <span class="filter-chip filter-chip--status" [ngClass]="'filter-chip--' + getStatusClass(filterStatus)" *ngIf="filterStatus !== null">
+        <i class="pi pi-circle-fill filter-chip__icon"></i>
+        {{ 'Status' | translate }}: {{ getStatusLabel(filterStatus) }}
+        <i class="pi pi-times filter-chip__remove" (click)="filterStatus = null; onFilterChange()"></i>
+      </span>
+      <span class="filter-chip filter-chip--method" *ngIf="filterPayMethod !== null">
+        <i class="pi pi-wallet filter-chip__icon"></i>
+        {{ 'Method' | translate }}: {{ getPayMethodLabel(filterPayMethod) | translate }}
+        <i class="pi pi-times filter-chip__remove" (click)="filterPayMethod = null; onFilterChange()"></i>
+      </span>
+      <span class="filter-chip filter-chip--date" *ngIf="filterDateFrom">
+        <i class="pi pi-calendar filter-chip__icon"></i>
+        {{ 'From' | translate }}: {{ formatDate(filterDateFrom) }}
+        <i class="pi pi-times filter-chip__remove" (click)="filterDateFrom = null; onFilterChange()"></i>
+      </span>
+      <span class="filter-chip filter-chip--date" *ngIf="filterDateTo">
+        <i class="pi pi-calendar filter-chip__icon"></i>
+        {{ 'To' | translate }}: {{ formatDate(filterDateTo) }}
+        <i class="pi pi-times filter-chip__remove" (click)="filterDateTo = null; onFilterChange()"></i>
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="card">
   <p-table
     #dt
     styleClass="reservation-table reservation-table--compact"
@@ -21,7 +153,7 @@
     dataKey="id"
     [scrollable]="true"
     scrollDirection="horizontal"
-    [tableStyle]="{ 'table-layout': 'fixed', width: '100%' }"
+    [tableStyle]="{ width: '100%' }"
     [paginator]="true"
     [rows]="10"
     [rowsPerPageOptions]="[10, 25, 50]"
@@ -34,100 +166,52 @@
   >
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 3rem"></th>
-        <th pSortableColumn="Id" pFrozenColumn>
-          {{ 'ID' | translate }}
-          <p-sortIcon field="Id"></p-sortIcon>
+        <th style="min-width: 3rem" pFrozenColumn alignFrozen="left"></th>
+        <th pSortableColumn="Id" pFrozenColumn alignFrozen="left" style="min-width: 150px;" class="text-nowrap">
+          {{ 'ID' | translate }} <p-sortIcon field="Id"></p-sortIcon>
         </th>
-        <th pSortableColumn="User.Name">
-          {{ 'Name' | translate }}
-          <p-sortIcon field="User.Name"></p-sortIcon>
+        <th pSortableColumn="User.FirstName" style="min-width: 250px;" class="text-nowrap">
+          {{ 'Name' | translate }} <p-sortIcon field="User.FirstName"></p-sortIcon>
         </th>
-        <th pSortableColumn="User.PhoneNumber">
-          {{ 'Phone Number' | translate }}
-          <p-sortIcon field="User.PhoneNumber"></p-sortIcon>
+        <th pSortableColumn="User.PhoneNumber" style="min-width: 200px;" class="text-nowrap">
+          {{ 'Phone Number' | translate }} <p-sortIcon field="User.PhoneNumber"></p-sortIcon>
         </th>
-        <th pSortableColumn="TotalPrice">
-          {{ 'Total Pay' | translate }}
-          <p-sortIcon field="TotalPrice"></p-sortIcon>
+        <th pSortableColumn="TotalPrice" style="min-width: 200px;" class="text-nowrap">
+          {{ 'Total Pay' | translate }} <p-sortIcon field="TotalPrice"></p-sortIcon>
         </th>
-        <th pSortableColumn="TotalTax">
-          {{ 'Total Tax' | translate }}
-          <p-sortIcon field="TotalTax"></p-sortIcon>
+        <th pSortableColumn="TotalTax" style="min-width: 200px;" class="text-nowrap">
+          {{ 'Total Tax' | translate }} <p-sortIcon field="TotalTax"></p-sortIcon>
         </th>
-        <th pSortableColumn="Sataus">
-          {{ 'Status' | translate }}
-          <p-sortIcon field="Sataus"></p-sortIcon>
+        <th pSortableColumn="totalPaidFromBonus" style="min-width: 220px;" class="text-nowrap">
+          {{ 'totalPaidFromBonus' | translate }} <p-sortIcon field="totalPaidFromBonus"></p-sortIcon>
         </th>
-        <th pSortableColumn="BookingRefernce">
-          {{ 'booking Refernce' | translate }}
-          <p-sortIcon field="BookingRefernce"></p-sortIcon>
+        <th pSortableColumn="totalPayAfterBonus" style="min-width: 220px;" class="text-nowrap">
+          {{ 'totalPayAfterBonus' | translate }} <p-sortIcon field="totalPayAfterBonus"></p-sortIcon>
         </th>
-        <th pSortableColumn="createdDate">
-          {{ 'Date' | translate }}
-          <p-sortIcon field="createdDate"></p-sortIcon>
+        <th pSortableColumn="Sataus" style="min-width: 200px;" class="text-nowrap">
+          {{ 'Status' | translate }} <p-sortIcon field="Sataus"></p-sortIcon>
         </th>
-        <!-- ── NEW: Payment Method ── -->
-        <th>{{ 'Payment Method' | translate }}</th>
-        <!-- ── NEW: Payment Image ── -->
-        <th>{{ 'Payment Image' | translate }}</th>
-        <th>{{ 'Details' | translate }}</th>
-      </tr>
-      <tr>
-        <th></th>
-        <th>
-          <p-columnFilter type="text" field="Id" display="row" [showMenu]="false"></p-columnFilter>
+        <th pSortableColumn="BookingRefernce" style="min-width: 250px;" class="text-nowrap">
+          {{ 'booking Refernce' | translate }} <p-sortIcon field="BookingRefernce"></p-sortIcon>
         </th>
-        <th>
-          <p-columnFilter type="text" field="User.FirstName" display="row" [showMenu]="false"></p-columnFilter>
+        <th pSortableColumn="createdDate" style="min-width: 250px;" class="text-nowrap">
+          {{ 'Date' | translate }} <p-sortIcon field="createdDate"></p-sortIcon>
         </th>
-        <th>
-          <p-columnFilter type="text" field="User.PhoneNumber" display="row" [showMenu]="false"></p-columnFilter>
+        <th style="min-width: 220px;" class="text-nowrap">
+          {{ 'Method' | translate }}
         </th>
-        <th>
-          <p-columnFilter type="text" field="TotalPrice" display="row" [showMenu]="false"></p-columnFilter>
+        <th style="min-width: 200px;" class="text-nowrap">
+          {{ 'Image' | translate }}
         </th>
-        <th>
-          <p-columnFilter type="text" field="TotalTax" display="row" [showMenu]="false"></p-columnFilter>
+        <th pFrozenColumn alignFrozen="right" style="min-width: 200px;" class="text-nowrap text-center">
+          {{ 'Details' | translate }}
         </th>
-        <th>
-          <p-columnFilter type="text" field="Sataus" matchMode="equals" display="row" [showMenu]="false">
-            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-              <p-dropdown
-                [ngModel]="value"
-                [options]="paymentStatus"
-                (onChange)="filter($event.value)"
-                placeholder="Select Status"
-                [showClear]="true"
-                optionValue="value"
-                appendTo="body"
-              >
-                <ng-template let-option pTemplate="item">
-                  {{ lang === 'ar' ? option.nameAr : option.nameEn }}
-                </ng-template>
-                <ng-template let-selectedOption pTemplate="selectedItem">
-                  {{ lang === 'ar' ? selectedOption.nameAr : selectedOption.nameEn }}
-                </ng-template>
-              </p-dropdown>
-            </ng-template>
-          </p-columnFilter>
-        </th>
-        <th>
-          <p-columnFilter type="text" field="BookingRefernce" display="row" [showMenu]="false"></p-columnFilter>
-        </th>
-        <th>
-          <p-columnFilter type="date" field="createdDate" display="row" [showMenu]="false"></p-columnFilter>
-        </th>
-        <!-- ── NEW: empty filter cells for new columns ── -->
-        <th></th>
-        <th></th>
-        <th></th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-payment let-expanded="expanded">
       <tr>
-        <td>
+        <td pFrozenColumn alignFrozen="left">
           <button
             type="button"
             pButton
@@ -138,7 +222,7 @@
             *ngIf="hasReservations(payment)"
           ></button>
         </td>
-        <td>{{ payment.id }}</td>
+        <td pFrozenColumn alignFrozen="left">{{ payment.id }}</td>
         <td>
           <a [routerLink]="['/customer-details', payment.user?.id]" class="text-primary text-decoration-none fw-bold">
             {{ payment.user?.name }}
@@ -147,6 +231,8 @@
         <td>{{ payment.user?.phoneNumber }}</td>
         <td>{{ payment.totalPrice }}</td>
         <td>{{ payment.totalTax }}</td>
+        <td>{{ payment.totalPaidFromBonus }}</td>
+        <td>{{ payment.totalPayAfterBonus }}</td>
         <td>
           <span [class]="'status-badge ' + getStatusClass(payment.bookingStatus || payment.sataus)">
             {{ getStatusLabel(payment.bookingStatus || payment.sataus) }}
@@ -155,17 +241,15 @@
         <td class="font-bold">{{ payment.bookingRefernce }}</td>
         <td>{{ payment.bookingDate || payment.createdDate | date: 'dd MMM yyyy, h:mm a' }}</td>
 
-        <!-- ── NEW: Payment Method ── -->
         <td>
           <span
             class="badge"
             [ngClass]="isInstaPay(payment.paymentMethod) ? 'bg-info' : 'bg-secondary'"
           >
-            {{ getPayMethodLabel(payment.paymentMethod) }}
+            {{ getPayMethodLabel(payment.paymentMethod) | translate }}
           </span>
         </td>
 
-        <!-- ── NEW: Payment Image (InstaPay only) ── -->
         <td>
           <ng-container *ngIf="isInstaPay(payment.paymentMethod) && payment.paymentProofImageUrl; else noImage">
             <a
@@ -183,10 +267,8 @@
           </ng-template>
         </td>
 
-        <!-- Details + InstaPay Actions -->
-        <td>
-          <div class="flex gap-1 align-items-center">
-            <!-- View Details -->
+        <td pFrozenColumn alignFrozen="right">
+          <div class="d-flex gap-1 align-items-center">
             <button
               pButton
               icon="pi pi-eye"
@@ -196,7 +278,6 @@
               tooltipPosition="top"
             ></button>
 
-            <!-- Cancel Booking -->
             <button
               pButton
               icon="pi pi-ban"
@@ -206,7 +287,6 @@
               tooltipPosition="top"
             ></button>
 
-            <!-- ── NEW: Confirm InstaPay (InstaPending only) ── -->
             <button
               *ngIf="isInstaPending(payment.bookingStatus || payment.sataus)"
               pButton
@@ -217,7 +297,6 @@
               tooltipPosition="top"
             ></button>
 
-            <!-- ── NEW: Cancel InstaPay (InstaPending only) ── -->
             <button
               *ngIf="isInstaPending(payment.bookingStatus || payment.sataus)"
               pButton
@@ -232,10 +311,9 @@
       </tr>
     </ng-template>
 
-    <!-- rowexpansion colspan updated from 10 to 12 -->
     <ng-template pTemplate="rowexpansion" let-payment>
       <tr>
-        <td colspan="12">
+        <td colspan="14">
           <div class="p-3">
             <div *ngIf="payment.tripReservations?.length" class="mb-3">
               <h5>{{ 'Trip Reservations' | translate }}</h5>
@@ -261,7 +339,7 @@
                       </a>
                     </td>
                     <td>
-                      <div class="flex gap-2 justify-content-center">
+                      <div class="d-flex gap-2 justify-content-center">
                         <span class="badge bg-primary text-white px-2 py-1 rounded">Adults: {{ trip.countDetails?.adults || 0 }}</span>
                         <span class="badge bg-info text-white px-2 py-1 rounded">Childs: {{ trip.countDetails?.childs || 0 }}</span>
                         <span class="badge bg-success text-white px-2 py-1 rounded font-bold">
@@ -311,7 +389,7 @@
                     <td>{{ outing.startTime || '--' }}</td>
                     <td>{{ outing.endTime || '--' }}</td>
                     <td>
-                      <div class="flex gap-2 justify-content-center">
+                      <div class="d-flex gap-2 justify-content-center">
                         <span class="badge bg-primary text-white px-2 py-1 rounded">Adults: {{ outing.countDetails?.adults || 0 }}</span>
                         <span class="badge bg-info text-white px-2 py-1 rounded">Childs: {{ outing.countDetails?.childs || 0 }}</span>
                         <span class="badge bg-success text-white px-2 py-1 rounded font-bold">
@@ -353,7 +431,7 @@
                       </a>
                     </td>
                     <td>
-                      <div class="flex gap-2 justify-content-center">
+                      <div class="d-flex gap-2 justify-content-center">
                         <span class="badge bg-primary text-white px-2 py-1 rounded">Adults: {{ room.adults || 0 }}</span>
                         <span class="badge bg-info text-white px-2 py-1 rounded">Childs: {{ room.childs || 0 }}</span>
                         <span class="badge bg-success text-white px-2 py-1 rounded font-bold">
@@ -395,7 +473,7 @@
                       </a>
                     </td>
                     <td>
-                      <div class="flex gap-2 justify-content-center">
+                      <div class="d-flex gap-2 justify-content-center">
                         <span class="badge bg-primary text-white px-2 py-1 rounded">Adults: {{ hajj.countDetails?.adults || 0 }}</span>
                         <span class="badge bg-info text-white px-2 py-1 rounded">Childs: {{ hajj.countDetails?.childs || 0 }}</span>
                         <span class="badge bg-success text-white px-2 py-1 rounded font-bold">
@@ -419,10 +497,10 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="12">
-          <div class="flex flex-column align-items-center justify-content-center py-5">
-            <i class="pi pi-inbox text-500 text-5xl mb-3"></i>
-            <span class="text-700 font-medium text-lg">{{ 'No bookings found' | translate }}</span>
+        <td colspan="14">
+          <div class="d-flex flex-column align-items-center justify-content-center py-5">
+            <i class="pi pi-inbox text-secondary fs-1 mb-3"></i>
+            <span class="text-secondary fw-medium fs-5">{{ 'No bookings found' | translate }}</span>
           </div>
         </td>
       </tr>

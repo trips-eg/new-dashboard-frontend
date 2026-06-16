@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Ibookings } from 'src/app/shared/model/ibookings';
@@ -10,7 +10,8 @@ import { TableRequestBuilder } from 'src/app/shared/utils/table-request-builder'
 import { Table, TableLazyLoadEvent } from 'primeng/table';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
-
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 // ── BookingStatus Enum (matches backend) ──
 enum BookingStatus {
@@ -43,8 +44,8 @@ enum PayMethod {
   templateUrl: './reservation-list.component.html',
   styleUrl: './reservation-list.component.scss'
 })
-export class ReservationListComponent implements OnInit {
-	imgUrl = environment.imgUrl;
+export class ReservationListComponent implements OnInit, OnDestroy {
+  imgUrl = environment.imgUrl;
   @ViewChild('dt') dt!: Table;
 
   // ✅ Pagination & Filters
@@ -53,12 +54,30 @@ export class ReservationListComponent implements OnInit {
 
   // Search global
   searchedWord: string = '';
-  phoneNumber: string = '';
+
+  filterStatus: string | null = null;
+  filterPayMethod: number | null = null;
+  filterDateFrom: Date | null = null;
+  filterDateTo: Date | null = null;
+
+  payMethodOptions = [
+    { label: 'Bank Card', value: PayMethod.BankCard },
+    { label: 'Reference Code', value: PayMethod.ReferenceCode },
+    { label: 'Shahry', value: PayMethod.Shahry },
+    { label: 'Valu', value: PayMethod.VALU },
+    { label: 'Mobile Wallet', value: PayMethod.MWALLET },
+    { label: 'Bank Installment', value: PayMethod.BankInstallment },
+    { label: 'Vodafone Cash', value: PayMethod.VodafoneCash },
+    { label: 'InstaPay', value: PayMethod.InstaPay }
+  ];
 
   // ✅ Data
   bookings: Ibookings[] = [];
   paymentStatus: any[] = [];
   lang: string = 'en';
+
+  private searchSubject = new Subject<string>();
+  private searchSubscription!: Subscription;
 
   constructor(
     private router: Router,
@@ -77,17 +96,49 @@ export class ReservationListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadPaymentStatus();
+    
+    // Set up search debouncing
+    this.searchSubscription = this.searchSubject.pipe(
+      debounceTime(400)
+    ).subscribe(() => {
+      this.onFilterChange();
+    });
   }
+
+  ngOnDestroy(): void {
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+    }
+  }
+
+  onSearchChange(value: string): void {
+    this.searchSubject.next(value);
+  }
+
 
   // ✅ Load bookings using Builder
   loadBookings(event: TableLazyLoadEvent): void {
     this.isLoading = true;
     const payload: any = TableRequestBuilder.build(event, this.searchedWord);
-    const phoneNumber = this.getPhoneNumberFilter(payload).trim();
 
-    if (phoneNumber) {
-      payload.phoneNumber = phoneNumber;
-      payload.filters = (payload.filters ?? []).filter((filter: any) => filter.column !== 'User.PhoneNumber');
+    if (this.filterStatus !== null) {
+      payload.filters = payload.filters || [];
+      payload.filters.push({ column: 'Sataus', value: this.filterStatus });
+    }
+    if (this.filterPayMethod !== null) {
+      payload.filters = payload.filters || [];
+      payload.filters.push({ column: 'PaymentMethod', value: this.filterPayMethod });
+    }
+    if (this.filterDateFrom) {
+      payload.dateFrom = this.formatDate(this.filterDateFrom);
+    }
+    if (this.filterDateTo) {
+      payload.dateTo = this.formatDate(this.filterDateTo);
+    }
+
+    // Try sending phone number if searchedWord is numeric just in case backend expects it
+    if (this.searchedWord && /^\d+$/.test(this.searchedWord)) {
+      payload.phoneNumber = this.searchedWord;
     }
 
     this.bookingService.getAllBooking(payload).subscribe({
@@ -95,22 +146,41 @@ export class ReservationListComponent implements OnInit {
         this.bookings = res?.data?.data || [];
         this.totalRecords = res?.data?.itemsCount || 0;
         this.isLoading = false;
+        this.toastrService.success(this.translate.instant('Bookings fetched successfully'), this.translate.instant('Success'));
       },
       error: (err) => {
         console.error('Error fetching bookings:', err);
         this.isLoading = false;
+        this.toastrService.error(this.translate.instant('Failed to fetch bookings'), this.translate.instant('Error'));
       }
     });
   }
 
   // ✅ Search action (Global)
-  onSearch(): void {
-    this.dt.reset();
+  onFilterChange(): void {
+    if (this.dt) {
+      this.dt.reset();
+    }
   }
 
-  private getPhoneNumberFilter(payload: any): string {
-    const phoneColumnFilter = payload.filters?.find((filter: any) => filter.column === 'User.PhoneNumber')?.value;
-    return (phoneColumnFilter ?? this.phoneNumber ?? '').toString();
+  resetFilters(): void {
+    this.searchedWord = '';
+    this.filterStatus = null;
+    this.filterPayMethod = null;
+    this.filterDateFrom = null;
+    this.filterDateTo = null;
+    if (this.dt) {
+      this.dt.reset();
+    }
+  }
+
+  formatDate(date: any): string | null {
+    if (!date) return null;
+    const d = new Date(date);
+    const month = '' + (d.getMonth() + 1);
+    const day = '' + d.getDate();
+    const year = d.getFullYear();
+    return [year, month.padStart(2, '0'), day.padStart(2, '0')].join('-');
   }
 
   // ✅ Navigate to details
@@ -142,12 +212,12 @@ export class ReservationListComponent implements OnInit {
       '7': 'status-confirmed', // InstaCompleted → same green as Confirmed
       '8': 'status-cancelled'  // InstaCancelled → same red as Cancelled
     };
-    return classes[value.toString()] || 'status-unknown';
+    return classes[value?.toString()] || 'status-unknown';
   }
 
   // ✅ Label for status
   getStatusLabel(value: number | string): string {
-    const status = this.paymentStatus.find((s) => s.value == value);
+    const status = this.paymentStatus.find((s) => s.value == value?.toString());
     if (status) {
       return this.lang === 'ar' ? status.nameAr : status.nameEn;
     }
@@ -157,7 +227,7 @@ export class ReservationListComponent implements OnInit {
       '7': 'Insta Completed',
       '8': 'Insta Cancelled'
     };
-    return fallback[value.toString()] ?? (this.lang === 'ar' ? 'غير معروف' : 'Unknown');
+    return fallback[value?.toString()] ?? (this.lang === 'ar' ? 'غير معروف' : 'Unknown');
   }
 
   // ✅ Check if booking has reservations

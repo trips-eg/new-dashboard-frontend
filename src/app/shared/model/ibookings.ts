@@ -801,6 +801,8 @@ export interface Ibookings {
   cashierUrl: string
   totalPrice: number
   totalTax: number
+  totalPaidFromBonus?: number
+  totalPayAfterBonus?: number
   total: number
   isPartial: boolean
   opayRate: number

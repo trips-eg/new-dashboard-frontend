@@ -36,6 +36,11 @@ const routes: Routes = [
         loadComponent: () => import('./demo/default/default.component').then((c) => c.DefaultComponent)
       },
       {
+        path: 'customer-analytics',
+        loadComponent: () =>
+          import('./demo/pages/customer-analytics/customer-analytics.component').then((c) => c.CustomerAnalyticsComponent)
+      },
+      {
         path: 'scanner',
         loadComponent: () => import('./demo/pages/scanner-page/scanner-page.component').then((c) => c.ScannerPageComponent)
       },

@@ -269,6 +269,16 @@ const NavigationItems = [
     permissions: [Permissions.CustomersCreate]
   },
   {
+    id: 'customer-analytics',
+    title: 'Customer Analytics',
+    type: 'item',
+    classes: 'nav-item',
+    url: '/customer-analytics',
+    icon: 'fas fa-chart-line',
+    breadcrumbs: false,
+    permissions: [Permissions.CustomersCreate]
+  },
+  {
     id: 'vendors',
     title: 'Vendors',
     type: 'item',

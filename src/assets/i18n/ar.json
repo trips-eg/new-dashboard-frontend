@@ -286,6 +286,9 @@
   "Name": "الاسم",
   "Total Pay": "المبلغ الإجمالي",
   "Total Tax": "إجمالي الضريبة",
+  "totalPaidFromBonus": "المدفوع من البونص",
+  "totalPayAfterBonus": "المبلغ بعد البونص",
+  "totalCompletedReservations": "إجمالي الحجوزات المكتملة",
   "Status": "الحالة",
 
   "View Details": "عرض التفاصيل",
