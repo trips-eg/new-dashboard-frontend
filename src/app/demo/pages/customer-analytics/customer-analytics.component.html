@@ -230,11 +230,13 @@
   <div *ngIf="!dialogLoading">
     <p-table
       [value]="dialogCustomers"
+      dataKey="id"
       [tableStyle]="{ 'min-width': '100%' }"
       styleClass="p-datatable-striped p-datatable-sm"
     >
       <ng-template pTemplate="header">
         <tr>
+          <th style="width: 3rem" *ngIf="dialogType === 'booked' || dialogType === 'paid'"></th>
           <th style="width: 60px">{{ 'Avatar' | translate }}</th>
           <th>{{ 'Name' | translate }}</th>
           <th>{{ 'Email' | translate }}</th>
@@ -246,8 +248,21 @@
         </tr>
       </ng-template>
 
-      <ng-template pTemplate="body" let-customer>
+      <ng-template pTemplate="body" let-customer let-expanded="expanded">
         <tr>
+          <!-- Row expansion toggle -->
+          <td *ngIf="dialogType === 'booked' || dialogType === 'paid'">
+            <button
+              type="button"
+              pButton
+              pRipple
+              [pRowToggler]="customer"
+              class="p-button-text p-button-rounded p-button-plain p-button-sm"
+              [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+              *ngIf="hasSectors(customer)"
+            ></button>
+          </td>
+
           <!-- Avatar -->
           <td>
             <div class="customer-avatar-wrapper">
@@ -266,7 +281,22 @@
 
           <!-- Name -->
           <td>
-            <div class="customer-name">{{ customer.name }}</div>
+            <div class="customer-name fw-semibold text-dark">{{ customer.name }}</div>
+            <!-- Dynamic Reservation Badges -->
+            <div class="d-flex flex-wrap gap-1 mt-1 mb-1" *ngIf="hasSectors(customer)">
+              <span class="badge bg-success-subtle px-2 py-0.5" style="font-size: 0.7rem;" *ngIf="customer.trips?.length">
+                <i class="fas fa-plane-departure me-1"></i>{{ 'Trips' | translate }} ({{ customer.trips.length }})
+              </span>
+              <span class="badge bg-info-subtle px-2 py-0.5" style="font-size: 0.7rem;" *ngIf="customer.outings?.length">
+                <i class="fas fa-umbrella-beach me-1"></i>{{ 'Outings' | translate }} ({{ customer.outings.length }})
+              </span>
+              <span class="badge bg-warning-subtle px-2 py-0.5" style="font-size: 0.7rem;" *ngIf="customer.hajj?.length">
+                <i class="fas fa-kaaba me-1"></i>{{ 'Hajj' | translate }} ({{ customer.hajj.length }})
+              </span>
+              <span class="badge bg-purple-subtle px-2 py-0.5" style="font-size: 0.7rem;" *ngIf="customer.rooms?.length">
+                <i class="fas fa-hotel me-1"></i>{{ 'Rooms' | translate }} ({{ customer.rooms.length }})
+              </span>
+            </div>
             <small class="text-muted">#{{ customer.id }}</small>
           </td>
 
@@ -322,9 +352,181 @@
         </tr>
       </ng-template>
 
+      <!-- Row expansion for sector details -->
+      <ng-template pTemplate="rowexpansion" let-customer>
+        <tr>
+          <td [attr.colspan]="(dialogType === 'booked' || dialogType === 'paid') ? '9' : '8'" class="p-3">
+            <div class="bg-white p-3 rounded shadow-sm border border-light">
+              <h6 class="mb-3 text-secondary fw-bold">
+                <i class="fas fa-suitcase me-2 text-primary"></i>
+                {{ 'Reservations Sector Details' | translate }}
+              </h6>
+              
+              <p-tabView styleClass="customer-sectors-tabs">
+                <!-- Trips Tab -->
+                <p-tabPanel *ngIf="customer.trips?.length">
+                  <ng-template pTemplate="header">
+                    <i class="fas fa-plane-departure text-success me-2"></i>
+                    <span>{{ 'Trips' | translate }}</span>
+                  </ng-template>
+                  <div class="table-responsive">
+                    <table class="table table-bordered table-sm table-hover align-middle mb-0">
+                      <thead class="bg-light">
+                        <tr>
+                          <th>{{ 'Trip Name' | translate }}</th>
+                          <th>{{ 'Company' | translate }}</th>
+                          <th>{{ 'Dates' | translate }}</th>
+                          <th>{{ 'Route' | translate }}</th>
+                          <th class="text-end">{{ 'Price' | translate }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let trip of customer.trips">
+                          <td class="fw-semibold text-primary">{{ trip.name }}</td>
+                          <td>
+                            <span>{{ trip.companyDto?.name || '—' }}</span>
+                          </td>
+                          <td>
+                            {{ trip.startDate | date:'dd/MM/yyyy' }} - {{ trip.endDate | date:'dd/MM/yyyy' }}
+                            <small class="text-muted d-block">({{ trip.numberOfDays }} {{ 'Days' | translate }})</small>
+                          </td>
+                          <td>
+                            {{ trip.fromLocation }} <i class="fas fa-arrow-right mx-1 text-muted"></i> {{ trip.toLocation }}
+                          </td>
+                          <td class="text-end fw-bold text-success">{{ trip.price | currency:'EGP':'symbol':'1.0-0' }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </p-tabPanel>
+
+                <!-- Outings Tab -->
+                <p-tabPanel *ngIf="customer.outings?.length">
+                  <ng-template pTemplate="header">
+                    <i class="fas fa-umbrella-beach text-info me-2"></i>
+                    <span>{{ 'Outings' | translate }}</span>
+                  </ng-template>
+                  <div class="table-responsive">
+                    <table class="table table-bordered table-sm table-hover align-middle mb-0">
+                      <thead class="bg-light">
+                        <tr>
+                          <th>{{ 'Outing Name' | translate }}</th>
+                          <th>{{ 'Company' | translate }}</th>
+                          <th>{{ 'Dates' | translate }}</th>
+                          <th>{{ 'Location' | translate }}</th>
+                          <th class="text-end">{{ 'Price' | translate }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let outing of customer.outings">
+                          <td class="fw-semibold text-primary">{{ outing.name }}</td>
+                          <td>
+                            <div class="d-flex align-items-center gap-2">
+                              <img *ngIf="outing.vendor?.logoUrl" [src]="baseUrl + outing.vendor.logoUrl" class="rounded-circle border" style="width: 24px; height: 24px; object-fit: cover;" />
+                              <span>{{ outing.companyDto?.name || outing.vendorName || outing.vendor?.name || '—' }}</span>
+                            </div>
+                          </td>
+                          <td>
+                            <ng-container *ngIf="outing.startDate || outing.endDate; else openDate">
+                              {{ outing.startDate | date:'dd/MM/yyyy' }} - {{ outing.endDate | date:'dd/MM/yyyy' }}
+                            </ng-container>
+                            <ng-template #openDate>
+                              <span class="text-muted small">
+                                <i class="far fa-calendar-alt me-1"></i>{{ 'Open Date' | translate }}
+                              </span>
+                            </ng-template>
+                          </td>
+                          <td>{{ outing.location || '—' }}</td>
+                          <td class="text-end fw-bold text-success">
+                            {{ (outing.price || outing.priceBefore || outing.miniPrice || outing.tickets?.[0]?.price || 0) | currency:'EGP':'symbol':'1.0-0' }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </p-tabPanel>
+
+                <!-- Hajj Tab -->
+                <p-tabPanel *ngIf="customer.hajj?.length">
+                  <ng-template pTemplate="header">
+                    <i class="fas fa-kaaba text-warning me-2"></i>
+                    <span>{{ 'Hajj' | translate }}</span>
+                  </ng-template>
+                  <div class="table-responsive">
+                    <table class="table table-bordered table-sm table-hover align-middle mb-0">
+                      <thead class="bg-light">
+                        <tr>
+                          <th>{{ 'Campaign Name' | translate }}</th>
+                          <th>{{ 'Company' | translate }}</th>
+                          <th>{{ 'Dates' | translate }}</th>
+                          <th>{{ 'Details' | translate }}</th>
+                          <th class="text-end">{{ 'Price' | translate }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let hajjItem of customer.hajj">
+                          <td class="fw-semibold text-primary">{{ hajjItem.name }}</td>
+                          <td>
+                            <span>{{ hajjItem.companyDto?.name || '—' }}</span>
+                          </td>
+                          <td>
+                            {{ hajjItem.startDate | date:'dd/MM/yyyy' }} - {{ hajjItem.endDate | date:'dd/MM/yyyy' }}
+                            <small class="text-muted d-block">({{ hajjItem.numberOfDays }} {{ 'Days' | translate }})</small>
+                          </td>
+                          <td>
+                            <div class="small">
+                              <strong>Makkah:</strong> {{ hajjItem.residenceInMakkah }} ({{ hajjItem.daysInMakkah }} Days) <br/>
+                              <strong>Madinah:</strong> {{ hajjItem.residenceInMadinah }} ({{ hajjItem.daysInMadinah }} Days) <br/>
+                              <strong>Flight:</strong> {{ hajjItem.flightLine }}
+                            </div>
+                          </td>
+                          <td class="text-end fw-bold text-success">{{ hajjItem.price | currency:'EGP':'symbol':'1.0-0' }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </p-tabPanel>
+
+                <!-- Rooms Tab -->
+                <p-tabPanel *ngIf="customer.rooms?.length">
+                  <ng-template pTemplate="header">
+                    <i class="fas fa-hotel text-primary me-2"></i>
+                    <span>{{ 'Rooms' | translate }}</span>
+                  </ng-template>
+                  <div class="table-responsive">
+                    <table class="table table-bordered table-sm table-hover align-middle mb-0">
+                      <thead class="bg-light">
+                        <tr>
+                          <th>{{ 'Hotel' | translate }}</th>
+                          <th>{{ 'Room' | translate }}</th>
+                          <th>{{ 'Company' | translate }}</th>
+                          <th>{{ 'Boarding' | translate }}</th>
+                          <th class="text-end">{{ 'Price' | translate }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let room of customer.rooms">
+                          <td class="fw-semibold text-primary">{{ room.hotel || room.hotelName }}</td>
+                          <td>{{ room.name || room.roomName }}</td>
+                          <td>
+                            <span>{{ room.companyDto?.name || '—' }}</span>
+                          </td>
+                          <td>{{ room.boarding || '—' }}</td>
+                          <td class="text-end fw-bold text-success">{{ room.price | currency:'EGP':'symbol':'1.0-0' }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </p-tabPanel>
+              </p-tabView>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
       <ng-template pTemplate="empty">
         <tr>
-          <td colspan="8" class="text-center py-4 text-muted">
+          <td [attr.colspan]="(dialogType === 'booked' || dialogType === 'paid') ? '9' : '8'" class="text-center py-4 text-muted">
             <i class="fas fa-users fa-2x mb-2 d-block"></i>
             {{ 'No customers found for this category' | translate }}
           </td>

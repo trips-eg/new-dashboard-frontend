@@ -3,11 +3,41 @@
 
   <div class="content-wrapper" *ngIf="coupon">
     <!-- Gradient Card -->
-    <div class="coupon-card">
+    <div class="coupon-card" [ngClass]="{
+      'coupon-card--bogo': coupon.discountType === 3,
+      'coupon-card--recovery': coupon.isRecoveryOffer && coupon.discountType !== 3
+    }">
+      <!-- Floating badges on the coupon card -->
+      <div class="coupon-badges">
+        <span class="coupon-badge coupon-badge--bogo" *ngIf="coupon.discountType === 3">
+          <i class="pi pi-shopping-cart"></i> BOGO
+        </span>
+        <span class="coupon-badge coupon-badge--recovery" *ngIf="coupon.isRecoveryOffer">
+          <i class="pi pi-refresh"></i> {{ 'Recovery Offer' | translate }}
+        </span>
+        <span class="coupon-badge coupon-badge--targeted" *ngIf="coupon.userId">
+          <i class="pi pi-user"></i> {{ 'Targeted' | translate }}
+        </span>
+      </div>
+
       <div class="card-top">
         <div class="discount-info">
           <i class="pi pi-tag icon"></i>
-          <h3>{{ 'Save' | translate }} {{ coupon.discountAmount }} {{ '% on your purchases!' | translate }}</h3>
+          <h3 *ngIf="coupon.discountType === 3" class="bogo-headline">
+            {{ 'Buy' | translate }} <span class="highlight-num">{{ coupon.buyQuantity }}</span>
+            {{ 'Get' | translate }} <span class="highlight-num">{{ coupon.getQuantity }}</span>
+            {{ 'Free!' | translate }}
+          </h3>
+          <h3 *ngIf="coupon.discountType !== 3 && coupon.discountDescription">
+            {{ coupon.discountDescription }}
+          </h3>
+          <h3 *ngIf="coupon.discountType !== 3 && !coupon.discountDescription">
+            {{ 'Save' | translate }} {{ coupon.discountAmount }}{{ coupon.discountType === 2 ? '%' : '' }} {{ 'on your purchases!' | translate }}
+          </h3>
+          <!-- Sub-description -->
+          <p class="coupon-sub" *ngIf="coupon.discountType === 3">
+            {{ 'Max Free' | translate }}: {{ coupon.maxFreeQuantity }}
+          </p>
         </div>
       </div>
 
@@ -22,6 +52,98 @@
           <i class="pi pi-copy"></i>
           {{ 'Copy Code' | translate }}
         </button>
+      </div>
+    </div>
+
+    <!-- Special Feature Cards Row -->
+    <div class="feature-cards-row" *ngIf="coupon.discountType === 3 || coupon.isRecoveryOffer || coupon.userId">
+      <!-- BOGO Feature Card -->
+      <div class="feature-card feature-card--bogo" *ngIf="coupon.discountType === 3">
+        <div class="feature-card__icon">
+          <i class="pi pi-shopping-cart"></i>
+        </div>
+        <div class="feature-card__content">
+          <h5>{{ 'Buy X Get Y' | translate }}</h5>
+          <div class="feature-card__stats">
+            <div class="stat-item">
+              <span class="stat-value">{{ coupon.buyQuantity }}</span>
+              <span class="stat-label">{{ 'Buy' | translate }}</span>
+            </div>
+            <div class="stat-divider">
+              <i class="pi pi-arrow-right"></i>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">{{ coupon.getQuantity }}</span>
+              <span class="stat-label">{{ 'Get' | translate }}</span>
+            </div>
+            <div class="stat-divider">
+              <i class="pi pi-gift"></i>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">{{ coupon.maxFreeQuantity }}</span>
+              <span class="stat-label">{{ 'Max Free' | translate }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recovery Feature Card -->
+      <div class="feature-card feature-card--recovery" *ngIf="coupon.isRecoveryOffer">
+        <div class="feature-card__icon">
+          <i class="pi pi-refresh"></i>
+        </div>
+        <div class="feature-card__content">
+          <h5>{{ 'Cart Recovery Offer' | translate }}</h5>
+          <p class="feature-card__desc">{{ 'Offered to recover abandoned bookings' | translate }}</p>
+          <div class="recovery-percentage">
+            <span class="recovery-value">{{ coupon.recoveryDiscountPercentage }}%</span>
+            <span class="recovery-label">{{ 'Recovery Discount' | translate }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Targeted User Feature Card -->
+      <div class="feature-card feature-card--targeted" *ngIf="coupon.userId">
+        <div class="feature-card__icon">
+          <i class="pi pi-user"></i>
+        </div>
+        <div class="feature-card__content" *ngIf="targetedCustomer; else loadingCustomer">
+          <h5>{{ 'Targeted Customer Information' | translate }}</h5>
+          <div class="customer-info-grid">
+            <div class="customer-info-item">
+              <i class="pi pi-id-card"></i>
+              <div>
+                <span class="info-label">{{ 'name' | translate }}</span>
+                <span class="info-value">{{ targetedCustomer.name }}</span>
+              </div>
+            </div>
+            <div class="customer-info-item">
+              <i class="pi pi-envelope"></i>
+              <div>
+                <span class="info-label">{{ 'email' | translate }}</span>
+                <span class="info-value">{{ targetedCustomer.email }}</span>
+              </div>
+            </div>
+            <div class="customer-info-item">
+              <i class="pi pi-phone"></i>
+              <div>
+                <span class="info-label">{{ 'phoneNumber' | translate }}</span>
+                <span class="info-value">{{ targetedCustomer.phoneNumber }}</span>
+              </div>
+            </div>
+          </div>
+          <button class="view-customer-btn" (click)="navigateToCustomer(coupon.userId)">
+            <i class="pi pi-external-link"></i>
+            {{ 'View Customer Profile' | translate }}
+          </button>
+        </div>
+        <ng-template #loadingCustomer>
+          <div class="feature-card__content">
+            <h5>{{ 'Targeted User' | translate }}</h5>
+            <p class="feature-card__desc">ID: {{ coupon.userId }}</p>
+            <i class="pi pi-spin pi-spinner" style="color:#64b5f6"></i>
+          </div>
+        </ng-template>
       </div>
     </div>
 

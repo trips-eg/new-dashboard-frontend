@@ -276,4 +276,13 @@ export class CustomerAnalyticsComponent implements OnInit {
     const filled = (percentage / 100) * circumference;
     return `${filled} ${circumference}`;
   }
+
+  hasSectors(customer: AnalyticsCustomer): boolean {
+    return !!(
+      (customer.trips && customer.trips.length > 0) ||
+      (customer.outings && customer.outings.length > 0) ||
+      (customer.hajj && customer.hajj.length > 0) ||
+      (customer.rooms && customer.rooms.length > 0)
+    );
+  }
 }

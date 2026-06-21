@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { CouponsService } from 'src/app/shared/services/coupons.service';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { EnumsService } from 'src/app/shared/services/enums.service';
 import { TranslateService } from '@ngx-translate/core';
 import { IcouponDetails } from 'src/app/shared/model/icoupon-details';
+import { CustomerService } from 'src/app/shared/services/customer.service';
 
 @Component({
   selector: 'app-coupon-details',
@@ -21,14 +22,17 @@ export class CouponDetailsComponent {
   coupon: IcouponDetails;
   userLimitOptions: any[] = [];
   currentLang: string;
+  targetedCustomer: any = null;
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private couponsService: CouponsService,
     private toastr: ToastrService,
     public config: DynamicDialogConfig,
     private enumsService: EnumsService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private customerService: CustomerService
   ) {
     this.currentLang = this.translateService.currentLang || 'en';
   }
@@ -64,6 +68,16 @@ export class CouponDetailsComponent {
     this.couponsService.getCouponById(id).subscribe((res) => {
       if (res.success) {
         this.coupon = res.data;
+        if (this.coupon.userId) {
+          this.customerService.getCustomerById(this.coupon.userId).subscribe({
+            next: (custRes) => {
+              if (custRes.success) {
+                this.targetedCustomer = custRes.data;
+              }
+            },
+            error: (err) => console.error('Error fetching targeted customer details:', err)
+          });
+        }
       }
     });
   }
@@ -112,5 +126,9 @@ export class CouponDetailsComponent {
         break;
     }
     window.open(route, '_blank');
+  }
+
+  navigateToCustomer(userId: number) {
+    window.open(`/customer-details/${userId}`, '_blank');
   }
 }

@@ -28,6 +28,10 @@ export class TransactionsService {
     return this._apiCaller.get(`${this.endPoints.getAllWallets}${query}`);
   }
 
+  adjustWalletBalance(customerId: number, amount: number): Observable<any> {
+    return this._apiCaller.put(`${this.endPoints.adjustWalletBalance}/${customerId}?amount=${amount}`, {});
+  }
+
   private buildQuery(filterMap?: FilterMap): string {
     const params = [
       filterMap?.pageIndex ? `pageIndex=${filterMap.pageIndex}` : null,

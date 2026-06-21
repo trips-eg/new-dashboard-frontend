@@ -53,6 +53,24 @@ export class CouponsListComponent implements OnInit {
     return found ? (this.lang === 'ar' ? found.nameAr : found.nameEn) : val;
   }
 
+  getDiscountLabel(coupon: ICoupon): string {
+    if (coupon.discountType === 3) {
+      const buy = coupon.buyQuantity || 0;
+      const get = coupon.getQuantity || 0;
+      const max = coupon.maxFreeQuantity || 0;
+      return this.lang === 'ar' 
+        ? `اشتري ${buy} احصل على ${get} مجاناً (حد أقصى ${max})`
+        : `Buy ${buy} Get ${get} Free (Max ${max})`;
+    }
+    if (coupon.discountDescription) {
+      return coupon.discountDescription;
+    }
+    if (coupon.discountType === 2) {
+      return `${coupon.discountAmount}%`;
+    }
+    return coupon.discountAmount?.toString() || '';
+  }
+
   openCouponDetails(couponId: number) {
     this.ref = this.dialogService.open(CouponDetailsComponent, {
       header: 'Coupon Details',
@@ -71,8 +89,8 @@ export class CouponsListComponent implements OnInit {
 
     this.CouponsService.getCoupons(payload).subscribe({
       next: (res) => {
-        this.coupons = res.data.data;
-        this.totalRecords = res.data.itemsCount;
+        this.coupons = res.data.data || [];
+        this.totalRecords = res.data.itemsCount || 0;
         this.isLoading = false;
       },
       error: (err) => {

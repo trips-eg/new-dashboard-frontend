@@ -140,7 +140,8 @@ export class APIs {
     getTransactions: 'Wallet/GetWalletTransaction',
     getWalletChargeTransaction: 'Wallet/GetWalletChargeTransaction',
     // ── Wallets list (admin) ──
-    getAllWallets: 'Wallet/GetAllWallets'
+    getAllWallets: 'Wallet/GetAllWallets',
+    adjustWalletBalance: 'Wallet/AdjustWalletBalance'
   };
 
   public static reservations = {

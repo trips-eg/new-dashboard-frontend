@@ -10,11 +10,13 @@ import { Transaction, TransactionResponse } from 'src/app/shared/model/itransact
 import { ChargeTransaction, ChargeTransactionResponse } from 'src/app/shared/model/icharge-transaction';
 import { FilterMap } from 'src/app/shared/mapping/filterMap';
 import { EmailListComponent } from '../../emails/email-list/email-list.component';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-customer-detail',
   standalone: true,
   imports: [SharedModule, SubHeaderComponent, EmailListComponent],
+  providers: [MessageService],
   templateUrl: './customer-detail.component.html',
   styleUrl: './customer-detail.component.scss'
 })
@@ -38,11 +40,17 @@ export class CustomerDetailComponent implements OnInit {
   chargeTotalRecords = 0;
   isLoadingChargeTransactions = false;
 
+  // Wallet Balance Adjustment
+  displayAdjustDialog = false;
+  adjustAmount: number | null = null;
+  isSubmittingAdjustment = false;
+
   constructor(
     private router: Router,
     private CustomerService: CustomerService,
     private route: ActivatedRoute,
-    private transactionsService: TransactionsService
+    private transactionsService: TransactionsService,
+    private messageService: MessageService
   ) {}
   ngOnInit(): void {
     this.getcustomerId();
@@ -195,5 +203,43 @@ export class CustomerDetailComponent implements OnInit {
       default:
         return 'Unknown';
     }
+  }
+
+  // Wallet Balance Adjustment Methods
+  openAdjustBalanceDialog() {
+    this.adjustAmount = null;
+    this.displayAdjustDialog = true;
+  }
+
+  closeAdjustDialog() {
+    this.displayAdjustDialog = false;
+  }
+
+  submitAdjustment() {
+    if (!this.customerId || !this.adjustAmount || this.adjustAmount <= 0) return;
+
+    this.isSubmittingAdjustment = true;
+
+    this.transactionsService.adjustWalletBalance(this.customerId, this.adjustAmount).subscribe({
+      next: (res) => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Wallet balance adjusted successfully'
+        });
+        this.isSubmittingAdjustment = false;
+        this.displayAdjustDialog = false;
+        this.loadCustomerData(); // Reload customer wallet & transactions
+      },
+      error: (err) => {
+        console.error('Error adjusting wallet balance:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err.error?.message || 'Failed to adjust wallet balance'
+        });
+        this.isSubmittingAdjustment = false;
+      }
+    });
   }
 }

@@ -70,6 +70,10 @@ export interface AnalyticsCustomer {
   imageUrl: string;
   wallet: CustomerWallet;
   totalCompletedReservations: number;
+  trips?: any[];
+  outings?: any[];
+  hajj?: any[];
+  rooms?: any[];
 }
 
 export interface CustomersByTypeData {

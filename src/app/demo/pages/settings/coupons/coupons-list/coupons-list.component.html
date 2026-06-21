@@ -74,12 +74,52 @@
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-coupon>
-      <tr>
-        <td>{{ coupon.code }}</td>
-        <td>{{ coupon.discountAmount }}</td>
-        <td>{{ coupon.usageNumber }}</td>
-        <td>{{ coupon.startDate | date: 'medium' }}</td>
-        <td>{{ coupon.endDate | date: 'medium' }}</td>
+      <tr class="coupon-row" [class.coupon-row--special]="coupon.discountType === 3 || coupon.isRecoveryOffer || coupon.userId">
+        <!-- Coupon Code + Badges -->
+        <td>
+          <div class="coupon-code-cell">
+            <div class="coupon-code-name">
+              <i class="pi pi-ticket coupon-code-icon"></i>
+              <span class="coupon-code-text">{{ coupon.code }}</span>
+            </div>
+            <div class="coupon-tags" *ngIf="coupon.isRecoveryOffer || coupon.userId || coupon.discountType === 3">
+              <span class="mini-tag mini-tag--bogo" *ngIf="coupon.discountType === 3"
+                    [pTooltip]="('Buy' | translate) + ' ' + coupon.buyQuantity + ' → ' + ('Get' | translate) + ' ' + coupon.getQuantity + ' ' + ('Free!' | translate)"
+                    tooltipPosition="top">
+                <i class="pi pi-shopping-cart"></i> BOGO
+              </span>
+              <span class="mini-tag mini-tag--recovery" *ngIf="coupon.isRecoveryOffer"
+                    [pTooltip]="('Recovery Discount' | translate) + ': ' + coupon.recoveryDiscountPercentage + '%'"
+                    tooltipPosition="top">
+                <i class="pi pi-refresh"></i> {{ 'Recovery Offer' | translate }}
+              </span>
+              <span class="mini-tag mini-tag--targeted" *ngIf="coupon.userId"
+                    [pTooltip]="'Targeted User' | translate"
+                    tooltipPosition="top">
+                <i class="pi pi-user"></i> {{ 'Targeted' | translate }}
+              </span>
+            </div>
+          </div>
+        </td>
+        <!-- Discount -->
+        <td>
+          <div class="discount-cell">
+            <span class="discount-value" [ngClass]="{
+              'discount-value--bogo': coupon.discountType === 3,
+              'discount-value--percent': coupon.discountType === 2,
+              'discount-value--fixed': coupon.discountType === 1
+            }">
+              {{ getDiscountLabel(coupon) }}
+            </span>
+          </div>
+        </td>
+        <td>
+          <span class="usage-badge">
+            <i class="pi pi-users"></i> {{ coupon.usageNumber }}
+          </span>
+        </td>
+        <td>{{ coupon.startDate | date: 'mediumDate' }}</td>
+        <td>{{ coupon.endDate | date: 'mediumDate' }}</td>
         <td>{{ returnValueOFuserLimit(coupon.userLimit) }}</td>
         <td>
           <div class="flex gap-1">

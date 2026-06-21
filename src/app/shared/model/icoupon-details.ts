@@ -9,6 +9,13 @@ export interface IcouponDetails {
   endDate: string;
   isGenral: boolean;
   userLimit: number;
+  buyQuantity?:   number;
+  getQuantity?:   number;
+  maxFreeQuantity?: number;
+  userId?:        number | null;
+  isRecoveryOffer?: boolean;
+  recoveryDiscountPercentage?: number | null;
+  discountDescription?: string;
   trip: Trip[];
   room: Room[];
   outing: Outing[];
