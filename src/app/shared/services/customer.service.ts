@@ -19,4 +19,5 @@ export class CustomerService {
   getCustomerById(id: number): Observable<any> {
     return this.ApiCallerService.get(`${this.endPoints.getCustomerById}?id=${id}`);
   }
+  
 }

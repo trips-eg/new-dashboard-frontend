@@ -5,16 +5,20 @@
     [subSection]="userlId ? ('Edit' | translate) : ('Add' | translate)"
   ></sub-header>
 
-  <form [formGroup]="couponForm" (ngSubmit)="onSubmit()" class="product-form shadow-3 p-4">
-    <p-panel header="{{ 'Coupon Info' | translate }}" toggleable styleClass="mt-3">
+  <form [formGroup]="couponForm" (ngSubmit)="onSubmit()" class="product-form mt-4">
+    <!-- Section 1: Coupon Info -->
+    <div class="form-section-card">
+      <div class="section-title">
+        <i class="pi pi-info-circle"></i>
+        <span>{{ 'Coupon Info' | translate }}</span>
+      </div>
+      
       <div class="formgrid grid">
         <!-- Code -->
         <div class="field col-12 col-md-6">
-          <label for="code">
-            {{ 'Coupon Code' | translate }}
-          </label>
+          <label for="code" class="font-semibold mb-1 block">{{ 'Coupon Code' | translate }}</label>
           <input id="code" type="text" formControlName="code" pInputText class="w-full" />
-          <div class="text-danger" *ngIf="couponForm.get('code')?.invalid && couponForm.get('code')?.touched">
+          <div class="text-danger mt-1" *ngIf="couponForm.get('code')?.invalid && couponForm.get('code')?.touched">
             <div *ngIf="couponForm.get('code')?.errors?.['required']">
               {{ 'This field is required' | translate }}
             </div>
@@ -23,7 +27,7 @@
 
         <!-- Discount Type -->
         <div class="field col-12 col-md-6">
-          <label for="discountType">{{ 'Discount Type' | translate }}</label>
+          <label for="discountType" class="font-semibold mb-1 block">{{ 'Discount Type' | translate }}</label>
           <p-dropdown
             id="discountType"
             [options]="discountTypeOptionsTranslated"
@@ -32,16 +36,15 @@
             optionValue="value"
             class="w-full"
             placeholder="{{ 'Select Type' | translate }}"
+            appendTo="body"
           ></p-dropdown>
         </div>
 
         <!-- Discount Amount — يظهر فقط عند النوع 1 أو 2 -->
         <div class="field col-12 col-md-6" *ngIf="!isBuyXGetX">
-          <label for="discountAmount">
-            {{ 'Discount rate' | translate }}
-          </label>
+          <label for="discountAmount" class="font-semibold mb-1 block">{{ 'Discount rate' | translate }}</label>
           <p-inputNumber id="discountAmount" suffix="%" formControlName="discountAmount" class="w-full"></p-inputNumber>
-          <div class="text-danger" *ngIf="couponForm.get('discountAmount')?.invalid && couponForm.get('discountAmount')?.touched">
+          <div class="text-danger mt-1" *ngIf="couponForm.get('discountAmount')?.invalid && couponForm.get('discountAmount')?.touched">
             <div *ngIf="couponForm.get('discountAmount')?.errors?.['required']">
               {{ 'This field is required' | translate }}
             </div>
@@ -57,27 +60,27 @@
         <!-- Buy X Get X Fields — تظهر فقط عند النوع 3 -->
         <ng-container *ngIf="isBuyXGetX">
           <div class="field col-12 col-md-4">
-            <label for="buyQuantity">{{ 'Buy Quantity' | translate }}</label>
+            <label for="buyQuantity" class="font-semibold mb-1 block">{{ 'Buy Quantity' | translate }}</label>
             <p-inputNumber id="buyQuantity" formControlName="buyQuantity" class="w-full" [min]="1"></p-inputNumber>
-            <div class="text-danger" *ngIf="couponForm.get('buyQuantity')?.invalid && couponForm.get('buyQuantity')?.touched">
+            <div class="text-danger mt-1" *ngIf="couponForm.get('buyQuantity')?.invalid && couponForm.get('buyQuantity')?.touched">
               <div *ngIf="couponForm.get('buyQuantity')?.errors?.['required']">{{ 'This field is required' | translate }}</div>
               <div *ngIf="couponForm.get('buyQuantity')?.errors?.['min']">{{ 'Value must be greater than 0' | translate }}</div>
             </div>
           </div>
 
           <div class="field col-12 col-md-4">
-            <label for="getQuantity">{{ 'Get Quantity' | translate }}</label>
+            <label for="getQuantity" class="font-semibold mb-1 block">{{ 'Get Quantity' | translate }}</label>
             <p-inputNumber id="getQuantity" formControlName="getQuantity" class="w-full" [min]="1"></p-inputNumber>
-            <div class="text-danger" *ngIf="couponForm.get('getQuantity')?.invalid && couponForm.get('getQuantity')?.touched">
+            <div class="text-danger mt-1" *ngIf="couponForm.get('getQuantity')?.invalid && couponForm.get('getQuantity')?.touched">
               <div *ngIf="couponForm.get('getQuantity')?.errors?.['required']">{{ 'This field is required' | translate }}</div>
               <div *ngIf="couponForm.get('getQuantity')?.errors?.['min']">{{ 'Value must be greater than 0' | translate }}</div>
             </div>
           </div>
 
           <div class="field col-12 col-md-4">
-            <label for="maxFreeQuantity">{{ 'Max Free Quantity' | translate }}</label>
+            <label for="maxFreeQuantity" class="font-semibold mb-1 block">{{ 'Max Free Quantity' | translate }}</label>
             <p-inputNumber id="maxFreeQuantity" formControlName="maxFreeQuantity" class="w-full" [min]="1"></p-inputNumber>
-            <div class="text-danger" *ngIf="couponForm.get('maxFreeQuantity')?.invalid && couponForm.get('maxFreeQuantity')?.touched">
+            <div class="text-danger mt-1" *ngIf="couponForm.get('maxFreeQuantity')?.invalid && couponForm.get('maxFreeQuantity')?.touched">
               <div *ngIf="couponForm.get('maxFreeQuantity')?.errors?.['required']">{{ 'This field is required' | translate }}</div>
               <div *ngIf="couponForm.get('maxFreeQuantity')?.errors?.['min']">{{ 'Value must be greater than 0' | translate }}</div>
             </div>
@@ -86,11 +89,9 @@
 
         <!-- Usage Number & User Limit -->
         <div class="field col-12 col-md-6">
-          <label for="usageNumber">
-            {{ 'Usage Number' | translate }}
-          </label>
+          <label for="usageNumber" class="font-semibold mb-1 block">{{ 'Usage Number' | translate }}</label>
           <p-inputNumber id="usageNumber" formControlName="usageNumber" class="w-full"></p-inputNumber>
-          <div class="text-danger" *ngIf="couponForm.get('usageNumber')?.invalid && couponForm.get('usageNumber')?.touched">
+          <div class="text-danger mt-1" *ngIf="couponForm.get('usageNumber')?.invalid && couponForm.get('usageNumber')?.touched">
             <div *ngIf="couponForm.get('usageNumber')?.errors?.['required']">
               {{ 'This field is required' | translate }}
             </div>
@@ -101,9 +102,7 @@
         </div>
 
         <div class="field col-12 col-md-6">
-          <label for="userLimit">
-            {{ 'User Limit' | translate }}
-          </label>
+          <label for="userLimit" class="font-semibold mb-1 block">{{ 'User Limit' | translate }}</label>
           <p-dropdown
             [options]="userLimitOptions$ | async"
             formControlName="userLimit"
@@ -111,8 +110,9 @@
             optionValue="value"
             class="w-full"
             placeholder="{{ 'Select Limit' | translate }}"
+            appendTo="body"
           ></p-dropdown>
-          <div class="text-danger" *ngIf="couponForm.get('userLimit')?.invalid && couponForm.get('userLimit')?.touched">
+          <div class="text-danger mt-1" *ngIf="couponForm.get('userLimit')?.invalid && couponForm.get('userLimit')?.touched">
             <div *ngIf="couponForm.get('userLimit')?.errors?.['required']">
               {{ 'This field is required' | translate }}
             </div>
@@ -121,9 +121,7 @@
 
         <!-- Dates -->
         <div class="field col-12 col-md-6">
-          <label for="startDate">
-            {{ 'Start Date' | translate }}
-          </label>
+          <label for="startDate" class="font-semibold mb-1 block">{{ 'Start Date' | translate }}</label>
           <p-calendar
             inputId="startDate"
             formControlName="startDate"
@@ -133,7 +131,7 @@
             [showIcon]="true"
             class="w-full"
           ></p-calendar>
-          <div class="text-danger" *ngIf="couponForm.get('startDate')?.invalid && couponForm.get('startDate')?.touched">
+          <div class="text-danger mt-1" *ngIf="couponForm.get('startDate')?.invalid && couponForm.get('startDate')?.touched">
             <div *ngIf="couponForm.get('startDate')?.errors?.['required']">
               {{ 'This field is required' | translate }}
             </div>
@@ -141,9 +139,7 @@
         </div>
 
         <div class="field col-12 col-md-6">
-          <label for="endDate">
-            {{ 'End Date' | translate }}
-          </label>
+          <label for="endDate" class="font-semibold mb-1 block">{{ 'End Date' | translate }}</label>
           <p-calendar
             inputId="endDate"
             formControlName="endDate"
@@ -153,7 +149,7 @@
             [showIcon]="true"
             class="w-full"
           ></p-calendar>
-          <div class="text-danger" *ngIf="couponForm.get('endDate')?.invalid && couponForm.get('endDate')?.touched">
+          <div class="text-danger mt-1" *ngIf="couponForm.get('endDate')?.invalid && couponForm.get('endDate')?.touched">
             <div *ngIf="couponForm.get('endDate')?.errors?.['required']">
               {{ 'This field is required' | translate }}
             </div>
@@ -163,89 +159,11 @@
           </div>
         </div>
 
-        <!-- Is General -->
-        <div class="field col-12">
-          <h3 class="flex justify-content-between align-items-center">
-            <span>{{ 'general' | translate }}</span>
-            <p-inputSwitch formControlName="isGenral"></p-inputSwitch>
-          </h3>
-        </div>
-
-        <!-- Trips & Rooms if not isGenral -->
-        <div
-          class="formgrid grid border-1 border-dashed surface-border border-round p-2 col-12 mb-3"
-          *ngIf="!couponForm.get('isGenral')?.value"
-        >
-          <div class="field col-12">
-            <span class="p-fluid">
-              <label for="tripIds">{{ 'Select Trips' | translate }}</label>
-              <p-multiSelect
-                formControlName="tripIds"
-                [options]="tripsOptions$ | async"
-                display="comma"
-                class="w-full"
-                optionLabel="label"
-                optionValue="value"
-                placeholder="{{ 'Select Trips' | translate }}"
-                [filter]="true"
-              ></p-multiSelect>
-            </span>
-          </div>
-
-          <div class="field col-12">
-            <span class="p-fluid">
-              <label for="roomIds">{{ 'Select Rooms' | translate }}</label>
-              <p-multiSelect
-                formControlName="roomIds"
-                [options]="roomsOptions$ | async"
-                display="comma"
-                class="w-full"
-                optionLabel="label"
-                optionValue="value"
-                placeholder="{{ 'Select Rooms' | translate }}"
-                [filter]="true"
-              ></p-multiSelect>
-            </span>
-          </div>
-
-          <div class="field col-12">
-            <span class="p-fluid">
-              <label for="outingIds">{{ 'Select Outings' | translate }}</label>
-              <p-multiSelect
-                formControlName="outingIds"
-                [options]="outingsOptions$ | async"
-                display="comma"
-                class="w-full"
-                optionLabel="label"
-                optionValue="value"
-                placeholder="{{ 'Select Outings' | translate }}"
-                [filter]="true"
-              ></p-multiSelect>
-            </span>
-          </div>
-
-          <div class="field col-12">
-            <span class="p-fluid">
-              <label for="hajjIds">{{ 'Select Hajj/Umrah' | translate }}</label>
-              <p-multiSelect
-                formControlName="hajjIds"
-                [options]="hajjOptions$ | async"
-                display="comma"
-                class="w-full"
-                optionLabel="label"
-                optionValue="value"
-                placeholder="{{ 'Select Hajj/Umrah' | translate }}"
-                [filter]="true"
-              ></p-multiSelect>
-            </span>
-          </div>
-        </div>
-
         <!-- Description -->
         <div class="field col-12">
-          <label for="description">{{ 'Description' | translate }}</label>
+          <label for="description" class="font-semibold mb-1 block">{{ 'Description' | translate }}</label>
           <textarea id="description" formControlName="description" rows="3" pInputTextarea class="w-full"></textarea>
-          <div class="text-danger" *ngIf="couponForm.get('description')?.invalid && couponForm.get('description')?.touched">
+          <div class="text-danger mt-1" *ngIf="couponForm.get('description')?.invalid && couponForm.get('description')?.touched">
             <div *ngIf="couponForm.get('description')?.errors?.['required']">
               {{ 'This field is required' | translate }}
             </div>
@@ -255,9 +173,291 @@
           </div>
         </div>
       </div>
-    </p-panel>
+    </div>
 
-    <div class="mt-4 text-end">
+    <!-- Section 2: Product Targeting -->
+    <div class="form-section-card">
+      <div class="section-title">
+        <i class="pi pi-tags"></i>
+        <span>{{ 'Product Applicability' | translate }}</span>
+      </div>
+
+      <div class="formgrid grid">
+        <!-- Is General -->
+        <div class="field col-12 flex justify-content-between align-items-center mb-3">
+          <div>
+            <h5 class="m-0 font-bold">{{ 'General Coupon' | translate }}</h5>
+            <small class="text-500">{{ 'Apply this coupon to all items across the platform' | translate }}</small>
+          </div>
+          <p-inputSwitch formControlName="isGenral"></p-inputSwitch>
+        </div>
+
+        <!-- Trips & Rooms if not isGenral -->
+        <div
+          class="col-12 grid border-1 border-dashed surface-border border-round p-3 bg-light mx-0 mb-2 mt-2"
+          *ngIf="!couponForm.get('isGenral')?.value"
+        >
+          <div class="field col-12 md:col-6">
+            <span class="p-fluid">
+              <label for="tripIds" class="font-semibold mb-1 block">{{ 'Select Trips' | translate }}</label>
+              <p-multiSelect
+                formControlName="tripIds"
+                [options]="tripsOptions$ | async"
+                display="comma"
+                class="w-full"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="{{ 'Select Trips' | translate }}"
+                [filter]="true"
+                appendTo="body"
+              ></p-multiSelect>
+            </span>
+          </div>
+
+          <div class="field col-12 md:col-6">
+            <span class="p-fluid">
+              <label for="roomIds" class="font-semibold mb-1 block">{{ 'Select Rooms' | translate }}</label>
+              <p-multiSelect
+                formControlName="roomIds"
+                [options]="roomsOptions$ | async"
+                display="comma"
+                class="w-full"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="{{ 'Select Rooms' | translate }}"
+                [filter]="true"
+                appendTo="body"
+              ></p-multiSelect>
+            </span>
+          </div>
+
+          <div class="field col-12 md:col-6">
+            <span class="p-fluid">
+              <label for="outingIds" class="font-semibold mb-1 block">{{ 'Select Outings' | translate }}</label>
+              <p-multiSelect
+                formControlName="outingIds"
+                [options]="outingsOptions$ | async"
+                display="comma"
+                class="w-full"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="{{ 'Select Outings' | translate }}"
+                [filter]="true"
+                appendTo="body"
+              ></p-multiSelect>
+            </span>
+          </div>
+
+          <div class="field col-12 md:col-6">
+            <span class="p-fluid">
+              <label for="hajjIds" class="font-semibold mb-1 block">{{ 'Select Hajj/Umrah' | translate }}</label>
+              <p-multiSelect
+                formControlName="hajjIds"
+                [options]="hajjOptions$ | async"
+                display="comma"
+                class="w-full"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="{{ 'Select Hajj/Umrah' | translate }}"
+                [filter]="true"
+                appendTo="body"
+              ></p-multiSelect>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: Targeting Settings -->
+    <div class="form-section-card">
+      <div class="section-title">
+        <i class="pi pi-users"></i>
+        <span>{{ 'Targeting Settings' | translate }}</span>
+      </div>
+
+      <!-- Choose Audience Mode -->
+      <div class="flex flex-column align-items-center mb-4 pt-3 pb-3 bg-light border-round">
+        <label class="font-semibold text-lg mb-2 text-600">{{ 'Who should receive this coupon?' | translate }}</label>
+        <div class="custom-segmented-control flex p-1 surface-200 border-round">
+          <button 
+            type="button" 
+            class="segmented-btn border-none border-round px-4 py-2 font-bold cursor-pointer transition-all"
+            [class.active]="couponForm.get('audienceType')?.value === 'all'"
+            (click)="setAudienceType('all')"
+          >
+            {{ lang === 'ar' ? 'جميع المستخدمين (عام)' : 'All Users (General)' }}
+          </button>
+          <button 
+            type="button" 
+            class="segmented-btn border-none border-round px-4 py-2 font-bold cursor-pointer transition-all"
+            [class.active]="couponForm.get('audienceType')?.value === 'filter'"
+            (click)="setAudienceType('filter')"
+          >
+            {{ lang === 'ar' ? 'تصفية الجمهور المستهدف' : 'Filter Target Audience' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Specific Audience Filters (Visible only when audienceType === 'filter') -->
+      <div class="audience-filters-container grid mx-0" *ngIf="couponForm.get('audienceType')?.value === 'filter'">
+        <!-- Anonymous Users Card -->
+        <div class="col-12 col-md-6 mb-3">
+          <div class="card p-3 border-1 surface-border border-round hover-shadow transition-all bg-white">
+            <div class="flex align-items-center justify-content-between">
+              <div class="flex align-items-center">
+                <i class="pi pi-user-minus text-2xl text-primary mr-3"></i>
+                <div>
+                  <h5 class="m-0 font-bold">{{ 'Anonymous Users' | translate }}</h5>
+                  <small class="text-500">{{ 'Target users who are not logged in' | translate }}</small>
+                </div>
+              </div>
+              <p-inputSwitch id="anonymous" formControlName="anonymous"></p-inputSwitch>
+            </div>
+          </div>
+        </div>
+
+        <!-- Logged-in Users Card -->
+        <div class="col-12 col-md-6 mb-3">
+          <div class="card p-3 border-1 surface-border border-round hover-shadow transition-all bg-white">
+            <div class="flex align-items-center justify-content-between">
+              <div class="flex align-items-center">
+                <i class="pi pi-user-plus text-2xl text-success mr-3"></i>
+                <div>
+                  <h5 class="m-0 font-bold">{{ 'Logged In Users' | translate }}</h5>
+                  <small class="text-500">{{ 'Target registered and authenticated customers' | translate }}</small>
+                </div>
+              </div>
+              <p-inputSwitch id="loginUser" formControlName="loginUser"></p-inputSwitch>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sub-Filters for Logged-in Users (Visible only when loginUser is checked) -->
+        <div class="col-12" *ngIf="couponForm.get('loginUser')?.value">
+          <div class="p-4 border-round surface-100 border-1 border-dashed surface-border mb-4">
+            <h5 class="text-primary font-bold mb-3">
+              <i class="pi pi-filter mr-2"></i>{{ 'Booking Status Filters' | translate }}
+            </h5>
+            <p class="text-500 mb-4">{{ 'Narrow down target logged-in users based on their reservation history' | translate }}</p>
+
+            <div class="grid">
+              <!-- Logged In Zero Bookings -->
+              <div class="col-12 col-md-4 mb-2">
+                <div class="flex align-items-center justify-content-between bg-white p-3 border-round border-1 surface-border">
+                  <div class="flex align-items-center">
+                    <i class="pi pi-ban text-orange-500 mr-2"></i>
+                    <span>{{ 'Zero Bookings' | translate }}</span>
+                  </div>
+                  <p-inputSwitch id="loggedInZeroBookings" formControlName="loggedInZeroBookings"></p-inputSwitch>
+                </div>
+              </div>
+
+              <!-- Completed Bookings -->
+              <div class="col-12 col-md-4 mb-2">
+                <div class="flex align-items-center justify-content-between bg-white p-3 border-round border-1 surface-border">
+                  <div class="flex align-items-center">
+                    <i class="pi pi-check-circle text-green-500 mr-2"></i>
+                    <span>{{ 'Completed Bookings' | translate }}</span>
+                  </div>
+                  <p-inputSwitch id="completedBookings" formControlName="completedBookings"></p-inputSwitch>
+                </div>
+              </div>
+
+              <!-- Cancelled Bookings -->
+              <div class="col-12 col-md-4 mb-2">
+                <div class="flex align-items-center justify-content-between bg-white p-3 border-round border-1 surface-border">
+                  <div class="flex align-items-center">
+                    <i class="pi pi-times-circle text-red-500 mr-2"></i>
+                    <span>{{ 'Cancelled Bookings' | translate }}</span>
+                  </div>
+                  <p-inputSwitch id="cancelledBookings" formControlName="cancelledBookings"></p-inputSwitch>
+                </div>
+              </div>
+            </div>
+
+            <!-- Specific Customer Selection -->
+            <div class="field col-12 mt-4 p-0">
+              <span class="p-fluid">
+                <label for="usersId" class="font-bold mb-2 block">
+                  <i class="pi pi-users mr-1"></i>{{ 'Select Specific Customers (Optional)' | translate }}
+                </label>
+                <p-multiSelect
+                  id="usersId"
+                  formControlName="usersId"
+                  [options]="customers"
+                  optionLabel="name"
+                  optionValue="id"
+                  placeholder="{{ 'Search and Select Specific Customers' | translate }}"
+                  [filter]="true"
+                  (onFilter)="onFilterCustomers($event)"
+                  [loading]="customersLoading"
+                  display="chip"
+                  class="w-full"
+                  appendTo="body"
+                ></p-multiSelect>
+              </span>
+              <small class="text-500 mt-1 block">{{ 'Leave empty to target all logged-in users matching the booking criteria above' | translate }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- General Info Alert when all users targeted -->
+      <div class="col-12 p-3 bg-blue-50 border-round border-left-3 border-blue-500 mb-4" *ngIf="couponForm.get('audienceType')?.value === 'all'">
+        <div class="flex align-items-center">
+          <i class="pi pi-info-circle text-blue-500 text-2xl mr-3"></i>
+          <div>
+            <h5 class="m-0 font-bold text-blue-800">{{ 'General Audience Mode' | translate }}</h5>
+            <p class="m-0 text-blue-700 text-sm">{{ 'This coupon code will be active and redeemable by all anonymous and logged-in customers.' | translate }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Dispatch Options -->
+    <div class="form-section-card">
+      <div class="section-title">
+        <i class="pi pi-send"></i>
+        <span>{{ 'Delivery Dispatch Options' | translate }}</span>
+      </div>
+
+      <div class="grid mx-0">
+        <!-- Send via Email Card -->
+        <div class="col-12 col-md-6 mb-3">
+          <div class="card p-3 border-1 surface-border border-round hover-shadow transition-all bg-white">
+            <div class="flex align-items-center justify-content-between">
+              <div class="flex align-items-center">
+                <i class="pi pi-envelope text-2xl text-blue-500 mr-3"></i>
+                <div>
+                  <h5 class="m-0 font-bold">{{ 'Email Dispatch' | translate }}</h5>
+                  <small class="text-500">{{ 'Automatically email code to targeted users' | translate }}</small>
+                </div>
+              </div>
+              <p-inputSwitch id="sendViaEmail" formControlName="sendViaEmail"></p-inputSwitch>
+            </div>
+          </div>
+        </div>
+
+        <!-- Send via Push Notification Card -->
+        <div class="col-12 col-md-6 mb-3">
+          <div class="card p-3 border-1 surface-border border-round hover-shadow transition-all bg-white">
+            <div class="flex align-items-center justify-content-between">
+              <div class="flex align-items-center">
+                <i class="pi pi-bell text-2xl text-yellow-500 mr-3"></i>
+                <div>
+                  <h5 class="m-0 font-bold">{{ 'Push Notification' | translate }}</h5>
+                  <small class="text-500">{{ 'Broadcast push notification to devices' | translate }}</small>
+                </div>
+              </div>
+              <p-inputSwitch id="sendViaNotification" formControlName="sendViaNotification"></p-inputSwitch>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="mt-4 mb-4 text-end">
       <p-button label="{{ 'Cancel' | translate }}" class="mx-1" severity="secondary" (onClick)="onCancel()"></p-button>
       <p-button
         label="{{ 'Save Coupon' | translate }}"
@@ -270,3 +470,5 @@
     </div>
   </form>
 </div>
+
+

@@ -659,5 +659,10 @@
   "Amount (EGP)": "المبلغ (جنيه مصري)",
   "Wallet balance adjusted successfully": "تم تعديل رصيد المحفظة بنجاح",
   "Failed to adjust wallet balance": "فشل تعديل رصيد المحفظة",
-  "Adjust Balance": "تعديل الرصيد"
+  "Adjust Balance": "تعديل الرصيد",
+  "outingDate": "تاريخ الرحلة",
+  "Adjust Wallet Balance": "تعديل رصيد المحفظة",
+  "Amount to Deduct": "المبلغ المراد خصمه",
+  "Cannot deduct more than the current balance": "لا يمكن خصم مبلغ أكبر من الرصيد الحالي",
+  "Enter a negative value (e.g., -100) to deduct balance.": "أدخل قيمة سالبة (مثال: 100-) لخصم الرصيد."
 }

@@ -1066,6 +1066,7 @@ export interface OutingReservation {
   couponRate: number
   from: string
   to: string
+  outingDate?: string
   allowedToSettlement: boolean
   allowedToRefund: boolean
   isPartial: boolean

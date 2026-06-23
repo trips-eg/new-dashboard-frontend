@@ -320,6 +320,11 @@ const routes: Routes = [
           import('./demo/pages/settings/coupons/coupon-details/coupon-details.component').then((m) => m.CouponDetailsComponent)
       },
       {
+        path: 'coupon-settings',
+        loadComponent: () =>
+          import('./demo/pages/settings/coupons/coupon-settings/coupon-settings.component').then((m) => m.CouponSettingsComponent)
+      },
+      {
         path: 'room-groups',
         loadComponent: () => import('./demo/pages/settings/room-groups/room-groups.component').then((m) => m.RoomGroupsComponent)
       },

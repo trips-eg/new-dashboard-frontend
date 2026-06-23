@@ -364,8 +364,7 @@
                   <tr>
                     <th>{{ 'Outing Name' | translate }}</th>
                     <th>{{ 'Company' | translate }}</th>
-                    <th>{{ 'from' | translate }}</th>
-                    <th>{{ 'to' | translate }}</th>
+                    <th>{{ 'outingDate' | translate }}</th>
                     <th>{{ 'startTime' | translate }}</th>
                     <th>{{ 'endTime' | translate }}</th>
                     <th>{{ 'Count Details' | translate }}</th>
@@ -384,8 +383,7 @@
                         {{ outing.companyDto?.name }}
                       </a>
                     </td>
-                    <td>{{ outing.from | date: 'mediumDate' }}</td>
-                    <td>{{ outing.to | date: 'mediumDate' }}</td>
+                    <td>{{ outing.outingDate | date: 'mediumDate' }}</td>
                     <td>{{ outing.startTime || '--' }}</td>
                     <td>{{ outing.endTime || '--' }}</td>
                     <td>

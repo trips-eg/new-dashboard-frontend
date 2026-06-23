@@ -28,42 +28,41 @@
       </th>
       <th style="min-width: 200px">{{ 'customer' | translate }}</th>
       <th style="min-width: 200px">{{ 'reservationDate' | translate }}</th>
-      <th style="min-width: 150px">{{ 'from' | translate }}</th>
-      <th style="min-width: 150px">{{ 'to' | translate }}</th>
+      <th style="min-width: 150px">{{ 'outingDate' | translate }}</th>
       <th style="min-width: 120px">{{ 'startTime' | translate }}</th>
       <th style="min-width: 120px">{{ 'endTime' | translate }}</th>
       <th style="min-width: 200px" *ngIf="showVendorColumn">{{ 'vendorName' | translate }}</th>
-
+      
       <th style="min-width: 200px">{{ 'isVendorSettled' | translate }}</th>
       <th style="min-width: 200px">{{ 'productPrice' | translate }}</th>
       <th style="min-width: 200px">{{ 'isVatIncluded' | translate }}</th>
       <th style="min-width: 200px">{{ 'salesTaxRate' | translate }}</th>
       <th style="min-width: 200px">{{ 'salesTaxValue' | translate }}</th>
       <th style="min-width: 200px">{{ 'priceAfterSalesTax' | translate }}</th>
-
+      
       <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'salesRate' | translate }}</th>
       <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'salesRateValue' | translate }}</th>
-
+      
       <th style="min-width: 200px">{{ 'tripsRate' | translate }}</th>
       <th style="min-width: 200px">{{ 'tripsValue' | translate }}</th>
       <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'tripsCommissionVatRate' | translate }}</th>
       <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'tripsCommissionVatValue' | translate }}</th>
-
+      
       <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'tripsProfitAfterCoupon' | translate }}</th>
       <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'tripsProfitAfterSalesRate' | translate }}</th>
-
+      
       <th style="min-width: 200px">{{ 'vendorProfitBeforeCoupon' | translate }}</th>
       <th style="min-width: 200px">{{ 'vendorProfitAfterCoupon' | translate }}</th>
-
+      
       <th style="min-width: 200px">{{ 'vendorRemainingFromTrips' | translate }}</th>
       <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'clientPaid' | translate }}</th>
-
+      
       <th style="min-width: 200px">{{ 'couponCode' | translate }}</th>
       <th style="min-width: 200px">{{ 'couponRate' | translate }}</th>
       <th style="min-width: 200px">{{ 'couponValue' | translate }}</th>
-
+      
       <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'isSalesSettled' | translate }}</th>
-
+      
       <th style="min-width: 250px">{{ 'countDetails' | translate }}</th>
       <th style="min-width: 150px">{{ 'status' | translate }}</th>
       <th *ngIf="!isVendor()" style="min-width: 150px">{{ 'actions' | translate }}</th>
@@ -93,8 +92,7 @@
         </span>
       </td>
       <td>{{ outing.reservationDate | date: 'short' }}</td>
-      <td>{{ outing.from | date: 'mediumDate' }}</td>
-      <td>{{ outing.to | date: 'mediumDate' }}</td>
+      <td>{{ outing.outingDate | date: 'mediumDate' }}</td>
       <td>{{ outing.startTime || '--' }}</td>
       <td>{{ outing.endTime || '--' }}</td>
 

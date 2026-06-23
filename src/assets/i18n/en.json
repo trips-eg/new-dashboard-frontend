@@ -672,5 +672,10 @@
   "Amount (EGP)": "Amount (EGP)",
   "Wallet balance adjusted successfully": "Wallet balance adjusted successfully",
   "Failed to adjust wallet balance": "Failed to adjust wallet balance",
-  "Adjust Balance": "Adjust Balance"
+  "Adjust Balance": "Adjust Balance",
+  "outingDate": "Outing Date",
+  "Adjust Wallet Balance": "Adjust Wallet Balance",
+  "Amount to Deduct": "Amount to Deduct",
+  "Cannot deduct more than the current balance": "Cannot deduct more than the current balance",
+  "Enter a negative value (e.g., -100) to deduct balance.": "Enter a negative value (e.g., -100) to deduct balance."
 }

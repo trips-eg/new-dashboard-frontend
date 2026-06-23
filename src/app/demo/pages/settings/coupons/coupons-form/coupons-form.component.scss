@@ -1,0 +1,84 @@
+.form-section-card {
+  background-color: var(--surface-card, #ffffff);
+  border: 1px solid var(--surface-border, #e9ecef);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+  }
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-color, #2196f3);
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid var(--surface-border, #e9ecef);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.75rem;
+  
+  i {
+    font-size: 1.4rem;
+    margin-right: 0.5rem;
+    color: var(--primary-color, #2196f3);
+  }
+}
+
+.audience-filters-container {
+  .card {
+    background-color: var(--surface-card, #ffffff);
+    border: 1px solid var(--surface-border, #e9ecef);
+    transition: all 0.25s ease-in-out;
+    border-radius: 8px;
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border-color: var(--primary-color, #2196f3);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.custom-segmented-control {
+  background-color: var(--surface-200, #e9ecef);
+  display: inline-flex;
+  gap: 4px;
+  
+  .segmented-btn {
+    background-color: transparent;
+    color: var(--text-color, #495057);
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    
+    &.active {
+      background-color: var(--primary-color, #2196f3);
+      color: var(--primary-color-text, #ffffff);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+    
+    &:hover:not(.active) {
+      background-color: var(--surface-300, #dee2e6);
+    }
+  }
+}
+
+.bg-light {
+  background-color: var(--surface-hover, #f8f9fa);
+}
+
+.transition-all {
+  transition: all 0.25s ease-in-out;
+}
+
+.hover-shadow {
+  &:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+  }
+}

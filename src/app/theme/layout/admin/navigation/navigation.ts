@@ -473,6 +473,16 @@ const NavigationItems = [
         icon: 'fa-solid fa-square-check',
         breadcrumbs: false,
         permissions: [Permissions.CouponsCreate]
+      },
+      {
+        id: 'coupon-settings',
+        title: 'coupon settings',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/coupon-settings',
+        icon: 'fa-solid fa-gear',
+        breadcrumbs: false,
+        permissions: [Permissions.CouponsCreate]
       }
     ]
   },

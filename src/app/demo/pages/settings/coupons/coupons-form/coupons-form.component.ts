@@ -12,6 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { OutingService } from 'src/app/shared/services/outing.service';
 import { HajjUmmrahService } from 'src/app/shared/services/hajj-ummrah.service';
+import { CustomerService } from 'src/app/shared/services/customer.service';
 
 @Component({
   selector: 'app-coupons-form',
@@ -33,6 +34,7 @@ export class CouponsFormComponent implements OnInit {
   Router = inject(Router);
   OutingService = inject(OutingService);
   HajjUmmrahService = inject(HajjUmmrahService);
+  CustomerService = inject(CustomerService);
   lang = this.TranslateService.currentLang;
 
   // خيارات نوع الخصم
@@ -63,6 +65,38 @@ export class CouponsFormComponent implements OnInit {
     )
   );
 
+  // تعيين نوع الجمهور المستهدف
+  setAudienceType(type: string) {
+    this.couponForm.get('audienceType')?.setValue(type);
+  }
+
+  // قائمة العملاء لتحميلها
+  customers: any[] = [];
+  customersLoading = false;
+
+  loadCustomers(search: string = '') {
+    this.customersLoading = true;
+    this.CustomerService.getAllCustomers({
+      pageIndex: 1,
+      pageSize: 500,
+      search: search
+    }).subscribe({
+      next: (res: any) => {
+        this.customers = res?.data?.data || [];
+        this.customersLoading = false;
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.customersLoading = false;
+      }
+    });
+  }
+
+  onFilterCustomers(event: any) {
+    const search = event.filter || '';
+    this.loadCustomers(search);
+  }
+
   createForm() {
     this.couponForm = this.fb.group({
       code: ['', Validators.required],
@@ -78,6 +112,17 @@ export class CouponsFormComponent implements OnInit {
       roomIds: [[]],
       outingIds: [[]],
       hajjIds: [[]],
+      // نوع الجمهور المستهدف
+      audienceType: ['all'],
+      // حقول الاستهداف والإشعارات الجديدة
+      usersId: [[]],
+      loginUser: [true],
+      anonymous: [true],
+      loggedInZeroBookings: [true],
+      completedBookings: [true],
+      cancelledBookings: [true],
+      sendViaEmail: [true],
+      sendViaNotification: [true],
       // حقول Buy X Get X الجديدة
       buyQuantity: [null],
       getQuantity: [null],
@@ -87,6 +132,48 @@ export class CouponsFormComponent implements OnInit {
     // عند تغيير نوع الخصم نحدث الـ validation ديناميكياً
     this.couponForm.get('discountType')?.valueChanges.subscribe(val => {
       this.updateValidationByType(val);
+    });
+
+    // عند تغيير نوع الجمهور نقوم بتحديث القيم الافتراضية
+    this.couponForm.get('audienceType')?.valueChanges.subscribe(val => {
+      if (val === 'all') {
+        this.couponForm.patchValue({
+          loginUser: true,
+          anonymous: true,
+          loggedInZeroBookings: true,
+          completedBookings: true,
+          cancelledBookings: true,
+          usersId: []
+        });
+      } else {
+        // عند اختيار تصفية مخصصة، نضع قيم افتراضية واضحة للبدء
+        this.couponForm.patchValue({
+          loginUser: true,
+          anonymous: false,
+          loggedInZeroBookings: true,
+          completedBookings: true,
+          cancelledBookings: true,
+          usersId: []
+        });
+      }
+    });
+
+    // مراقبة loginUser لإفراغ usersId وتصفير حقول الحجز عند إلغاء تفعيله
+    this.couponForm.get('loginUser')?.valueChanges.subscribe(val => {
+      if (!val) {
+        this.couponForm.patchValue({
+          usersId: [],
+          loggedInZeroBookings: false,
+          completedBookings: false,
+          cancelledBookings: false
+        });
+      } else {
+        this.couponForm.patchValue({
+          loggedInZeroBookings: true,
+          completedBookings: true,
+          cancelledBookings: true
+        });
+      }
     });
   }
 
@@ -122,6 +209,7 @@ export class CouponsFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.createForm();
+    this.loadCustomers();
   }
 
   roomsOptions$ = this.RoomService.getAllRooms({ pageIndex: 1, pageSize: 1000 }).pipe(
@@ -177,14 +265,32 @@ export class CouponsFormComponent implements OnInit {
     }
 
     const formValue = this.couponForm.value;
+    const isAll = formValue.audienceType === 'all';
+
     const trimmedValue = {
       ...formValue,
       code: formValue.code?.trim() || '',
       description: formValue.description?.trim() || '',
-			buyQuantity: formValue.buyQuantity ?? 0,
-			getQuantity: formValue.getQuantity ?? 0,
-			maxFreeQuantity: formValue.maxFreeQuantity ?? 0
+      buyQuantity: formValue.buyQuantity ?? 0,
+      getQuantity: formValue.getQuantity ?? 0,
+      maxFreeQuantity: formValue.maxFreeQuantity ?? 0,
+      startDate: formValue.startDate ? new Date(formValue.startDate).toISOString() : new Date().toISOString(),
+      endDate: formValue.endDate ? new Date(formValue.endDate).toISOString() : new Date().toISOString(),
+      tripIds: formValue.tripIds || [],
+      roomIds: formValue.roomIds || [],
+      outingIds: formValue.outingIds || [],
+      hajjIds: formValue.hajjIds || [],
+      usersId: isAll ? [] : (formValue.usersId || []),
+      loginUser: isAll ? true : (formValue.loginUser ?? false),
+      anonymous: isAll ? true : (formValue.anonymous ?? false),
+      loggedInZeroBookings: isAll ? true : (formValue.loggedInZeroBookings ?? false),
+      completedBookings: isAll ? true : (formValue.completedBookings ?? false),
+      cancelledBookings: isAll ? true : (formValue.cancelledBookings ?? false),
+      sendViaEmail: formValue.sendViaEmail ?? true,
+      sendViaNotification: formValue.sendViaNotification ?? true
     };
+
+    delete (trimmedValue as any).audienceType;
 
     console.log(trimmedValue);
 
@@ -204,3 +310,5 @@ export class CouponsFormComponent implements OnInit {
     this.Router.navigate(['/coupons']);
   }
 }
+
+

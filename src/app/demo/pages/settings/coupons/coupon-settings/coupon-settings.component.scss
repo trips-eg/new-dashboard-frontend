@@ -1,0 +1,69 @@
+/* Premium UI Transitions & Animations */
+.animate-fadein {
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Card hover styles */
+.card {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--surface-border) !important;
+  background-color: var(--surface-card);
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(149, 157, 165, 0.12) !important;
+    border-color: var(--primary-color) !important;
+  }
+}
+
+/* TabView premium styling override */
+::ng-deep {
+  .p-tabview {
+    .p-tabview-nav {
+      border-bottom: 2px solid var(--surface-border);
+      li {
+        .p-tabview-nav-link {
+          font-weight: 600;
+          transition: color 0.2s, border-color 0.2s;
+          display: flex;
+          align-items: center;
+          &:not(.p-disabled):focus {
+            box-shadow: none;
+          }
+        }
+        &.p-highlight .p-tabview-nav-link {
+          border-color: var(--primary-color);
+          color: var(--primary-color);
+        }
+      }
+    }
+    .p-tabview-panels {
+      padding: 1.5rem 0 0 0;
+    }
+  }
+
+  .p-inputgroup-addon {
+    background-color: var(--surface-100);
+    border-color: var(--surface-border);
+    color: var(--text-color-secondary);
+  }
+}
+
+.fs-6 {
+  font-size: 0.9rem !important;
+}
+
+.max-w-20rem {
+  max-width: 25rem;
+}

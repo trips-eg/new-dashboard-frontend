@@ -211,7 +211,19 @@ export class APIs {
     setcoupons: 'Coupons/AddCoupons',
     deletecoupons: 'Coupons/DeleteCoupons?id=',
     getusedcoupons: 'Coupons/GetAllUsedCoupons',
-    getcouponById: 'Coupons/GetCouponsById?id='
+    getcouponById: 'Coupons/GetCouponsById?id=',
+    getAllSettings: 'Coupons/Settings/GetAll',
+    updateSettings: 'Coupons/Settings/Update',
+    getWeekend: 'Coupons/Settings/Weekend',
+    updateWeekend: 'Coupons/Settings/Weekend',
+    getBirthday: 'Coupons/Settings/Birthday',
+    updateBirthday: 'Coupons/Settings/Birthday',
+    getRecovery: 'Coupons/Settings/Recovery',
+    updateRecovery: 'Coupons/Settings/Recovery',
+    getWeekendItems: 'Coupons/Settings/GetWeekendCouponItems',
+    updateWeekendItems: 'Coupons/Settings/UpdateWeekendCouponItems',
+    getBirthdayItems: 'Coupons/Settings/GetBirthdayCouponItems',
+    updateBirthdayItems: 'Coupons/Settings/UpdateBirthdayCouponItems'
   };
   public static roomGroups = {
     GetAllroomGroups: 'RoomGroups/GetAllRoomGroups',

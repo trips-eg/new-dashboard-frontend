@@ -216,7 +216,15 @@ export class CustomerDetailComponent implements OnInit {
   }
 
   submitAdjustment() {
-    if (!this.customerId || !this.adjustAmount || this.adjustAmount <= 0) return;
+    if (!this.customerId || !this.adjustAmount || this.adjustAmount === 0) return;
+    if (this.adjustAmount < 0 && (this.walletBalance + this.adjustAmount < 0)) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Cannot deduct more than the current balance'
+      });
+      return;
+    }
 
     this.isSubmittingAdjustment = true;
 
