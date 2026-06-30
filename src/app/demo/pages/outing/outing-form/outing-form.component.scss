@@ -1,0 +1,532 @@
+// Outing Form Component SCSS
+@import 'src/scss/settings/color-variables';
+
+h2 {
+  margin-bottom: 2rem;
+  color: var(--main-color, #2db9be);
+  font-weight: 700;
+}
+
+.main {
+  padding: 24px 30px;
+  background-color: #f8fafc; // Soft background for the entire form area
+  min-height: 100vh;
+}
+
+.product-form {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+// Stepper customizations
+:host ::ng-deep {
+  .p-stepper {
+    background: transparent;
+    border: none;
+
+    .p-stepper-nav {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+      border: 1px solid #f1f5f9;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: nowrap !important;
+      overflow-x: auto;
+      gap: 1rem;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+
+      &::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+      }
+    }
+
+    .p-stepper-header {
+      background: transparent;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      gap: 0.75rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+
+      .p-stepper-number {
+        font-size: 1rem;
+        font-weight: 700;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        background-color: #f1f5f9;
+        color: #64748b;
+        border: 2px solid #e2e8f0;
+      }
+
+      .p-stepper-title {
+        font-weight: 600;
+        color: #64748b;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+      }
+
+      &:hover {
+        .p-stepper-number {
+          border-color: var(--main-color, #2db9be);
+          color: var(--main-color, #2db9be);
+        }
+        .p-stepper-title {
+          color: var(--main-color, #2db9be);
+        }
+      }
+
+      &.p-highlight {
+        .p-stepper-number {
+          background: var(--main-color, #2db9be);
+          color: #ffffff;
+          border-color: var(--main-color, #2db9be);
+          box-shadow: 0 0 12px rgba(45, 185, 190, 0.3);
+        }
+        .p-stepper-title {
+          color: var(--secondary, #21345c);
+          font-weight: 700;
+        }
+      }
+    }
+
+    .p-stepper-separator {
+      background-color: #cbd5e1;
+      height: 2px;
+      flex-grow: 1;
+      min-width: 2rem;
+      transition: background-color 0.3s;
+    }
+
+    .p-stepper-panels {
+      background: transparent;
+      padding: 0;
+    }
+
+    // Input overrides inside stepper
+    .p-inputtext, .p-dropdown, .p-calendar, .p-inputnumber, .p-multiselect, textarea, textarea[pInputTextarea] {
+      border-radius: 8px !important;
+      border: 1px solid #cbd5e1;
+      transition: all 0.2s ease-in-out;
+      font-family: inherit;
+
+      &:focus, &.p-focus {
+        border-color: var(--main-color, #2db9be) !important;
+        box-shadow: 0 0 0 3px rgba(45, 185, 190, 0.15) !important;
+        outline: none;
+      }
+    }
+
+    .p-multiselect-label {
+      padding: 0.5rem 0.75rem !important;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      align-items: center;
+    }
+  }
+
+  // Panel Custom Overrides
+  .custom-panel.p-panel {
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+
+    .p-panel-header {
+      background: #ffffff !important;
+      border: none !important;
+      border-bottom: 1px solid #f1f5f9 !important;
+      padding: 1.25rem 1.5rem !important;
+      color: var(--secondary, #21345c) !important;
+      font-weight: 700 !important;
+      font-size: 1.1rem;
+    }
+
+    .p-panel-content {
+      border: none !important;
+      padding: 1.5rem !important;
+      background: #ffffff !important;
+    }
+  }
+
+  // Editor styling integration
+  .p-editor-container {
+    .p-editor-toolbar {
+      border-radius: 8px 8px 0 0 !important;
+      border: 1px solid #cbd5e1 !important;
+      border-bottom: none !important;
+      background: #f8fafc;
+    }
+    .p-editor-content {
+      border-radius: 0 0 8px 8px !important;
+      border: 1px solid #cbd5e1 !important;
+      .ql-editor {
+        min-height: 120px;
+        font-family: inherit;
+      }
+    }
+  }
+}
+
+// Custom Premium UI Form Cards
+.ux-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.04);
+  }
+
+  .ux-card-header {
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+
+    .ux-card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    i {
+      font-size: 1.25rem;
+      color: var(--main-color, #2db9be);
+      background: rgba(45, 185, 190, 0.08);
+      padding: 0.6rem;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    h4, h3, h5 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--secondary, #21345c);
+    }
+  }
+}
+
+// Field wrapper styling
+.field {
+  margin-bottom: 1.5rem;
+  
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.9rem;
+  }
+}
+
+// Responsive switch buttons grid
+.ux-toggle-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.25s ease;
+  height: 100%;
+
+  &.active {
+    background: rgba(45, 185, 190, 0.03);
+    border-color: var(--main-color, #2db9be);
+    box-shadow: 0 2px 8px rgba(45, 185, 190, 0.05);
+
+    label {
+      color: var(--secondary, #21345c);
+      font-weight: 700;
+    }
+  }
+
+  label {
+    margin: 0;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+}
+
+// Date Period Card (connector layouts)
+.date-period-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  transition: all 0.25s ease;
+  position: relative;
+
+  &:hover {
+    border-color: #cbd5e1;
+    background-color: #f1f5f9;
+  }
+
+  .connector-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    height: 100%;
+    font-size: 1.1rem;
+
+    @media (max-width: 768px) {
+      transform: rotate(90deg);
+      margin: 0.5rem 0;
+    }
+  }
+}
+
+// Policies nested styles
+.policy-section-wrapper {
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+  padding: 1.25rem;
+  margin-top: 1rem;
+  transition: all 0.3s;
+}
+
+// Action buttons positioning
+.buttons {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+
+  ::ng-deep .p-button {
+    border-radius: 8px !important;
+    font-weight: 600;
+    padding: 0.6rem 1.5rem;
+    transition: all 0.2s;
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// Custom Choice-Card selectors
+.ux-selection-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  height: 100%;
+  text-align: left;
+
+  &:hover {
+    border-color: var(--main-color, #2db9be);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(45, 185, 190, 0.05);
+  }
+
+  &.active {
+    border-color: var(--main-color, #2db9be);
+    background: rgba(45, 185, 190, 0.02);
+    box-shadow: 0 4px 15px rgba(45, 185, 190, 0.1);
+
+    .card-icon {
+      background: var(--main-color, #2db9be);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(45, 185, 190, 0.3);
+    }
+  }
+
+  .card-header-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    width: 100%;
+    padding-right: 2rem;
+  }
+
+  .card-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 8px;
+    background: rgba(45, 185, 190, 0.08);
+    color: var(--main-color, #2db9be);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+  }
+
+  .card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--secondary, #21345c);
+    margin: 0;
+  }
+
+  .card-description {
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.4;
+    text-transform: none;
+  }
+
+  .card-radio-indicator {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.25rem;
+  }
+}
+
+.p-error {
+  color: #ef4444;
+  font-size: 0.775rem;
+  margin-top: 0.35rem;
+  font-weight: 600;
+  display: block;
+}
+
+// Table styling integration
+:host ::ng-deep {
+  .p-datatable {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+
+    .p-datatable-thead > tr > th {
+      background: #f8fafc;
+      color: var(--secondary, #21345c);
+      font-weight: 700;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .p-datatable-tbody > tr > td {
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+    }
+  }
+}
+
+// Premium Excel Upload Zone & Serial Badges
+.excel-upload-zone {
+  background: #ffffff;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: var(--main-color, #2db9be);
+    background: rgba(45, 185, 190, 0.02);
+  }
+
+  .upload-icon-wrapper {
+    background: rgba(45, 185, 190, 0.08);
+    color: var(--main-color, #2db9be);
+  }
+}
+
+.bg-light-blue {
+  background-color: rgba(45, 185, 190, 0.03) !important;
+}
+
+.serial-preview-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: #cbd5e1;
+    transform: translateY(-1px);
+  }
+}
+
+// Custom Weekday Button Picker
+.weekday-picker {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.weekday-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  background-color: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  color: #475569;
+  transition: all 0.2s ease-in-out;
+  user-select: none;
+
+  &:hover:not(:disabled) {
+    border-color: var(--main-color, #2db9be);
+    color: var(--main-color, #2db9be);
+    background-color: rgba(45, 185, 190, 0.04);
+    transform: scale(1.05);
+  }
+
+  &.active {
+    background-color: var(--main-color, #2db9be);
+    border-color: var(--main-color, #2db9be);
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(45, 185, 190, 0.25);
+  }
+
+  &:disabled {
+    background-color: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #94a3b8;
+    cursor: not-allowed;
+    text-decoration: line-through;
+    opacity: 0.7;
+  }
+}

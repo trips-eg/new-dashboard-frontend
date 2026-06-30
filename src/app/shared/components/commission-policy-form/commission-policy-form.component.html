@@ -1,0 +1,213 @@
+<div class="commission-policy-container position-relative">
+  <!-- Spinner for loading -->
+  <div *ngIf="isLoading" class="d-flex justify-content-center align-items-center py-5">
+    <i class="pi pi-spin pi-spinner text-primary" style="font-size: 2.5rem"></i>
+  </div>
+
+  <form *ngIf="!isLoading" [formGroup]="policyForm" (ngSubmit)="submitForm()" class="policy-form-layout">
+    <div class="row g-3">
+      <!-- Pricing Model Selection -->
+      <div class="col-12">
+        <label class="form-label fw-bold text-slate-700 mb-2 fs-6">
+          {{ 'Pricing Model' | translate }} <span class="text-danger">*</span>
+        </label>
+        
+        <!-- Horizontal grid for Pricing Model select cards -->
+        <div class="model-grid-layout d-grid gap-2 mb-3">
+          <!-- Option 1: Percentage -->
+          <div 
+            class="model-select-card d-flex flex-column align-items-center justify-content-center p-3 border rounded-3 cursor-pointer text-center position-relative transition-all"
+            [class.selected]="currentModel === PricingModel.Percentage"
+            (click)="selectPricingModel(PricingModel.Percentage)"
+          >
+            <div class="model-card-icon-wrapper rounded-circle percentage-bg d-flex align-items-center justify-content-center shadow-sm mb-2">
+              <i class="pi pi-percentage text-emerald-600"></i>
+            </div>
+            <span class="model-card-title fw-bold text-slate-800">{{ 'Percentage' | translate }}</span>
+            <div class="model-card-radio-dot mt-2" [class.checked]="currentModel === PricingModel.Percentage"></div>
+          </div>
+
+          <!-- Option 2: Fixed Amount -->
+          <div 
+            class="model-select-card d-flex flex-column align-items-center justify-content-center p-3 border rounded-3 cursor-pointer text-center position-relative transition-all"
+            [class.selected]="currentModel === PricingModel.FixedAmount"
+            (click)="selectPricingModel(PricingModel.FixedAmount)"
+          >
+            <div class="model-card-icon-wrapper rounded-circle fixed-bg d-flex align-items-center justify-content-center shadow-sm mb-2">
+              <i class="pi pi-tag text-indigo-600"></i>
+            </div>
+            <span class="model-card-title fw-bold text-slate-800">{{ 'Fixed Fee' | translate }}</span>
+            <div class="model-card-radio-dot mt-2" [class.checked]="currentModel === PricingModel.FixedAmount"></div>
+          </div>
+
+          <!-- Option 3: Committed Price -->
+          <div 
+            class="model-select-card d-flex flex-column align-items-center justify-content-center p-3 border rounded-3 cursor-pointer text-center position-relative transition-all"
+            [class.selected]="currentModel === PricingModel.CommittedPrice"
+            (click)="selectPricingModel(PricingModel.CommittedPrice)"
+          >
+            <div class="model-card-icon-wrapper rounded-circle committed-bg d-flex align-items-center justify-content-center shadow-sm mb-2">
+              <i class="pi pi-lock text-amber-600"></i>
+            </div>
+            <span class="model-card-title fw-bold text-slate-800">{{ 'Committed Net' | translate }}</span>
+            <div class="model-card-radio-dot mt-2" [class.checked]="currentModel === PricingModel.CommittedPrice"></div>
+          </div>
+        </div>
+
+        <!-- Dynamic UX Description Box -->
+        <div class="model-helper-alert p-3 rounded-3 mb-3 border bg-light-subtle d-flex gap-3 align-items-start">
+          <i class="pi pi-info-circle text-indigo-600 mt-1 fs-5"></i>
+          <div>
+            <span class="fw-bold d-block text-slate-800 text-xs uppercase mb-1">{{ 'Pricing Model Description' | translate }}</span>
+            <p class="text-muted text-xs m-0" *ngIf="currentModel === PricingModel.Percentage">
+              {{ 'Percentage Rate: Charge a percentage commission on the total selling price of the trip.' | translate }}
+            </p>
+            <p class="text-muted text-xs m-0" *ngIf="currentModel === PricingModel.FixedAmount">
+              {{ 'Fixed Fee: Charge a flat, fixed fee per booking regardless of the trip price.' | translate }}
+            </p>
+            <p class="text-muted text-xs m-0" *ngIf="currentModel === PricingModel.CommittedPrice">
+              {{ 'Committed Net Price: Set a fixed net price for the vendor; the difference between the base price and this net price becomes Trips commission.' | translate }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trips Commission Value Input (Percentage or Fixed Amount) -->
+      <div class="col-12" *ngIf="currentModel === PricingModel.Percentage || currentModel === PricingModel.FixedAmount">
+        <div class="form-group-custom p-3 rounded-3 border bg-light-subtle">
+          <label for="tripsCommissionValue" class="form-label-custom fw-bold text-slate-700 mb-2">
+            <span *ngIf="currentModel === PricingModel.Percentage">{{ 'Trips Commission Percentage' | translate }} (%)</span>
+            <span *ngIf="currentModel === PricingModel.FixedAmount">{{ 'Trips Commission Fixed Amount' | translate }} (EGP)</span>
+            <span class="text-danger">*</span>
+          </label>
+          <div class="input-wrapper position-relative">
+            <p-inputNumber
+              id="tripsCommissionValue"
+              formControlName="tripsCommissionValue"
+              [min]="0"
+              [max]="currentModel === PricingModel.Percentage ? 100 : null"
+              [suffix]="currentModel === PricingModel.Percentage ? '%' : ''"
+              mode="decimal"
+              [minFractionDigits]="0"
+              [maxFractionDigits]="2"
+              class="w-full"
+              styleClass="w-full custom-input-number"
+            ></p-inputNumber>
+          </div>
+          <small class="p-error block mt-1" *ngIf="policyForm.get('tripsCommissionValue')?.touched && policyForm.get('tripsCommissionValue')?.invalid">
+            {{ 'Please enter a valid commission value' | translate }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Company Net Price Input (Committed Price) -->
+      <div class="col-12" *ngIf="currentModel === PricingModel.CommittedPrice">
+        <div class="form-group-custom p-3 rounded-3 border bg-light-subtle">
+          <label for="companyNetPrice" class="form-label-custom fw-bold text-slate-700 mb-2">
+            {{ 'Company Net Price (Committed Price)' | translate }} (EGP) <span class="text-danger">*</span>
+          </label>
+          <div class="input-wrapper position-relative">
+            <p-inputNumber
+              id="companyNetPrice"
+              formControlName="companyNetPrice"
+              [min]="0"
+              [max]="basePrice"
+              mode="decimal"
+              [minFractionDigits]="0"
+              [maxFractionDigits]="2"
+              class="w-full"
+              styleClass="w-full custom-input-number"
+            ></p-inputNumber>
+          </div>
+          <small class="p-error block mt-1" *ngIf="policyForm.get('companyNetPrice')?.touched && policyForm.get('companyNetPrice')?.errors?.['max']">
+            {{ 'Net price cannot exceed the base price' | translate }} ({{ basePrice | number }} EGP)
+          </small>
+          <small class="p-error block mt-1" *ngIf="policyForm.get('companyNetPrice')?.touched && policyForm.get('companyNetPrice')?.errors?.['required']">
+            {{ 'Please enter a valid net price' | translate }}
+          </small>
+        </div>
+      </div>
+
+      <!-- Interactive Calculator Card (Visual UX aid) -->
+      <div class="col-12 mt-3" *ngIf="basePrice > 0">
+        <div class="projection-widget p-3 rounded-4 border shadow-sm">
+          <h6 class="fw-bold mb-3 text-slate-800 d-flex align-items-center gap-2">
+            <i class="pi pi-calculator text-indigo-600"></i>
+            <span>{{ 'Live Projections' | translate }}</span>
+          </h6>
+
+          <!-- Mathematical Flow Breakdown -->
+          <div class="projection-flow d-flex flex-column flex-md-row align-items-stretch align-items-md-center justify-content-between gap-2 p-1">
+            
+            <!-- Term 1 -->
+            <div class="projection-box text-center flex-grow-1 p-3 rounded-3 bg-white border">
+              <span class="box-label text-muted d-block mb-1 text-xs uppercase letter-spacing">
+                {{ (currentModel === PricingModel.CommittedPrice ? 'Customer Price (Selling)' : 'Product Base Price') | translate }}
+              </span>
+              <span class="box-value fw-bold text-slate-800 fs-5">
+                {{ calculatedSellingPrice | number }} <small class="text-xs text-muted">EGP</small>
+              </span>
+            </div>
+
+            <!-- Operator 1 -->
+            <div class="projection-operator align-self-center d-flex align-items-center justify-content-center rounded-circle border shadow-sm">
+              <span class="fw-bold text-secondary">-</span>
+            </div>
+
+            <!-- Term 2 -->
+            <div class="projection-box text-center flex-grow-1 p-3 rounded-3 bg-white border">
+              <span class="box-label text-muted d-block mb-1 text-xs uppercase letter-spacing">
+                {{ (currentModel === PricingModel.CommittedPrice ? 'Vendor Committed Net' : 'Commission Value') | translate }}
+              </span>
+              <span class="box-value fw-bold text-indigo-600 fs-5">
+                <span *ngIf="currentModel !== PricingModel.CommittedPrice">+</span>
+                {{ (currentModel === PricingModel.CommittedPrice ? (calculatedNetPrice | number) : (calculatedCommission | number)) }} 
+                <small class="text-xs text-muted">EGP</small>
+              </span>
+            </div>
+
+            <!-- Operator 2 -->
+            <div class="projection-operator align-self-center d-flex align-items-center justify-content-center rounded-circle border shadow-sm">
+              <span class="fw-bold text-secondary">=</span>
+            </div>
+
+            <!-- Term 3 (Final Result) -->
+            <div class="projection-box text-center flex-grow-1 p-3 rounded-3 final-box-bg shadow-sm">
+              <span class="box-label text-white-50 d-block mb-1 text-xs uppercase letter-spacing">
+                {{ (currentModel === PricingModel.CommittedPrice ? 'Trips Commission (Earnings)' : 'Net to Vendor') | translate }}
+              </span>
+              <span class="box-value fw-bold text-white fs-4">
+                <span *ngIf="currentModel === PricingModel.CommittedPrice">+</span>
+                {{ (currentModel === PricingModel.CommittedPrice ? (calculatedCommission | number) : (calculatedNetPrice | number)) }} 
+                <small class="text-xs text-white-50">EGP</small>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions (Only visible if not controlled by a parent stepper) -->
+    <div class="row mt-4" *ngIf="!isDialogMode">
+      <div class="col-12 d-flex justify-content-end gap-2 border-top pt-3">
+        <button
+          pButton
+          type="button"
+          label="{{ 'Cancel' | translate }}"
+          class="p-button-secondary p-button-outlined custom-btn-cancel"
+          (click)="cancel()"
+          [disabled]="isSaving"
+        ></button>
+        <button
+          pButton
+          type="submit"
+          label="{{ 'Save Policy' | translate }}"
+          icon="pi pi-check"
+          class="p-button-primary custom-btn-save"
+          [loading]="isSaving"
+        ></button>
+      </div>
+    </div>
+  </form>
+</div>

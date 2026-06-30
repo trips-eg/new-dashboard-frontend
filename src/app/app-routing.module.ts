@@ -429,6 +429,11 @@ const routes: Routes = [
           import('./demo/pages/settings/financial-settings/financial-settings.component').then((m) => m.FinancialSettingsComponent)
       },
       {
+        path: 'commission-policies',
+        loadComponent: () =>
+          import('./demo/pages/settings/commission-policies/commission-policies.component').then((m) => m.CommissionPoliciesComponent)
+      },
+      {
         path: 'notifications',
         loadComponent: () => import('./demo/pages/notifications/notifications.component').then((m) => m.NotificationsComponent)
       },

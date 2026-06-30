@@ -1,0 +1,307 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'Commission Policies' | translate"
+    [mainSection]="'Settings' | translate"
+    [subSection]="'Commission Policies' | translate"
+  ></sub-header>
+
+  <div class="p-4">
+    <!-- Controls Row: Tabs & Search -->
+    <div class="row g-3 mb-4 align-items-stretch">
+      <!-- Category Selection Tabs -->
+      <div class="col-12 col-lg-6">
+        <div class="tab-nav-wrapper p-2 bg-white rounded-3 shadow-sm border h-full d-flex align-items-center">
+          <div class="nav-pills-custom d-flex flex-wrap gap-2 w-full">
+            <button
+              type="button"
+              class="tab-btn btn d-flex align-items-center justify-content-center gap-2 flex-grow-1 flex-md-grow-0"
+              [class.active-tab]="activeTab === 'travels'"
+              (click)="onTabChange('travels')"
+            >
+              <i class="pi pi-send"></i>
+              <span>{{ 'Travels / Trips' | translate }}</span>
+            </button>
+            <button
+              type="button"
+              class="tab-btn btn d-flex align-items-center justify-content-center gap-2 flex-grow-1 flex-md-grow-0"
+              [class.active-tab]="activeTab === 'outings'"
+              (click)="onTabChange('outings')"
+            >
+              <i class="pi pi-compass"></i>
+              <span>{{ 'Outings' | translate }}</span>
+            </button>
+            <button
+              type="button"
+              class="tab-btn btn d-flex align-items-center justify-content-center gap-2 flex-grow-1 flex-md-grow-0"
+              [class.active-tab]="activeTab === 'hajj'"
+              (click)="onTabChange('hajj')"
+            >
+              <i class="pi pi-globe"></i>
+              <span>{{ 'Hajj & Umrah' | translate }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Search -->
+      <div class="col-12 col-md-6 col-lg-3">
+        <div class="search-card p-2 rounded-3 bg-white border shadow-sm h-full d-flex align-items-center">
+          <div class="search-input-wrapper position-relative w-full">
+            <i class="pi pi-search search-icon"></i>
+            <input
+              pInputText
+              type="text"
+              [(ngModel)]="searchedWord"
+              (input)="onSearch()"
+              placeholder="{{ 'search by product or vendor name ...' | translate }}"
+              class="w-full search-input"
+            />
+            <button 
+              *ngIf="searchedWord"
+              type="button"
+              class="btn-clear-search"
+              (click)="clearSearchFilter()"
+            >
+              <i class="pi pi-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Commission Model Filter -->
+      <div class="col-12 col-md-6 col-lg-3">
+        <div class="search-card p-2 rounded-3 bg-white border shadow-sm h-full d-flex align-items-center">
+          <div class="search-input-wrapper position-relative w-full">
+            <i class="pi pi-filter search-icon"></i>
+            <p-dropdown 
+              [options]="commissionModelOptions" 
+              [(ngModel)]="selectedPricingModel" 
+              (onChange)="dt.filter($event.value, 'ItemPricingPolicy.PricingModel', 'equals')"
+              [showClear]="true" 
+              placeholder="{{ 'All Models' | translate }}"
+              styleClass="w-full filter-dropdown-top border-0 bg-transparent shadow-none"
+            >
+              <ng-template let-option pTemplate="item">
+                <span>{{ option.label | translate }}</span>
+              </ng-template>
+              <ng-template let-selectedOption pTemplate="selectedItem">
+                <span>{{ selectedOption.label | translate }}</span>
+              </ng-template>
+            </p-dropdown>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Filters Row -->
+    <div *ngIf="selectedPricingModel || searchedWord" class="active-filters-wrapper d-flex flex-wrap align-items-center gap-2 mb-3 px-1">
+      <span class="active-filters-label text-xs text-secondary fw-semibold uppercase me-1">{{ 'Active Filters' | translate }}:</span>
+      
+      <!-- Search Term Chip -->
+      <div *ngIf="searchedWord" class="filter-chip d-inline-flex align-items-center gap-2 py-1 px-3 bg-light border rounded-pill text-xs fw-medium text-slate-700">
+        <i class="pi pi-search text-xs"></i>
+        <span>"{{ searchedWord }}"</span>
+        <button type="button" class="btn-close-chip border-0 bg-transparent text-muted hover:text-slate-900 p-0" (click)="clearSearchFilter()">
+          <i class="pi pi-times text-xs text-secondary"></i>
+        </button>
+      </div>
+
+      <!-- Commission Model Chip -->
+      <div *ngIf="selectedPricingModel" class="filter-chip d-inline-flex align-items-center gap-2 py-1 px-3 bg-light border rounded-pill text-xs fw-medium text-slate-700">
+        <i class="pi pi-filter text-xs"></i>
+        <span>{{ getPricingModelLabel(selectedPricingModel) | translate }}</span>
+        <button type="button" class="btn-close-chip border-0 bg-transparent text-muted hover:text-slate-900 p-0" (click)="clearPricingModelFilter()">
+          <i class="pi pi-times text-xs text-secondary"></i>
+        </button>
+      </div>
+
+      <!-- Clear All Button -->
+      <button type="button" class="btn-clear-all-filters btn btn-link text-xs text-danger fw-semibold text-decoration-none p-0 ms-auto" (click)="clearAllFilters()">
+        {{ 'Clear All' | translate }}
+      </button>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-card mb-4 rounded-4 shadow-sm border bg-white overflow-hidden">
+      <p-table
+        #dt
+        [value]="items"
+        [lazy]="true"
+        (onLazyLoad)="loadData($event)"
+        [paginator]="true"
+        [rows]="10"
+        [totalRecords]="totalRecords"
+        [loading]="isLoading"
+        dataKey="id"
+        [tableStyle]="{ 'min-width': '60rem' }"
+        styleClass="p-datatable-striped p-datatable-hover"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 8%" class="text-center font-semibold">ID</th>
+            <th style="width: 25%" class="font-semibold">{{ 'Product Details' | translate }}</th>
+            <th style="width: 17%" class="font-semibold">{{ 'vendor Name' | translate }}</th>
+            <th style="width: 12%" class="font-semibold">{{ 'Base Price' | translate }}</th>
+            <th style="width: 15%" class="font-semibold" pSortableColumn="ItemPricingPolicy.PricingModel">
+              <div class="d-inline-flex align-items-center gap-1 text-nowrap">
+                <span>{{ 'Commission Model' | translate }}</span>
+                <p-sortIcon field="ItemPricingPolicy.PricingModel"></p-sortIcon>
+              </div>
+            </th>
+            <th style="width: 12%" class="font-semibold">{{ 'Net Price' | translate }}</th>
+            <th style="width: 11%" class="font-semibold" pSortableColumn="ItemPricingPolicy.ProfitLoss">
+              <div class="d-inline-flex align-items-center gap-1 text-nowrap">
+                <span>{{ 'Profit / Loss' | translate }}</span>
+                <p-sortIcon field="ItemPricingPolicy.ProfitLoss"></p-sortIcon>
+              </div>
+            </th>
+            <th style="width: 10%" class="text-end"></th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-item>
+          <tr class="table-row-hover">
+            <td class="text-center fw-medium text-secondary">#{{ item.id }}</td>
+            <td>
+              <div class="d-flex align-items-center gap-3">
+                <!-- Custom Category Badge -->
+                <span *ngIf="activeTab === 'travels'" class="category-badge trip-bg">
+                  <i class="pi pi-send text-xs"></i>
+                  <span>Trip</span>
+                </span>
+                <span *ngIf="activeTab === 'outings'" class="category-badge outing-bg">
+                  <i class="pi pi-compass text-xs"></i>
+                  <span>Outing</span>
+                </span>
+                <span *ngIf="activeTab === 'hajj'" class="category-badge hajj-bg">
+                  <i class="pi pi-globe text-xs"></i>
+                  <span>Hajj</span>
+                </span>
+                <span class="product-name fw-semibold text-slate-800">{{ item.name }}</span>
+              </div>
+            </td>
+            <td>
+              <span
+                *ngIf="getVendorId(item); else noVendorLink"
+                (click)="navigateToVendor(item)"
+                class="fw-semibold text-primary cursor-pointer"
+                style="cursor: pointer; text-decoration: none;"
+                onmouseover="this.style.textDecoration='underline'"
+                onmouseout="this.style.textDecoration='none'"
+              >
+                {{ getVendorName(item) }}
+              </span>
+              <ng-template #noVendorLink>
+                <span class="fw-semibold text-slate-700">{{ getVendorName(item) }}</span>
+              </ng-template>
+            </td>
+            <td>
+              <span class="price-value font-semibold">{{ item.price | number }}</span>
+              <span class="price-currency text-xs text-muted ms-1">EGP</span>
+            </td>
+            <td>
+              <!-- Rich Custom Badges depending on Policy pricingModel -->
+              <div *ngIf="item.policy; else noPolicy">
+                <span *ngIf="item.policy.pricingModel === 1" class="model-badge badge-percentage">
+                  <i class="pi pi-percentage model-badge-icon"></i>
+                  <span class="model-value">{{ item.policy.tripsCommissionValue }}%</span>
+                  <span class="model-type">{{ 'Rate' | translate }}</span>
+                </span>
+                <span *ngIf="item.policy.pricingModel === 2" class="model-badge badge-fixed">
+                  <i class="pi pi-tag model-badge-icon"></i>
+                  <span class="model-value">{{ item.policy.tripsCommissionValue | number }}</span>
+                  <span class="model-currency">EGP</span>
+                  <span class="model-type">{{ 'Fixed' | translate }}</span>
+                </span>
+                <span *ngIf="item.policy.pricingModel === 3" class="model-badge badge-committed">
+                  <i class="pi pi-lock model-badge-icon"></i>
+                  <span class="model-value">{{ item.policy.companyNetPrice | number }}</span>
+                  <span class="model-currency">EGP</span>
+                  <span class="model-type">{{ 'Committed' | translate }}</span>
+                </span>
+              </div>
+              <ng-template #noPolicy>
+                <span class="model-badge badge-none">
+                  <i class="pi pi-info-circle model-badge-icon"></i>
+                  <span class="model-type">{{ 'Not Configured' | translate }}</span>
+                </span>
+              </ng-template>
+            </td>
+            <td>
+              <span *ngIf="item.policy; else noPolicyNet" class="font-semibold text-slate-700">
+                {{ item.policy.companyNetPrice | number }}
+                <span class="text-xs text-muted ms-1">EGP</span>
+              </span>
+              <ng-template #noPolicyNet>
+                <span class="text-muted">-</span>
+              </ng-template>
+            </td>
+            <td>
+              <span *ngIf="item.policy; else noPolicyProfit"
+                    [ngClass]="item.policy.profitLoss >= 0 ? 'text-success' : 'text-danger'"
+                    class="font-semibold">
+                {{ item.policy.profitLoss >= 0 ? '+' : '' }}{{ item.policy.profitLoss | number }}
+                <span class="text-xs ms-1">EGP</span>
+              </span>
+              <ng-template #noPolicyProfit>
+                <span class="text-muted">-</span>
+              </ng-template>
+            </td>
+            <td>
+              <div class="d-flex justify-content-end pr-3">
+                <button
+                  pButton
+                  pRipple
+                  type="button"
+                  icon="pi pi-cog"
+                  class="p-button-rounded p-button-text p-button-sm btn-action-configure"
+                  title="{{ 'Configure Policy' | translate }}"
+                  (click)="openPolicyDialog(item)"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8" class="text-center py-5">
+              <div class="empty-state-container py-4">
+                <i class="pi pi-box text-muted mb-3" style="font-size: 3rem"></i>
+                <h5 class="fw-semibold text-dark">{{ 'No products found' | translate }}</h5>
+                <p class="text-muted text-sm max-w-md mx-auto">
+                  {{ 'Try adjusting your search criteria or switch to another section.' | translate }}
+                </p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Dialog Popup -->
+<p-dialog
+  header="{{ 'Manage Commission Policy' | translate }} - {{ selectedItem?.name }}"
+  [(visible)]="displayDialog"
+  [modal]="true"
+  [style]="{ width: '520px' }"
+  [breakpoints]="{ '960px': '75vw', '640px': '90vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="closeDialog()"
+  styleClass="policy-dialog"
+  [closeOnEscape]="true"
+  [dismissableMask]="true"
+>
+  <app-commission-policy-form
+    *ngIf="displayDialog && selectedItem"
+    [itemId]="selectedItem.id"
+    [itemType]="activeItemType"
+    [basePrice]="selectedItem.price || 0"
+    [isDialogMode]="false"
+    (onSaveSuccess)="onSavePolicySuccess($event)"
+    (onCancel)="closeDialog()"
+  ></app-commission-policy-form>
+</p-dialog>

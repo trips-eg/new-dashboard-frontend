@@ -274,7 +274,11 @@ export class APIs {
 
     getAllTripReservation: 'TripReservations/GetAllTripReservation',
     addTripReservation: 'TripReservations/AddTripReservation',
-    deleteReservation: 'TripReservations/DeleteReservation?id='
+    deleteReservation: 'TripReservations/DeleteReservation?id=',
+    getAllAccommodationTypes: 'AccommodationType/GetAllAccommodationTypes',
+    addAccommodationType: 'AccommodationType/AddAccommodationType',
+    getAllTravelFeatures: 'TravelFeature/GetAll',
+    createTravelFeature: 'TravelFeature/Create'
   };
 
   public static Hotel = {
@@ -340,5 +344,10 @@ export class APIs {
   public static CustomerAnalytics = {
     getCustomerAnalytics: 'Dashboard/GetCustomerAnalytics',
     getCustomersByAnalyticsType: 'Dashboard/GetCustomersByAnalyticsType'
+  };
+
+  public static Pricing = {
+    GetCommissionPolicy: 'Pricing/GetCommissionPolicy',
+    SaveCommissionPolicy: 'Pricing/SaveCommissionPolicy'
   };
 }

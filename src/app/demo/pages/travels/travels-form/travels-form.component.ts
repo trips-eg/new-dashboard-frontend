@@ -28,6 +28,23 @@ export class TravelsFormComponent implements OnInit {
   programTypeList: { label: string; value: any }[] = [];
   cityList: { label: string; value: any }[] = [];
   countryList: { label: string; value: any }[] = [];
+  accommodationTypeList: { label: string; value: any }[] = [];
+  displayAddAccommodationTypeDialog: boolean = false;
+  accommodationTypeForm: FormGroup = this.fb.group({
+    nameEn: ['', Validators.required],
+    nameAr: ['', Validators.required]
+  });
+  isSavingAccommodationType: boolean = false;
+  travelFeatureList: { label: string; value: any }[] = [];
+  displayAddTravelFeatureDialog: boolean = false;
+  travelFeatureForm: FormGroup = this.fb.group({
+    name: ['', Validators.required]
+  });
+  isSavingTravelFeature: boolean = false;
+  childPricingTypes = [
+    { label: 'Percentage (%)', value: 1 },
+    { label: 'Fixed Amount', value: 2 }
+  ];
   travelForm: FormGroup = this.fb.group({});
   selectedImages: File[] = [];
   filterparams?: FilterMap = {};
@@ -71,20 +88,41 @@ export class TravelsFormComponent implements OnInit {
     const lang = this.translate.currentLang;
     const tooltips = {
       1: {
-        en: 'Normal trip: A trip with a predefined start and end date, lasting for a specific number of days (e.g., 5 days or more or less). All activities and schedules take place within this fixed time frame.',
-        ar: `الرحلات العادية هي رحلات يتم تحديد تاريخ بداية ونهاية لها مسبقًا، وتستمر لمدة محددة (مثل 5 أيام أو أكثر أو أقل)، بحيث تكون جميع الأنشطة والمواعيد ضمن هذه الفترة الزمنية المحددة.`
+        en: 'Normal trip: Predefined start and end dates, lasting a fixed number of days.',
+        ar: 'رحلة عادية: ذات تاريخ بداية ونهاية محددين ومدة ثابتة.'
       },
       2: {
-        en: 'Periodic trip: A trip available for booking within a specific date range (start and end dates). Travelers can choose their own departure date within that range, while the trip duration itself remains fixed and defined by a specific number of days.',
-        ar: `الرحلات خلال فترة معينة هي رحلات تكون متاحة للحجز داخل فترة محددة (تاريخ بداية ونهاية)، ويمكن للمسافر اختيار موعد انطلاق الرحلة داخل هذه الفترة، بينما مدة الرحلة نفسها ثابتة وتُحدد بعدد معين من الأيام.`
+        en: 'Periodic trip: Bookable within a date range; travelers select their start date for a fixed duration.',
+        ar: 'رحلة خلال فترة: متاحة للحجز في نطاق تواريخ محدد، ويختار المسافر تاريخ المغادرة بمدة ثابتة.'
       },
       3: {
-        en: 'Day use: A one-day trip that takes place on specific days of the week determined in advance. The trip starts and ends on the same day, with no overnight stay.',
-        ar: `الرحلات اليومية هي رحلات تُقام في أيام محددة من الأسبوع يتم تحديدها مسبقًا، وتكون مدتها ثابتة ليوم واحد فقط، أي تبدأ وتنتهي في نفس اليوم.`
+        en: 'Day use: A single-day trip starting and ending on the same day.',
+        ar: 'رحلة يومية: ليوم واحد فقط تبدأ وتنتهي في نفس اليوم.'
       }
     };
 
     return tooltips[value][lang] || '';
+  }
+
+  get selectedCountryName(): string {
+    const countryId = this.travelForm.get('CountryId')?.value;
+    if (!countryId) return '';
+    const country = this.countryList.find(c => c.value === countryId);
+    return country ? country.label : '';
+  }
+
+  get selectedCityName(): string {
+    const cityId = this.travelForm.get('CityId')?.value;
+    if (!cityId) return '';
+    const city = this.cityList.find(c => c.value === cityId);
+    return city ? city.label : '';
+  }
+
+  get selectedAccommodationName(): string {
+    const accId = this.travelForm.get('AccommodationTypeId')?.value;
+    if (!accId) return '';
+    const acc = this.accommodationTypeList.find(a => a.value === accId);
+    return acc ? acc.label : '';
   }
 
   ngOnInit() {
@@ -237,10 +275,12 @@ export class TravelsFormComponent implements OnInit {
   // /////////---------------------------------- get All Dropdown lists ------------------------------////////////////////////////////
   getDropDownList() {
     this.filterparams.pageIndex = 1;
-    this.filterparams.pageSize = 10;
+    this.filterparams.pageSize = 250; // Increase to load all countries
     this.getCitiesByCountryCode();
     this.getCountryList(this.filterparams);
     this.getProgramTypeList();
+    this.getAccommodationTypeList();
+    this.getTravelFeatures();
   }
 
   getCitiesByCountryId(event) {
@@ -295,6 +335,141 @@ export class TravelsFormComponent implements OnInit {
         value: type.value
       }));
     });
+  }
+
+  getAccommodationTypeList() {
+    this.travelService.getAllAccommodationTypes().subscribe((response) => {
+      if (response && response.success && response.data) {
+        const list = Array.isArray(response.data) ? response.data : (response.data.data || []);
+        this.accommodationTypeList = list.map((type: any) => ({
+          label: this.lang === 'ar' ? type.description || type.name : type.name || type.description,
+          value: type.id
+        }));
+      } else if (Array.isArray(response)) {
+        this.accommodationTypeList = response.map((type: any) => ({
+          label: this.lang === 'ar' ? type.description || type.name : type.name || type.description,
+          value: type.id
+        }));
+      }
+    });
+  }
+
+  showAddAccommodationTypeDialog() {
+    this.accommodationTypeForm.reset();
+    this.displayAddAccommodationTypeDialog = true;
+  }
+
+  selectAccommodationType(value: any) {
+    this.travelForm.get('AccommodationTypeId')?.setValue(value);
+    this.travelForm.get('AccommodationTypeId')?.markAsTouched();
+  }
+
+  saveAccommodationType() {
+    if (this.accommodationTypeForm.invalid) return;
+
+    this.isSavingAccommodationType = true;
+    this.travelService.addAccommodationType(this.accommodationTypeForm.value).subscribe({
+      next: (response) => {
+        this.isSavingAccommodationType = false;
+        if (response.success) {
+          this.toast.success('Accommodation Type added successfully');
+          this.displayAddAccommodationTypeDialog = false;
+          this.getAccommodationTypeList();
+          if (response.data && response.data.id) {
+            this.selectAccommodationType(response.data.id);
+          }
+        } else {
+          this.toast.error(response.message || 'Failed to add accommodation type');
+        }
+      },
+      error: (error) => {
+        this.isSavingAccommodationType = false;
+        this.toast.error(error.error?.message || 'Error occurred while saving');
+      }
+    });
+  }
+
+  getTravelFeatures() {
+    this.travelService.getAllTravelFeatures().subscribe((response) => {
+      if (response && response.success && response.data) {
+        const list = Array.isArray(response.data) ? response.data : (response.data.data || []);
+        this.travelFeatureList = list.map((feat: any) => ({
+          label: feat.name,
+          value: feat.id
+        }));
+      } else if (Array.isArray(response)) {
+        this.travelFeatureList = response.map((feat: any) => ({
+          label: feat.name,
+          value: feat.id
+        }));
+      }
+    });
+  }
+
+  showAddTravelFeatureDialog() {
+    this.travelFeatureForm.reset();
+    this.displayAddTravelFeatureDialog = true;
+  }
+
+  saveTravelFeature() {
+    if (this.travelFeatureForm.invalid) return;
+
+    this.isSavingTravelFeature = true;
+    this.travelService.createTravelFeature(this.travelFeatureForm.value).subscribe({
+      next: (response) => {
+        this.isSavingTravelFeature = false;
+        if (response.success) {
+          this.toast.success('Travel Feature added successfully');
+          this.displayAddTravelFeatureDialog = false;
+          this.getTravelFeatures();
+          if (response.data && response.data.id) {
+            const currentFeatures = this.travelForm.get('Features')?.value || [];
+            this.travelForm.get('Features')?.setValue([...currentFeatures, response.data.id]);
+          }
+        } else {
+          this.toast.error(response.message || 'Failed to add travel feature');
+        }
+      },
+      error: (error) => {
+        this.isSavingTravelFeature = false;
+        this.toast.error(error.error?.message || 'Error occurred while saving');
+      }
+    });
+  }
+
+  isTravelFeatureSelected(id: any): boolean {
+    const currentFeatures = this.travelForm.get('Features')?.value || [];
+    return currentFeatures.includes(id);
+  }
+
+  toggleTravelFeature(id: any): void {
+    const control = this.travelForm.get('Features');
+    const currentFeatures = control?.value || [];
+    if (currentFeatures.includes(id)) {
+      control?.setValue(currentFeatures.filter((item: any) => item !== id));
+    } else {
+      control?.setValue([...currentFeatures, id]);
+    }
+    control?.markAsTouched();
+  }
+
+  get childPricingPolicies(): FormArray {
+    return this.travelForm.get('ChildPricingPolicies') as FormArray;
+  }
+
+  addChildPricingPolicy(): void {
+    const policyGroup = this.fb.group({
+      id: [0],
+      minAge: [0, [Validators.required, Validators.min(0)]],
+      maxAge: [0, [Validators.required, Validators.min(0)]],
+      pricingType: [1, Validators.required],
+      value: [0, [Validators.required, Validators.min(0)]]
+    });
+    this.childPricingPolicies.push(policyGroup);
+  }
+
+  removeChildPricingPolicy(index: number): void {
+    this.childPricingPolicies.removeAt(index);
   }
 
   //////////////////----------------    get Travel by Id and bind All data in the forms --------------------//////////////////////////
@@ -359,6 +534,8 @@ export class TravelsFormComponent implements OnInit {
             IsAllowPaymentUponArrival: travelData.isAllowPaymentUponArrival || false,
             IsIncludeVate: travelData.isIncludeVate || false,
             depositRate: travelData.depositRate || 100,
+            AccommodationTypeId: travelData.accommodationTypeId,
+            Features: travelData.features?.map((f: any) => f.id) || [],
             ImagesFiles: null
           });
 
@@ -382,6 +559,22 @@ export class TravelsFormComponent implements OnInit {
               this.descriptions.push(
                 this.fb.group({
                   description: desc.description
+                })
+              );
+            });
+          }
+
+          // Clear and populate child pricing policies
+          this.childPricingPolicies.clear();
+          if (travelData.childPricingPolicies && travelData.childPricingPolicies.length > 0) {
+            travelData.childPricingPolicies.forEach((policy: any) => {
+              this.childPricingPolicies.push(
+                this.fb.group({
+                  id: [policy.id || 0],
+                  minAge: [policy.minAge, [Validators.required, Validators.min(0)]],
+                  maxAge: [policy.maxAge, [Validators.required, Validators.min(0)]],
+                  pricingType: [policy.pricingType, Validators.required],
+                  value: [policy.value, [Validators.required, Validators.min(0)]]
                 })
               );
             });
@@ -483,7 +676,10 @@ export class TravelsFormComponent implements OnInit {
       IsAllowPaymentUponArrival: [false, Validators.required],
       depositRate: [100, Validators.required],
       IsIncludeVate: [false, Validators.required],
-      TripType: [null, Validators.required]
+      TripType: [null, Validators.required],
+      AccommodationTypeId: [null, Validators.required],
+      Features: [[]],
+      ChildPricingPolicies: this.fb.array([])
     }));
   }
 
@@ -571,6 +767,14 @@ export class TravelsFormComponent implements OnInit {
         this.selectedImages.forEach((file) => formData.append('ImagesFiles', file));
       } else if (key === 'Descriptions' && value?.length > 0) {
         value.forEach((desc: any) => formData.append('Descriptions', JSON.stringify(desc)));
+      } else if (key === 'Features') {
+        if (value && value.length > 0) {
+          value.forEach((id: any) => formData.append('Features', id.toString()));
+        }
+      } else if (key === 'ChildPricingPolicies') {
+        if (value && value.length > 0) {
+          value.forEach((policy: any) => formData.append('ChildPricingPolicies', JSON.stringify(policy)));
+        }
       } else {
         // ✅ معالجة القيم null أو undefined
         const safeValue = value === null || value === undefined ? '' : value;
@@ -632,6 +836,14 @@ export class TravelsFormComponent implements OnInit {
         this.selectedImages.forEach((file) => formData.append('ImagesFiles', file));
       } else if (key === 'Descriptions' && value?.length > 0) {
         value.forEach((desc: any) => formData.append('Descriptions', JSON.stringify(desc)));
+      } else if (key === 'Features') {
+        if (value && value.length > 0) {
+          value.forEach((id: any) => formData.append('Features', id.toString()));
+        }
+      } else if (key === 'ChildPricingPolicies') {
+        if (value && value.length > 0) {
+          value.forEach((policy: any) => formData.append('ChildPricingPolicies', JSON.stringify(policy)));
+        }
       } else {
         // ✅ معالجة القيم null أو undefined
         const safeValue = value === null || value === undefined ? '' : value;

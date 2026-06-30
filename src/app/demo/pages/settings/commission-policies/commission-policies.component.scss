@@ -1,0 +1,521 @@
+// Premium Design Tokens
+$primary-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+$emerald-gradient: linear-gradient(135deg, #34d399 0%, #059669 100%);
+$indigo-gradient: linear-gradient(135deg, #818cf8 0%, #4f46e5 100%);
+$amber-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+$slate-light: #f8fafc;
+$slate-border: #e2e8f0;
+$shadow-elegant: 0 10px 30px -10px rgba(79, 70, 229, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
+$shadow-hover: 0 20px 40px -15px rgba(79, 70, 229, 0.15), 0 4px 6px rgba(0, 0, 0, 0.05);
+$transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+.main {
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+// 2. Navigation Pills Tab Bar
+.tab-nav-wrapper {
+  background: #ffffff;
+  border-color: rgba(226, 232, 240, 0.8) !important;
+
+  .nav-pills-custom {
+    .tab-btn {
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #64748b;
+      transition: $transition-smooth;
+
+      i {
+        font-size: 0.95rem;
+        transition: transform 0.2s ease;
+      }
+
+      &:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+        
+        i {
+          transform: scale(1.1);
+        }
+      }
+
+      &.active-tab {
+        background: $primary-gradient !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+        border-color: transparent;
+
+        i {
+          color: #ffffff;
+        }
+      }
+    }
+  }
+}
+
+// 3. Search Filter Card
+.search-card {
+  border-color: rgba(226, 232, 240, 0.8) !important;
+
+  .search-input-wrapper {
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 0.95rem;
+      pointer-events: none;
+    }
+
+    .search-input {
+      padding: 0.7rem 2.5rem 0.7rem 2.5rem;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      font-size: 0.9rem;
+      transition: $transition-smooth;
+      background-color: #f8fafc;
+      width: 100%;
+
+      &:focus {
+        border-color: #6366f1;
+        background-color: #ffffff;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+        outline: none;
+      }
+    }
+
+    .btn-clear-search {
+      position: absolute;
+      right: 0.8rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.2rem;
+      border-radius: 50%;
+      transition: $transition-smooth;
+
+      &:hover {
+        background-color: #e2e8f0;
+        color: #475569;
+      }
+    }
+  }
+}
+
+// 4. Data Table Redesign
+.table-card {
+  border-color: rgba(226, 232, 240, 0.8) !important;
+  box-shadow: $shadow-elegant !important;
+
+  ::ng-deep {
+    .p-datatable {
+      .p-datatable-thead > tr > th {
+        background-color: #f8fafc;
+        color: #475569;
+        font-weight: 700;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        border-bottom: 2px solid #e2e8f0;
+        padding: 1.25rem 1.5rem;
+
+        &.p-sortable-column {
+          outline: none !important;
+          
+          .p-sortable-column-icon {
+            font-size: 0.75rem !important;
+            color: #94a3b8 !important;
+            margin-left: 0.25rem !important;
+            transition: color 0.15s ease;
+          }
+
+          &:hover {
+            background-color: #f1f5f9 !important;
+            color: #4f46e5 !important;
+            
+            .p-sortable-column-icon {
+              color: #6366f1 !important;
+            }
+          }
+
+          &.p-highlight {
+            color: #4f46e5 !important;
+            background-color: rgba(99, 102, 241, 0.04) !important;
+            
+            .p-sortable-column-icon {
+              color: #4f46e5 !important;
+            }
+          }
+        }
+      }
+
+      .p-datatable-tbody > tr {
+        background-color: #ffffff;
+        transition: $transition-smooth;
+
+        &:hover {
+          background-color: rgba(248, 250, 252, 0.8) !important;
+        }
+
+        & > td {
+          padding: 1.25rem 1.5rem;
+          border-bottom: 1px solid #f1f5f9;
+          vertical-align: middle;
+          color: #334155;
+          font-size: 0.9rem;
+        }
+      }
+
+      // Paginator custom
+      .p-paginator {
+        background-color: #ffffff;
+        border-top: 1px solid #f1f5f9;
+        padding: 0.75rem 1rem;
+
+        .p-paginator-pages .p-paginator-page {
+          border-radius: 8px;
+          min-width: 2.2rem;
+          height: 2.2rem;
+          margin: 0 0.15rem;
+          transition: $transition-smooth;
+          font-weight: 600;
+
+          &.p-highlight {
+            background: rgba(99, 102, 241, 0.08);
+            color: #4f46e5;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Category Badges
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.3rem 0.65rem;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+
+  &.trip-bg {
+    background-color: rgba(99, 102, 241, 0.08) !important;
+    color: #4f46e5 !important;
+    border: 1px solid rgba(99, 102, 241, 0.12);
+  }
+
+  &.outing-bg {
+    background-color: rgba(14, 165, 233, 0.08) !important;
+    color: #0ea5e9 !important;
+    border: 1px solid rgba(14, 165, 233, 0.12);
+  }
+
+  &.hajj-bg {
+    background-color: rgba(245, 158, 11, 0.08) !important;
+    color: #d97706 !important;
+    border: 1px solid rgba(245, 158, 11, 0.12);
+  }
+}
+
+.product-name {
+  font-size: 0.95rem;
+  color: #1e293b;
+}
+
+// Price column
+.price-value {
+  color: #1e293b;
+  font-size: 0.95rem;
+}
+
+// 5. Commission Policy Badges
+.model-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.85rem;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+
+  .model-badge-icon {
+    font-size: 0.8rem;
+    margin-right: 0.4rem;
+  }
+
+  .model-value {
+    color: #0f172a;
+    font-weight: 700;
+    margin-right: 0.2rem;
+  }
+
+  .model-currency {
+    font-size: 0.72rem;
+    color: #475569;
+    font-weight: 600;
+    margin-right: 0.3rem;
+  }
+
+  .model-type {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  // Percentage Badging
+  &.badge-percentage {
+    background-color: rgba(52, 211, 153, 0.1);
+    color: #047857;
+    border: 1px solid rgba(52, 211, 153, 0.2);
+
+    .model-badge-icon {
+      color: #059669;
+    }
+    
+    .model-type {
+      color: #065f46;
+    }
+  }
+
+  // Fixed Amount Badging
+  &.badge-fixed {
+    background-color: rgba(99, 102, 241, 0.08);
+    color: #4338ca;
+    border: 1px solid rgba(99, 102, 241, 0.18);
+
+    .model-badge-icon {
+      color: #4f46e5;
+    }
+
+    .model-type {
+      color: #3730a3;
+    }
+  }
+
+  // Committed Net Badging
+  &.badge-committed {
+    background-color: rgba(251, 191, 36, 0.08);
+    color: #b45309;
+    border: 1px solid rgba(251, 191, 36, 0.18);
+
+    .model-badge-icon {
+      color: #d97706;
+    }
+
+    .model-type {
+      color: #92400e;
+    }
+  }
+
+  // Not Configured Badging
+  &.badge-none {
+    background-color: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+
+    .model-badge-icon {
+      color: #94a3b8;
+    }
+
+    .model-type {
+      color: #475569;
+    }
+  }
+}
+
+// 6. Action Button Rotating animation
+.btn-action-configure {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50% !important;
+  color: #64748b !important;
+  transition: $transition-smooth !important;
+
+  &:hover {
+    background-color: rgba(99, 102, 241, 0.08) !important;
+    color: #4f46e5 !important;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+
+    ::ng-deep .p-button-icon {
+      transform: rotate(45deg);
+    }
+  }
+
+  ::ng-deep .p-button-icon {
+    font-size: 1.15rem;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+// 7. Modal Dialog Popup Design
+::ng-deep .policy-dialog {
+  border-radius: 20px !important;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(10px);
+
+  .p-dialog-header {
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1.25rem 1.5rem;
+    color: #1e293b;
+
+    .p-dialog-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: -0.01em;
+      font-family: 'Outfit', 'Inter', sans-serif;
+    }
+
+    .p-dialog-header-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      transition: $transition-smooth;
+
+      &:hover {
+        background-color: #cbd5e1;
+        color: #0f172a;
+      }
+    }
+  }
+
+  .p-dialog-content {
+    padding: 1.5rem !important;
+    background-color: #ffffff;
+  }
+}
+
+// 8. Empty state
+.empty-state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  p {
+    max-width: 320px;
+  }
+}
+
+// 9. Premium Filter Dropdown Styles
+::ng-deep {
+  .filter-dropdown-top.p-dropdown {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    font-family: inherit;
+    font-size: 0.9rem;
+    
+    .p-dropdown-label {
+      padding: 0.4rem 0.5rem 0.4rem 2rem !important;
+      color: #1e293b;
+      font-weight: 500;
+      text-align: left;
+    }
+
+    .p-dropdown-trigger {
+      color: #94a3b8;
+      width: 2rem;
+    }
+
+    .p-dropdown-clear-icon {
+      right: 2.2rem;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+  }
+
+  // Handle RTL for padding
+  [dir="rtl"] {
+    .filter-dropdown-top.p-dropdown {
+      .p-dropdown-label {
+        padding: 0.4rem 2rem 0.4rem 0.5rem !important;
+        text-align: right;
+      }
+    }
+  }
+}
+
+// 10. Active Filters
+.active-filters-wrapper {
+  animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  .active-filters-label {
+    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+    color: #64748b;
+  }
+
+  .filter-chip {
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(99, 102, 241, 0.03);
+    background-color: #f1f5f9;
+    border-color: #e2e8f0 !important;
+    color: #334155;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.08);
+      background-color: #e2e8f0;
+    }
+
+    .btn-close-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      line-height: 1;
+      margin-left: 4px;
+      transition: color 0.15s ease;
+
+      i {
+        font-size: 0.65rem !important;
+      }
+    }
+  }
+
+  .btn-clear-all-filters {
+    transition: color 0.15s ease;
+    text-decoration: none;
+    
+    &:hover {
+      color: #dc2626 !important;
+      text-decoration: underline !important;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+

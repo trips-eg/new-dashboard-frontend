@@ -697,6 +697,16 @@ const NavigationItems = [
         permissions: [Permissions.SalesAgencyCreate]
       },
       {
+        id: 'commission-policies',
+        title: 'Commission Policies',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/commission-policies',
+        icon: 'fa-solid fa-file-invoice-dollar',
+        breadcrumbs: false,
+        permissions: [Permissions.SalesAgencyCreate]
+      },
+      {
         id: 'scanner',
         title: 'scanner',
         type: 'item',

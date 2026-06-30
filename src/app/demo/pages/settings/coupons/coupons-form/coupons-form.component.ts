@@ -158,23 +158,6 @@ export class CouponsFormComponent implements OnInit {
       }
     });
 
-    // مراقبة loginUser لإفراغ usersId وتصفير حقول الحجز عند إلغاء تفعيله
-    this.couponForm.get('loginUser')?.valueChanges.subscribe(val => {
-      if (!val) {
-        this.couponForm.patchValue({
-          usersId: [],
-          loggedInZeroBookings: false,
-          completedBookings: false,
-          cancelledBookings: false
-        });
-      } else {
-        this.couponForm.patchValue({
-          loggedInZeroBookings: true,
-          completedBookings: true,
-          cancelledBookings: true
-        });
-      }
-    });
   }
 
   updateValidationByType(discountType: number) {

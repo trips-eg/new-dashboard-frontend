@@ -47,6 +47,20 @@ export class TravelTripsService {
     return this._apiCaller.post(`${this.endPoints.updateTravelBlockStatus}${id}`, {});
   }
 
+  getAllAccommodationTypes(): Observable<any> {
+    return this._apiCaller.get(this.endPoints.getAllAccommodationTypes);
+  }
+  addAccommodationType(model: any): Observable<any> {
+    return this._apiCaller.post(this.endPoints.addAccommodationType, model);
+  }
+
+  getAllTravelFeatures(): Observable<any> {
+    return this._apiCaller.get(this.endPoints.getAllTravelFeatures);
+  }
+  createTravelFeature(model: any): Observable<any> {
+    return this._apiCaller.post(this.endPoints.createTravelFeature, model);
+  }
+
   //////// ----------------- program steps ----------////////////////
   getProgramStepType(): Observable<any> {
     return this._apiCaller.get(`${this.endPoints.getProgramStepType}`);

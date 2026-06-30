@@ -14,7 +14,7 @@ export class HttpInterceptorInterceptor implements HttpInterceptor {
     private _configService: ConfigureService,
     private _translation: TranslateService,
     private toast: ToastrService,
-    private spinner: NgxSpinnerService , // Inject NgxSpinnerService
+    private spinner: NgxSpinnerService, // Inject NgxSpinnerService
     private router: Router // Import Router to navigate on error
   ) {}
 
@@ -34,7 +34,7 @@ export class HttpInterceptorInterceptor implements HttpInterceptor {
           token: `Bearer ${token}`,
           // withCredentials: 'true',
           //  cookies: `Bearer ${token}`,
-          
+
           'Accept-Language': `${Lang}`
         }
       });
@@ -47,7 +47,7 @@ export class HttpInterceptorInterceptor implements HttpInterceptor {
           err.error.status = 401;
           // this._configService.Logout();
           // this.toast.error('Unauthorized access', 'Error');
-           //this.router.navigate(['/unauthorized']);
+          //this.router.navigate(['/unauthorized']);
         }
         const error = err.error.message || err.statusText;
         return throwError(err);

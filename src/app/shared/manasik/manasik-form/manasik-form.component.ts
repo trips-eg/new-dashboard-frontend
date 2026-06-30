@@ -2,6 +2,7 @@ import { Component, EventEmitter, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HajjUmmrahService } from 'src/app/shared/services/hajj-ummrah.service';
+import { TravelTripsService } from 'src/app/shared/services/travel-trips.service';
 import { ManasikType } from '../../Enums/manasikType';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 import { ImgUploaderComponent } from '../../img-uploader/img-uploader.component';
@@ -47,6 +48,25 @@ export class ManasikFormComponent implements OnInit {
   selectedImages: File[] = [];
   existingImages: any[] = [];
   deletedImageIds: number[] = [];
+  accommodationTypeList: { label: string; value: any }[] = [];
+  displayAddAccommodationTypeDialog: boolean = false;
+  accommodationTypeForm: FormGroup = this.fb.group({
+    nameEn: ['', Validators.required],
+    nameAr: ['', Validators.required]
+  });
+  isSavingAccommodationType: boolean = false;
+
+  travelFeatureList: { label: string; value: any }[] = [];
+  displayAddTravelFeatureDialog: boolean = false;
+  travelFeatureForm: FormGroup = this.fb.group({
+    name: ['', Validators.required]
+  });
+  isSavingTravelFeature: boolean = false;
+
+  childPricingTypes = [
+    { label: 'Percentage (%)', value: 1 },
+    { label: 'Fixed Amount', value: 2 }
+  ];
 
   // Step 2 form – Steps (Segments)
   stepsForm!: FormGroup;
@@ -60,7 +80,8 @@ export class ManasikFormComponent implements OnInit {
     private router: Router,
     private service: HajjUmmrahService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private travelService: TravelTripsService
   ) {}
 
   ngOnInit(): void {
@@ -72,6 +93,7 @@ export class ManasikFormComponent implements OnInit {
       this.buildForm();
       this.buildStepsForm();
       this.buildTicketsForm();
+      this.getDropDownList();
 
       if (this.isEditMode && this.manasikId) {
         this.loadManasikData(this.manasikId);
@@ -135,6 +157,8 @@ export class ManasikFormComponent implements OnInit {
       IsIncludeVate: data.isIncludeVate,
       FromLocation: data.fromLocation || '',
       ToLocation: data.toLocation || '',
+      AccommodationTypeId: data.accommodationTypeId || null,
+      Features: data.features?.map((f: any) => f.id) || [],
       Type: data.type
     });
 
@@ -146,6 +170,22 @@ export class ManasikFormComponent implements OnInit {
           this.fb.group({
             id: [desc.id],
             description: [desc.description]
+          })
+        );
+      });
+    }
+
+    // Populate Child Pricing Policies
+    this.childPricingPolicies.clear();
+    if (data.childPricingPolicies && data.childPricingPolicies.length > 0) {
+      data.childPricingPolicies.forEach((policy: any) => {
+        this.childPricingPolicies.push(
+          this.fb.group({
+            id: [policy.id || 0],
+            minAge: [policy.minAge, [Validators.required, Validators.min(0)]],
+            maxAge: [policy.maxAge, [Validators.required, Validators.min(0)]],
+            pricingType: [policy.pricingType, Validators.required],
+            value: [policy.value, [Validators.required, Validators.min(0)]]
           })
         );
       });
@@ -242,7 +282,10 @@ export class ManasikFormComponent implements OnInit {
       FromLocation: ['', Validators.required],
       ToLocation: ['', Validators.required],
       Descriptions: this.fb.array([]),
-      Type: [this.type]
+      Type: [this.type],
+      AccommodationTypeId: [null],
+      Features: [[]],
+      ChildPricingPolicies: this.fb.array([])
     });
   }
 
@@ -433,16 +476,17 @@ export class ManasikFormComponent implements OnInit {
     // List of date fields that need conversion
     const dateFields = ['StartDate', 'EndDate'];
 
-    // Append normal fields (excluding VendorId and Descriptions)
+    // Append normal fields (excluding Descriptions, Features, ChildPricingPolicies)
     Object.keys(value).forEach((key) => {
-      if (key !== 'Descriptions') {
-        // Convert dates to ISO string
-        if (dateFields.includes(key) && value[key]) {
-          const dateValue = new Date(value[key]);
-          formData.append(key, dateValue.toISOString());
-        } else {
-          formData.append(key, value[key]);
-        }
+      if (key === 'Descriptions' || key === 'Features' || key === 'ChildPricingPolicies') return;
+
+      // Convert dates to ISO string
+      if (dateFields.includes(key) && value[key]) {
+        const dateValue = new Date(value[key]);
+        formData.append(key, dateValue.toISOString());
+      } else {
+        const safeValue = value[key] === null || value[key] === undefined ? '' : value[key];
+        formData.append(key, safeValue);
       }
     });
 
@@ -466,6 +510,20 @@ export class ManasikFormComponent implements OnInit {
     this.selectedImages.forEach((file) => {
       formData.append('ImagesFiles', file);
     });
+
+    // Append Features
+    if (value.Features && value.Features.length > 0) {
+      value.Features.forEach((id: any) => {
+        formData.append('Features', id.toString());
+      });
+    }
+
+    // Append ChildPricingPolicies
+    if (value.ChildPricingPolicies && value.ChildPricingPolicies.length > 0) {
+      value.ChildPricingPolicies.forEach((policy: any) => {
+        formData.append('ChildPricingPolicies', JSON.stringify(policy));
+      });
+    }
 
     return formData;
   }
@@ -690,5 +748,145 @@ export class ManasikFormComponent implements OnInit {
         });
       }
     });
+  }
+
+  getDropDownList() {
+    this.getAccommodationTypeList();
+    this.getTravelFeatures();
+  }
+
+  getAccommodationTypeList() {
+    this.travelService.getAllAccommodationTypes().subscribe((response) => {
+      if (response && response.success && response.data) {
+        const list = Array.isArray(response.data) ? response.data : (response.data.data || []);
+        this.accommodationTypeList = list.map((type: any) => ({
+          label: type.name || type.description,
+          value: type.id
+        }));
+      } else if (Array.isArray(response)) {
+        this.accommodationTypeList = response.map((type: any) => ({
+          label: type.name || type.description,
+          value: type.id
+        }));
+      }
+    });
+  }
+
+  showAddAccommodationTypeDialog() {
+    this.accommodationTypeForm.reset();
+    this.displayAddAccommodationTypeDialog = true;
+  }
+
+  selectAccommodationType(value: any) {
+    this.form.get('AccommodationTypeId')?.setValue(value);
+    this.form.get('AccommodationTypeId')?.markAsTouched();
+  }
+
+  saveAccommodationType() {
+    if (this.accommodationTypeForm.invalid) return;
+
+    this.isSavingAccommodationType = true;
+    this.travelService.addAccommodationType(this.accommodationTypeForm.value).subscribe({
+      next: (response) => {
+        this.isSavingAccommodationType = false;
+        if (response.success) {
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Accommodation Type added successfully' });
+          this.displayAddAccommodationTypeDialog = false;
+          this.getAccommodationTypeList();
+          if (response.data && response.data.id) {
+            this.selectAccommodationType(response.data.id);
+          }
+        } else {
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: response.message || 'Failed to add accommodation type' });
+        }
+      },
+      error: (error) => {
+        this.isSavingAccommodationType = false;
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: error.error?.message || 'Error occurred while saving' });
+      }
+    });
+  }
+
+  getTravelFeatures() {
+    this.travelService.getAllTravelFeatures().subscribe((response) => {
+      if (response && response.success && response.data) {
+        const list = Array.isArray(response.data) ? response.data : (response.data.data || []);
+        this.travelFeatureList = list.map((feat: any) => ({
+          label: feat.name,
+          value: feat.id
+        }));
+      } else if (Array.isArray(response)) {
+        this.travelFeatureList = response.map((feat: any) => ({
+          label: feat.name,
+          value: feat.id
+        }));
+      }
+    });
+  }
+
+  showAddTravelFeatureDialog() {
+    this.travelFeatureForm.reset();
+    this.displayAddTravelFeatureDialog = true;
+  }
+
+  saveTravelFeature() {
+    if (this.travelFeatureForm.invalid) return;
+
+    this.isSavingTravelFeature = true;
+    this.travelService.createTravelFeature(this.travelFeatureForm.value).subscribe({
+      next: (response) => {
+        this.isSavingTravelFeature = false;
+        if (response.success) {
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Travel Feature added successfully' });
+          this.displayAddTravelFeatureDialog = false;
+          this.getTravelFeatures();
+          if (response.data && response.data.id) {
+            const currentFeatures = this.form.get('Features')?.value || [];
+            this.form.get('Features')?.setValue([...currentFeatures, response.data.id]);
+          }
+        } else {
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: response.message || 'Failed to add travel feature' });
+        }
+      },
+      error: (error) => {
+        this.isSavingTravelFeature = false;
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: error.error?.message || 'Error occurred while saving' });
+      }
+    });
+  }
+
+  isTravelFeatureSelected(id: any): boolean {
+    const currentFeatures = this.form.get('Features')?.value || [];
+    return currentFeatures.includes(id);
+  }
+
+  toggleTravelFeature(id: any): void {
+    const control = this.form.get('Features');
+    const currentFeatures = control?.value || [];
+    if (currentFeatures.includes(id)) {
+      control?.setValue(currentFeatures.filter((item: any) => item !== id));
+    } else {
+      control?.setValue([...currentFeatures, id]);
+    }
+    control?.markAsTouched();
+  }
+
+  get childPricingPolicies(): FormArray {
+    return this.form.get('ChildPricingPolicies') as FormArray;
+  }
+
+  addChildPricingPolicy(): void {
+    const policyGroup = this.fb.group({
+      id: [0],
+      minAge: [0, [Validators.required, Validators.min(0)]],
+      maxAge: [0, [Validators.required, Validators.min(0)]],
+      pricingType: [1, Validators.required],
+      value: [0, [Validators.required, Validators.min(0)]]
+    });
+    this.childPricingPolicies.push(policyGroup);
+  }
+
+  removeChildPricingPolicy(index: number): void {
+    this.childPricingPolicies.removeAt(index);
   }
 }

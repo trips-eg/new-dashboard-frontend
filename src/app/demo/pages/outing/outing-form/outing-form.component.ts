@@ -1267,6 +1267,7 @@ export class OutingFormComponent implements OnInit {
               summary: 'Success',
               detail: 'Schedule deleted successfully!'
             });
+            this.schedulesList = this.schedulesList.filter((_, i) => i !== index);
           }
         },
         error: (err) => {
@@ -1278,8 +1279,9 @@ export class OutingFormComponent implements OnInit {
           });
         }
       });
+    } else {
+      this.schedulesList = this.schedulesList.filter((_, i) => i !== index);
     }
-    this.schedulesList = this.schedulesList.filter((_, i) => i !== index);
   }
 
   onNextSchedules(nextCallback?: any) {
@@ -1292,16 +1294,12 @@ export class OutingFormComponent implements OnInit {
       return;
     }
 
-    // If no schedules are added, proceed
     if (this.schedulesList.length === 0) {
       this.messageService.add({
-        severity: 'info',
-        summary: 'Info',
-        detail: 'No schedules to save.'
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Please add at least one schedule'
       });
-      setTimeout(() => {
-        this.router.navigate(['/outing']);
-      }, 1000);
       return;
     }
 
@@ -1311,7 +1309,7 @@ export class OutingFormComponent implements OnInit {
     const schedulesPayload = {
       outingId: this.outingId,
       schedules: this.schedulesList.map((s) => ({
-        id: s.id, // for updates check if API supports bulk update with ID
+        id: s.id || 0,
         dayOfWeek: s.dayOfWeek,
         schedualType: s.schedualType,
         validFrom: s.validFrom,
@@ -1324,7 +1322,6 @@ export class OutingFormComponent implements OnInit {
       }))
     };
 
-    // Determine whether to add or update
     const apiCall = this.isEditMode
       ? this.outingService.updateOutingSchedules(schedulesPayload)
       : this.outingService.addOutingSchedules(schedulesPayload);
@@ -1351,10 +1348,13 @@ export class OutingFormComponent implements OnInit {
             summary: 'Success',
             detail: 'Schedules saved successfully!'
           });
-          // Final step: Navigate to list
-          setTimeout(() => {
-            this.router.navigate(['/outing']);
-          }, 1500);
+          if (nextCallback) {
+            setTimeout(() => nextCallback.emit(), 500);
+          } else {
+            setTimeout(() => {
+              this.router.navigate(['/outing']);
+            }, 1500);
+          }
         }
       });
   }
@@ -1575,6 +1575,45 @@ export class OutingFormComponent implements OnInit {
     } else {
       this.router.navigate(['/outing']);
     }
+  }
+
+  isDaySelected(value: number): boolean {
+    const selected = this.schedulesForm.get('dayOfWeek')?.value || [];
+    return selected.includes(value);
+  }
+
+  toggleDaySelection(value: number) {
+    const control = this.schedulesForm.get('dayOfWeek');
+    let selected = [...(control?.value || [])];
+    if (selected.includes(value)) {
+      selected = selected.filter(v => v !== value);
+    } else {
+      selected.push(value);
+    }
+    control?.setValue(selected);
+    control?.markAsTouched();
+    control?.updateValueAndValidity();
+  }
+
+  isDayDisabled(value: number): boolean {
+    const available = this.availableDays.map(d => d.value);
+    return !available.includes(value);
+  }
+
+  get selectedCategoryName(): string {
+    const categoryId = this.outingForm.get('OutingCategoryId')?.value;
+    if (!categoryId) return '';
+    const category = this.categories.find(c => c.value === categoryId);
+    return category ? category.label : '';
+  }
+
+  getStartingPrice(): number {
+    if (!this.ticketsList || this.ticketsList.length === 0) return 0;
+    return Math.min(...this.ticketsList.map(t => t.price || 0));
+  }
+
+  onFinish() {
+    this.router.navigate(['/outing']);
   }
 
   // ============= Form Control Getters =============

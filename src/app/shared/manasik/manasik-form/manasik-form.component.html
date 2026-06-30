@@ -12,424 +12,724 @@
       <p-stepperPanel [header]="'Manasik Information' | translate">
         <ng-template pTemplate="content" let-nextCallback="nextCallback">
           <form class="form-field" [formGroup]="form">
-            <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
-              <div class="col-12 mb-3">
-                <h5>{{ 'Basic Information' | translate }}</h5>
+            <!-- SECTION 1: Basic Information -->
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-info-circle"></i>
+                  <h3>{{ 'Basic Information' | translate }}</h3>
+                </div>
               </div>
 
-              <div class="field col-12 col-md-6">
-                <label>
-                  {{ 'Name' | translate }}
-                  <span class="text-red-500">*</span>
-                </label>
-                <input pInputText formControlName="Name" class="w-full" />
-                <small class="p-error" *ngIf="form.get('Name')?.invalid && (form.get('Name')?.touched || form.get('Name')?.dirty)">
-                  {{ 'Name is required' | translate }}
-                </small>
-              </div>
+              <div class="formgrid grid">
+                <!-- Name -->
+                <div class="field col-12 col-md-6">
+                  <label for="manasikName">
+                    {{ 'Name' | translate }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="manasikName"
+                    pInputText
+                    formControlName="Name"
+                    class="w-full"
+                    placeholder="{{ 'Enter package name...' | translate }}"
+                  />
+                  <small class="p-error" *ngIf="form.get('Name')?.invalid && (form.get('Name')?.touched || form.get('Name')?.dirty)">
+                    {{ 'Name is required' | translate }}
+                  </small>
+                </div>
 
-              <div class="field col-12 col-md-6">
-                <label>
-                  {{ 'Rating' | translate }}
-                  <span class="text-red-500">*</span>
-                </label>
-                <p-dropdown
-                  formControlName="Rating"
-                  [options]="[
-                    { label: '1 Star', value: 1 },
-                    { label: '2 Stars', value: 2 },
-                    { label: '3 Stars', value: 3 },
-                    { label: '4 Stars', value: 4 },
-                    { label: '5 Stars', value: 5 }
-                  ]"
-                  placeholder="{{ '-- Select rating --' | translate }}"
-                  styleClass="w-full"
-                ></p-dropdown>
-                <small class="p-error" *ngIf="form.get('Rating')?.invalid && (form.get('Rating')?.touched || form.get('Rating')?.dirty)">
-                  {{ 'Rating is required' | translate }}
-                </small>
-              </div>
+                <!-- Rating -->
+                <div class="field col-12 col-md-6">
+                  <label for="manasikRating">
+                    {{ 'Rating' | translate }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <p-dropdown
+                    id="manasikRating"
+                    formControlName="Rating"
+                    [options]="[
+                      { label: '1 Star', value: 1 },
+                      { label: '2 Stars', value: 2 },
+                      { label: '3 Stars', value: 3 },
+                      { label: '4 Stars', value: 4 },
+                      { label: '5 Stars', value: 5 }
+                    ]"
+                    placeholder="{{ '-- Select rating --' | translate }}"
+                    styleClass="w-full"
+                    class="w-full"
+                  ></p-dropdown>
+                  <small class="p-error" *ngIf="form.get('Rating')?.invalid && (form.get('Rating')?.touched || form.get('Rating')?.dirty)">
+                    {{ 'Rating is required' | translate }}
+                  </small>
+                </div>
 
-              <div class="field col-12 col-md-4">
-                <label>
-                  {{ 'Price' | translate }}
-                  <span class="text-red-500">*</span>
-                </label>
-                <p-inputNumber formControlName="Price" class="w-full" [min]="1"></p-inputNumber>
-                <small class="p-error" *ngIf="form.get('Price')?.invalid && (form.get('Price')?.touched || form.get('Price')?.dirty)">
-                  {{ 'Price is required and must be greater than 0' | translate }}
-                </small>
-              </div>
+                <!-- Price -->
+                <div class="field col-12 col-md-4">
+                  <label for="manasikPrice">
+                    {{ 'Price' | translate }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <p-inputNumber
+                    id="manasikPrice"
+                    formControlName="Price"
+                    class="w-full"
+                    styleClass="w-full"
+                    [min]="1"
+                    placeholder="{{ 'Base Price (e.g. 5000)...' | translate }}"
+                  ></p-inputNumber>
+                  <small class="p-error" *ngIf="form.get('Price')?.invalid && (form.get('Price')?.touched || form.get('Price')?.dirty)">
+                    {{ 'Price is required and must be greater than 0' | translate }}
+                  </small>
+                </div>
 
-              <div class="field col-12 col-md-4">
-                <label>
-                  {{ 'Child Price' | translate }}
-                  <span class="text-red-500">*</span>
-                </label>
-                <p-inputNumber formControlName="ChildPrice" class="w-full"></p-inputNumber>
-                <!-- <small
-                  class="p-error"
-                  *ngIf="form.get('ChildPrice')?.invalid && (form.get('ChildPrice')?.touched || form.get('ChildPrice')?.dirty)"
-                >
-                  {{ 'Child Price is required' | translate }}
-                </small> -->
-              </div>
+                <!-- Child Price -->
+                <div class="field col-12 col-md-4">
+                  <label for="manasikChildPrice">
+                    {{ 'Child Price' | translate }}
+                  </label>
+                  <p-inputNumber
+                    id="manasikChildPrice"
+                    formControlName="ChildPrice"
+                    class="w-full"
+                    styleClass="w-full"
+                    placeholder="{{ 'Child Price (e.g. 2500)...' | translate }}"
+                  ></p-inputNumber>
+                </div>
 
-              <div class="field col-12 col-md-4">
-                <label>
-                  {{ 'Price Before' | translate }}
-                </label>
-                <p-inputNumber formControlName="PriceBefore" [min]="0" class="w-full"></p-inputNumber>
-              </div>
+                <!-- Price Before -->
+                <div class="field col-12 col-md-4">
+                  <label for="manasikPriceBefore">
+                    {{ 'Price Before' | translate }}
+                  </label>
+                  <p-inputNumber
+                    id="manasikPriceBefore"
+                    formControlName="PriceBefore"
+                    [min]="0"
+                    class="w-full"
+                    styleClass="w-full"
+                    placeholder="{{ 'Price before discount...' | translate }}"
+                  ></p-inputNumber>
+                </div>
 
-              <div class="field col-12 col-md-4">
-                <label>
-                  {{ 'Capacity' | translate }}
-                  <span class="text-red-500">*</span>
-                </label>
-                <p-inputNumber formControlName="Capacity" [min]="1" class="w-full"></p-inputNumber>
-                <small
-                  class="p-error"
-                  *ngIf="form.get('Capacity')?.invalid && (form.get('Capacity')?.touched || form.get('Capacity')?.dirty)"
-                >
-                  {{ 'Capacity is required and must be at least 1' | translate }}
-                </small>
-              </div>
-
-              <div class="field col-12 col-md-6">
-                <label>
-                  {{ 'Start Date' | translate }}
-                  <span class="text-red-500">*</span>
-                </label>
-                <p-calendar
-                  formControlName="StartDate"
-                  [showIcon]="true"
-                  [showTime]="true"
-                  dateFormat="dd-mm-yy"
-                  styleClass="w-full"
-                  [iconDisplay]="'input'"
-                ></p-calendar>
-                <small
-                  class="p-error"
-                  *ngIf="form.get('StartDate')?.invalid && (form.get('StartDate')?.touched || form.get('StartDate')?.dirty)"
-                >
-                  {{ 'Start Date is required' | translate }}
-                </small>
-              </div>
-
-              <div class="field col-12 col-md-6">
-                <label>
-                  {{ 'End Date' | translate }}
-                  <span class="text-red-500">*</span>
-                </label>
-                <p-calendar
-                  formControlName="EndDate"
-                  [showIcon]="true"
-                  [showTime]="true"
-                  dateFormat="dd-mm-yy"
-                  styleClass="w-full"
-                  [iconDisplay]="'input'"
-                ></p-calendar>
-                <small class="p-error" *ngIf="form.get('EndDate')?.invalid && (form.get('EndDate')?.touched || form.get('EndDate')?.dirty)">
-                  {{ 'End Date is required' | translate }}
-                </small>
-              </div>
-
-              <div class="col-12 mb-3 mt-3">
-                <h5>{{ 'Location Details' | translate }}</h5>
-              </div>
-
-              <div class="field col-12 col-md-4">
-                <label>
-                  {{ 'Days in Makkah' | translate }}
-                  <span class="text-red-500">*</span>
-                </label>
-                <p-inputNumber formControlName="DaysInMakkah" [min]="0" class="w-full"></p-inputNumber>
-                <small
-                  class="p-error"
-                  *ngIf="form.get('DaysInMakkah')?.invalid && (form.get('DaysInMakkah')?.touched || form.get('DaysInMakkah')?.dirty)"
-                >
-                  {{ 'Days in Makkah is required' | translate }}
-                </small>
-              </div>
-
-              <div class="field col-12 col-md-4">
-                <label>
-                  {{ 'Days in Madinah' | translate }}
-                  <span class="text-red-500">*</span>
-                </label>
-                <p-inputNumber formControlName="DaysInMadinah" [min]="0" class="w-full"></p-inputNumber>
-                <small
-                  class="p-error"
-                  *ngIf="form.get('DaysInMadinah')?.invalid && (form.get('DaysInMadinah')?.touched || form.get('DaysInMadinah')?.dirty)"
-                >
-                  {{ 'Days in Madinah is required' | translate }}
-                </small>
-              </div>
-
-              <div class="field col-12 col-md-4">
-                <label>
-                  {{ 'Number of Days' | translate }}
-                  <span class="text-red-500">*</span>
-                </label>
-                <p-inputNumber formControlName="NumberOfDays" [min]="1" class="w-full"></p-inputNumber>
-                <small
-                  class="p-error"
-                  *ngIf="form.get('NumberOfDays')?.invalid && (form.get('NumberOfDays')?.touched || form.get('NumberOfDays')?.dirty)"
-                >
-                  {{ 'Number of Days is required and must be at least 1' | translate }}
-                </small>
-              </div>
-
-              <div class="field col-12 col-md-6">
-                <label>
-                  {{ 'Residence in Makkah' | translate }}
-                  <span class="text-red-500">*</span>
-                </label>
-                <input pInputText formControlName="ResidenceInMakkah" class="w-full" />
-                <small
-                  class="p-error"
-                  *ngIf="
-                    form.get('ResidenceInMakkah')?.invalid &&
-                    (form.get('ResidenceInMakkah')?.touched || form.get('ResidenceInMakkah')?.dirty)
-                  "
-                >
-                  {{ 'Residence in Makkah is required' | translate }}
-                </small>
-              </div>
-
-              <div class="field col-12 col-md-6">
-                <label>
-                  {{ 'Residence in Madinah' | translate }}
-                  <span class="text-red-500">*</span>
-                </label>
-                <input pInputText formControlName="ResidenceInMadinah" class="w-full" />
-                <small
-                  class="p-error"
-                  *ngIf="
-                    form.get('ResidenceInMadinah')?.invalid &&
-                    (form.get('ResidenceInMadinah')?.touched || form.get('ResidenceInMadinah')?.dirty)
-                  "
-                >
-                  {{ 'Residence in Madinah is required' | translate }}
-                </small>
-              </div>
-
-              <div class="field col-12 col-md-6">
-                <label>
-                  {{ 'From Location' | translate }}
-                  <span class="text-red-500">*</span>
-                </label>
-                <input pInputText formControlName="FromLocation" class="w-full" />
-                <small
-                  class="p-error"
-                  *ngIf="form.get('FromLocation')?.invalid && (form.get('FromLocation')?.touched || form.get('FromLocation')?.dirty)"
-                >
-                  {{ 'From Location is required' | translate }}
-                </small>
-              </div>
-
-              <div class="field col-12 col-md-6">
-                <label>
-                  {{ 'To Location' | translate }}
-                  <span class="text-red-500">*</span>
-                </label>
-                <input pInputText formControlName="ToLocation" class="w-full" />
-                <small
-                  class="p-error"
-                  *ngIf="form.get('ToLocation')?.invalid && (form.get('ToLocation')?.touched || form.get('ToLocation')?.dirty)"
-                >
-                  {{ 'To Location is required' | translate }}
-                </small>
-              </div>
-
-              <div class="field col-12 col-md-6">
-                <label>
-                  {{ 'Flight Line' | translate }}
-                  <span class="text-red-500">*</span>
-                </label>
-                <input pInputText formControlName="FlightLine" class="w-full" />
-                <small
-                  class="p-error"
-                  *ngIf="form.get('FlightLine')?.invalid && (form.get('FlightLine')?.touched || form.get('FlightLine')?.dirty)"
-                >
-                  {{ 'Flight Line is required' | translate }}
-                </small>
-              </div>
-
-              <div class="field col-12 col-md-6">
-                <label>
-                  {{ 'External Link' | translate }}
-                  <span class="text-red-500">*</span>
-                </label>
-                <input pInputText formControlName="ExternalLink" class="w-full" />
-                <!-- <small
-                  class="p-error"
-                  *ngIf="form.get('ExternalLink')?.invalid && (form.get('ExternalLink')?.touched || form.get('ExternalLink')?.dirty)"
-                >
-                  {{ 'External Link is required' | translate }}
-                </small> -->
-              </div>
-
-              <div class="col-12 mb-3 mt-3">
-                <h5>{{ 'Settings' | translate }}</h5>
-              </div>
-
-              <div class="field col-12 col-md-3">
-                <label>{{ 'Is Active' | translate }}</label>
-                <div><p-inputSwitch formControlName="IsActive"></p-inputSwitch></div>
-              </div>
-
-              <div class="field col-12 col-md-3">
-                <label>{{ 'Is Recommended' | translate }}</label>
-                <div><p-inputSwitch formControlName="IsRecommended"></p-inputSwitch></div>
-              </div>
-
-              <div class="field col-12 col-md-3">
-                <label>{{ 'Include VAT' | translate }}</label>
-                <div><p-inputSwitch formControlName="IsIncludeVate"></p-inputSwitch></div>
-              </div>
-              <div class="field col-12 col-md-3">
-                <label>{{ 'Is Fake' | translate }}</label>
-                <div><p-inputSwitch formControlName="IsFake"></p-inputSwitch></div>
-              </div>
-
-              <!-- Policy Panel -->
-              <div class="col-12 mt-3">
-                <p-panel [header]="'Policies' | translate" [toggleable]="true" styleClass="custom-panel w-full">
-                  <!-- Refund Policy -->
-                  <h3 class="flex justify-content-between align-items-center">
-                    <span>{{ 'Is Refund Enabled' | translate }}</span>
-                    <span><p-inputSwitch formControlName="IsRefundable" /></span>
-                  </h3>
-
-                  <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round" *ngIf="form.get('IsRefundable')?.value">
-                    <div class="field col-12 col-md-6 mx-auto">
-                      <label for="MinimumDaysToRefund">
-                        {{ 'Minimum Days To Refund' | translate }}
-                        <span class="text-red-500">*</span>
-                      </label>
-                      <p-inputNumber
-                        mode="decimal"
-                        inputId="MinimumDaysToRefund"
-                        id="MinimumDaysToRefund"
-                        formControlName="MinimumDaysToRefund"
-                        [min]="1"
-                        class="w-full"
-                      />
-                      <!-- <small
-                        class="p-error"
-                        *ngIf="
-                          form.get('MinimumDaysToRefund')?.invalid &&
-                          (form.get('MinimumDaysToRefund')?.touched || form.get('MinimumDaysToRefund')?.dirty)
-                        "
-                      >
-                        {{ 'Minimum Days To Refund is required' | translate }}
-                      </small> -->
-                    </div>
-                  </div>
-
-                  <!-- Payment Policy -->
-                  <h3 class="flex justify-content-between align-items-center mt-4">
-                    <span>{{ 'Deposit Rate' | translate }}</span>
-                    <span><p-inputSwitch formControlName="IsAllowPaymentUponArrival" /></span>
-                  </h3>
-
-                  <div
-                    class="formgrid grid p-3 border-1 border-dashed surface-border border-round"
-                    *ngIf="form.get('IsAllowPaymentUponArrival')?.value"
+                <!-- Capacity -->
+                <div class="field col-12 col-md-4">
+                  <label for="manasikCapacity">
+                    {{ 'Capacity' | translate }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <p-inputNumber
+                    id="manasikCapacity"
+                    formControlName="Capacity"
+                    [min]="1"
+                    class="w-full"
+                    styleClass="w-full"
+                    placeholder="{{ 'Total seats (e.g. 45)...' | translate }}"
+                  ></p-inputNumber>
+                  <small
+                    class="p-error"
+                    *ngIf="form.get('Capacity')?.invalid && (form.get('Capacity')?.touched || form.get('Capacity')?.dirty)"
                   >
-                    <div class="field col-12 col-md-6 mx-auto">
-                      <label for="depositRate">
-                        {{ 'Deposit Rate' | translate }}
-                        <span class="text-red-500">*</span>
-                      </label>
-                      <p-inputNumber
-                        mode="decimal"
-                        inputId="depositRate"
-                        id="depositRate"
-                        formControlName="depositRate"
-                        [min]="0"
-                        [max]="100"
-                        suffix="%"
-                        class="w-full"
-                      />
-                      <small
-                        class="p-error"
-                        *ngIf="form.get('depositRate')?.invalid && (form.get('depositRate')?.touched || form.get('depositRate')?.dirty)"
-                      >
-                        {{ 'Deposit Rate is required (0-100%)' | translate }}
-                      </small>
-                    </div>
-                  </div>
+                    {{ 'Capacity is required and must be at least 1' | translate }}
+                  </small>
+                </div>
 
-                  <!-- Cancellation Policy -->
-                  <h3 class="flex justify-content-between mt-4">
-                    {{ 'Cancellation Policies' | translate }}
-                  </h3>
-                  <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
-                    <div class="field col-12">
-                      <label for="cancellationPolicy">
-                        {{ 'Cancellation Policy' | translate }}
-                        <span class="text-red-500">*</span>
-                      </label>
-                      <p-editor id="cancellationPolicy" formControlName="CancellationPolicy" [style]="{ height: '150px' }"></p-editor>
-                      <small
-                        class="p-error"
-                        *ngIf="
-                          form.get('CancellationPolicy')?.invalid &&
-                          (form.get('CancellationPolicy')?.touched || form.get('CancellationPolicy')?.dirty)
-                        "
-                      >
-                        {{ 'Cancellation Policy is required' | translate }}
-                      </small>
-                    </div>
-                  </div>
-                </p-panel>
+                <!-- Start Date -->
+                <div class="field col-12 col-md-4">
+                  <label for="manasikStartDate">
+                    {{ 'Start Date' | translate }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <p-calendar
+                    id="manasikStartDate"
+                    formControlName="StartDate"
+                    [showIcon]="true"
+                    [showTime]="true"
+                    dateFormat="dd-mm-yy"
+                    styleClass="w-full"
+                    class="w-full"
+                    [iconDisplay]="'input'"
+                  ></p-calendar>
+                  <small
+                    class="p-error"
+                    *ngIf="form.get('StartDate')?.invalid && (form.get('StartDate')?.touched || form.get('StartDate')?.dirty)"
+                  >
+                    {{ 'Start Date is required' | translate }}
+                  </small>
+                </div>
+
+                <!-- End Date -->
+                <div class="field col-12 col-md-4">
+                  <label for="manasikEndDate">
+                    {{ 'End Date' | translate }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <p-calendar
+                    id="manasikEndDate"
+                    formControlName="EndDate"
+                    [showIcon]="true"
+                    [showTime]="true"
+                    dateFormat="dd-mm-yy"
+                    styleClass="w-full"
+                    class="w-full"
+                    [iconDisplay]="'input'"
+                  ></p-calendar>
+                  <small
+                    class="p-error"
+                    *ngIf="form.get('EndDate')?.invalid && (form.get('EndDate')?.touched || form.get('EndDate')?.dirty)"
+                  >
+                    {{ 'End Date is required' | translate }}
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 2: Location Details -->
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-map-marker"></i>
+                  <h3>{{ 'Location & Travel Details' | translate }}</h3>
+                </div>
               </div>
 
-              <div class="col-12 mb-3 mt-3">
-                <h5>{{ 'Descriptions' | translate }}</h5>
+              <div class="formgrid grid">
+                <!-- Days in Makkah -->
+                <div class="field col-12 col-md-4">
+                  <label for="daysMakkah">
+                    {{ 'Days in Makkah' | translate }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <p-inputNumber
+                    id="daysMakkah"
+                    formControlName="DaysInMakkah"
+                    [min]="0"
+                    class="w-full"
+                    styleClass="w-full"
+                    placeholder="e.g. 7"
+                  ></p-inputNumber>
+                  <small
+                    class="p-error"
+                    *ngIf="form.get('DaysInMakkah')?.invalid && (form.get('DaysInMakkah')?.touched || form.get('DaysInMakkah')?.dirty)"
+                  >
+                    {{ 'Days in Makkah is required' | translate }}
+                  </small>
+                </div>
+
+                <!-- Days in Madinah -->
+                <div class="field col-12 col-md-4">
+                  <label for="daysMadinah">
+                    {{ 'Days in Madinah' | translate }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <p-inputNumber
+                    id="daysMadinah"
+                    formControlName="DaysInMadinah"
+                    [min]="0"
+                    class="w-full"
+                    styleClass="w-full"
+                    placeholder="e.g. 7"
+                  ></p-inputNumber>
+                  <small
+                    class="p-error"
+                    *ngIf="form.get('DaysInMadinah')?.invalid && (form.get('DaysInMadinah')?.touched || form.get('DaysInMadinah')?.dirty)"
+                  >
+                    {{ 'Days in Madinah is required' | translate }}
+                  </small>
+                </div>
+
+                <!-- Number of Days -->
+                <div class="field col-12 col-md-4">
+                  <label for="totalDays">
+                    {{ 'Number of Days' | translate }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <p-inputNumber
+                    id="totalDays"
+                    formControlName="NumberOfDays"
+                    [min]="1"
+                    class="w-full"
+                    styleClass="w-full"
+                    placeholder="e.g. 14"
+                  ></p-inputNumber>
+                  <small
+                    class="p-error"
+                    *ngIf="form.get('NumberOfDays')?.invalid && (form.get('NumberOfDays')?.touched || form.get('NumberOfDays')?.dirty)"
+                  >
+                    {{ 'Number of Days is required and must be at least 1' | translate }}
+                  </small>
+                </div>
+
+                <!-- Residence in Makkah -->
+                <div class="field col-12 col-md-6">
+                  <label for="hotelMakkah">
+                    {{ 'Residence in Makkah' | translate }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="hotelMakkah"
+                    pInputText
+                    formControlName="ResidenceInMakkah"
+                    class="w-full"
+                    placeholder="{{ 'Makkah hotel name...' | translate }}"
+                  />
+                  <small
+                    class="p-error"
+                    *ngIf="
+                      form.get('ResidenceInMakkah')?.invalid &&
+                      (form.get('ResidenceInMakkah')?.touched || form.get('ResidenceInMakkah')?.dirty)
+                    "
+                  >
+                    {{ 'Residence in Makkah is required' | translate }}
+                  </small>
+                </div>
+
+                <!-- Residence in Madinah -->
+                <div class="field col-12 col-md-6">
+                  <label for="hotelMadinah">
+                    {{ 'Residence in Madinah' | translate }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="hotelMadinah"
+                    pInputText
+                    formControlName="ResidenceInMadinah"
+                    class="w-full"
+                    placeholder="{{ 'Madinah hotel name...' | translate }}"
+                  />
+                  <small
+                    class="p-error"
+                    *ngIf="
+                      form.get('ResidenceInMadinah')?.invalid &&
+                      (form.get('ResidenceInMadinah')?.touched || form.get('ResidenceInMadinah')?.dirty)
+                    "
+                  >
+                    {{ 'Residence in Madinah is required' | translate }}
+                  </small>
+                </div>
+
+                <!-- From Location -->
+                <div class="field col-12 col-md-6">
+                  <label for="locFrom">
+                    {{ 'From Location' | translate }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="locFrom"
+                    pInputText
+                    formControlName="FromLocation"
+                    class="w-full"
+                    placeholder="{{ 'Departure city or airport...' | translate }}"
+                  />
+                  <small
+                    class="p-error"
+                    *ngIf="form.get('FromLocation')?.invalid && (form.get('FromLocation')?.touched || form.get('FromLocation')?.dirty)"
+                  >
+                    {{ 'From Location is required' | translate }}
+                  </small>
+                </div>
+
+                <!-- To Location -->
+                <div class="field col-12 col-md-6">
+                  <label for="locTo">
+                    {{ 'To Location' | translate }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="locTo"
+                    pInputText
+                    formControlName="ToLocation"
+                    class="w-full"
+                    placeholder="{{ 'Arrival destination (e.g. Jeddah)...' | translate }}"
+                  />
+                  <small
+                    class="p-error"
+                    *ngIf="form.get('ToLocation')?.invalid && (form.get('ToLocation')?.touched || form.get('ToLocation')?.dirty)"
+                  >
+                    {{ 'To Location is required' | translate }}
+                  </small>
+                </div>
+
+                <!-- Flight Line -->
+                <div class="field col-12 col-md-6">
+                  <label for="airline">
+                    {{ 'Flight Line' | translate }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="airline"
+                    pInputText
+                    formControlName="FlightLine"
+                    class="w-full"
+                    placeholder="{{ 'Airline name (e.g. EgyptAir, Saudia)...' | translate }}"
+                  />
+                  <small
+                    class="p-error"
+                    *ngIf="form.get('FlightLine')?.invalid && (form.get('FlightLine')?.touched || form.get('FlightLine')?.dirty)"
+                  >
+                    {{ 'Flight Line is required' | translate }}
+                  </small>
+                </div>
+
+                <!-- External Link -->
+                <div class="field col-12 col-md-6">
+                  <label for="manasikExtLink">
+                    {{ 'External Link' | translate }}
+                  </label>
+                  <input
+                    id="manasikExtLink"
+                    pInputText
+                    formControlName="ExternalLink"
+                    class="w-full"
+                    placeholder="{{ 'Enter external landing page URL...' | translate }}"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 3: Configurations / Settings -->
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-sliders-h"></i>
+                  <h3>{{ 'Settings & Configurations' | translate }}</h3>
+                </div>
+              </div>
+              <div class="formgrid grid align-items-stretch">
+                <!-- Is Active -->
+                <div class="col-12 col-md-3 mb-3 mb-md-0">
+                  <div class="ux-toggle-card h-full" [class.active]="form.get('IsActive')?.value">
+                    <label for="isActiveSwitch" class="cursor-pointer">{{ 'Is Active' | translate }}</label>
+                    <p-inputSwitch id="isActiveSwitch" formControlName="IsActive" />
+                  </div>
+                </div>
+
+                <!-- Is Recommended -->
+                <div class="col-12 col-md-3 mb-3 mb-md-0">
+                  <div class="ux-toggle-card h-full" [class.active]="form.get('IsRecommended')?.value">
+                    <label for="recommendedSwitch" class="cursor-pointer">{{ 'Is Recommended' | translate }}</label>
+                    <p-inputSwitch id="recommendedSwitch" formControlName="IsRecommended" />
+                  </div>
+                </div>
+
+                <!-- Include VAT -->
+                <div class="col-12 col-md-3 mb-3 mb-md-0">
+                  <div class="ux-toggle-card h-full" [class.active]="form.get('IsIncludeVate')?.value">
+                    <label for="vatSwitch" class="cursor-pointer">{{ 'Include VAT' | translate }}</label>
+                    <p-inputSwitch id="vatSwitch" formControlName="IsIncludeVate" />
+                  </div>
+                </div>
+
+                <!-- Is Fake -->
+                <div class="col-12 col-md-3">
+                  <div class="ux-toggle-card h-full" [class.active]="form.get('IsFake')?.value">
+                    <label for="fakeSwitch" class="cursor-pointer">{{ 'Is Fake' | translate }}</label>
+                    <p-inputSwitch id="fakeSwitch" formControlName="IsFake" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 4: Policies -->
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-shield"></i>
+                  <h3>{{ 'Refund & Payment Policies' | translate }}</h3>
+                </div>
               </div>
 
-              <div class="col-12" formArrayName="Descriptions">
-                <div *ngFor="let desc of descriptions.controls; let i = index" [formGroupName]="i" class="mb-3">
-                  <div class="flex gap-2">
-                    <div class="flex-1">
-                      <textarea
-                        pInputTextarea
-                        rows="2"
-                        formControlName="description"
-                        class="w-full"
-                        [placeholder]="'Description ' + (i + 1)"
-                      ></textarea>
-                      <small
-                        class="p-error"
-                        *ngIf="desc.get('description')?.invalid && (desc.get('description')?.touched || desc.get('description')?.dirty)"
-                      >
-                        {{ 'Description is required' | translate }}
-                      </small>
-                    </div>
-                    <p-button icon="pi pi-trash" severity="danger" [text]="true" (onClick)="removeDescription(i)"></p-button>
+              <!-- Refund Policy -->
+              <div class="field col-12 p-0 mb-4">
+                <div class="ux-toggle-card mb-3" [class.active]="form.get('IsRefundable')?.value">
+                  <label for="refundSwitch" class="cursor-pointer font-bold">{{ 'Is Refund Enabled' | translate }}</label>
+                  <p-inputSwitch id="refundSwitch" formControlName="IsRefundable" />
+                </div>
+
+                <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round" *ngIf="form.get('IsRefundable')?.value">
+                  <div class="field col-12 col-md-6 mx-auto mb-0">
+                    <label for="MinimumDaysToRefund">
+                      {{ 'Minimum Days To Refund' | translate }}
+                      <span class="text-red-500">*</span>
+                    </label>
+                    <p-inputNumber
+                      mode="decimal"
+                      inputId="MinimumDaysToRefund"
+                      id="MinimumDaysToRefund"
+                      formControlName="MinimumDaysToRefund"
+                      [min]="1"
+                      class="w-full"
+                      styleClass="w-full"
+                      placeholder="e.g. 5 days before start"
+                    />
                   </div>
+                </div>
+              </div>
+
+              <!-- Payment Policy -->
+              <div class="field col-12 p-0 mb-4">
+                <div class="ux-toggle-card mb-3" [class.active]="form.get('IsAllowPaymentUponArrival')?.value">
+                  <label for="paymentArrivalSwitch" class="cursor-pointer font-bold">{{ 'Is Deposit Rate Enabled' | translate }}</label>
+                  <p-inputSwitch id="paymentArrivalSwitch" formControlName="IsAllowPaymentUponArrival" />
+                </div>
+
+                <div
+                  class="formgrid grid p-3 border-1 border-dashed surface-border border-round"
+                  *ngIf="form.get('IsAllowPaymentUponArrival')?.value"
+                >
+                  <div class="field col-12 col-md-6 mx-auto mb-0">
+                    <label for="depositRate">
+                      {{ 'Deposit Rate' | translate }}
+                      <span class="text-red-500">*</span>
+                    </label>
+                    <p-inputNumber
+                      mode="decimal"
+                      inputId="depositRate"
+                      id="depositRate"
+                      formControlName="depositRate"
+                      [min]="0"
+                      [max]="100"
+                      suffix="%"
+                      class="w-full"
+                      styleClass="w-full"
+                      placeholder="e.g. 20%"
+                    />
+                    <small
+                      class="p-error block mt-1"
+                      *ngIf="form.get('depositRate')?.invalid && (form.get('depositRate')?.touched || form.get('depositRate')?.dirty)"
+                    >
+                      {{ 'Deposit Rate is required (0-100%)' | translate }}
+                    </small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cancellation Policy -->
+              <div class="field col-12 p-0 mb-0">
+                <label for="cancellationPolicy" class="font-bold mb-2">
+                  {{ 'Cancellation Policy' | translate }}
+                  <span class="text-red-500">*</span>
+                </label>
+                <p-editor id="cancellationPolicy" formControlName="CancellationPolicy" [style]="{ height: '150px' }"></p-editor>
+                <small
+                  class="p-error block mt-1"
+                  *ngIf="
+                    form.get('CancellationPolicy')?.invalid &&
+                    (form.get('CancellationPolicy')?.touched || form.get('CancellationPolicy')?.dirty)
+                  "
+                >
+                  {{ 'Cancellation Policy is required' | translate }}
+                </small>
+              </div>
+            </div>
+
+            <!-- SECTION 5: Descriptions -->
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-align-left"></i>
+                  <h3>{{ 'Descriptions' | translate }}</h3>
                 </div>
                 <p-button
                   label="{{ 'Add Description' | translate }}"
                   icon="pi pi-plus"
                   [outlined]="true"
                   (onClick)="addDescription()"
+                  styleClass="p-button-sm"
                 ></p-button>
               </div>
 
-              <div class="field col-12 mt-3">
-                <label>{{ 'Images' | translate }}</label>
-                <app-img-uploader
-                  [multiple]="true"
-                  [displayFiles]="existingImages"
-                  (filesChanged)="onImagesUpload($event)"
-                  (removeImgFromDBWithId)="onImageDeleted($event)"
-                ></app-img-uploader>
+              <div class="col-12 p-0" formArrayName="Descriptions">
+                <div *ngFor="let desc of descriptions.controls; let i = index" [formGroupName]="i" class="instruction-item">
+                  <span class="instruction-number">{{ i + 1 }}</span>
+                  <textarea
+                    pInputTextarea
+                    rows="2"
+                    formControlName="description"
+                    [placeholder]="'Description ' + (i + 1)"
+                    class="w-full"
+                  ></textarea>
+                  <p-button icon="pi pi-trash" severity="danger" [text]="true" (onClick)="removeDescription(i)"></p-button>
+                </div>
               </div>
+            </div>
+
+            <!-- SECTION 6: Child Pricing Policies -->
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-users"></i>
+                  <h3>{{ 'Child Pricing Policies' | translate }}</h3>
+                </div>
+                <button
+                  type="button"
+                  pButton
+                  icon="pi pi-plus"
+                  label="{{ 'Add Policy' | translate }}"
+                  (click)="addChildPricingPolicy()"
+                  class="p-button-outlined p-button-sm"
+                ></button>
+              </div>
+
+              <p class="text-sm text-color-secondary m-0 mb-3">
+                {{
+                  'Define pricing rules based on child age ranges. Rules can be defined as percentage of base price or fixed amount.'
+                    | translate
+                }}
+              </p>
+
+              <!-- Hint Text -->
+              <small class="form-text text-info block mb-3" *ngIf="childPricingPolicies.length === 0">
+                {{ 'No policies defined. Default child price will apply.' | translate }}
+              </small>
+
+              <div formArrayName="ChildPricingPolicies" class="grid formgrid">
+                <div *ngFor="let group of childPricingPolicies.controls; let i = index" [formGroupName]="i" class="col-12">
+                  <div class="child-policy-row">
+                    <div class="grid align-items-center formgrid">
+                      <!-- Min Age -->
+                      <div class="col-12 col-md-2 mb-3 mb-md-0">
+                        <div class="field-col">
+                          <label>{{ 'Min Age' | translate }}</label>
+                          <p-inputNumber
+                            formControlName="minAge"
+                            [min]="0"
+                            [max]="17"
+                            placeholder="0"
+                            styleClass="w-full"
+                            class="w-full"
+                          ></p-inputNumber>
+                        </div>
+                      </div>
+
+                      <!-- Max Age -->
+                      <div class="col-12 col-md-2 mb-3 mb-md-0">
+                        <div class="field-col">
+                          <label>{{ 'Max Age' | translate }}</label>
+                          <p-inputNumber
+                            formControlName="maxAge"
+                            [min]="0"
+                            [max]="17"
+                            placeholder="12"
+                            styleClass="w-full"
+                            class="w-full"
+                          ></p-inputNumber>
+                        </div>
+                      </div>
+
+                      <!-- Pricing Type -->
+                      <div class="col-12 col-md-3 mb-3 mb-md-0">
+                        <div class="field-col">
+                          <label>{{ 'Pricing Type' | translate }}</label>
+                          <p-dropdown
+                            formControlName="pricingType"
+                            [options]="childPricingTypes"
+                            optionLabel="label"
+                            optionValue="value"
+                            styleClass="w-full"
+                            class="w-full"
+                          ></p-dropdown>
+                        </div>
+                      </div>
+
+                      <!-- Value -->
+                      <div class="col-12 col-md-3 mb-3 mb-md-0">
+                        <div class="field-col">
+                          <label>{{ 'Value' | translate }}</label>
+                          <p-inputNumber
+                            formControlName="value"
+                            [min]="0"
+                            [placeholder]="group.get('pricingType')?.value === 1 ? 'e.g. 50 (%)' : 'e.g. 500 (Fixed)'"
+                            [suffix]="group.get('pricingType')?.value === 1 ? '%' : ''"
+                            styleClass="w-full"
+                            class="w-full"
+                          ></p-inputNumber>
+                        </div>
+                      </div>
+
+                      <!-- Actions -->
+                      <div class="col-12 col-md-2 text-center text-md-right mt-2 mt-md-0">
+                        <div class="field-col">
+                          <label class="d-none d-md-block" style="visibility: hidden">Delete</label>
+                          <button
+                            type="button"
+                            pButton
+                            icon="pi pi-trash"
+                            class="policy-delete-btn w-full"
+                            (click)="removeChildPricingPolicy(i)"
+                            label="{{ 'Delete' | translate }}"
+                          ></button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 7: Services Provided / Accommodations -->
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-home"></i>
+                  <h3>{{ 'Services Provided / Accommodations' | translate }}</h3>
+                </div>
+              </div>
+              <div class="pills-container">
+                <span
+                  *ngFor="let item of accommodationTypeList"
+                  (click)="selectAccommodationType(item.value)"
+                  [class.active]="form.get('AccommodationTypeId')?.value === item.value"
+                  class="accommodation-pill"
+                >
+                  {{ item.label }}
+                </span>
+                <span (click)="showAddAccommodationTypeDialog()" class="accommodation-pill add-new-pill">
+                  <i class="pi pi-plus-circle mr-1"></i>
+                  {{ 'New Type' | translate }}
+                </span>
+              </div>
+            </div>
+
+            <!-- SECTION 8: Travel Features -->
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-tags"></i>
+                  <h3>{{ 'Travel Features' | translate }}</h3>
+                </div>
+              </div>
+              <div class="pills-container">
+                <span
+                  *ngFor="let feat of travelFeatureList"
+                  (click)="toggleTravelFeature(feat.value)"
+                  [class.active]="isTravelFeatureSelected(feat.value)"
+                  class="accommodation-pill"
+                >
+                  {{ feat.label }}
+                </span>
+                <span (click)="showAddTravelFeatureDialog()" class="accommodation-pill add-new-pill">
+                  <i class="pi pi-plus-circle mr-1"></i>
+                  {{ 'New Feature' | translate }}
+                </span>
+              </div>
+            </div>
+
+            <!-- SECTION 9: Images -->
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-images"></i>
+                  <h3>{{ 'Images' | translate }}</h3>
+                </div>
+              </div>
+              <app-img-uploader
+                [multiple]="true"
+                [displayFiles]="existingImages"
+                (filesChanged)="onImagesUpload($event)"
+                (removeImgFromDBWithId)="onImageDeleted($event)"
+              ></app-img-uploader>
             </div>
 
             <div class="buttons mt-3 text-end">
@@ -449,25 +749,57 @@
       <p-stepperPanel [header]="'Program Steps' | translate">
         <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback">
           <form class="form-field" [formGroup]="stepsForm">
-            <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
-              <div class="col-12 mb-3">
-                <h5>{{ 'Manage Program Steps' | translate }}</h5>
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-calendar-times"></i>
+                  <h3>{{ 'Manage Program Steps' | translate }}</h3>
+                </div>
+                <p-button
+                  label="{{ 'Add Step' | translate }}"
+                  icon="pi pi-plus"
+                  class="p-button-outlined p-button-sm"
+                  (onClick)="addStep()"
+                ></p-button>
               </div>
 
-              <div class="col-12" formArrayName="steps">
-                <div
-                  *ngFor="let step of steps.controls; let i = index"
-                  [formGroupName]="i"
-                  class="mb-4 p-3 border-1 surface-border border-round"
-                >
-                  <div class="flex justify-content-between align-items-center mb-3">
-                    <h6 class="m-0">{{ 'Step' | translate }} {{ i + 1 }}</h6>
-                    <p-button icon="pi pi-trash" severity="danger" [text]="true" (onClick)="removeStep(i)"></p-button>
-                  </div>
+              <!-- Empty state helper -->
+              <div
+                *ngIf="steps.length === 0"
+                class="text-center py-5 border-1 border-dashed surface-border border-round bg-light-subtle mb-3"
+              >
+                <i class="pi pi-calendar text-4xl text-muted mb-3 block"></i>
+                <p class="text-muted m-0">
+                  {{ 'No program steps added yet. Click Add Step to begin defining the package program.' | translate }}
+                </p>
+              </div>
 
-                  <div class="formgrid grid">
+              <p-accordion [multiple]="true" formArrayName="steps" *ngIf="steps.length > 0">
+                <p-accordionTab *ngFor="let step of steps.controls; let i = index" [formGroupName]="i">
+                  <ng-template pTemplate="header">
+                    <div class="accordion-tab-header">
+                      <div class="header-left">
+                        <span class="day-badge">{{ 'Step' | translate }} {{ i + 1 }}</span>
+                        <span class="step-title font-bold">{{ step.get('title')?.value || ('New Program Step' | translate) }}</span>
+                      </div>
+                      <p-button
+                        icon="pi pi-trash"
+                        severity="danger"
+                        [text]="true"
+                        class="p-button-rounded p-button-text p-button-danger p-0 ml-auto"
+                        styleClass="p-button-rounded p-button-text"
+                        (onClick)="removeStep(i); $event.stopPropagation()"
+                      ></p-button>
+                    </div>
+                  </ng-template>
+
+                  <!-- Step Fields -->
+                  <div class="formgrid grid pt-3">
                     <div class="field col-12 col-md-6">
-                      <label>{{ 'Type' | translate }}</label>
+                      <label>
+                        {{ 'Type' | translate }}
+                        <span class="text-red-500">*</span>
+                      </label>
                       <p-dropdown
                         formControlName="type"
                         [options]="[
@@ -477,17 +809,32 @@
                         ]"
                         placeholder="{{ '-- Select type --' | translate }}"
                         styleClass="w-full"
+                        class="w-full"
                       ></p-dropdown>
                     </div>
 
                     <div class="field col-12 col-md-6">
-                      <label>{{ 'Title' | translate }}</label>
-                      <input pInputText formControlName="title" />
+                      <label>
+                        {{ 'Title' | translate }}
+                        <span class="text-red-500">*</span>
+                      </label>
+                      <input
+                        pInputText
+                        formControlName="title"
+                        placeholder="{{ 'Enter step title (e.g. Flight to Jeddah)...' | translate }}"
+                        class="w-full"
+                      />
                     </div>
 
                     <div class="field col-12">
                       <label>{{ 'Details' | translate }}</label>
-                      <textarea pInputTextarea rows="3" formControlName="details" class="w-full"></textarea>
+                      <textarea
+                        pInputTextarea
+                        rows="3"
+                        formControlName="details"
+                        placeholder="{{ 'Enter detailed description of the program step...' | translate }}"
+                        class="w-full"
+                      ></textarea>
                     </div>
 
                     <div class="field col-12 col-md-4">
@@ -499,6 +846,7 @@
                         [showSeconds]="true"
                         dateFormat="dd-mm-yy"
                         styleClass="w-full"
+                        class="w-full"
                         [iconDisplay]="'input'"
                       ></p-calendar>
                     </div>
@@ -512,6 +860,7 @@
                         [showSeconds]="true"
                         dateFormat="dd-mm-yy"
                         styleClass="w-full"
+                        class="w-full"
                         [iconDisplay]="'input'"
                       ></p-calendar>
                     </div>
@@ -525,59 +874,74 @@
                         [showSeconds]="true"
                         dateFormat="dd-mm-yy"
                         styleClass="w-full"
+                        class="w-full"
                         [iconDisplay]="'input'"
                       ></p-calendar>
                     </div>
 
                     <div class="field col-12 col-md-6">
                       <label>{{ 'From Location' | translate }}</label>
-                      <input pInputText formControlName="fromLocation" />
+                      <input
+                        pInputText
+                        formControlName="fromLocation"
+                        placeholder="{{ 'Departure location...' | translate }}"
+                        class="w-full"
+                      />
                     </div>
 
                     <div class="field col-12 col-md-6">
                       <label>{{ 'To Location' | translate }}</label>
-                      <input pInputText formControlName="toLocation" />
+                      <input
+                        pInputText
+                        formControlName="toLocation"
+                        placeholder="{{ 'Arrival destination...' | translate }}"
+                        class="w-full"
+                      />
                     </div>
 
                     <!-- Step Descriptions -->
                     <div class="col-12 mt-3">
-                      <label class="block mb-2">{{ 'Step Descriptions' | translate }}</label>
+                      <div class="flex justify-content-between align-items-center mb-3">
+                        <label class="block font-bold m-0">
+                          <i class="pi pi-align-left mr-1 text-primary"></i>
+                          {{ 'Step Descriptions' | translate }}
+                        </label>
+                        <p-button
+                          label="{{ 'Add Description' | translate }}"
+                          icon="pi pi-plus"
+                          [outlined]="true"
+                          size="small"
+                          styleClass="p-button-sm"
+                          (onClick)="addStepDescription(i)"
+                        ></p-button>
+                      </div>
+
                       <div formArrayName="stepDescriptions">
-                        <div *ngFor="let desc of getStepDescriptions(i).controls; let j = index" [formGroupName]="j" class="mb-2">
-                          <div class="flex gap-2">
-                            <div class="flex-1">
-                              <input pInputText formControlName="description" class="w-full" [placeholder]="'Description ' + (j + 1)" />
-                            </div>
-                            <p-button icon="pi pi-trash" severity="danger" [text]="true" (onClick)="removeStepDescription(i, j)"></p-button>
-                          </div>
+                        <div
+                          *ngFor="let desc of getStepDescriptions(i).controls; let j = index"
+                          [formGroupName]="j"
+                          class="instruction-item"
+                        >
+                          <span class="instruction-number">{{ j + 1 }}</span>
+                          <input pInputText formControlName="description" class="w-full" [placeholder]="'Description ' + (j + 1)" />
+                          <p-button icon="pi pi-trash" severity="danger" [text]="true" (onClick)="removeStepDescription(i, j)"></p-button>
                         </div>
                       </div>
-                      <p-button
-                        label="{{ 'Add Description' | translate }}"
-                        icon="pi pi-plus"
-                        [outlined]="true"
-                        size="small"
-                        (onClick)="addStepDescription(i)"
-                      ></p-button>
                     </div>
                   </div>
-                </div>
-              </div>
+                </p-accordionTab>
+              </p-accordion>
 
-              <div class="col-12">
-                <p-button label="{{ 'Add Step' | translate }}" icon="pi pi-plus" (onClick)="addStep()"></p-button>
+              <div class="buttons mt-4 text-end border-top pt-3">
+                <p-button label="{{ 'Previous' | translate }}" class="mx-1" severity="secondary" (onClick)="prevCallback.emit()"></p-button>
+                <p-button
+                  [label]="(isEditMode ? 'Update & Next' : 'Next') | translate"
+                  class="mx-1"
+                  severity="primary"
+                  [loading]="isLoading"
+                  (onClick)="submitStep2(nextCallback)"
+                ></p-button>
               </div>
-            </div>
-
-            <div class="buttons mt-3 text-end">
-              <p-button label="{{ 'Previous' | translate }}" class="mx-1" severity="secondary" (onClick)="prevCallback.emit()"></p-button>
-              <p-button
-                [label]="(isEditMode ? 'Update & Next' : 'Next') | translate"
-                class="mx-1"
-                severity="primary"
-                [loading]="isLoading"
-                (onClick)="submitStep2(nextCallback)"
-              ></p-button>
             </div>
           </form>
         </ng-template>
@@ -587,85 +951,142 @@
       <p-stepperPanel [header]="'rooms tybe' | translate">
         <ng-template pTemplate="content" let-prevCallback="prevCallback">
           <form class="form-field" [formGroup]="ticketsForm">
-            <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
-              <div class="col-12 mb-3">
-                <h5>{{ 'Manage Manasik Tickets' | translate }}</h5>
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-tags"></i>
+                  <h3>{{ 'Manage Manasik Tickets' | translate }}</h3>
+                </div>
               </div>
 
-              <div class="field col-12 col-md-6">
-                <label>{{ 'room tybe' | translate }}</label>
-                <input pInputText formControlName="ticketType" />
+              <!-- Add New Ticket Row Fields -->
+              <div class="p-3 border-1 surface-border border-round bg-light-subtle mb-4">
+                <div class="formgrid grid">
+                  <div class="field col-12 col-md-6">
+                    <label class="font-bold">
+                      {{ 'room tybe' | translate }}
+                      <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                      pInputText
+                      formControlName="ticketType"
+                      placeholder="{{ 'e.g. Double Room, Triple Room...' | translate }}"
+                      class="w-full"
+                    />
+                  </div>
+
+                  <div class="field col-12 col-md-6">
+                    <label class="font-bold">{{ 'Description' | translate }}</label>
+                    <input
+                      pInputText
+                      formControlName="description"
+                      placeholder="{{ 'Enter room description details...' | translate }}"
+                      class="w-full"
+                    />
+                  </div>
+
+                  <div class="field col-12 col-md-4">
+                    <label class="font-bold">
+                      {{ 'Price' | translate }}
+                      <span class="text-red-500">*</span>
+                    </label>
+                    <p-inputNumber
+                      formControlName="price"
+                      class="w-full"
+                      styleClass="w-full"
+                      placeholder="{{ 'e.g. 12000...' | translate }}"
+                    ></p-inputNumber>
+                  </div>
+
+                  <div class="field col-12 col-md-4">
+                    <label class="font-bold">
+                      {{ 'Available Quantity' | translate }}
+                      <span class="text-red-500">*</span>
+                    </label>
+                    <p-inputNumber
+                      formControlName="availableQuantity"
+                      [min]="1"
+                      class="w-full"
+                      styleClass="w-full"
+                      placeholder="{{ 'e.g. 10...' | translate }}"
+                    ></p-inputNumber>
+                  </div>
+
+                  <div class="field col-12 col-md-4">
+                    <label class="font-bold block mb-2">{{ 'Is Active' | translate }}</label>
+                    <p-inputSwitch formControlName="isActive"></p-inputSwitch>
+                  </div>
+
+                  <div class="col-12 mt-2">
+                    <p-button
+                      label="{{ 'Add to List' | translate }}"
+                      icon="pi pi-plus"
+                      (onClick)="addTicket()"
+                      [disabled]="ticketsForm.invalid"
+                      severity="success"
+                      class="shadow"
+                    ></p-button>
+                  </div>
+                </div>
               </div>
 
-              <div class="field col-12 col-md-6">
-                <label>{{ 'Description' | translate }}</label>
-                <input pInputText formControlName="description" />
-              </div>
-
-              <div class="field col-12 col-md-4">
-                <label>{{ 'Price' | translate }}</label>
-                <p-inputNumber formControlName="price"></p-inputNumber>
-              </div>
-
-              <div class="field col-12 col-md-4">
-                <label>{{ 'Available Quantity' | translate }}</label>
-                <p-inputNumber formControlName="availableQuantity" [min]="1"></p-inputNumber>
-              </div>
-
-              <div class="field col-12 col-md-4">
-                <label>{{ 'Is Active' | translate }}</label>
-                <div><p-inputSwitch formControlName="isActive"></p-inputSwitch></div>
-              </div>
-
-              <div class="col-12">
-                <p-button
-                  label="{{ 'Add to List' | translate }}"
-                  icon="pi pi-plus"
-                  (onClick)="addTicket()"
-                  [disabled]="ticketsForm.invalid"
-                ></p-button>
-              </div>
-
-              <!-- Tickets List -->
-              <div class="col-12 mt-3" *ngIf="tickets.length > 0">
-                <p-table [value]="tickets.controls" styleClass="p-datatable-sm">
+              <!-- Tickets/Rooms List Table -->
+              <div class="col-12 p-0 mb-4" *ngIf="tickets.length > 0">
+                <div class="font-bold mb-3">
+                  <i class="pi pi-list mr-1 text-primary"></i>
+                  {{ 'Added Room Types / Tickets' | translate }}
+                </div>
+                <p-table [value]="tickets.controls" styleClass="p-datatable-gridlines p-datatable-striped">
                   <ng-template pTemplate="header">
                     <tr>
                       <th>{{ 'rooms tybe' | translate }}</th>
                       <th>{{ 'Description' | translate }}</th>
-                      <th>{{ 'Price' | translate }}</th>
-                      <th>{{ 'Quantity' | translate }}</th>
-                      <th>{{ 'Active' | translate }}</th>
-                      <th>{{ 'Actions' | translate }}</th>
+                      <th style="width: 120px" class="text-center">{{ 'Price' | translate }}</th>
+                      <th style="width: 120px" class="text-center">{{ 'Quantity' | translate }}</th>
+                      <th style="width: 100px" class="text-center">{{ 'Active' | translate }}</th>
+                      <th style="width: 80px" class="text-center">{{ 'Actions' | translate }}</th>
                     </tr>
                   </ng-template>
                   <ng-template pTemplate="body" let-ticket let-i="rowIndex">
                     <tr>
-                      <td>{{ ticket.get('ticketType')?.value }}</td>
+                      <td class="font-bold">{{ ticket.get('ticketType')?.value }}</td>
                       <td>{{ ticket.get('description')?.value }}</td>
-                      <td>{{ ticket.get('price')?.value }}</td>
-                      <td>{{ ticket.get('availableQuantity')?.value }}</td>
-                      <td>
-                        <i class="pi" [ngClass]="ticket.get('isActive')?.value ? 'pi-check text-green-500' : 'pi-times text-red-500'"></i>
+                      <td class="text-center font-semibold text-primary">{{ ticket.get('price')?.value | number }} EGP</td>
+                      <td class="text-center">{{ ticket.get('availableQuantity')?.value }}</td>
+                      <td class="text-center">
+                        <span class="p-badge" [ngClass]="ticket.get('isActive')?.value ? 'p-badge-success' : 'p-badge-danger'">
+                          {{ (ticket.get('isActive')?.value ? 'Active' : 'Inactive') | translate }}
+                        </span>
                       </td>
-                      <td>
+                      <td class="text-center">
                         <p-button icon="pi pi-trash" severity="danger" [text]="true" (onClick)="removeTicket(i)"></p-button>
                       </td>
                     </tr>
                   </ng-template>
                 </p-table>
               </div>
-            </div>
 
-            <div class="buttons mt-3 text-end">
-              <p-button label="{{ 'Previous' | translate }}" class="mx-1" severity="secondary" (onClick)="prevCallback.emit()"></p-button>
-              <p-button
-                [label]="(isEditMode ? 'Update Manasik' : 'Create Manasik') | translate"
-                class="mx-1"
-                severity="primary"
-                [loading]="isLoading"
-                (onClick)="submitStep3()"
-              ></p-button>
+              <!-- Empty state helper -->
+              <div
+                *ngIf="tickets.length === 0"
+                class="text-center py-5 border-1 border-dashed surface-border border-round bg-light-subtle mb-4"
+              >
+                <i class="pi pi-ticket text-4xl text-muted mb-3 block"></i>
+                <p class="text-muted m-0">
+                  {{ 'No tickets/rooms added yet. Fill the fields above and click Add to List to define room types.' | translate }}
+                </p>
+              </div>
+
+              <div class="buttons mt-4 text-end border-top pt-3">
+                <p-button label="{{ 'Previous' | translate }}" class="mx-1" severity="secondary" (onClick)="prevCallback.emit()"></p-button>
+                <p-button
+                  [label]="(isEditMode ? 'Update Manasik' : 'Create Manasik') | translate"
+                  class="mx-1"
+                  severity="primary"
+                  [loading]="isLoading"
+                  (onClick)="submitStep3()"
+                ></p-button>
+              </div>
             </div>
           </form>
         </ng-template>
@@ -675,3 +1096,72 @@
 </div>
 <p-toast />
 <p-confirmDialog />
+
+<!-- Dialogs for adding lookup values -->
+<p-dialog
+  header="{{ 'Add Accommodation Type' | translate }}"
+  [(visible)]="displayAddAccommodationTypeDialog"
+  [modal]="true"
+  [responsive]="true"
+  [style]="{ width: '450px' }"
+>
+  <form [formGroup]="accommodationTypeForm" (ngSubmit)="saveAccommodationType()">
+    <div class="grid p-fluid">
+      <div class="col-12 field mb-3">
+        <label for="newAccNameEn">{{ 'Name (English)' | translate }} *</label>
+        <input id="newAccNameEn" type="text" pInputText formControlName="nameEn" />
+      </div>
+      <div class="col-12 field mb-3">
+        <label for="newAccNameAr">{{ 'Name (Arabic)' | translate }} *</label>
+        <input id="newAccNameAr" type="text" pInputText formControlName="nameAr" />
+      </div>
+    </div>
+    <div class="flex justify-content-end gap-2 mt-3">
+      <button
+        type="button"
+        pButton
+        label="{{ 'Cancel' | translate }}"
+        class="p-button-secondary p-button-outlined"
+        (click)="displayAddAccommodationTypeDialog = false"
+      ></button>
+      <button
+        type="submit"
+        pButton
+        label="{{ 'Save' | translate }}"
+        [disabled]="accommodationTypeForm.invalid || isSavingAccommodationType"
+      ></button>
+    </div>
+  </form>
+</p-dialog>
+
+<p-dialog
+  header="{{ 'Add Travel Feature' | translate }}"
+  [(visible)]="displayAddTravelFeatureDialog"
+  [modal]="true"
+  [responsive]="true"
+  [style]="{ width: '400px' }"
+>
+  <form [formGroup]="travelFeatureForm" (ngSubmit)="saveTravelFeature()">
+    <div class="grid p-fluid">
+      <div class="col-12 field mb-3">
+        <label for="newFeatureName">{{ 'Feature Name' | translate }} *</label>
+        <input id="newFeatureName" type="text" pInputText formControlName="name" />
+      </div>
+    </div>
+    <div class="flex justify-content-end gap-2 mt-3">
+      <button
+        type="button"
+        pButton
+        label="{{ 'Cancel' | translate }}"
+        class="p-button-secondary p-button-outlined"
+        (click)="displayAddTravelFeatureDialog = false"
+      ></button>
+      <button
+        type="submit"
+        pButton
+        label="{{ 'Save' | translate }}"
+        [disabled]="travelFeatureForm.invalid || isSavingTravelFeature"
+      ></button>
+    </div>
+  </form>
+</p-dialog>

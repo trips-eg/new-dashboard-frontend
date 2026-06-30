@@ -4,302 +4,464 @@
     [mainSection]="'Outing' | translate"
     [subSection]="isEditMode ? ('Edit' | translate) : ('Add' | translate)"
   ></sub-header>
-  <div class="product-form shadow-3 p-4">
+
+  <div class="product-form">
     <p-stepper [(activeStep)]="activeStep" *ngIf="reloadStepper">
       <!-- Step 1: Outing Information -->
       <p-stepperPanel [header]="'Outing Information' | translate">
         <ng-template pTemplate="content" let-nextCallback="nextCallback">
           <form class="form-field" [formGroup]="outingForm">
-            <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
-              <div class="field col-12 col-md-6">
-                <label>{{ 'Outing Type' | translate }}</label>
-                <p-dropdown
-                  formControlName="OutingType"
-                  [options]="outingTypeOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="{{ '-- Select Outing Type --' | translate }}"
-                  styleClass="w-full"
-                ></p-dropdown>
-                <small
-                  class="p-error"
-                  *ngIf="
-                    outingForm.get('OutingType')?.invalid && (outingForm.get('OutingType')?.touched || outingForm.get('OutingType')?.dirty)
-                  "
-                >
-                  {{ 'Please select outing type' | translate }}
-                </small>
+            
+            <!-- Outing Type Selection Choice Cards -->
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-compass"></i>
+                  <h3>{{ 'Outing Type' | translate }}</h3>
+                </div>
               </div>
-
-              <div class="field col-12 col-md-6">
-                <label>{{ 'Name' | translate }}</label>
-                <input pInputText formControlName="Name" />
-                <small class="p-error" *ngIf="nameCtrl?.invalid && (nameCtrl?.touched || nameCtrl?.dirty)">
-                  {{ 'This field is required' | translate }}
-                </small>
-              </div>
-
-              <div class="field col-12 col-md-6">
-                <label>{{ 'Target Audience' | translate }}</label>
-                <input pInputText formControlName="TargetAudience" />
-              </div>
-
-              <div class="field col-12">
-                <label>{{ 'Description' | translate }}</label>
-                <textarea pInputTextarea rows="4" formControlName="Description" class="w-full"></textarea>
-                <small class="p-error" *ngIf="descCtrl?.invalid && (descCtrl?.touched || descCtrl?.dirty)">
-                  {{ 'This field is required' | translate }}
-                </small>
-              </div>
-
-              <div class="field col-12 col-md-3">
-                <label>{{ 'Location' | translate }}</label>
-                <input pInputText formControlName="Location" />
-              </div>
-
-              <div class="field col-12 col-md-3">
-                <label>{{ 'External Link' | translate }}</label>
-                <input pInputText formControlName="ExternalLink" type="url" placeholder="https://..." />
-              </div>
-
-              <div class="field col-12 col-md-3">
-                <label>{{ 'Category' | translate }}</label>
-                <p-dropdown
-                  formControlName="OutingCategoryId"
-                  [options]="categories"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="{{ '-- Select --' | translate }}"
-                  styleClass="w-full"
-                ></p-dropdown>
-                <small class="p-error" *ngIf="categoryCtrl?.invalid && (categoryCtrl?.touched || categoryCtrl?.dirty)">
-                  {{ 'Please select Outing Category' | translate }}
-                </small>
-              </div>
-
-              <div class="field col-12 col-md-3">
-                <label class="block mb-2">{{ 'Features' | translate }}</label>
-                <p-multiSelect
-                  formControlName="FeatureIds"
-                  [options]="features"
-                  optionLabel="name"
-                  optionValue="id"
-                  [filter]="true"
-                  (onFilter)="onFeaturesFilter($event)"
-                  placeholder="{{ 'Select Features' | translate }}"
-                  styleClass="w-full"
-                  display="chip"
-                ></p-multiSelect>
-                <small class="p-error" *ngIf="featuresCtrl?.invalid && (featuresCtrl?.touched || featuresCtrl?.dirty)">
-                  {{ 'Please select at least one feature' | translate }}
-                </small>
-              </div>
-
-              <div class="field col-12 col-md-3">
-                <label>{{ 'Rating' | translate }}</label>
-                <p-dropdown
-                  formControlName="Rating"
-                  [options]="starRatings"
-                  placeholder="{{ '-- Select rating --' | translate }}"
-                  styleClass="w-full"
-                ></p-dropdown>
-                <small class="p-error" *ngIf="ratingCtrl?.invalid && (ratingCtrl?.touched || ratingCtrl?.dirty)">
-                  {{ 'Please select at least one feature' | translate }}
-                </small>
-              </div>
-
-              <!-- Added Branches Field -->
-              <div class="field col-12 col-md-4">
-                <label class="block mb-2">{{ 'Branches' | translate }}</label>
-                <p-multiSelect
-                  formControlName="BranchIds"
-                  [options]="branches"
-                  optionLabel="name"
-                  optionValue="id"
-                  [filter]="true"
-                  placeholder="{{ 'Select Branches' | translate }}"
-                  styleClass="w-full"
-                  display="chip"
-                >
-                  <ng-template pTemplate="footer">
-                    <div class="p-2 flex gap-2 align-items-center">
-                      <input
-                        pInputText
-                        type="text"
-                        [(ngModel)]="newBranchName"
-                        [ngModelOptions]="{ standalone: true }"
-                        placeholder="{{ 'New Branch Name' | translate }}"
-                        class="flex-1 p-inputtext-sm"
-                      />
-                      <input
-                        pInputText
-                        type="text"
-                        [(ngModel)]="newBranchLocation"
-                        [ngModelOptions]="{ standalone: true }"
-                        placeholder="{{ 'Location' | translate }}"
-                        class="flex-1 p-inputtext-sm"
-                      />
-
-                      <p-button icon="pi pi-plus" styleClass="p-button-sm" (onClick)="addNewBranch()"></p-button>
-                    </div>
-                  </ng-template>
-                </p-multiSelect>
-                <small
-                  class="p-error"
-                  *ngIf="
-                    outingForm.get('BranchIds')?.invalid && (outingForm.get('BranchIds')?.touched || outingForm.get('BranchIds')?.dirty)
-                  "
-                >
-                  {{ 'Please select at least one branch' | translate }}
-                </small>
-              </div>
-
-              <!-- Start Date - Only shown for Normal type -->
-              <div class="field col-12 col-md-4" *ngIf="outingForm.get('OutingType')?.value === OutingType.Normal">
-                <label>{{ 'Start Date' | translate }}</label>
-                <p-calendar
-                  formControlName="StartDate"
-                  [showIcon]="true"
-                  [showTime]="true"
-                  dateFormat="dd-mm-yy"
-                  styleClass="w-full"
-                  [iconDisplay]="'input'"
-                ></p-calendar>
-                <small class="p-error" *ngIf="startDateCtrl?.invalid && (startDateCtrl?.touched || startDateCtrl?.dirty)">
-                  {{ 'Please select start date' | translate }}
-                </small>
-              </div>
-
-              <!-- End Date - Only shown for Normal type -->
-              <div class="field col-12 col-md-4" *ngIf="outingForm.get('OutingType')?.value === OutingType.Normal">
-                <label>{{ 'End Date' | translate }}</label>
-                <p-calendar
-                  [iconDisplay]="'input'"
-                  formControlName="EndDate"
-                  [showIcon]="true"
-                  [showTime]="true"
-                  dateFormat="dd-mm-yy"
-                  styleClass="w-full"
-                ></p-calendar>
-                <small class="p-error" *ngIf="endDateCtrl?.invalid && (endDateCtrl?.touched || endDateCtrl?.dirty)">
-                  {{ 'Please select end date' | translate }}
-                </small>
-              </div>
-
-              <div class="field col-12 col-md-4">
-                <label>{{ 'Savings Ratio' | translate }}</label>
-                <p-inputNumber
-                  formControlName="SavingsRatio"
-                  mode="decimal"
-                  [min]="0"
-                  [max]="100"
-                  suffix="%"
-                  styleClass="w-full"
-                ></p-inputNumber>
-              </div>
-
-              <div class="field col-12 col-md-4">
-                <label>{{ 'Price Before' | translate }}</label>
-                <p-inputNumber formControlName="PriceBefore" mode="decimal" [min]="0" styleClass="w-full"></p-inputNumber>
-              </div>
-
-              <div class="field col-12 col-md-6">
-                <label>{{ 'Is Active' | translate }}</label>
-                <div><p-inputSwitch formControlName="IsActive"></p-inputSwitch></div>
-              </div>
-
-              <div class="field col-12 col-md-6">
-                <label>{{ 'Is Blocked' | translate }}</label>
-                <div><p-inputSwitch formControlName="IsBlocked"></p-inputSwitch></div>
-              </div>
-              <!-- Add this section after the Images field and before the buttons in Step 1 -->
-
-              <!-- Policies Panel -->
-              <div class="field col-12 mt-3">
-                <p-panel header="{{ 'policies' | translate }}" [toggleable]="true" styleClass="custom-panel">
-                  <!-- Refund Policy -->
-                  <h3 class="flex justify-content-between align-items-center">
-                    <span>{{ 'is refund enabled' | translate }}</span>
-                    <span><p-inputSwitch formControlName="IsRefundable" /></span>
-                  </h3>
-
+              <div class="grid formgrid">
+                <!-- Normal Outing Card -->
+                <div class="col-12 col-md-6 mb-3 mb-md-0">
                   <div
-                    class="formgrid grid p-3 border-1 border-dashed surface-border border-round"
-                    *ngIf="outingForm.get('IsRefundable')?.value"
+                    class="ux-selection-card"
+                    [class.active]="outingForm.get('OutingType')?.value === 1"
+                    (click)="outingForm.get('OutingType')?.setValue(1)"
                   >
-                    <div class="field col-12 col-md-6 mx-auto">
-                      <label for="MinimumDaysToRefund">
-                        {{ 'Minimum Days To Refund' | translate }}
-                      </label>
-                      <p-inputNumber
-                        mode="decimal"
-                        inputId="MinimumDaysToRefund"
-                        id="MinimumDaysToRefund"
-                        formControlName="MinimumDaysToRefund"
-                        [min]="1"
-                      />
-                      <div class="text-danger" *ngIf="shouldShowError('MinimumDaysToRefund')">
-                        {{ 'Please enter minimum days to refund' | translate }}
+                    <div class="card-header-row">
+                      <div class="card-icon">
+                        <i class="pi pi-calendar"></i>
                       </div>
+                      <div class="card-title">{{ 'Normal Outing' | translate }}</div>
+                    </div>
+                    <div class="card-description">
+                      {{ 'Fixed start and end date. Great for one-off events, weekend trips, and single dates.' | translate }}
+                    </div>
+                    <div class="card-radio-indicator">
+                      <p-radioButton
+                        [value]="1"
+                        formControlName="OutingType"
+                      ></p-radioButton>
                     </div>
                   </div>
-
-                  <!-- Deposit Rate (always visible after price section) -->
-                  <h3 class="mt-4">
-                    {{ 'Deposit Rate' | translate }}
-                  </h3>
-                  <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
-                    <div class="field col-12 col-md-6 mx-auto">
-                      <label for="depositRate">
-                        {{ 'depositRate' | translate }}
-                      </label>
-                      <p-inputNumber
-                        mode="decimal"
-                        inputId="depositRate"
-                        id="depositRate"
-                        formControlName="depositRate"
-                        [min]="0"
-                        [max]="100"
-                        suffix="%"
-                      />
-                      <small class="text-muted d-block mt-1">{{ 'Optional: Set deposit percentage (0-100%)' | translate }}</small>
-                    </div>
-                  </div>
-
-                  <!-- Cancellation Policy -->
-                  <h3 class="mt-4">
-                    {{ 'Cancellation policies' | translate }}
-                  </h3>
-                  <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
-                    <div class="field col-12">
-                      <label for="cancellationPolicy">
-                        {{ 'Cancellation Policy' | translate }}
-                      </label>
-                      <p-editor id="cancellationPolicy" formControlName="CancellationPolicy" [style]="{ height: '150px' }"></p-editor>
-                      <small class="text-muted d-block mt-1">
-                        {{ 'Optional: Describe the cancellation policy for customers' | translate }}
-                      </small>
-                      <div class="text-danger" *ngIf="shouldShowError('CancellationPolicy')">
-                        {{ 'Please enter minimum days to refund' | translate }}
+                </div>
+                <!-- Scheduled Outing Card -->
+                <div class="col-12 col-md-6">
+                  <div
+                    class="ux-selection-card"
+                    [class.active]="outingForm.get('OutingType')?.value === 2"
+                    (click)="outingForm.get('OutingType')?.setValue(2)"
+                  >
+                    <div class="card-header-row">
+                      <div class="card-icon">
+                        <i class="pi pi-clock"></i>
                       </div>
+                      <div class="card-title">{{ 'Scheduled Outing' | translate }}</div>
+                    </div>
+                    <div class="card-description">
+                      {{ 'Recurring schedule. Select days of the week, time slots, and validity periods.' | translate }}
+                    </div>
+                    <div class="card-radio-indicator">
+                      <p-radioButton
+                        [value]="2"
+                        formControlName="OutingType"
+                      ></p-radioButton>
                     </div>
                   </div>
-                </p-panel>
+                </div>
+              </div>
+              <small
+                class="p-error mt-2 block"
+                *ngIf="
+                  outingForm.get('OutingType')?.invalid && (outingForm.get('OutingType')?.touched || outingForm.get('OutingType')?.dirty)
+                "
+              >
+                {{ 'Please select outing type' | translate }}
+              </small>
+            </div>
+
+            <!-- Outing Details Card -->
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-info-circle"></i>
+                  <h3>{{ 'Outing Details' | translate }}</h3>
+                </div>
+              </div>
+              
+              <div class="formgrid grid">
+                <!-- Name -->
+                <div class="field col-12 col-md-6">
+                  <label for="outingName">{{ 'Outing Name' | translate }}</label>
+                  <input
+                    id="outingName"
+                    pInputText
+                    formControlName="Name"
+                    placeholder="{{ 'Enter outing name (e.g., Adventure Park Trip)...' | translate }}"
+                    class="w-full"
+                  />
+                  <small class="p-error" *ngIf="nameCtrl?.invalid && (nameCtrl?.touched || nameCtrl?.dirty)">
+                    {{ 'This field is required' | translate }}
+                  </small>
+                </div>
+
+                <!-- Target Audience -->
+                <div class="field col-12 col-md-6">
+                  <label for="targetAudience">{{ 'Target Audience' | translate }}</label>
+                  <input
+                    id="targetAudience"
+                    pInputText
+                    formControlName="TargetAudience"
+                    placeholder="{{ 'Enter target audience (e.g., Families, Students)...' | translate }}"
+                    class="w-full"
+                  />
+                </div>
+
+                <!-- Category -->
+                <div class="field col-12 col-md-6">
+                  <label for="category">{{ 'Category' | translate }}</label>
+                  <p-dropdown
+                    id="category"
+                    formControlName="OutingCategoryId"
+                    [options]="categories"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="{{ '-- Select Category --' | translate }}"
+                    styleClass="w-full"
+                  ></p-dropdown>
+                  <small class="p-error" *ngIf="categoryCtrl?.invalid && (categoryCtrl?.touched || categoryCtrl?.dirty)">
+                    {{ 'Please select Outing Category' | translate }}
+                  </small>
+                </div>
+
+                <!-- Rating -->
+                <div class="field col-12 col-md-6">
+                  <label>{{ 'Rating' | translate }}</label>
+                  <p-dropdown
+                    formControlName="Rating"
+                    [options]="starRatings"
+                    placeholder="{{ '-- Select rating --' | translate }}"
+                    styleClass="w-full"
+                  ></p-dropdown>
+                  <small class="p-error" *ngIf="ratingCtrl?.invalid && (ratingCtrl?.touched || ratingCtrl?.dirty)">
+                    {{ 'Please select rating' | translate }}
+                  </small>
+                </div>
+
+                <!-- Features -->
+                <div class="field col-12">
+                  <label class="block mb-2 font-semibold">{{ 'Features' | translate }}</label>
+                  <p-multiSelect
+                    formControlName="FeatureIds"
+                    [options]="features"
+                    optionLabel="name"
+                    optionValue="id"
+                    [filter]="true"
+                    (onFilter)="onFeaturesFilter($event)"
+                    placeholder="{{ 'Select Features' | translate }}"
+                    styleClass="w-full"
+                    display="chip"
+                  ></p-multiSelect>
+                  <small class="p-error" *ngIf="featuresCtrl?.invalid && (featuresCtrl?.touched || featuresCtrl?.dirty)">
+                    {{ 'Please select at least one feature' | translate }}
+                  </small>
+                </div>
+
+                <!-- Location -->
+                <div class="field col-12 col-md-6">
+                  <label>{{ 'Location' | translate }}</label>
+                  <input
+                    pInputText
+                    formControlName="Location"
+                    placeholder="{{ 'Enter location (e.g., Cairo, Egypt)...' | translate }}"
+                    class="w-full"
+                  />
+                </div>
+
+                <!-- External Link -->
+                <div class="field col-12 col-md-6">
+                  <label>{{ 'External Link' | translate }}</label>
+                  <input
+                    pInputText
+                    formControlName="ExternalLink"
+                    type="url"
+                    placeholder="https://example.com/more-details"
+                    class="w-full"
+                  />
+                </div>
+
+                <!-- Branches -->
+                <div class="field col-12">
+                  <label class="block mb-2">{{ 'Branches' | translate }}</label>
+                  <p-multiSelect
+                    formControlName="BranchIds"
+                    [options]="branches"
+                    optionLabel="name"
+                    optionValue="id"
+                    [filter]="true"
+                    placeholder="{{ 'Select Branches' | translate }}"
+                    styleClass="w-full"
+                    display="chip"
+                  >
+                    <ng-template pTemplate="footer">
+                      <div class="p-2 flex gap-2 align-items-center">
+                        <input
+                          pInputText
+                          type="text"
+                          [(ngModel)]="newBranchName"
+                          [ngModelOptions]="{ standalone: true }"
+                          placeholder="{{ 'New Branch Name' | translate }}"
+                          class="flex-1 p-inputtext-sm"
+                        />
+                        <input
+                          pInputText
+                          type="text"
+                          [(ngModel)]="newBranchLocation"
+                          [ngModelOptions]="{ standalone: true }"
+                          placeholder="{{ 'Location' | translate }}"
+                          class="flex-1 p-inputtext-sm"
+                        />
+                        <p-button icon="pi pi-plus" styleClass="p-button-sm" (onClick)="addNewBranch()"></p-button>
+                      </div>
+                    </ng-template>
+                  </p-multiSelect>
+                  <small
+                    class="p-error"
+                    *ngIf="
+                      outingForm.get('BranchIds')?.invalid && (outingForm.get('BranchIds')?.touched || outingForm.get('BranchIds')?.dirty)
+                    "
+                  >
+                    {{ 'Please select at least one branch' | translate }}
+                  </small>
+                </div>
+
+                <!-- Description -->
+                <div class="field col-12">
+                  <label class="font-semibold">{{ 'Description' | translate }}</label>
+                  <p-editor
+                    formControlName="Description"
+                    placeholder="{{ 'Describe this outing in detail, outline schedule details, highlights, etc...' | translate }}"
+                    [style]="{ height: '150px' }"
+                  ></p-editor>
+                  <small class="p-error block mt-1" *ngIf="descCtrl?.invalid && (descCtrl?.touched || descCtrl?.dirty)">
+                    {{ 'This field is required' | translate }}
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Outing Dates Card (only for Normal Outing Type) -->
+            <div class="ux-card" *ngIf="outingForm.get('OutingType')?.value === 1">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-calendar-plus"></i>
+                  <h3>{{ 'Outing Dates' | translate }}</h3>
+                </div>
               </div>
 
-              <div class="field col-12">
-                <label>{{ 'Images' | translate }}</label>
+              <div class="date-period-card">
+                <div class="grid formgrid align-items-center">
+                  <!-- Start Date -->
+                  <div class="field col-12 col-md-5 mb-0">
+                    <label class="font-bold">{{ 'Start Date' | translate }}</label>
+                    <p-calendar
+                      formControlName="StartDate"
+                      [showIcon]="true"
+                      [showTime]="true"
+                      dateFormat="dd-mm-yy"
+                      styleClass="w-full"
+                      [iconDisplay]="'input'"
+                    ></p-calendar>
+                    <small class="p-error" *ngIf="startDateCtrl?.invalid && (startDateCtrl?.touched || startDateCtrl?.dirty)">
+                      {{ 'Please select start date' | translate }}
+                    </small>
+                  </div>
+
+                  <!-- Connector Arrow -->
+                  <div class="col-12 col-md-2 text-center mb-3 mb-md-0">
+                    <div class="connector-arrow mt-4">
+                      <i class="pi pi-arrow-right"></i>
+                    </div>
+                  </div>
+
+                  <!-- End Date -->
+                  <div class="field col-12 col-md-5 mb-0">
+                    <label class="font-bold">{{ 'End Date' | translate }}</label>
+                    <p-calendar
+                      [iconDisplay]="'input'"
+                      formControlName="EndDate"
+                      [showIcon]="true"
+                      [showTime]="true"
+                      dateFormat="dd-mm-yy"
+                      styleClass="w-full"
+                    ></p-calendar>
+                    <small class="p-error" *ngIf="endDateCtrl?.invalid && (endDateCtrl?.touched || endDateCtrl?.dirty)">
+                      {{ 'Please select end date' | translate }}
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Financial Settings Card -->
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-money-bill"></i>
+                  <h3>{{ 'Pricing Settings' | translate }}</h3>
+                </div>
+              </div>
+
+              <div class="grid formgrid">
+                <div class="field col-12 col-md-6">
+                  <label>{{ 'Price Before' | translate }}</label>
+                  <p-inputNumber
+                    formControlName="PriceBefore"
+                    mode="decimal"
+                    [min]="0"
+                    placeholder="{{ 'Original price before discount...' | translate }}"
+                    styleClass="w-full"
+                  ></p-inputNumber>
+                </div>
+
+                <div class="field col-12 col-md-6">
+                  <label>{{ 'Savings Ratio' | translate }}</label>
+                  <p-inputNumber
+                    formControlName="SavingsRatio"
+                    mode="decimal"
+                    [min]="0"
+                    [max]="100"
+                    suffix="%"
+                    placeholder="{{ 'Enter savings discount ratio (%)...' | translate }}"
+                    styleClass="w-full"
+                  ></p-inputNumber>
+                </div>
+              </div>
+            </div>
+
+            <!-- Status Settings Card -->
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-cog"></i>
+                  <h3>{{ 'Status Settings' | translate }}</h3>
+                </div>
+              </div>
+              <div class="grid formgrid align-items-stretch">
+                <div class="col-12 col-md-6 mb-3 mb-md-0">
+                  <div class="ux-toggle-card h-full" [class.active]="outingForm.get('IsActive')?.value">
+                    <label for="isActiveSwitch" class="cursor-pointer">{{ 'Is Active' | translate }}</label>
+                    <p-inputSwitch id="isActiveSwitch" formControlName="IsActive"></p-inputSwitch>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6 mb-3 mb-md-0">
+                  <div class="ux-toggle-card h-full" [class.active]="outingForm.get('IsBlocked')?.value">
+                    <label for="isBlockedSwitch" class="cursor-pointer">{{ 'Is Blocked' | translate }}</label>
+                    <p-inputSwitch id="isBlockedSwitch" formControlName="IsBlocked"></p-inputSwitch>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Policies Card -->
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-shield"></i>
+                  <h3>{{ 'Policies Configuration' | translate }}</h3>
+                </div>
+              </div>
+              
+              <!-- Refund Policy -->
+              <div class="policy-section-wrapper mb-4">
+                <h4 class="flex justify-content-between align-items-center mb-3">
+                  <span class="font-bold text-secondary text-base">{{ 'Refundable Option' | translate }}</span>
+                  <p-inputSwitch formControlName="IsRefundable" />
+                </h4>
+
+                <div class="field col-12 mb-0 pt-2" *ngIf="outingForm.get('IsRefundable')?.value">
+                  <label for="MinimumDaysToRefund" class="font-semibold text-sm">
+                    {{ 'Minimum Days To Refund' | translate }}
+                  </label>
+                  <p-inputNumber
+                    mode="decimal"
+                    inputId="MinimumDaysToRefund"
+                    id="MinimumDaysToRefund"
+                    formControlName="MinimumDaysToRefund"
+                    [min]="1"
+                    placeholder="{{ 'Enter minimum days required to refund...' | translate }}"
+                    styleClass="w-full"
+                  />
+                  <div class="p-error" *ngIf="shouldShowError('MinimumDaysToRefund')">
+                    {{ 'Please enter minimum days to refund' | translate }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Deposit Rate -->
+              <div class="policy-section-wrapper mb-4">
+                <h4 class="font-bold text-secondary text-base mb-3">{{ 'Deposit Settings' | translate }}</h4>
+                <div class="field col-12 mb-0">
+                  <label for="depositRate" class="font-semibold text-sm">
+                    {{ 'depositRate' | translate }}
+                  </label>
+                  <p-inputNumber
+                    mode="decimal"
+                    inputId="depositRate"
+                    id="depositRate"
+                    formControlName="depositRate"
+                    [min]="0"
+                    [max]="100"
+                    suffix="%"
+                    placeholder="{{ 'Enter deposit rate percentage...' | translate }}"
+                    styleClass="w-full"
+                  />
+                  <small class="text-muted d-block mt-1">{{ 'Optional: Set deposit percentage (0-100%)' | translate }}</small>
+                </div>
+              </div>
+
+              <!-- Cancellation Policy -->
+              <div class="policy-section-wrapper mb-0">
+                <h4 class="font-bold text-secondary text-base mb-3">{{ 'Cancellation policies' | translate }}</h4>
+                <div class="field col-12 mb-0">
+                  <label for="cancellationPolicy" class="font-semibold text-sm">
+                    {{ 'Cancellation Policy' | translate }}
+                  </label>
+                  <p-editor id="cancellationPolicy" formControlName="CancellationPolicy" [style]="{ height: '150px' }"></p-editor>
+                  <small class="text-muted d-block mt-1">
+                    {{ 'Optional: Describe the cancellation policy for customers' | translate }}
+                  </small>
+                  <div class="p-error" *ngIf="shouldShowError('CancellationPolicy')">
+                    {{ 'Cancellation policy content is required' | translate }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Outing Gallery Card -->
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-images"></i>
+                  <h3>{{ 'Outing Gallery' | translate }}</h3>
+                </div>
+              </div>
+
+              <div class="field col-12 mb-0">
                 <app-img-uploader
                   [multiple]="true"
                   [displayFiles]="existingImages"
                   (filesChanged)="onImagesUpload($event)"
                   (removeImgFromDBWithId)="onImageDeleted($event)"
                 ></app-img-uploader>
-                <small class="p-error" *ngIf="showImageError">{{ 'At least one image is required' | translate }}</small>
+                <small class="p-error text-red-500" *ngIf="showImageError">
+                  {{ 'At least one image is required' | translate }}
+                </small>
               </div>
             </div>
 
-            <div class="buttons mt-3 text-end">
+            <div class="buttons text-end">
               <p-button label="{{ 'Back' | translate }}" class="mx-1" severity="secondary" (onClick)="onBack()"></p-button>
               <p-button label="{{ 'Next' | translate }}" class="mx-1" severity="primary" (onClick)="onNext(nextCallback)"></p-button>
             </div>
@@ -311,37 +473,42 @@
       <p-stepperPanel [header]="'Add-Ons' | translate">
         <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback">
           <form class="form-field" [formGroup]="addOnsForm">
-            <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
-              <div class="col-12 mb-3">
-                <h5>{{ 'Manage Outing Add-Ons' | translate }}</h5>
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-plus-circle"></i>
+                  <h3>{{ 'Manage Outing Add-Ons' | translate }}</h3>
+                </div>
               </div>
 
-              <div class="field col-12 col-md-4">
-                <label>{{ 'Add-On Name' | translate }}</label>
-                <input pInputText formControlName="name" />
-              </div>
+              <div class="grid formgrid">
+                <div class="field col-12 col-md-4">
+                  <label>{{ 'Add-On Name' | translate }}</label>
+                  <input pInputText formControlName="name" placeholder="{{ 'Enter add-on name...' | translate }}" class="w-full" />
+                </div>
 
-              <div class="field col-12 col-md-4">
-                <label>{{ 'Price' | translate }}</label>
-                <p-inputNumber formControlName="price"></p-inputNumber>
-              </div>
+                <div class="field col-12 col-md-4">
+                  <label>{{ 'Price' | translate }}</label>
+                  <p-inputNumber formControlName="price" placeholder="{{ 'Enter add-on price...' | translate }}" styleClass="w-full"></p-inputNumber>
+                </div>
 
-              <div class="field col-12 col-md-4">
-                <label>{{ 'Description' | translate }}</label>
-                <input pInputText formControlName="description" />
-              </div>
+                <div class="field col-12 col-md-4">
+                  <label>{{ 'Description' | translate }}</label>
+                  <input pInputText formControlName="description" placeholder="{{ 'Optional description...' | translate }}" class="w-full" />
+                </div>
 
-              <div class="col-12">
-                <p-button
-                  label="{{ 'Add to List' | translate }}"
-                  icon="pi pi-plus"
-                  (onClick)="addAddOn()"
-                  [disabled]="addOnsForm.invalid"
-                ></p-button>
+                <div class="col-12 mt-2">
+                  <p-button
+                    label="{{ 'Add to List' | translate }}"
+                    icon="pi pi-plus"
+                    (onClick)="addAddOn()"
+                    [disabled]="addOnsForm.invalid"
+                  ></p-button>
+                </div>
               </div>
 
               <!-- Add-Ons List -->
-              <div class="col-12 mt-3" *ngIf="addOnsList.length > 0">
+              <div class="mt-4" *ngIf="addOnsList.length > 0">
                 <p-table [value]="addOnsList" styleClass="p-datatable-sm">
                   <ng-template pTemplate="header">
                     <tr>
@@ -365,7 +532,7 @@
               </div>
             </div>
 
-            <div class="buttons mt-3 text-end">
+            <div class="buttons">
               <p-button label="{{ 'Previous' | translate }}" class="mx-1" severity="secondary" (onClick)="prevCallback.emit()"></p-button>
               <p-button
                 label="{{ 'Next' | translate }}"
@@ -384,37 +551,42 @@
       <p-stepperPanel [header]="'Offers' | translate">
         <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback">
           <form class="form-field" [formGroup]="offersForm">
-            <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
-              <div class="col-12 mb-3">
-                <h5>{{ 'Manage Outing Offers' | translate }}</h5>
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-percentage"></i>
+                  <h3>{{ 'Manage Outing Offers' | translate }}</h3>
+                </div>
               </div>
 
-              <div class="field col-12 col-md-12">
-                <label>{{ 'Offer Title' | translate }}</label>
-                <input pInputText formControlName="title" placeholder="{{ 'Enter title' | translate }}" />
-              </div>
+              <div class="grid formgrid">
+                <div class="field col-12">
+                  <label>{{ 'Offer Title' | translate }}</label>
+                  <input pInputText formControlName="title" placeholder="{{ 'Enter offer title...' | translate }}" class="w-full" />
+                </div>
 
-              <div class="field col-12 col-md-12">
-                <label>{{ 'Description' | translate }}</label>
-                <textarea pInputTextarea rows="4" formControlName="description" class="w-full"></textarea>
-              </div>
+                <div class="field col-12">
+                  <label>{{ 'Description' | translate }}</label>
+                  <textarea pInputTextarea rows="4" formControlName="description" placeholder="{{ 'Describe this offer in detail...' | translate }}" class="w-full"></textarea>
+                </div>
 
-              <div class="col-12">
-                <p-button
-                  label="{{ 'Add to List' | translate }}"
-                  icon="pi pi-plus"
-                  (onClick)="addOffer()"
-                  [disabled]="offersForm.invalid"
-                ></p-button>
+                <div class="col-12 mt-2">
+                  <p-button
+                    label="{{ 'Add Offer' | translate }}"
+                    icon="pi pi-plus"
+                    (onClick)="addOffer()"
+                    [disabled]="offersForm.invalid"
+                  ></p-button>
+                </div>
               </div>
 
               <!-- Single Offer Preview -->
-              <div class="col-12 mt-3" *ngIf="offer">
-                <div class="card p-3">
+              <div class="mt-4" *ngIf="offer">
+                <div class="card p-3 shadow-1 border-round border-1 surface-border bg-light">
                   <div class="flex align-items-center justify-content-between gap-3">
                     <div class="flex-1">
-                      <h6 class="m-0">{{ offer.title }}</h6>
-                      <p class="m-0 text-500">{{ offer.description }}</p>
+                      <h6 class="m-0 font-bold text-secondary">{{ offer.title }}</h6>
+                      <p class="m-0 text-500 mt-1 text-sm">{{ offer.description }}</p>
                     </div>
                     <div>
                       <p-button icon="pi pi-trash" severity="danger" [text]="true" (onClick)="removeOffer()"></p-button>
@@ -424,7 +596,7 @@
               </div>
             </div>
 
-            <div class="buttons mt-3 text-end">
+            <div class="buttons">
               <p-button label="{{ 'Previous' | translate }}" class="mx-1" severity="secondary" (onClick)="prevCallback.emit()"></p-button>
               <p-button
                 label="{{ 'Next' | translate }}"
@@ -439,218 +611,158 @@
         </ng-template>
       </p-stepperPanel>
 
-      <!-- <p-stepperPanel [header]="'Offers' | translate">
-        <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback">
-          <form class="form-field" [formGroup]="offersForm">
-            <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
-              <div class="col-12 mb-3">
-                <h5>{{ 'Manage Outing Offers' | translate }}</h5>
-              </div>
-
-              <div class="field col-12 col-md-4">
-                <label>{{ 'Offer Name' | translate }}</label>
-                <input pInputText formControlName="name" />
-              </div>
-
-              <div class="field col-12 col-md-4">
-                <label>{{ 'Discount (%)' | translate }}</label>
-                <p-inputNumber formControlName="discount" [min]="0" [max]="100"></p-inputNumber>
-              </div>
-
-              <div class="field col-12 col-md-2">
-                <label>{{ 'Start Date' | translate }}</label>
-                <p-calendar
-                  formControlName="startDate"
-                  [showIcon]="true"
-                  dateFormat="dd-mm-yy"
-                  styleClass="w-full"
-                ></p-calendar>
-              </div>
-
-              <div class="field col-12 col-md-2">
-                <label>{{ 'End Date' | translate }}</label>
-                <p-calendar
-                  formControlName="endDate"
-                  [showIcon]="true"
-                  dateFormat="dd-mm-yy"
-                  styleClass="w-full"
-                ></p-calendar>
-              </div>
-
-              <div class="col-12">
-                <p-button
-                  label="{{ 'Add to List' | translate }}"
-                  icon="pi pi-plus"
-                  (onClick)="addOffer()"
-                  [disabled]="offersForm.invalid"
-                ></p-button>
-              </div>
-
-            
-              <div class="col-12 mt-3" *ngIf="offersList.length > 0">
-                <p-table [value]="offersList" styleClass="p-datatable-sm">
-                  <ng-template pTemplate="header">
-                    <tr>
-                      <th>{{ 'Name' | translate }}</th>
-                      <th>{{ 'Discount' | translate }}</th>
-                      <th>{{ 'Start Date' | translate }}</th>
-                      <th>{{ 'End Date' | translate }}</th>
-                      <th>{{ 'Actions' | translate }}</th>
-                    </tr>
-                  </ng-template>
-                  <ng-template pTemplate="body" let-offer let-i="rowIndex">
-                    <tr>
-                      <td>{{ offer.name }}</td>
-                      <td>{{ offer.discount }}%</td>
-                      <td>{{ offer.startDate | date: 'dd-MM-yyyy' }}</td>
-                      <td>{{ offer.endDate | date: 'dd-MM-yyyy' }}</td>
-                      <td>
-                        <p-button
-                          icon="pi pi-trash"
-                          severity="danger"
-                          [text]="true"
-                          (onClick)="removeOffer(i)"
-                        ></p-button>
-                      </td>
-                    </tr>
-                  </ng-template>
-                </p-table>
-              </div>
-            </div>
-
-            <div class="buttons mt-3 text-end">
-              <p-button
-                label="{{ 'Previous' | translate }}"
-                class="mx-1"
-                severity="secondary"
-                (onClick)="prevCallback.emit()"
-              ></p-button>
-              <p-button
-                label="{{ 'Next' | translate }}"
-                class="mx-1"
-                severity="primary"
-                [loading]="isLoading"
-                [disabled]="isLoading"
-                (onClick)="onNextOffers(nextCallback)"
-              ></p-button>
-            </div>
-          </form>
-        </ng-template>
-      </p-stepperPanel> -->
-
       <!-- Step 4: Tickets -->
       <p-stepperPanel [header]="'Tickets' | translate">
         <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback">
           <form class="form-field" [formGroup]="ticketsForm">
-            <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
-              <div class="col-12 mb-3 flex justify-content-between align-items-center">
-                <h5 class="m-0">{{ 'Manage Outing Tickets' | translate }}</h5>
-                <div class="flex gap-3">
-                  <p-inputSwitch
-                    formControlName="hasSerialNumber"
-                    pTooltip="{{ 'Has Serial Number' | translate }}"
-                    tooltipPosition="top"
-                  ></p-inputSwitch>
-                  <p-inputSwitch formControlName="isActive" pTooltip="{{ 'Is Active' | translate }}" tooltipPosition="top"></p-inputSwitch>
+            <div class="ux-card">
+              <div class="ux-card-header flex-wrap">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-ticket"></i>
+                  <h3>{{ 'Manage Outing Tickets' | translate }}</h3>
                 </div>
               </div>
 
-              <div class="field col-12 col-md-6">
-                <label>{{ 'Ticket Type' | translate }}</label>
-                <input pInputText formControlName="ticketType" />
-              </div>
-
-              <div class="field col-12 col-md-6">
-                <label>{{ 'Description' | translate }}</label>
-                <input pInputText formControlName="description" />
-              </div>
-
-              <div class="field col-12 col-md-4">
-                <label>{{ 'Price' | translate }}</label>
-                <p-inputNumber formControlName="price"></p-inputNumber>
-              </div>
-
-              <div class="field col-12 col-md-4">
-                <label>{{ 'Available Quantity' | translate }}</label>
-                <p-inputNumber formControlName="availableQuantity" [min]="1"></p-inputNumber>
-                <small class="text-info" *ngIf="isAvailableQuantityDisabled">
-                  {{ 'Auto-calculated from uploaded Excel file' | translate }}
-                </small>
-              </div>
-
-              <!-- Excel Uploader (conditional) -->
-              <div class="field col-12 col-md-4" *ngIf="ticketsForm.get('hasSerialNumber')?.value">
-                <label class="block mb-2">{{ 'Upload Serial Numbers' | translate }}</label>
-                <p-fileUpload
-                  #excelUploader
-                  mode="basic"
-                  accept=".xlsx,.xls"
-                  [maxFileSize]="5000000"
-                  [auto]="true"
-                  chooseLabel="{{ 'Choose Excel File' | translate }}"
-                  (onSelect)="onExcelFileSelect($event)"
-                  [disabled]="isUploadingExcel"
-                ></p-fileUpload>
-              </div>
-
-              <!-- Serial Numbers Preview -->
-              <div class="col-12 mt-2 mb-3" *ngIf="excelSerialNumbers.length > 0">
-                <p-panel header="{{ 'Serial Numbers Preview' | translate }}" [toggleable]="true">
-                  <p-table [value]="excelSerialNumbers" [rows]="15" [paginator]="true" styleClass="p-datatable-sm">
-                    <ng-template pTemplate="header">
-                      <tr>
-                        <th>#</th>
-                        <th>{{ 'Ticket Code' | translate }}</th>
-                      </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-serial let-i="rowIndex">
-                      <tr>
-                        <td>{{ i + 1 }}</td>
-                        <td>{{ serial.ticketCode }}</td>
-                      </tr>
-                    </ng-template>
-                  </p-table>
-                  <div class="mt-2">
-                    <p-button
-                      label="{{ 'Clear' | translate }}"
-                      icon="pi pi-times"
-                      severity="secondary"
-                      [text]="true"
-                      (onClick)="clearExcelUpload()"
-                    ></p-button>
+              <div class="grid formgrid align-items-stretch">
+                <!-- Has Serial Number Switch -->
+                <div class="col-12 col-md-6 mb-3">
+                  <div class="ux-toggle-card h-full" [class.active]="ticketsForm.get('hasSerialNumber')?.value">
+                    <label for="hasSerialNumberSwitch" class="cursor-pointer font-semibold text-secondary">{{ 'Has Serial Number' | translate }}</label>
+                    <p-inputSwitch id="hasSerialNumberSwitch" formControlName="hasSerialNumber"></p-inputSwitch>
                   </div>
-                </p-panel>
-              </div>
+                </div>
 
-              <div class="col-12 flex gap-2">
-                <p-button
-                  [label]="editingTicketIndex >= 0 ? ('Update Ticket' | translate) : ('Add to List' | translate)"
-                  [icon]="editingTicketIndex >= 0 ? 'pi pi-check' : 'pi pi-plus'"
-                  (onClick)="addTicket()"
-                  [disabled]="ticketsForm.invalid"
-                ></p-button>
-                <p-button
-                  *ngIf="editingTicketIndex >= 0"
-                  label="{{ 'Cancel' | translate }}"
-                  icon="pi pi-times"
-                  severity="secondary"
-                  (onClick)="cancelTicketEdit()"
-                ></p-button>
+                <!-- Is Active Switch -->
+                <div class="col-12 col-md-6 mb-3">
+                  <div class="ux-toggle-card h-full" [class.active]="ticketsForm.get('isActive')?.value">
+                    <label for="isActiveTicketSwitch" class="cursor-pointer font-semibold text-secondary">{{ 'Is Active' | translate }}</label>
+                    <p-inputSwitch id="isActiveTicketSwitch" formControlName="isActive"></p-inputSwitch>
+                  </div>
+                </div>
+                <div class="field col-12 col-md-6">
+                  <label>{{ 'Ticket Type' | translate }}</label>
+                  <input pInputText formControlName="ticketType" placeholder="{{ 'e.g. VIP, Standard, Adult...' | translate }}" class="w-full" />
+                </div>
+
+                <div class="field col-12 col-md-6">
+                  <label>{{ 'Description' | translate }}</label>
+                  <input pInputText formControlName="description" placeholder="{{ 'Enter short ticket description...' | translate }}" class="w-full" />
+                </div>
+
+                <div class="field col-12 col-md-6">
+                  <label>{{ 'Price' | translate }}</label>
+                  <p-inputNumber formControlName="price" placeholder="{{ 'Price of the ticket...' | translate }}" styleClass="w-full"></p-inputNumber>
+                </div>
+
+                <div class="field col-12 col-md-6">
+                  <label class="flex align-items-center gap-2">
+                    {{ 'Available Quantity' | translate }}
+                    <i
+                      class="pi pi-lock text-primary text-xs"
+                      *ngIf="isAvailableQuantityDisabled"
+                      pTooltip="{{ 'Locked because serials are auto-calculated from Excel' | translate }}"
+                      tooltipPosition="top"
+                    ></i>
+                  </label>
+                  <p-inputNumber
+                    formControlName="availableQuantity"
+                    [min]="1"
+                    placeholder="{{ 'Enter available count...' | translate }}"
+                    styleClass="w-full"
+                  ></p-inputNumber>
+                  <small class="text-info block mt-1" *ngIf="isAvailableQuantityDisabled">
+                    {{ 'Auto-calculated from uploaded Excel file' | translate }}
+                  </small>
+                </div>
+
+                <!-- Excel Uploader Box -->
+                <div class="col-12 mt-2 mb-3" *ngIf="ticketsForm.get('hasSerialNumber')?.value">
+                  <div class="excel-upload-zone p-4 text-center border-round border-2 border-dashed surface-border bg-light transition-all flex flex-column align-items-center justify-content-center gap-3">
+                    <div class="upload-icon-wrapper bg-primary-reverse border-circle flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                      <i class="pi pi-file-excel text-primary text-3xl"></i>
+                    </div>
+                    <div>
+                      <h4 class="font-bold text-secondary text-base mb-1">{{ 'Upload Serial Numbers Excel' | translate }}</h4>
+                      <p class="text-xs text-500 m-0">{{ 'Upload an Excel file containing a list of serial numbers for these tickets.' | translate }}</p>
+                    </div>
+                    
+                    <p-fileUpload
+                      #excelUploader
+                      mode="basic"
+                      accept=".xlsx,.xls"
+                      [maxFileSize]="5000000"
+                      [auto]="true"
+                      chooseLabel="{{ 'Choose Excel File' | translate }}"
+                      (onSelect)="onExcelFileSelect($event)"
+                      [disabled]="isUploadingExcel"
+                      styleClass="p-button-outlined"
+                    ></p-fileUpload>
+                    
+                    <small class="text-info block mt-1" *ngIf="isUploadingExcel">
+                      <i class="pi pi-spin pi-spinner mr-1"></i> {{ 'Uploading and processing file...' | translate }}
+                    </small>
+                  </div>
+                </div>
+
+                <!-- Serial Numbers Preview -->
+                <div class="col-12 mt-2 mb-3" *ngIf="excelSerialNumbers.length > 0">
+                  <div class="ux-preview-card border-round p-3 border-1 surface-border bg-light-blue">
+                    <div class="flex align-items-center justify-content-between mb-3">
+                      <div class="flex align-items-center gap-2">
+                        <i class="pi pi-list text-primary font-bold"></i>
+                        <span class="font-bold text-secondary text-sm">
+                          {{ 'Uploaded Serial Numbers' | translate }} ({{ excelSerialNumbers.length }})
+                        </span>
+                      </div>
+                      <p-button
+                        label="{{ 'Clear Excel File' | translate }}"
+                        icon="pi pi-trash"
+                        severity="danger"
+                        [text]="true"
+                        styleClass="p-button-sm p-0"
+                        (onClick)="clearExcelUpload()"
+                      ></p-button>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2 max-h-12rem overflow-y-auto p-2 bg-white border-round border-1 surface-border">
+                      <span *ngFor="let serial of excelSerialNumbers; let idx = index" class="serial-preview-badge">
+                        <span class="text-secondary font-semibold">#{{ idx + 1 }}</span>
+                        <span class="text-primary font-bold">{{ serial.ticketCode || serial.serialNumber }}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 flex gap-2 mt-2">
+                  <p-button
+                    [label]="editingTicketIndex >= 0 ? ('Update Ticket' | translate) : ('Add Ticket' | translate)"
+                    [icon]="editingTicketIndex >= 0 ? 'pi pi-check' : 'pi pi-plus'"
+                    (onClick)="addTicket()"
+                    [disabled]="ticketsForm.invalid"
+                  ></p-button>
+                  <p-button
+                    *ngIf="editingTicketIndex >= 0"
+                    label="{{ 'Cancel' | translate }}"
+                    icon="pi pi-times"
+                    severity="secondary"
+                    (onClick)="cancelTicketEdit()"
+                  ></p-button>
+                </div>
               </div>
 
               <!-- Tickets List with Row Expansion -->
-              <div class="col-12 mt-3" *ngIf="ticketsList.length > 0">
+              <div class="mt-4" *ngIf="ticketsList.length > 0">
                 <p-table [value]="ticketsList" dataKey="ticketType" styleClass="p-datatable-sm">
                   <ng-template pTemplate="header">
                     <tr>
                       <th style="width: 3rem"></th>
                       <th>{{ 'Ticket Type' | translate }}</th>
-                      <th>{{ 'Description' | translate }}</th>
+                      <th style="min-width: 15rem; max-width: 25rem;">{{ 'Description' | translate }}</th>
                       <th>{{ 'Price' | translate }}</th>
                       <th>{{ 'Quantity' | translate }}</th>
                       <th>{{ 'Has Serial' | translate }}</th>
                       <th>{{ 'Active' | translate }}</th>
-                      <th>{{ 'Actions' | translate }}</th>
+                      <th style="min-width: 10rem; width: 10rem;">{{ 'Actions' | translate }}</th>
                     </tr>
                   </ng-template>
                   <ng-template pTemplate="body" let-ticket let-i="rowIndex" let-expanded="expanded">
@@ -668,7 +780,7 @@
                         ></p-button>
                       </td>
                       <td>{{ ticket.ticketType }}</td>
-                      <td>{{ ticket.description }}</td>
+                      <td style="min-width: 15rem; max-width: 25rem; word-break: break-word; white-space: normal;">{{ ticket.description }}</td>
                       <td>{{ ticket.price }}</td>
                       <td>{{ ticket.availableQuantity }}</td>
                       <td>
@@ -677,7 +789,7 @@
                       <td>
                         <i class="pi" [ngClass]="ticket.isActive ? 'pi-check text-green-500' : 'pi-times text-red-500'"></i>
                       </td>
-                      <td>
+                      <td style="min-width: 10rem; width: 10rem; white-space: nowrap;">
                         <p-button
                           icon="pi pi-pencil"
                           severity="info"
@@ -711,7 +823,7 @@
                     <tr>
                       <td colspan="8">
                         <div class="p-3">
-                          <h5>{{ 'Serial Numbers' | translate }} ({{ ticket.excelData?.length || 0 }})</h5>
+                          <h5 class="font-bold text-secondary mb-2">{{ 'Serial Numbers' | translate }} ({{ ticket.excelData?.length || 0 }})</h5>
                           <p-table [value]="ticket.excelData" [rows]="10" [paginator]="true" styleClass="p-datatable-sm">
                             <ng-template pTemplate="header">
                               <tr>
@@ -734,12 +846,11 @@
               </div>
             </div>
 
-            <div class="buttons mt-3 text-end">
+            <div class="buttons">
               <p-button label="{{ 'Previous' | translate }}" class="mx-1" severity="secondary" (onClick)="prevCallback.emit()"></p-button>
 
-              <!-- Next button for Scheduled type -->
+              <!-- Next button for all outing types -->
               <p-button
-                *ngIf="isScheduledOuting"
                 label="{{ 'Next' | translate }}"
                 class="mx-1"
                 severity="primary"
@@ -747,132 +858,133 @@
                 [disabled]="isLoading"
                 (onClick)="onNextTickets(nextCallback)"
               ></p-button>
-
-              <!-- Finish button for Normal type -->
-              <p-button
-                *ngIf="!isScheduledOuting"
-                label="{{ 'Finish' | translate }}"
-                class="mx-1"
-                severity="success"
-                [loading]="isLoading"
-                [disabled]="isLoading"
-                (onClick)="onFinishNormal()"
-              ></p-button>
             </div>
           </form>
-
           <p-toast></p-toast>
         </ng-template>
       </p-stepperPanel>
 
       <!-- Step 5: Schedules - Only shown for Scheduled type -->
       <p-stepperPanel [header]="'Schedules' | translate" *ngIf="isScheduledOuting">
-        <ng-template pTemplate="content" let-prevCallback="prevCallback">
+        <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback">
           <form class="form-field" [formGroup]="schedulesForm">
-            <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
-              <div class="col-12 mb-3">
-                <h5>{{ 'Manage Outing Schedules' | translate }}</h5>
-              </div>
-
-              <div class="field col-12 col-md-4">
-                <label>{{ 'Day of Week' | translate }}</label>
-                <p-multiSelect
-                  formControlName="dayOfWeek"
-                  [options]="availableDays"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="{{ 'Select Days' | translate }}"
-                  styleClass="w-full"
-                  emptyMessage="{{ 'No days available' | translate }}"
-                  display="chip"
-                ></p-multiSelect>
-              </div>
-
-              <div class="field col-12 col-md-4">
-                <label>{{ 'Schedule Type' | translate }}</label>
-                <p-dropdown
-                  formControlName="schedualType"
-                  [options]="[
-                    { label: 'Specific', value: SchedualType.Spacific },
-                    { label: 'Interval', value: SchedualType.Interval }
-                  ]"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="{{ 'Select Type' | translate }}"
-                  styleClass="w-full"
-                ></p-dropdown>
-              </div>
-
-              <div class="field col-12 col-md-4"></div>
-
-              <div class="field col-12 col-md-6">
-                <label>{{ 'Valid From' | translate }}</label>
-                <p-calendar formControlName="validFrom" dateFormat="yy-mm-dd"></p-calendar>
-              </div>
-
-              <div class="field col-12 col-md-6">
-                <label>{{ 'Valid To' | translate }}</label>
-                <p-calendar formControlName="validTo" dateFormat="yy-mm-dd"></p-calendar>
-              </div>
-
-              <!-- Time Slots Management -->
-              <div class="col-12">
-                <p class="font-bold mb-2">{{ 'Time Slots' | translate }}</p>
-                <div class="formgrid grid p-2 surface-50 border-round">
-                  <div class="field col-12 col-md-5">
-                    <label>{{ 'Start Time' | translate }}</label>
-                    <p-calendar
-                      formControlName="startTime"
-                      [timeOnly]="true"
-                      [hourFormat]="'12'"
-                      dataType="string"
-                      inputId="starttime"
-                    ></p-calendar>
-                  </div>
-
-                  <div class="field col-12 col-md-5">
-                    <label>{{ 'End Time' | translate }}</label>
-                    <p-calendar
-                      formControlName="endTime"
-                      [timeOnly]="true"
-                      [hourFormat]="'12'"
-                      dataType="string"
-                      inputId="endtime"
-                    ></p-calendar>
-                  </div>
-
-                  <div class="field col-12 col-md-2 flex align-items-end">
-                    <p-button
-                      icon="pi pi-plus"
-                      label="{{ 'Add Time Slot' | translate }}"
-                      (onClick)="addTimeSlot()"
-                      styleClass="p-button-outlined"
-                      [disabled]="!schedulesForm.get('startTime')?.value || !schedulesForm.get('endTime')?.value"
-                    ></p-button>
-                  </div>
-
-                  <!-- Temp Times Display -->
-                  <div class="col-12" *ngIf="tempTimeSlots.length > 0">
-                    <div class="flex flex-wrap gap-2">
-                      <span *ngFor="let time of tempTimeSlots; let i = index" class="p-tag p-tag-info text-base px-3 py-1">
-                        {{ time.startTime }} - {{ time.endTime }}
-                        <i class="pi pi-times ml-2 cursor-pointer" (click)="removeTimeSlot(i)"></i>
-                      </span>
-                    </div>
-                  </div>
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-clock"></i>
+                  <h3>{{ 'Manage Outing Schedules' | translate }}</h3>
                 </div>
               </div>
 
-              <div class="col-12 mt-3">
-                <p-button
-                  label="{{ 'Add Schedule' | translate }}"
-                  icon="pi pi-plus"
-                  (onClick)="addSchedule()"
-                  [disabled]="schedulesForm.invalid"
-                ></p-button>
+              <div class="grid formgrid">
+                <div class="field col-12 mb-3">
+                  <label class="block mb-2 font-semibold text-secondary">{{ 'Day of Week' | translate }}</label>
+                  <div class="weekday-picker flex gap-2 flex-wrap">
+                    <button
+                      *ngFor="let day of daysOfWeek"
+                      type="button"
+                      class="weekday-btn"
+                      [class.active]="isDaySelected(day.value)"
+                      [disabled]="isDayDisabled(day.value)"
+                      (click)="toggleDaySelection(day.value)"
+                      pTooltip="{{ isDayDisabled(day.value) ? ('Day already scheduled' | translate) : day.label | translate }}"
+                      tooltipPosition="top"
+                    >
+                      {{ day.label.substring(0, 3) | translate }}
+                    </button>
+                  </div>
+                  <small class="p-error block mt-2" *ngIf="schedulesForm.get('dayOfWeek')?.touched && schedulesForm.get('dayOfWeek')?.invalid">
+                    {{ 'Please select at least one day' | translate }}
+                  </small>
+                </div>
+
+                <div class="field col-12 col-md-4">
+                  <label>{{ 'Schedule Type' | translate }}</label>
+                  <p-dropdown
+                    formControlName="schedualType"
+                    [options]="[
+                      { label: 'Specific', value: SchedualType.Spacific },
+                      { label: 'Interval', value: SchedualType.Interval }
+                    ]"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="{{ 'Select Type' | translate }}"
+                    styleClass="w-full"
+                  ></p-dropdown>
+                </div>
+
+                <div class="field col-12 col-md-4">
+                  <label>{{ 'Valid From' | translate }}</label>
+                  <p-calendar formControlName="validFrom" dateFormat="yy-mm-dd" styleClass="w-full"></p-calendar>
+                </div>
+
+                <div class="field col-12 col-md-4">
+                  <label>{{ 'Valid To' | translate }}</label>
+                  <p-calendar formControlName="validTo" dateFormat="yy-mm-dd" styleClass="w-full"></p-calendar>
+                </div>
+
+                <!-- Time Slots Management -->
+                <div class="col-12 field">
+                  <label class="font-bold mb-2">{{ 'Time Slots' | translate }}</label>
+                  <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round bg-light">
+                    <div class="field col-12 col-md-5">
+                      <label>{{ 'Start Time' | translate }}</label>
+                      <p-calendar
+                        formControlName="startTime"
+                        [timeOnly]="true"
+                        [hourFormat]="'12'"
+                        dataType="string"
+                        inputId="starttime"
+                        styleClass="w-full"
+                      ></p-calendar>
+                    </div>
+
+                    <div class="field col-12 col-md-5">
+                      <label>{{ 'End Time' | translate }}</label>
+                      <p-calendar
+                        formControlName="endTime"
+                        [timeOnly]="true"
+                        [hourFormat]="'12'"
+                        dataType="string"
+                        inputId="endtime"
+                        styleClass="w-full"
+                      ></p-calendar>
+                    </div>
+
+                    <div class="field col-12 col-md-2 flex align-items-end mb-3">
+                      <p-button
+                        icon="pi pi-plus"
+                        label="{{ 'Add Slot' | translate }}"
+                        (onClick)="addTimeSlot()"
+                        styleClass="p-button-outlined w-full"
+                        [disabled]="!schedulesForm.get('startTime')?.value || !schedulesForm.get('endTime')?.value"
+                      ></p-button>
+                    </div>
+
+                    <!-- Temp Times Display -->
+                    <div class="col-12" *ngIf="tempTimeSlots.length > 0">
+                      <div class="flex flex-wrap gap-2 mt-2">
+                        <span *ngFor="let time of tempTimeSlots; let i = index" class="p-tag p-tag-info text-base px-3 py-1">
+                          {{ time.startTime }} - {{ time.endTime }}
+                          <i class="pi pi-times ml-2 cursor-pointer" (click)="removeTimeSlot(i)"></i>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 mt-2">
+                  <p-button
+                    label="{{ 'Add Schedule' | translate }}"
+                    icon="pi pi-plus"
+                    (onClick)="addSchedule()"
+                    [disabled]="schedulesForm.invalid"
+                  ></p-button>
+                </div>
               </div>
 
-              <div class="col-12 mt-3" *ngIf="schedulesList.length > 0">
+              <!-- Schedules List -->
+              <div class="mt-4" *ngIf="schedulesList.length > 0">
                 <p-table [value]="schedulesList" styleClass="p-datatable-sm" [rowTrackBy]="trackByFn">
                   <ng-template pTemplate="header">
                     <tr>
@@ -918,19 +1030,185 @@
               </div>
             </div>
 
-            <div class="buttons mt-3 text-end">
+            <div class="buttons">
               <p-button label="{{ 'Previous' | translate }}" class="mx-1" severity="secondary" (onClick)="prevCallback.emit()"></p-button>
               <p-button
-                label="{{ 'Finish' | translate }}"
+                label="{{ 'Next' | translate }}"
                 class="mx-1"
-                severity="success"
+                severity="primary"
                 [loading]="isLoading"
                 [disabled]="isLoading"
-                (onClick)="onNextSchedules()"
+                (onClick)="onNextSchedules(nextCallback)"
               ></p-button>
             </div>
           </form>
           <p-toast></p-toast>
+        </ng-template>
+      </p-stepperPanel>
+
+      <!-- Step 6: Review & Finish -->
+      <p-stepperPanel [header]="'Review' | translate">
+        <ng-template pTemplate="content" let-prevCallback="prevCallback">
+          <div class="ux-card p-4">
+            
+            <div class="text-center mb-5">
+              <div class="success-checkmark mb-2">
+                <i class="pi pi-check-circle text-6xl text-success"></i>
+              </div>
+              <h2 class="text-secondary font-bold text-2xl m-0">
+                {{ (isEditMode ? 'Review Outing Updates' : 'Review & Finalize Outing') | translate }}
+              </h2>
+              <p class="text-secondary mt-1 text-sm">{{ 'Check your configuration details below before confirming.' | translate }}</p>
+            </div>
+
+            <!-- Enhanced Split Layout -->
+            <div class="grid formgrid align-items-stretch">
+              
+              <!-- Left Side: Interactive Mockup Card -->
+              <div class="col-12 col-lg-5 mb-4 mb-lg-0">
+                <div class="border-round overflow-hidden shadow-2 bg-white flex flex-column h-full border-1 surface-border" style="border-radius: 16px;">
+                  <div class="p-4 text-white relative flex flex-column justify-content-between" style="min-height: 150px; background: linear-gradient(135deg, var(--main-color, #2db9be) 0%, #1e878b 100%);">
+                    <span class="absolute top-0 right-0 m-3 badge bg-white-transparent text-white px-2 py-1 text-xs border-round font-semibold" style="background: rgba(255,255,255,0.25);">
+                      {{ selectedCategoryName }}
+                    </span>
+                    <div>
+                      <h3 class="m-0 text-white font-bold text-xl">{{ outingForm.get('Name')?.value || ('New Outing' | translate) }}</h3>
+                      <p class="text-white-80 m-0 mt-2 text-xs"><i class="pi pi-map-marker mr-1"></i>{{ outingForm.get('Location')?.value }}</p>
+                    </div>
+                    <div class="flex justify-content-between align-items-center mt-3 pt-2" style="border-top: 1px solid rgba(255, 255, 255, 0.2);">
+                      <span class="text-xs text-white-80">{{ (isScheduledOuting ? 'Scheduled Outing' : 'Normal Outing') | translate }}</span>
+                      <span class="text-white font-bold text-sm">
+                        <i class="pi pi-star-fill text-warning mr-1 text-xs"></i>{{ outingForm.get('Rating')?.value }} / 5
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div class="p-4 flex-grow-1 flex flex-column justify-content-between">
+                    <div>
+                      <h5 class="text-secondary font-bold mb-2 text-sm">{{ 'Description' | translate }}</h5>
+                      <div class="text-sm text-500 overflow-y-auto max-h-8rem line-height-1.4" [innerHTML]="outingForm.get('Description')?.value || ('No description provided yet.' | translate)"></div>
+                    </div>
+                    
+                    <div class="mt-4 pt-3 border-top-1 surface-border flex justify-content-between align-items-center">
+                      <span class="text-xs text-500 font-semibold">{{ 'ESTIMATED PRICE' | translate }}</span>
+                      <span class="text-xl font-bold text-primary">
+                        {{ getStartingPrice() | number }} <span class="text-xs text-500 font-medium">EGP / {{ 'Ticket' | translate }}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Side: Config Details List -->
+              <div class="col-12 col-lg-7">
+                <div class="p-4 border-round bg-white h-full flex flex-column justify-content-between border-1 surface-border" style="border-radius: 16px;">
+                  <div class="flex flex-column gap-4">
+                    
+                    <!-- Tickets Segment -->
+                    <div>
+                      <div class="flex align-items-center gap-2 mb-2">
+                        <i class="pi pi-ticket text-primary font-bold"></i>
+                        <h4 class="m-0 text-sm font-bold text-secondary">{{ 'Configured Tickets' | translate }}</h4>
+                      </div>
+                      <div class="flex flex-wrap gap-2">
+                        <span *ngFor="let t of ticketsList" class="badge-pill bg-light border-1 surface-border px-3 py-2 border-round text-sm flex align-items-center gap-2" style="border-radius: 20px;">
+                          <span class="font-bold text-secondary text-xs">{{ t.ticketType }}</span>
+                          <span class="text-primary font-bold text-xs">({{ t.price }} EGP)</span>
+                          <span class="text-500 text-xs">Qty: {{ t.availableQuantity }}</span>
+                        </span>
+                        <div *ngIf="ticketsList.length === 0" class="text-sm text-400 italic">
+                          {{ 'No tickets added' | translate }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Add-Ons Segment -->
+                    <div>
+                      <div class="flex align-items-center gap-2 mb-2">
+                        <i class="pi pi-plus-circle text-primary font-bold"></i>
+                        <h4 class="m-0 text-sm font-bold text-secondary">{{ 'Add-Ons' | translate }}</h4>
+                      </div>
+                      <div class="flex flex-wrap gap-2">
+                        <span *ngFor="let a of addOnsList" class="badge-pill bg-light border-1 surface-border px-3 py-1 border-round text-sm flex align-items-center gap-2" style="border-radius: 20px;">
+                          <span class="font-semibold text-secondary text-xs">{{ a.name }}</span>
+                          <span class="text-primary font-bold text-xs">({{ a.price }} EGP)</span>
+                        </span>
+                        <div *ngIf="addOnsList.length === 0" class="text-sm text-400 italic">
+                          {{ 'No add-ons configured' | translate }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Offer Segment -->
+                    <div *ngIf="offer">
+                      <div class="flex align-items-center gap-2 mb-2">
+                        <i class="pi pi-percentage text-primary font-bold"></i>
+                        <h4 class="m-0 text-sm font-bold text-secondary">{{ 'Active Offer' | translate }}</h4>
+                      </div>
+                      <div class="p-3 border-round bg-orange-50 border-1 border-orange-200 flex align-items-center gap-3">
+                        <i class="pi pi-gift text-2xl text-orange-500"></i>
+                        <div>
+                          <h5 class="m-0 font-bold text-orange-800 text-sm">{{ offer.title }}</h5>
+                          <p class="m-0 text-xs text-orange-600 mt-1">{{ 'Discount Rate:' | translate }} {{ offer.discount }}%</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Schedules Segment (for Scheduled Outings) -->
+                    <div *ngIf="isScheduledOuting">
+                      <div class="flex align-items-center gap-2 mb-2">
+                        <i class="pi pi-calendar-plus text-primary font-bold"></i>
+                        <h4 class="m-0 text-sm font-bold text-secondary">{{ 'Weekly Schedules' | translate }}</h4>
+                      </div>
+                      <div class="flex flex-column gap-2 max-h-12rem overflow-y-auto p-2 bg-light border-round border-1 surface-border">
+                        <div *ngFor="let s of schedulesList" class="p-2 border-bottom-1 surface-border flex justify-content-between align-items-center">
+                          <div class="flex align-items-center gap-2">
+                            <span class="font-bold text-secondary text-sm">
+                              {{ s.schedualType === SchedualType.Spacific ? ('Specific' | translate) : ('Interval' | translate) }}
+                            </span>
+                            <span class="text-xs text-500">
+                              ({{ s.validFrom | date: 'dd-MM-yy' }} {{ 'to' | translate }} {{ s.validTo | date: 'dd-MM-yy' }})
+                            </span>
+                          </div>
+                          <div class="flex gap-1 flex-wrap">
+                            <span *ngFor="let slot of s.times" class="text-xs bg-white text-primary border-round border-1 border-primary px-2 py-1">
+                              {{ slot.startTime }} - {{ slot.endTime }}
+                            </span>
+                          </div>
+                        </div>
+                        <div *ngIf="schedulesList.length === 0" class="text-sm text-400 italic">
+                          {{ 'No schedules added' | translate }}
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Back & Submit Action Row -->
+            <div class="buttons justify-content-center flex gap-3 mt-5">
+              <p-button
+                label="{{ 'Go Back & Edit' | translate }}"
+                icon="pi pi-arrow-left"
+                severity="secondary"
+                styleClass="shadow"
+                type="button"
+                (onClick)="prevCallback.emit()"
+              ></p-button>
+              <p-button
+                label="{{ 'Submit Outing' | translate }}"
+                icon="pi pi-check"
+                severity="success"
+                styleClass="shadow px-5"
+                type="button"
+                (onClick)="onFinish()"
+              ></p-button>
+            </div>
+
+          </div>
         </ng-template>
       </p-stepperPanel>
     </p-stepper>
