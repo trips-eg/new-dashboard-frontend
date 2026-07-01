@@ -348,6 +348,7 @@ export class APIs {
 
   public static Pricing = {
     GetCommissionPolicy: 'Pricing/GetCommissionPolicy',
-    SaveCommissionPolicy: 'Pricing/SaveCommissionPolicy'
+    SaveCommissionPolicy: 'Pricing/SaveCommissionPolicy',
+    GetPricingPolicyStatistics: 'Pricing/GetPricingPolicyStatistics'
   };
 }

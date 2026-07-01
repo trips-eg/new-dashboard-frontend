@@ -11,7 +11,7 @@ export enum PricingModel {
 
 export enum CommissionItemType {
   Travel = 1,
-  Outing = 2,
+  Outing = 5,
   Hajj = 4
 }
 
@@ -38,5 +38,9 @@ export class PricingService {
 
   saveCommissionPolicy(data: CommissionPolicy): Observable<any> {
     return this._apiCaller.post(this.endPoints.SaveCommissionPolicy, data);
+  }
+
+  getPricingPolicyStatistics(): Observable<any> {
+    return this._apiCaller.get(this.endPoints.GetPricingPolicyStatistics);
   }
 }

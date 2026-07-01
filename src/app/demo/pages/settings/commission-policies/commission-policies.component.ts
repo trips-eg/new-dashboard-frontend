@@ -7,9 +7,11 @@ import { CommissionPolicyFormComponent } from 'src/app/shared/components/commiss
 import { TravelTripsService } from 'src/app/shared/services/travel-trips.service';
 import { OutingService } from 'src/app/shared/services/outing.service';
 import { HajjUmmrahService } from 'src/app/shared/services/hajj-ummrah.service';
-import { CommissionItemType } from 'src/app/shared/services/pricing.service';
+import { PricingService, CommissionItemType } from 'src/app/shared/services/pricing.service';
 import { Table, TableLazyLoadEvent } from 'primeng/table';
 import { TableRequestBuilder } from 'src/app/shared/utils/table-request-builder';
+
+
 
 @Component({
   selector: 'app-commission-policies',
@@ -38,16 +40,64 @@ export class CommissionPoliciesComponent implements OnInit {
   // Dialog State
   displayDialog: boolean = false;
   selectedItem: any = null;
+  statistics: any = null;
+
+  // Real database totals
+  totalTripsCount: number = 0;
+  totalOutingsCount: number = 0;
+  totalHajjCount: number = 0;
 
   constructor(
     private travelService: TravelTripsService,
     private outingService: OutingService,
     private hajjService: HajjUmmrahService,
+    private pricingService: PricingService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     // Loaded lazily on table initialize
+    this.loadStatistics();
+    this.loadRealTotals();
+  }
+
+  loadStatistics(): void {
+    this.pricingService.getPricingPolicyStatistics().subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.statistics = res.data;
+        }
+      },
+      error: (err) => console.error('Error fetching pricing statistics:', err)
+    });
+  }
+
+  loadRealTotals(): void {
+    const payload = { pageIndex: 1, pageSize: 1, isPagingEnabled: true, search: '' };
+
+    this.travelService.getAllTravels(payload).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.totalTripsCount = res.data.itemsCount || 0;
+        }
+      }
+    });
+
+    this.outingService.getAllOutings(payload).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.totalOutingsCount = res.data.itemsCount || 0;
+        }
+      }
+    });
+
+    this.hajjService.getAllManasik(payload).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.totalHajjCount = res.data.itemsCount || 0;
+        }
+      }
+    });
   }
 
   onTabChange(tab: 'travels' | 'outings' | 'hajj'): void {
@@ -177,9 +227,17 @@ export class CommissionPoliciesComponent implements OnInit {
   onSavePolicySuccess(updatedPolicy: any): void {
     this.displayDialog = false;
     if (this.selectedItem) {
-      this.selectedItem.policy = updatedPolicy;
+      if (this.selectedItem.isTicket) {
+        this.selectedItem.ticket.itemPricingPolicy = updatedPolicy;
+        this.selectedItem.ticket.tripsCommissionValue = updatedPolicy.tripsCommissionValue;
+        this.selectedItem.ticket.profitLoss = updatedPolicy.profitLoss;
+      } else {
+        this.selectedItem.policy = updatedPolicy;
+      }
     }
     this.selectedItem = null;
+    this.loadStatistics();
+    this.loadRealTotals();
     if (this.dt) {
       this.dt.reset(); // Reload to refresh prices and calculations
     }
@@ -202,5 +260,57 @@ export class CommissionPoliciesComponent implements OnInit {
     if (policy.pricingModel === 1) return `${policy.tripsCommissionValue}% Percentage`;
     if (policy.pricingModel === 2) return `${policy.tripsCommissionValue} EGP Fixed`;
     return `Net: ${policy.companyNetPrice} EGP`;
+  }
+
+  openTicketPolicyDialog(ticket: any, outing: any): void {
+    this.selectedItem = {
+      id: ticket.id,
+      name: `${outing.name} - ${ticket.ticketType}`,
+      price: ticket.price,
+      isTicket: true,
+      ticket: ticket,
+      outing: outing
+    };
+    this.displayDialog = true;
+  }
+
+  getOutingPriceRange(item: any): string {
+    if (!item.tickets || item.tickets.length === 0) return 'No tickets';
+    const prices = item.tickets.map((t: any) => t.price).filter((p: any) => p !== null && p !== undefined);
+    if (prices.length === 0) return '-';
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+    if (min === max) {
+      return `${min} EGP`;
+    }
+    return `${min} - ${max} EGP`;
+  }
+
+  getConfiguredTicketsCount(item: any): number {
+    if (!item.tickets) return 0;
+    return item.tickets.filter((t: any) => t.itemPricingPolicy && t.itemPricingPolicy.pricingModel).length;
+  }
+
+  getOutingsPolicyStatusClass(item: any): string {
+    const total = item.tickets?.length || 0;
+    if (total === 0) return 'bg-secondary text-white';
+    const configured = this.getConfiguredTicketsCount(item);
+    if (configured === 0) return 'bg-danger-subtle text-danger border border-danger-subtle';
+    if (configured === total) return 'bg-success-subtle text-success border border-success-subtle';
+    return 'bg-warning-subtle text-warning border border-warning-subtle';
+  }
+
+  getOutingsPolicyStatusText(item: any): string {
+    const total = item.tickets?.length || 0;
+    if (total === 0) return 'No Tickets';
+    const configured = this.getConfiguredTicketsCount(item);
+    if (configured === 0) return 'Not Configured';
+    if (configured === total) return 'Fully Configured';
+    return 'Partially Configured';
+  }
+
+  getPercentage(value: number, total: number): number {
+    if (!total || total === 0) return 0;
+    return Math.round((value / total) * 100);
   }
 }

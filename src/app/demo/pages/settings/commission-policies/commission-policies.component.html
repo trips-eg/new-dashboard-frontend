@@ -6,6 +6,156 @@
   ></sub-header>
 
   <div class="p-4">
+    <!-- ═══════════ STATS CARDS ═══════════ -->
+    <div *ngIf="statistics" class="row g-3 mb-4">
+      <!-- Travels Card -->
+      <div class="col-12 col-md-4">
+        <div class="stat-premium-card card border-0 shadow-sm overflow-hidden h-full">
+          <div class="card-body p-4 position-relative">
+            <div class="d-flex align-items-center gap-3">
+              <div class="stat-icon-wrapper trip-theme bg-primary-subtle text-primary">
+                <i class="pi pi-send text-xl"></i>
+              </div>
+              <div class="stat-content flex-grow-1">
+                <h6 class="stat-title text-slate-500 text-xs fw-semibold uppercase mb-1">{{ 'Travels / Trips' | translate }}</h6>
+                <div class="d-flex align-items-baseline gap-2">
+                  <span class="stat-value text-slate-800 fw-bold fs-4">{{ totalTripsCount }}</span>
+                  <span class="text-xs text-muted">{{ 'Total Items' | translate }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="stat-metrics mt-3 pt-3 border-top">
+              <div class="d-flex justify-content-between text-xs mb-2">
+                <span class="text-secondary d-flex align-items-center gap-1">
+                  <span class="dot-indicator bg-success"></span>
+                  {{ 'Configured' | translate }}: <strong class="text-slate-800 ms-1">{{ statistics.tripsWithPricingPolicy }}</strong>
+                </span>
+                <span class="text-secondary d-flex align-items-center gap-1">
+                  <span class="dot-indicator bg-danger"></span>
+                  {{ 'Not Configured' | translate }}: <strong class="text-slate-800 ms-1">{{ totalTripsCount - statistics.tripsWithPricingPolicy >= 0 ? totalTripsCount - statistics.tripsWithPricingPolicy : 0 }}</strong>
+                </span>
+              </div>
+              
+              <!-- Progress Bar -->
+              <div class="progress-bar-wrapper">
+                <div class="progress" style="height: 6px;">
+                  <div 
+                    class="progress-bar bg-success rounded-pill" 
+                    role="progressbar" 
+                    [style.width.%]="getPercentage(statistics.tripsWithPricingPolicy, totalTripsCount)"
+                    [attr.aria-valuenow]="getPercentage(statistics.tripsWithPricingPolicy, totalTripsCount)" 
+                    aria-valuemin="0" 
+                    aria-valuemax="100">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="decorative-blob trip-blob"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Outings Card -->
+      <div class="col-12 col-md-4">
+        <div class="stat-premium-card card border-0 shadow-sm overflow-hidden h-full">
+          <div class="card-body p-4 position-relative">
+            <div class="d-flex align-items-center gap-3">
+              <div class="stat-icon-wrapper outing-theme bg-success-subtle text-success">
+                <i class="pi pi-compass text-xl"></i>
+              </div>
+              <div class="stat-content flex-grow-1">
+                <h6 class="stat-title text-slate-500 text-xs fw-semibold uppercase mb-1">{{ 'Outings' | translate }}</h6>
+                <div class="d-flex align-items-baseline gap-2">
+                  <span class="stat-value text-slate-800 fw-bold fs-4">{{ totalOutingsCount }}</span>
+                  <span class="text-xs text-muted">{{ 'Total Items' | translate }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="stat-metrics mt-3 pt-3 border-top">
+              <div class="d-flex justify-content-between text-xs mb-2">
+                <span class="text-secondary d-flex align-items-center gap-1">
+                  <span class="dot-indicator bg-success"></span>
+                  {{ 'Configured' | translate }}: <strong class="text-slate-800 ms-1">{{ statistics.outingsWithPricingPolicy }}</strong>
+                </span>
+                <span class="text-secondary d-flex align-items-center gap-1">
+                  <span class="dot-indicator bg-danger"></span>
+                  {{ 'Not Configured' | translate }}: <strong class="text-slate-800 ms-1">{{ totalOutingsCount - statistics.outingsWithPricingPolicy >= 0 ? totalOutingsCount - statistics.outingsWithPricingPolicy : 0 }}</strong>
+                </span>
+              </div>
+              
+              <!-- Progress Bar -->
+              <div class="progress-bar-wrapper">
+                <div class="progress" style="height: 6px;">
+                  <div 
+                    class="progress-bar bg-success rounded-pill" 
+                    role="progressbar" 
+                    [style.width.%]="getPercentage(statistics.outingsWithPricingPolicy, totalOutingsCount)"
+                    [attr.aria-valuenow]="getPercentage(statistics.outingsWithPricingPolicy, totalOutingsCount)" 
+                    aria-valuemin="0" 
+                    aria-valuemax="100">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="decorative-blob outing-blob"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hajj Card -->
+      <div class="col-12 col-md-4">
+        <div class="stat-premium-card card border-0 shadow-sm overflow-hidden h-full">
+          <div class="card-body p-4 position-relative">
+            <div class="d-flex align-items-center gap-3">
+              <div class="stat-icon-wrapper hajj-theme bg-warning-subtle text-warning">
+                <i class="pi pi-globe text-xl"></i>
+              </div>
+              <div class="stat-content flex-grow-1">
+                <h6 class="stat-title text-slate-500 text-xs fw-semibold uppercase mb-1">{{ 'Hajj & Umrah' | translate }}</h6>
+                <div class="d-flex align-items-baseline gap-2">
+                  <span class="stat-value text-slate-800 fw-bold fs-4">{{ totalHajjCount }}</span>
+                  <span class="text-xs text-muted">{{ 'Total Items' | translate }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="stat-metrics mt-3 pt-3 border-top">
+              <div class="d-flex justify-content-between text-xs mb-2">
+                <span class="text-secondary d-flex align-items-center gap-1">
+                  <span class="dot-indicator bg-success"></span>
+                  {{ 'Configured' | translate }}: <strong class="text-slate-800 ms-1">{{ statistics.hajjWithPricingPolicy }}</strong>
+                </span>
+                <span class="text-secondary d-flex align-items-center gap-1">
+                  <span class="dot-indicator bg-danger"></span>
+                  {{ 'Not Configured' | translate }}: <strong class="text-slate-800 ms-1">{{ totalHajjCount - statistics.hajjWithPricingPolicy >= 0 ? totalHajjCount - statistics.hajjWithPricingPolicy : 0 }}</strong>
+                </span>
+              </div>
+              
+              <!-- Progress Bar -->
+              <div class="progress-bar-wrapper">
+                <div class="progress" style="height: 6px;">
+                  <div 
+                    class="progress-bar bg-success rounded-pill" 
+                    role="progressbar" 
+                    [style.width.%]="getPercentage(statistics.hajjWithPricingPolicy, totalHajjCount)"
+                    [attr.aria-valuenow]="getPercentage(statistics.hajjWithPricingPolicy, totalHajjCount)" 
+                    aria-valuemin="0" 
+                    aria-valuemax="100">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="decorative-blob hajj-blob"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Controls Row: Tabs & Search -->
     <div class="row g-3 mb-4 align-items-stretch">
       <!-- Category Selection Tabs -->
@@ -130,6 +280,7 @@
         (onLazyLoad)="loadData($event)"
         [paginator]="true"
         [rows]="10"
+        [rowsPerPageOptions]="[10, 25, 50]"
         [totalRecords]="totalRecords"
         [loading]="isLoading"
         dataKey="id"
@@ -138,6 +289,7 @@
       >
         <ng-template pTemplate="header">
           <tr>
+            <th *ngIf="activeTab === 'outings'" style="width: 4%"></th>
             <th style="width: 8%" class="text-center font-semibold">ID</th>
             <th style="width: 25%" class="font-semibold">{{ 'Product Details' | translate }}</th>
             <th style="width: 17%" class="font-semibold">{{ 'vendor Name' | translate }}</th>
@@ -159,25 +311,49 @@
           </tr>
         </ng-template>
 
-        <ng-template pTemplate="body" let-item>
+        <ng-template pTemplate="body" let-item let-expanded="expanded">
           <tr class="table-row-hover">
+            <td *ngIf="activeTab === 'outings'">
+              <button
+                type="button"
+                pButton
+                pRipple
+                [pRowToggler]="item"
+                class="p-button-text p-button-rounded p-button-plain p-button-sm"
+                [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                *ngIf="item.tickets?.length"
+              ></button>
+            </td>
             <td class="text-center fw-medium text-secondary">#{{ item.id }}</td>
             <td>
-              <div class="d-flex align-items-center gap-3">
-                <!-- Custom Category Badge -->
-                <span *ngIf="activeTab === 'travels'" class="category-badge trip-bg">
-                  <i class="pi pi-send text-xs"></i>
-                  <span>Trip</span>
-                </span>
-                <span *ngIf="activeTab === 'outings'" class="category-badge outing-bg">
-                  <i class="pi pi-compass text-xs"></i>
-                  <span>Outing</span>
-                </span>
-                <span *ngIf="activeTab === 'hajj'" class="category-badge hajj-bg">
-                  <i class="pi pi-globe text-xs"></i>
-                  <span>Hajj</span>
-                </span>
+              <div class="d-flex flex-column gap-1.5 align-items-start">
+                <!-- Product Name -->
                 <span class="product-name fw-semibold text-slate-800">{{ item.name }}</span>
+                
+                <!-- Badges Row -->
+                <div class="d-flex align-items-center gap-2">
+                  <!-- Category Badge -->
+                  <span *ngIf="activeTab === 'travels'" class="category-badge trip-bg m-0">
+                    <i class="pi pi-send text-xs"></i>
+                    <span>Trip</span>
+                  </span>
+                  <span *ngIf="activeTab === 'outings'" class="category-badge outing-bg m-0">
+                    <i class="pi pi-compass text-xs"></i>
+                    <span>Outing</span>
+                  </span>
+                  <span *ngIf="activeTab === 'hajj'" class="category-badge hajj-bg m-0">
+                    <i class="pi pi-globe text-xs"></i>
+                    <span>Hajj</span>
+                  </span>
+                  
+                  <!-- Status Badge -->
+                  <span 
+                    [class]="item.isActive ? 'badge bg-success-subtle text-success border border-success-subtle' : 'badge bg-danger-subtle text-danger border border-danger-subtle'"
+                    style="font-size: 0.7rem; padding: 0.15rem 0.45rem;"
+                  >
+                    {{ (item.isActive ? 'Active' : 'Inactive') | translate }}
+                  </span>
+                </div>
               </div>
             </td>
             <td>
@@ -196,68 +372,217 @@
               </ng-template>
             </td>
             <td>
-              <span class="price-value font-semibold">{{ item.price | number }}</span>
-              <span class="price-currency text-xs text-muted ms-1">EGP</span>
-            </td>
-            <td>
-              <!-- Rich Custom Badges depending on Policy pricingModel -->
-              <div *ngIf="item.policy; else noPolicy">
-                <span *ngIf="item.policy.pricingModel === 1" class="model-badge badge-percentage">
-                  <i class="pi pi-percentage model-badge-icon"></i>
-                  <span class="model-value">{{ item.policy.tripsCommissionValue }}%</span>
-                  <span class="model-type">{{ 'Rate' | translate }}</span>
-                </span>
-                <span *ngIf="item.policy.pricingModel === 2" class="model-badge badge-fixed">
-                  <i class="pi pi-tag model-badge-icon"></i>
-                  <span class="model-value">{{ item.policy.tripsCommissionValue | number }}</span>
-                  <span class="model-currency">EGP</span>
-                  <span class="model-type">{{ 'Fixed' | translate }}</span>
-                </span>
-                <span *ngIf="item.policy.pricingModel === 3" class="model-badge badge-committed">
-                  <i class="pi pi-lock model-badge-icon"></i>
-                  <span class="model-value">{{ item.policy.companyNetPrice | number }}</span>
-                  <span class="model-currency">EGP</span>
-                  <span class="model-type">{{ 'Committed' | translate }}</span>
-                </span>
-              </div>
-              <ng-template #noPolicy>
-                <span class="model-badge badge-none">
-                  <i class="pi pi-info-circle model-badge-icon"></i>
-                  <span class="model-type">{{ 'Not Configured' | translate }}</span>
-                </span>
+              <ng-container *ngIf="activeTab !== 'outings'; else outingPrice">
+                <span class="price-value font-semibold">{{ item.price | number }}</span>
+                <span class="price-currency text-xs text-muted ms-1">EGP</span>
+              </ng-container>
+              <ng-template #outingPrice>
+                <span class="text-xs text-secondary font-medium d-block mb-0.5">{{ 'Tickets Price Range' | translate }}</span>
+                <span class="price-value font-semibold text-sm">{{ getOutingPriceRange(item) }}</span>
               </ng-template>
             </td>
             <td>
-              <span *ngIf="item.policy; else noPolicyNet" class="font-semibold text-slate-700">
-                {{ item.policy.companyNetPrice | number }}
-                <span class="text-xs text-muted ms-1">EGP</span>
-              </span>
-              <ng-template #noPolicyNet>
-                <span class="text-muted">-</span>
+              <ng-container *ngIf="activeTab !== 'outings'; else outingCommissionSummary">
+                <!-- Rich Custom Badges depending on Policy pricingModel -->
+                <div *ngIf="item.policy; else noPolicy">
+                  <span *ngIf="item.policy.pricingModel === 1" class="model-badge badge-percentage">
+                    <i class="pi pi-percentage model-badge-icon"></i>
+                    <span class="model-value">{{ item.policy.tripsCommissionValue }}%</span>
+                    <span class="model-type">{{ 'Rate' | translate }}</span>
+                  </span>
+                  <span *ngIf="item.policy.pricingModel === 2" class="model-badge badge-fixed">
+                    <i class="pi pi-tag model-badge-icon"></i>
+                    <span class="model-value">{{ item.policy.tripsCommissionValue | number }}</span>
+                    <span class="model-currency">EGP</span>
+                    <span class="model-type">{{ 'Fixed' | translate }}</span>
+                  </span>
+                  <span *ngIf="item.policy.pricingModel === 3" class="model-badge badge-committed">
+                    <i class="pi pi-lock model-badge-icon"></i>
+                    <span class="model-value">{{ item.policy.companyNetPrice | number }}</span>
+                    <span class="model-currency">EGP</span>
+                    <span class="model-type">{{ 'Committed' | translate }}</span>
+                  </span>
+                </div>
+                <ng-template #noPolicy>
+                  <span class="model-badge badge-none">
+                    <i class="pi pi-info-circle model-badge-icon"></i>
+                    <span class="model-type">{{ 'Not Configured' | translate }}</span>
+                  </span>
+                </ng-template>
+              </ng-container>
+              <ng-template #outingCommissionSummary>
+                <div class="d-flex flex-column gap-1 align-items-start">
+                  <span class="text-xs text-secondary font-medium">
+                    {{ getConfiguredTicketsCount(item) }} / {{ item.tickets?.length || 0 }} {{ 'Configured' | translate }}
+                  </span>
+                  <span class="badge py-1 px-2" [ngClass]="getOutingsPolicyStatusClass(item)" style="font-size: 0.75rem;">
+                    {{ getOutingsPolicyStatusText(item) | translate }}
+                  </span>
+                </div>
               </ng-template>
             </td>
             <td>
-              <span *ngIf="item.policy; else noPolicyProfit"
-                    [ngClass]="item.policy.profitLoss >= 0 ? 'text-success' : 'text-danger'"
-                    class="font-semibold">
-                {{ item.policy.profitLoss >= 0 ? '+' : '' }}{{ item.policy.profitLoss | number }}
-                <span class="text-xs ms-1">EGP</span>
-              </span>
-              <ng-template #noPolicyProfit>
-                <span class="text-muted">-</span>
+              <ng-container *ngIf="activeTab !== 'outings'; else outingNetPrice">
+                <span *ngIf="item.policy; else noPolicyNet" class="font-semibold text-slate-700">
+                  {{ item.policy.companyNetPrice | number }}
+                  <span class="text-xs text-muted ms-1">EGP</span>
+                </span>
+                <ng-template #noPolicyNet>
+                  <span class="text-muted">-</span>
+                </ng-template>
+              </ng-container>
+              <ng-template #outingNetPrice>
+                <span class="text-muted text-xs font-normal">{{ 'Per Ticket' | translate }}</span>
+              </ng-template>
+            </td>
+            <td>
+              <ng-container *ngIf="activeTab !== 'outings'; else outingProfitLoss">
+                <span *ngIf="item.policy; else noPolicyProfit"
+                      [ngClass]="item.policy.profitLoss >= 0 ? 'text-success' : 'text-danger'"
+                      class="font-semibold">
+                  {{ item.policy.profitLoss >= 0 ? '+' : '' }}{{ item.policy.profitLoss | number }}
+                  <span class="text-xs ms-1">EGP</span>
+                </span>
+                <ng-template #noPolicyProfit>
+                  <span class="text-muted">-</span>
+                </ng-template>
+              </ng-container>
+              <ng-template #outingProfitLoss>
+                <span class="text-muted text-xs font-normal">{{ 'Per Ticket' | translate }}</span>
               </ng-template>
             </td>
             <td>
               <div class="d-flex justify-content-end pr-3">
-                <button
-                  pButton
-                  pRipple
-                  type="button"
-                  icon="pi pi-cog"
-                  class="p-button-rounded p-button-text p-button-sm btn-action-configure"
-                  title="{{ 'Configure Policy' | translate }}"
-                  (click)="openPolicyDialog(item)"
-                ></button>
+                <ng-container *ngIf="activeTab !== 'outings'; else outingAction">
+                  <button
+                    pButton
+                    pRipple
+                    type="button"
+                    icon="pi pi-cog"
+                    class="p-button-rounded p-button-text p-button-sm btn-action-configure"
+                    title="{{ 'Configure Policy' | translate }}"
+                    (click)="openPolicyDialog(item)"
+                  ></button>
+                </ng-container>
+                <ng-template #outingAction>
+                  <button
+                    type="button"
+                    pButton
+                    pRipple
+                    [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                    class="p-button-rounded p-button-text p-button-sm p-button-secondary"
+                    title="{{ (expanded ? 'Collapse Tickets' : 'Expand Tickets') | translate }}"
+                    [pRowToggler]="item"
+                    *ngIf="item.tickets?.length"
+                  ></button>
+                </ng-template>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Expanded sub-table for Outing Tickets -->
+        <ng-template pTemplate="rowexpansion" let-item>
+          <tr *ngIf="activeTab === 'outings'">
+            <td colspan="9" class="p-3 bg-light-subtle">
+              <div class="px-4 py-3 rounded-3 border bg-white shadow-sm">
+                <h6 class="mb-3 text-secondary fw-semibold d-flex align-items-center gap-2">
+                  <i class="pi pi-ticket text-primary"></i>
+                  <span>{{ 'Tickets & Commission Policies' | translate }}</span>
+                </h6>
+                
+                <div class="table-responsive">
+                  <table class="table table-sm table-striped align-middle mb-0">
+                    <thead class="bg-light text-secondary font-semibold">
+                      <tr>
+                        <th style="width: 25%">{{ 'Ticket Type' | translate }}</th>
+                        <th style="width: 15%">{{ 'Price' | translate }}</th>
+                        <th style="width: 25%">{{ 'Commission Model' | translate }}</th>
+                        <th style="width: 15%">{{ 'Net Price' | translate }}</th>
+                        <th style="width: 15%">{{ 'Profit / Loss' | translate }}</th>
+                        <th style="width: 5%" class="text-end"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let ticket of item.tickets" class="hover:bg-slate-50">
+                        <td class="fw-semibold text-slate-800">
+                          <div class="d-flex align-items-center gap-2">
+                            <span>{{ ticket.ticketType }}</span>
+                            <span 
+                              [class]="ticket.isActive ? 'badge bg-success-subtle text-success border border-success-subtle' : 'badge bg-danger-subtle text-danger border border-danger-subtle'"
+                              style="font-size: 0.65rem; padding: 0.15rem 0.4rem;"
+                            >
+                              {{ (ticket.isActive ? 'Active' : 'Inactive') | translate }}
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          <span class="fw-semibold text-slate-700">{{ ticket.price | number }}</span>
+                          <span class="text-xs text-muted ms-1">EGP</span>
+                        </td>
+                        <td>
+                          <!-- Commission Model badge for ticket -->
+                          <div *ngIf="ticket.itemPricingPolicy; else noTicketPolicy">
+                            <span *ngIf="ticket.itemPricingPolicy.pricingModel === 1" class="model-badge badge-percentage">
+                              <i class="pi pi-percentage model-badge-icon"></i>
+                              <span class="model-value">{{ ticket.itemPricingPolicy.tripsCommissionValue }}%</span>
+                              <span class="model-type">{{ 'Rate' | translate }}</span>
+                            </span>
+                            <span *ngIf="ticket.itemPricingPolicy.pricingModel === 2" class="model-badge badge-fixed">
+                              <i class="pi pi-tag model-badge-icon"></i>
+                              <span class="model-value">{{ ticket.itemPricingPolicy.tripsCommissionValue | number }}</span>
+                              <span class="model-currency">EGP</span>
+                              <span class="model-type">{{ 'Fixed' | translate }}</span>
+                            </span>
+                            <span *ngIf="ticket.itemPricingPolicy.pricingModel === 3" class="model-badge badge-committed">
+                              <i class="pi pi-lock model-badge-icon"></i>
+                              <span class="model-value">{{ ticket.itemPricingPolicy.companyNetPrice | number }}</span>
+                              <span class="model-currency">EGP</span>
+                              <span class="model-type">{{ 'Committed' | translate }}</span>
+                            </span>
+                          </div>
+                          <ng-template #noTicketPolicy>
+                            <span class="model-badge badge-none">
+                              <i class="pi pi-info-circle model-badge-icon"></i>
+                              <span class="model-type">{{ 'Not Configured' | translate }}</span>
+                            </span>
+                          </ng-template>
+                        </td>
+                        <td>
+                          <span *ngIf="ticket.itemPricingPolicy; else noTicketPolicyNet" class="fw-semibold text-slate-700">
+                            {{ ticket.itemPricingPolicy.companyNetPrice | number }}
+                            <span class="text-xs text-muted ms-1">EGP</span>
+                          </span>
+                          <ng-template #noTicketPolicyNet>
+                            <span class="text-muted">-</span>
+                          </ng-template>
+                        </td>
+                        <td>
+                          <span *ngIf="ticket.itemPricingPolicy; else noTicketPolicyProfit"
+                                [ngClass]="ticket.itemPricingPolicy.profitLoss >= 0 ? 'text-success' : 'text-danger'"
+                                class="font-semibold">
+                            {{ ticket.itemPricingPolicy.profitLoss >= 0 ? '+' : '' }}{{ ticket.itemPricingPolicy.profitLoss | number }}
+                            <span class="text-xs ms-1">EGP</span>
+                          </span>
+                          <ng-template #noTicketPolicyProfit>
+                            <span class="text-muted">-</span>
+                          </ng-template>
+                        </td>
+                        <td class="text-end">
+                          <button
+                            pButton
+                            pRipple
+                            type="button"
+                            icon="pi pi-cog"
+                            class="p-button-rounded p-button-text p-button-sm btn-action-configure"
+                            title="{{ 'Configure Policy' | translate }}"
+                            (click)="openTicketPolicyDialog(ticket, item)"
+                          ></button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </td>
           </tr>
@@ -265,7 +590,7 @@
 
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="8" class="text-center py-5">
+            <td [attr.colspan]="activeTab === 'outings' ? 9 : 8" class="text-center py-5">
               <div class="empty-state-container py-4">
                 <i class="pi pi-box text-muted mb-3" style="font-size: 3rem"></i>
                 <h5 class="fw-semibold text-dark">{{ 'No products found' | translate }}</h5>

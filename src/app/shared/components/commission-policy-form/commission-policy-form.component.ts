@@ -14,7 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class CommissionPolicyFormComponent implements OnInit, OnChanges {
   @Input() itemId!: number;
-  @Input() itemType!: number; // 2 = Outing, 3 = Hajj, 4 = Travel
+  @Input() itemType!: number; // 1 = Travel, 4 = Hajj, 5 = Outing
   @Input() basePrice: number = 0; // For live calculation helper
   @Input() isDialogMode: boolean = false; // Hide inner cancel/save buttons if controlled by parent stepper
   @Output() onSaveSuccess = new EventEmitter<any>();
