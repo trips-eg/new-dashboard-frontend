@@ -28,6 +28,8 @@
               "src/favicon.ico",
               "src/assets",
               "src/web.config",
+              "src/manifest.webmanifest",
+              "src/icons",
               {
                 "glob": "**/*",
                 "input": "node_modules/ngx-scanner-qrcode/wasm/",
@@ -46,7 +48,12 @@
               "node_modules/intl-tel-input/build/css/intlTelInput.css",
               "src/styles.scss"
             ],
-            "scripts": ["node_modules/@popperjs/core/dist/umd/popper.min.js", "node_modules/bootstrap/dist/js/bootstrap.min.js"]
+            "scripts": [
+              "node_modules/@popperjs/core/dist/umd/popper.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.min.js"
+            ],
+            "serviceWorker": true,
+            "ngswConfigPath": "ngsw-config.json"
           },
           "configurations": {
             "production": {

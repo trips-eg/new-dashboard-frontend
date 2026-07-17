@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -27,8 +27,8 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { MessageService } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
-
-
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { UpdateBannerComponent } from './shared/components/update-banner/update-banner.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -46,8 +46,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     NavGroupComponent,
     NavItemComponent,
     NavCollapseComponent,
-    ConfigurationComponent
-
+    ConfigurationComponent,
+    UpdateBannerComponent
   ],
   imports: [BrowserModule,  NgxSpinnerModule,AppRoutingModule, ToastrModule.forRoot({
     timeOut: 4000,
@@ -60,7 +60,10 @@ export function HttpLoaderFactory(http: HttpClient) {
       useFactory: HttpLoaderFactory,
       deps: [HttpClient],
     },
-  })],
+  }), ServiceWorkerModule.register('ngsw-worker.js', {
+  enabled: !isDevMode(),
+  registrationStrategy: 'registerWhenStable:30000'
+})],
   providers: [NavigationItem,MessageService,ToastrService ,DialogService,{provide:HTTP_INTERCEPTORS , useClass:HttpInterceptorInterceptor , multi:true}],
   bootstrap: [AppComponent]
 })

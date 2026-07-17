@@ -51,6 +51,7 @@ export class TravelsFormComponent implements OnInit {
   lang: string;
   mode: string = '';
   today: Date = new Date();
+  minDate: Date | null = new Date();
   imgPaseUrl = environment.imgUrl;
   starRatings = [1, 2, 3, 4, 5];
   tripTybe = [
@@ -135,6 +136,7 @@ export class TravelsFormComponent implements OnInit {
     this.getProgramForm();
     this.getDropDownList();
     if (this.travelId) {
+      this.minDate = null;
       this.getTravelById(this.travelId);
       this.travelForm.get('TripType')?.disable();
     }

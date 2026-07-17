@@ -615,7 +615,7 @@
                           [showIcon]="true"
                           dateFormat="dd-mm-yy"
                           [showTime]="false"
-                          [minDate]="today"
+                          [minDate]="minDate"
                           [iconDisplay]="'input'"
                           class="w-full"
                           (onSelect)="onStartDateChange(group)"
@@ -652,7 +652,7 @@
                           [iconDisplay]="'input'"
                           dateFormat="dd-mm-yy"
                           class="w-full"
-                          [minDate]="group.get('minEndDate')?.value || today"
+                          [minDate]="group.get('minEndDate')?.value || minDate"
                           [maxDate]="group.get('maxEndDate')?.value"
                         ></p-calendar>
                         <small class="p-error" *ngIf="group.get('endDate')?.invalid && group.get('endDate')?.touched">
@@ -933,7 +933,7 @@
                     <p-calendar
                       [iconDisplay]="'input'"
                       formControlName="time"
-                      [minDate]="today"
+                      [minDate]="minDate"
                       placeholder="Select a date"
                       [showIcon]="true"
                       class="w-full"

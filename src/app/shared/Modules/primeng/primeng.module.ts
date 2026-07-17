@@ -21,7 +21,7 @@ import { SidebarModule } from 'primeng/sidebar';
 import { TooltipModule } from 'primeng/tooltip';
 import { FileUploadModule } from 'primeng/fileupload';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
-//import { DynamicDialogModule } from 'primeng/dynamicdialog';
+import { DynamicDialogModule } from 'primeng/dynamicdialog';
 import { DialogModule } from 'primeng/dialog';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -93,7 +93,7 @@ import { StepperModule } from 'primeng/stepper';
     TooltipModule,
     FileUploadModule,
     OverlayPanelModule,
-    // DynamicDialogModule,
+    DynamicDialogModule,
     DialogModule,
     ConfirmPopupModule,
     ConfirmDialogModule,
@@ -165,7 +165,7 @@ import { StepperModule } from 'primeng/stepper';
     TooltipModule,
     FileUploadModule,
     OverlayPanelModule,
-    //DynamicDialogModule,
+    DynamicDialogModule,
     DialogModule,
     ConfirmPopupModule,
     ConfirmDialogModule,

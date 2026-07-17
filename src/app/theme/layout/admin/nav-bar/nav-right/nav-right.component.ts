@@ -4,6 +4,8 @@ import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
+import { SwUpdate } from '@angular/service-worker';
+import { ToastrService } from 'ngx-toastr';
 
 import { ConfigureService } from 'src/app/theme/shared/services/configure.service';
 
@@ -28,7 +30,9 @@ export class NavRightComponent implements OnInit, OnDestroy {
     private translationService: TranslateService,
     private _configSer: ConfigureService,
     private router: Router,
-    @Inject(DOCUMENT) private document: Document
+    @Inject(DOCUMENT) private document: Document,
+    private swUpdate: SwUpdate,
+    private toastr: ToastrService
   ) {
     this.currentLang = this.translationService.getDefaultLang();
     this.refreshUserData();
@@ -79,6 +83,44 @@ export class NavRightComponent implements OnInit, OnDestroy {
  isVendor(): boolean {
     const roles = this._configSer.userRoles();
     return roles.some((role) => role.startsWith('Vendor.'));
+  }
+
+  checkForUpdates() {
+    if (this.swUpdate.isEnabled) {
+      this.toastr.info(
+        this.currentLang === 'ar' ? 'جاري التحقق من وجود تحديثات...' : 'Checking for updates...',
+        '',
+        { timeOut: 2000 }
+      );
+      this.swUpdate.checkForUpdate().then(hasUpdate => {
+        if (!hasUpdate) {
+          this.toastr.success(
+            this.currentLang === 'ar' ? 'لوحة التحكم محدثة بالفعل إلى أحدث إصدار.' : 'The dashboard is already up to date.',
+            '',
+            { timeOut: 3000 }
+          );
+        } else {
+          this.toastr.info(
+            this.currentLang === 'ar' ? 'تم العثور على تحديث! جاري تنزيل الملفات...' : 'Update found! Downloading assets in the background...',
+            '',
+            { timeOut: 4000 }
+          );
+        }
+      }).catch(err => {
+        console.error('Check for updates failed:', err);
+        this.toastr.error(
+          this.currentLang === 'ar' ? 'فشل التحقق من التحديثات.' : 'Failed to check for updates.',
+          '',
+          { timeOut: 3000 }
+        );
+      });
+    } else {
+      this.toastr.warning(
+        this.currentLang === 'ar' ? 'التحقق من التحديثات غير متاح في بيئة التطوير.' : 'Update check is not available in development mode.',
+        '',
+        { timeOut: 3000 }
+      );
+    }
   }
 
 }

@@ -57,6 +57,11 @@
                 <span>{{"My Profile" | translate}}</span>
               </a>
 
+              <a (click)="checkForUpdates()" class="dropdown-item" style="cursor: pointer;">
+                <i class="pi pi-refresh ms-2" style="font-size: 14px;"></i>
+                <span>{{"Check for Updates" | translate}}</span>
+              </a>
+
               <a  (click)="logout()" class="dropdown-item">
                 <i class="ti ti-logout ms-2"></i>
                 <span>{{'Logout' | translate}}</span>

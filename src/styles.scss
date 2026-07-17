@@ -1112,3 +1112,37 @@ strong {
 .p-colorpicker-panel .p-colorpicker-hue {
   background: linear-gradient(to bottom, red 0, #ff0 17%, lime 33%, cyan 50%, blue 67%, #f0f 83%, red 100%) !important;
 }
+
+/* Custom style for PWA Update Cookie Banner */
+.update-cookie-banner {
+  border-radius: 8px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -4px rgba(0, 0, 0, 0.15) !important;
+  background: transparent !important;
+  border: none !important;
+  margin-bottom: 24px !important;
+  max-width: 95vw !important;
+  width: 820px !important;
+  animation: slideUp 0.3s ease-out;
+  
+  .p-dialog-header {
+    display: none !important;
+  }
+  
+  .p-dialog-content {
+    background: transparent !important;
+    padding: 0 !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
