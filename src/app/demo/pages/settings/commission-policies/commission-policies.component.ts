@@ -239,7 +239,16 @@ export class CommissionPoliciesComponent implements OnInit {
     this.loadStatistics();
     this.loadRealTotals();
     if (this.dt) {
-      this.dt.reset(); // Reload to refresh prices and calculations
+      const lazyEvent = typeof this.dt.createLazyLoadMetadata === 'function'
+        ? this.dt.createLazyLoadMetadata()
+        : {
+            first: this.dt.first || 0,
+            rows: this.dt.rows || 10,
+            sortField: this.dt.sortField,
+            sortOrder: this.dt.sortOrder,
+            filters: this.dt.filters
+          };
+      this.loadData(lazyEvent);
     }
   }
 

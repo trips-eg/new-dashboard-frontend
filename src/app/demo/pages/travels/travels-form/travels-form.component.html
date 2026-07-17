@@ -1112,29 +1112,29 @@
   <form [formGroup]="accommodationTypeForm" (ngSubmit)="saveAccommodationType()">
     <div class="fluid formgrid grid p-3">
       <div class="field col-12 mb-3">
-        <label for="nameEn" class="block mb-2 font-semibold">
-          {{ 'English Name' | translate }}
+        <label for="newAccName" class="block mb-2 font-semibold">
+          {{ 'Name' | translate }}
           <span class="text-red-500">*</span>
         </label>
-        <input id="nameEn" type="text" pInputText formControlName="nameEn" class="w-full" />
+        <input id="newAccName" type="text" pInputText formControlName="name" class="w-full" />
         <small
           class="p-error block mt-1"
-          *ngIf="accommodationTypeForm.get('nameEn')?.invalid && accommodationTypeForm.get('nameEn')?.touched"
+          *ngIf="accommodationTypeForm.get('name')?.invalid && accommodationTypeForm.get('name')?.touched"
         >
-          {{ 'English name is required' | translate }}
+          {{ 'Name is required' | translate }}
         </small>
       </div>
       <div class="field col-12 mb-3">
-        <label for="nameAr" class="block mb-2 font-semibold">
-          {{ 'Arabic Name' | translate }}
+        <label for="newAccDesc" class="block mb-2 font-semibold">
+          {{ 'Description' | translate }}
           <span class="text-red-500">*</span>
         </label>
-        <input id="nameAr" type="text" pInputText formControlName="nameAr" class="w-full" />
+        <textarea id="newAccDesc" pInputTextarea formControlName="description" class="w-full" rows="3"></textarea>
         <small
           class="p-error block mt-1"
-          *ngIf="accommodationTypeForm.get('nameAr')?.invalid && accommodationTypeForm.get('nameAr')?.touched"
+          *ngIf="accommodationTypeForm.get('description')?.invalid && accommodationTypeForm.get('description')?.touched"
         >
-          {{ 'Arabic name is required' | translate }}
+          {{ 'Description is required' | translate }}
         </small>
       </div>
     </div>

@@ -1108,12 +1108,24 @@
   <form [formGroup]="accommodationTypeForm" (ngSubmit)="saveAccommodationType()">
     <div class="grid p-fluid">
       <div class="col-12 field mb-3">
-        <label for="newAccNameEn">{{ 'Name (English)' | translate }} *</label>
-        <input id="newAccNameEn" type="text" pInputText formControlName="nameEn" />
+        <label for="newAccName">{{ 'Name' | translate }} *</label>
+        <input id="newAccName" type="text" pInputText formControlName="name" />
+        <small
+          class="p-error block mt-1"
+          *ngIf="accommodationTypeForm.get('name')?.invalid && accommodationTypeForm.get('name')?.touched"
+        >
+          {{ 'Name is required' | translate }}
+        </small>
       </div>
       <div class="col-12 field mb-3">
-        <label for="newAccNameAr">{{ 'Name (Arabic)' | translate }} *</label>
-        <input id="newAccNameAr" type="text" pInputText formControlName="nameAr" />
+        <label for="newAccDesc">{{ 'Description' | translate }} *</label>
+        <textarea id="newAccDesc" pInputTextarea formControlName="description" rows="3"></textarea>
+        <small
+          class="p-error block mt-1"
+          *ngIf="accommodationTypeForm.get('description')?.invalid && accommodationTypeForm.get('description')?.touched"
+        >
+          {{ 'Description is required' | translate }}
+        </small>
       </div>
     </div>
     <div class="flex justify-content-end gap-2 mt-3">

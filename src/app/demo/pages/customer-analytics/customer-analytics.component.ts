@@ -14,6 +14,14 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment';
 
+export interface SearchHistoryItem {
+  id: number;
+  query: string;
+  language: string;
+  resultCount: number;
+  searchDate: string;
+}
+
 interface FunnelStep {
   key: AnalyticsType;
   label: string;
@@ -246,12 +254,12 @@ export class CustomerAnalyticsComponent implements OnInit {
     if (!customer.imageUrl || customer.imageUrl.includes('Default/avatar') || customer.imageUrl === 'NULL') {
       return '';
     }
-    
+
     const url = customer.imageUrl.trim();
     if (url.startsWith('http')) {
       return url;
     }
-    
+
     const base = this.baseUrl.endsWith('/') ? this.baseUrl : `${this.baseUrl}/`;
     return `${base}${url.startsWith('/') ? url.substring(1) : url}`;
   }
@@ -284,5 +292,23 @@ export class CustomerAnalyticsComponent implements OnInit {
       (customer.hajj && customer.hajj.length > 0) ||
       (customer.rooms && customer.rooms.length > 0)
     );
+  }
+
+  hasDetails(customer: any): boolean {
+    const history = this.getSearchHistory(customer);
+    console.log('hasDetails check for customer:', customer.name || customer.id, {
+      dialogType: this.dialogType,
+      hasHistory: history.length > 0,
+      historyData: history,
+      customerObj: customer
+    });
+    if (this.dialogType === 'searched') {
+      return history.length > 0;
+    }
+    return this.hasSectors(customer);
+  }
+
+  getSearchHistory(customer: any): SearchHistoryItem[] {
+    return customer.searchHistory || customer.searchHistories || [];
   }
 }

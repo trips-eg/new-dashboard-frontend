@@ -1,85 +1,120 @@
-<div class="product-form p-4 mb-4">
-  <div class="form-field">
-    <form [formGroup]="OutingCategoryform" (ngSubmit)="onSubmit()">
-      <h3 class="flex justify-content-between">
-        {{ config.data ? ('edit outing category' | translate) : ('add outing category' | translate) }}
-      </h3>
+<div class="outing-category-container p-2">
+  <form [formGroup]="OutingCategoryform" (ngSubmit)="onSubmit()">
+    
+    <!-- Form Fields Grid Container -->
+    <div class="formgrid grid p-fluid p-3 border-round-xl surface-card shadow-1 border-1 surface-border">
+      
+      <!-- Category Name Input Field -->
+      <div class="field col-12 mb-3">
+        <label for="name" class="font-semibold text-800 block mb-2">
+          {{ 'outing category name' | translate }} <span class="text-red-500">*</span>
+        </label>
+        <span class="p-input-icon-left w-full">
+          <i class="pi pi-tag text-color-secondary"></i>
+          <input
+            pInputText
+            id="name"
+            formControlName="Name"
+            [placeholder]="'enter outing category name' | translate"
+            class="w-full text-base input-custom-height"
+            [ngClass]="{'ng-invalid ng-dirty': nameCtrl?.invalid && (nameCtrl?.touched || nameCtrl?.dirty)}"
+          />
+        </span>
+        <small class="error-msg text-red-500 mt-1 flex align-items-center gap-1" *ngIf="nameCtrl?.invalid && (nameCtrl?.touched || nameCtrl?.dirty)">
+          <i class="pi pi-exclamation-circle text-xs"></i>
+          <span *ngIf="nameCtrl?.hasError('required')">{{ 'Name is required' | translate }}</span>
+          <span *ngIf="nameCtrl?.hasError('minlength')">{{ 'must be at least 3 characters' | translate }}</span>
+        </small>
+      </div>
 
-      <div class="formgrid grid p-3 border-1 border-dashed surface-border border-round">
+      <!-- Display Order / Sequence Input Field -->
+      <div class="field col-12 md:col-6 mb-3">
+        <label for="sequence" class="font-semibold text-800 block mb-2">
+          {{ 'Sequence' | translate }} <span class="text-red-500">*</span>
+        </label>
+        <p-inputNumber
+          id="sequence"
+          formControlName="Sequence"
+          [min]="0"
+          styleClass="w-full"
+          class="w-full"
+          [inputStyleClass]="'input-custom-height w-full font-bold'"
+          placeholder="{{ 'Sequence' | translate }}"
+        ></p-inputNumber>
+        <small class="error-msg text-red-500 mt-1 flex align-items-center gap-1" *ngIf="sequenceCtrl?.invalid && (sequenceCtrl?.touched || sequenceCtrl?.dirty)">
+          <i class="pi pi-exclamation-circle text-xs"></i>
+          <span>{{ 'must be at least 0' | translate }}</span>
+        </small>
+      </div>
 
-        <!-- Name -->
-        <div class="field col-md-12">
-          <div class="flex flex-column gap-2">
-            <label for="name">{{ 'outing category name' | translate }}</label>
-            <input
-              pInputText
-              id="name"
-              formControlName="Name"
-              [ngClass]="{'ng-invalid ng-dirty': nameCtrl?.invalid && (nameCtrl?.touched || nameCtrl?.dirty)}"
-            />
-            <small>{{ 'enter outing category name' | translate }}</small>
-          </div>
-          <small class="error" *ngIf="nameCtrl?.hasError('required') && (nameCtrl?.touched || nameCtrl?.dirty)">
-            * required
-          </small>
-          <small class="error" *ngIf="nameCtrl?.hasError('minlength')">
-            * must be at least 3 characters
-          </small>
+      <!-- Active Status Toggle Switch (Side-by-side layout) -->
+      <div class="field col-12 md:col-6 mb-3 flex flex-column justify-content-start align-items-start">
+        <label class="font-semibold text-800 mb-2">{{ 'status' | translate }}</label>
+        <div class="flex align-items-center gap-2 bg-light-status px-3 py-2 border-round-lg border-1 surface-border w-full justify-content-between h-custom-status">
+          <span class="text-sm text-600 font-medium">{{ (OutingCategoryform.get('IsActive')?.value ? 'active' : 'inactive') | translate }}</span>
+          <p-inputSwitch formControlName="IsActive"></p-inputSwitch>
         </div>
+      </div>
 
-        <!-- Description -->
-        <div class="field col-md-12">
-          <div class="flex flex-column gap-2">
-            <label for="desc">{{ 'Description' | translate }}</label>
-            <textarea
-              pInputTextarea
-              id="desc"
-              formControlName="Description"
-              [ngClass]="{'ng-invalid ng-dirty': descCtrl?.invalid && (descCtrl?.touched || descCtrl?.dirty)}"
-            ></textarea>
-            <small>{{ 'enter Description' | translate }}</small>
-          </div>
-          <small class="error" *ngIf="descCtrl?.hasError('required') && (descCtrl?.touched || descCtrl?.dirty)">
-            * required
-          </small>
-          <small class="error" *ngIf="descCtrl?.hasError('minlength')">
-            * must be at least 5 characters
-          </small>
-        </div>
+      <!-- Category Description Textarea Field -->
+      <div class="field col-12 mb-3">
+        <label for="desc" class="font-semibold text-800 block mb-2">
+          {{ 'Description' | translate }} <span class="text-red-500">*</span>
+        </label>
+        <textarea
+          pInputTextarea
+          id="desc"
+          formControlName="Description"
+          [placeholder]="'enter Description' | translate"
+          rows="3"
+          class="w-full text-base"
+          [ngClass]="{'ng-invalid ng-dirty': descCtrl?.invalid && (descCtrl?.touched || descCtrl?.dirty)}"
+        ></textarea>
+        <small class="error-msg text-red-500 mt-1 flex align-items-center gap-1" *ngIf="descCtrl?.invalid && (descCtrl?.touched || descCtrl?.dirty)">
+          <i class="pi pi-exclamation-circle text-xs"></i>
+          <span *ngIf="descCtrl?.hasError('required')">{{ 'Description is required' | translate }}</span>
+          <span *ngIf="descCtrl?.hasError('minlength')">{{ 'must be at least 5 characters' | translate }}</span>
+          <span *ngIf="descCtrl?.hasError('maxlength')">{{ 'Description cannot exceed 50 characters' | translate }}</span>
+        </small>
+      </div>
 
-        <!-- Image -->
-        <div class="field col-md-12">
-          <div class="flex flex-column gap-2">
-            <label>{{ 'bg image' | translate }}</label>
-            <app-img-uploader
+      <!-- Image File Uploader Section -->
+      <div class="field col-12 mb-2">
+        <label class="font-semibold text-800 block mb-2">
+          {{ 'bg image' | translate }} <span class="text-red-500">*</span>
+        </label>
+        <div class="border-round-lg border-1 border-dashed surface-border p-3 bg-uploader-box">
+          <app-img-uploader
             [multiple]="false"
-              [displayFiles]="existingImages"
-              (filesChanged)="onImagesUpload($event)"
-            ></app-img-uploader>
-            <small>{{ 'enter background image' | translate }}</small>
-          </div>
-          <small class="error" *ngIf="showImageError">
-            * required
-          </small>
+            [displayFiles]="existingImages"
+            (filesChanged)="onImagesUpload($event)"
+          ></app-img-uploader>
         </div>
+        <small class="error-msg text-red-500 mt-1 flex align-items-center gap-1" *ngIf="showImageError">
+          <i class="pi pi-exclamation-circle text-xs"></i>
+          <span>{{ 'At least one image is required' | translate }}</span>
+        </small>
       </div>
+    </div>
 
-      <!-- Buttons -->
-      <div class="buttons mt-3 text-end">
-        <p-button
-          label="{{ 'Cancel' | translate }}"
-          class="mx-1"
-          severity="secondary"
-          (onClick)="onCancel()"
-        ></p-button>
+    <!-- Actions Buttons Section -->
+    <div class="flex justify-content-end gap-2 mt-4 pt-3 border-top-1 surface-border">
+      <p-button
+        label="{{ 'Cancel' | translate }}"
+        icon="pi pi-times"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="onCancel()"
+        styleClass="px-4 py-2 border-round-lg"
+      ></p-button>
 
-        <p-button
-          label="{{ 'save' | translate }}"
-          severity="success"
-          icon="pi pi-save"
-          type="submit"
-        ></p-button>
-      </div>
-    </form>
-  </div>
+      <p-button
+        label="{{ 'save' | translate }}"
+        severity="success"
+        icon="pi pi-save"
+        type="submit"
+        styleClass="px-4 py-2 border-round-lg"
+      ></p-button>
+    </div>
+  </form>
 </div>

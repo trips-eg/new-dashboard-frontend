@@ -47,7 +47,7 @@ export class OutingCategoryComponent {
     this.isFormVisible = true;
 
     this.ref = this.dialogService.open(OutingCategoryformComponent, {
-      header: this.translate.instant('outing category'),
+      header: this.translate.instant('add outing category'),
       width: '50vw',
       modal: true,
       breakpoints: {

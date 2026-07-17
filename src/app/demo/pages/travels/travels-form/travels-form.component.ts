@@ -31,8 +31,8 @@ export class TravelsFormComponent implements OnInit {
   accommodationTypeList: { label: string; value: any }[] = [];
   displayAddAccommodationTypeDialog: boolean = false;
   accommodationTypeForm: FormGroup = this.fb.group({
-    nameEn: ['', Validators.required],
-    nameAr: ['', Validators.required]
+    name: ['', Validators.required],
+    description: ['', Validators.required]
   });
   isSavingAccommodationType: boolean = false;
   travelFeatureList: { label: string; value: any }[] = [];
@@ -534,7 +534,7 @@ export class TravelsFormComponent implements OnInit {
             IsAllowPaymentUponArrival: travelData.isAllowPaymentUponArrival || false,
             IsIncludeVate: travelData.isIncludeVate || false,
             depositRate: travelData.depositRate || 100,
-            AccommodationTypeId: travelData.accommodationTypeId,
+            AccommodationTypeId: (travelData.accommodationTypes && travelData.accommodationTypes.length > 0) ? travelData.accommodationTypes[0].id : travelData.accommodationTypeId,
             Features: travelData.features?.map((f: any) => f.id) || [],
             ImagesFiles: null
           });

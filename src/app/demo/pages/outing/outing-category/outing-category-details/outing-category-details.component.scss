@@ -1,0 +1,104 @@
+.category-details-container {
+  padding-bottom: 1.5rem;
+
+  .hero-banner {
+    height: 240px;
+    background-color: var(--surface-100);
+
+    .banner-image {
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    &:hover .banner-image {
+      transform: scale(1.02);
+    }
+
+    .hero-overlay {
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%);
+    }
+  }
+
+  /* This is the key 3D overlap effect */
+  .details-card-overlap {
+    margin-top: -60px; /* Pulls the card up over the image */
+    position: relative;
+    z-index: 10;
+  }
+
+  .info-card {
+    background: var(--surface-card);
+    border-radius: 1.25rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  }
+
+  .category-id {
+    letter-spacing: 0.05em;
+  }
+
+  .status-badge {
+    border-radius: 0.75rem;
+    padding: 0.5rem 1rem;
+    
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    &.active {
+      background-color: var(--green-50);
+      color: var(--green-700);
+      border: 1px solid var(--green-200);
+
+      .dot {
+        background-color: var(--green-600);
+        box-shadow: 0 0 8px var(--green-400);
+        animation: statusPulse 2s infinite;
+      }
+    }
+
+    &.inactive {
+      background-color: var(--red-50);
+      color: var(--red-700);
+      border: 1px solid var(--red-200);
+
+      .dot {
+        background-color: var(--red-600);
+        box-shadow: 0 0 8px var(--red-400);
+        animation: statusPulse 2s infinite;
+      }
+    }
+  }
+
+  .description-text {
+    line-height: 1.7;
+    color: var(--text-color-secondary);
+    font-size: 1.05rem;
+    white-space: pre-wrap;
+  }
+
+  // Border formatting for separating sections cleanly
+  @media screen and (min-width: 768px) {
+    .border-right-1 {
+      border-right: 1px solid var(--surface-border) !important;
+    }
+  }
+}
+
+@keyframes statusPulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+}

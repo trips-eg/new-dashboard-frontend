@@ -32,23 +32,41 @@ export class OutingCategoryformComponent {
     this.initializeForm();
 
     // Populate data if edit mode
-    if (this.config.data) {
-      this.OutingCategoryform.patchValue({
-        Name: this.config.data.name,
-        Description: this.config.data.description
-      });
-
-      if (this.config.data.imageUrl) {
-        this.existingImages = [{ id: 0, url: this.config.data.imageUrl }];
-      }
+    if (this.config.data && this.config.data.id) {
+      this.loadCategoryDetails(this.config.data.id);
     }
+  }
+
+  loadCategoryDetails(id: number): void {
+    this.OutingCategoryServise.getOutingCategoryById(id).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          const category = res.data;
+          this.OutingCategoryform.patchValue({
+            Name: category.name,
+            Description: category.description,
+            IsActive: category.isActive ?? true,
+            Sequence: category.sequence ?? 0
+          });
+
+          if (category.imageUrl) {
+            this.existingImages = [{ id: 0, url: category.imageUrl }];
+          }
+        }
+      },
+      error: (err) => {
+        this.toaster.error('Failed to load category details', 'Error');
+        console.error('Error loading category:', err);
+      }
+    });
   }
 
   initializeForm() {
     this.OutingCategoryform = this.fb.group({
       Name: ['', [Validators.required, Validators.minLength(3)]],
       Description: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(50)]] ,
-      IsActive: [true]
+      IsActive: [true],
+      Sequence: [0, [Validators.required, Validators.min(0)]]
     });
   }
 
@@ -79,6 +97,7 @@ onSubmit() {
   formData.append('Name', this.OutingCategoryform.get('Name')?.value);
   formData.append('Description', this.OutingCategoryform.get('Description')?.value);
   formData.append('IsActive', this.OutingCategoryform.get('IsActive')?.value);
+  formData.append('Sequence', this.OutingCategoryform.get('Sequence')?.value);
 
   if (this.newImages.length > 0) {
     formData.append('UploadedImage', this.newImages[0]);
@@ -129,5 +148,9 @@ onSubmit() {
 
   get descCtrl() {
     return this.OutingCategoryform.get('Description');
+  }
+
+  get sequenceCtrl() {
+    return this.OutingCategoryform.get('Sequence');
   }
 }

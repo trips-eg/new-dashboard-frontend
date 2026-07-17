@@ -731,5 +731,22 @@
   "Pricing Model Description": "Pricing Model Description",
   "Percentage Rate: Charge a percentage commission on the total selling price of the trip.": "Percentage Rate: Charge a percentage commission on the total selling price of the trip.",
   "Fixed Fee: Charge a flat, fixed fee per booking regardless of the trip price.": "Fixed Fee: Charge a flat, fixed fee per booking regardless of the trip price.",
-  "Committed Net Price: Set a fixed net price for the vendor; anything sold above this becomes Trips commission.": "Committed Net Price: Set a fixed net price for the vendor; anything sold above this becomes Trips commission."
+  "Committed Net Price: Set a fixed net price for the vendor; anything sold above this becomes Trips commission.": "Committed Net Price: Set a fixed net price for the vendor; anything sold above this becomes Trips commission.",
+  "Search History": "Search History",
+  "Search Query": "Search Query",
+  "Language": "Language",
+  "Result Count": "Result Count",
+  "Search Date": "Search Date",
+  "Searches": "Searches",
+  "outing category": "Outing Category",
+  "add outing category": "Add Outing Category",
+  "edit outing category": "Edit Outing Category",
+  "outing category name": "Category Name",
+  "enter outing category name": "Enter Category Name",
+  "enter Description": "Enter Description",
+  "category description": "Category Description",
+  "category name": "Category Name",
+  "bg image": "Background Image",
+  "enter background image": "Select background image",
+  "Sequence": "Display Order"
 }

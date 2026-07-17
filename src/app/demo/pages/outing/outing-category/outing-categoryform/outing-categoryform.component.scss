@@ -1,0 +1,55 @@
+.outing-category-container {
+  .bg-light-status {
+    background-color: var(--surface-hover);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .border-bottom-1 {
+    border-bottom: 1px solid var(--surface-border);
+  }
+
+  .border-top-1 {
+    border-top: 1px solid var(--surface-border);
+  }
+
+  .input-custom-height {
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
+  }
+
+  .bg-uploader-box {
+    background-color: var(--surface-hover);
+    border-color: var(--surface-border);
+    transition: border-color 0.2s ease-in-out;
+
+    &:hover {
+      border-color: var(--primary-color) !important;
+    }
+  }
+
+  .error-msg {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+  }
+
+  // Soft glow style for inputs
+  .p-inputtext, textarea {
+    border-radius: 8px;
+    border: 1px solid var(--surface-border);
+    transition: all 0.2s ease-in-out;
+
+    &:focus {
+      border-color: var(--primary-color) !important;
+      box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15) !important;
+    }
+  }
+
+  .h-custom-status {
+    height: 42px;
+  }
+
+  textarea {
+    min-height: 100px;
+  }
+}

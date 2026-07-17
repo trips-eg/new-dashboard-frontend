@@ -6,7 +6,10 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { OutingCategoryServiseService } from 'src/app/shared/services/outing-category-servise.service';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 import { OutingCategoryformComponent } from '../outing-categoryform/outing-categoryform.component';
+import { OutingCategoryDetailsComponent } from '../outing-category-details/outing-category-details.component';
 import { TableRequestBuilder } from 'src/app/shared/utils/table-request-builder';
+import { TranslateService } from '@ngx-translate/core';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-outing-category-list',
@@ -19,11 +22,20 @@ import { TableRequestBuilder } from 'src/app/shared/utils/table-request-builder'
 })
 export class OutingCategoryListComponent {
   @ViewChild('dt') dt!: Table;
+  baseUrl = environment.imgUrl;
+
+  getImageUrl(imageUrl: string): string {
+    return imageUrl 
+      ? this.baseUrl + imageUrl 
+      : 'https://placehold.co/600x400?text=No+Image';
+  }
+
   constructor(
     private dialogService: DialogService,
     private ConfirmationService: ConfirmationService,
     private ToastrService: ToastrService,
-    private OutingCategoryService: OutingCategoryServiseService
+    private OutingCategoryService: OutingCategoryServiseService,
+    private translate: TranslateService
   ) {}
   pageChange(event: any) {
     // Deprecated in favor of onLazyLoad
@@ -34,6 +46,11 @@ export class OutingCategoryListComponent {
 
   categories: any[] = []; // Fixed typo from 'catigoreys'
   searchTerm: string = '';
+  selectedStatus: boolean | null = null;
+  statusOptions = [
+    { label: 'active', value: true },
+    { label: 'inactive', value: false }
+  ];
 
   totalRecords: number = 0;
   loading: boolean = false;
@@ -44,6 +61,13 @@ export class OutingCategoryListComponent {
   loadCategories(event: TableLazyLoadEvent) {
     this.loading = true;
     const payload = TableRequestBuilder.build(event, this.searchTerm);
+
+    if (this.selectedStatus !== null && this.selectedStatus !== undefined) {
+      payload.filters.push({
+        column: 'isActive',
+        value: this.selectedStatus
+      });
+    }
 
     this.OutingCategoryService.getAlloutingCategoty(payload).subscribe({
       next: (res: any) => {
@@ -64,13 +88,23 @@ export class OutingCategoryListComponent {
     this.dt.reset();
   }
 
-  handleEdit(name: string, description: string, id: number, imageUrl) {
+  onStatusFilter() {
+    this.dt.reset();
+  }
+
+  clearFilters() {
+    this.searchTerm = '';
+    this.selectedStatus = null;
+    this.dt.reset();
+  }
+
+  handleEdit(name: string, description: string, id: number, imageUrl: string, isActive: boolean, sequence: number) {
     this.ref = this.dialogService.open(OutingCategoryformComponent, {
-      header: 'nationality',
+      header: this.translate.instant('edit outing category'),
       width: '50vw',
       modal: true,
       closable: true,
-      data: { id, name, description, imageUrl },
+      data: { id, name, description, imageUrl, isActive, sequence },
       breakpoints: {
         '960px': '75vw',
         '640px': '90vw'
@@ -80,6 +114,33 @@ export class OutingCategoryListComponent {
     this.ref.onClose.subscribe((data) => {
       if (data) {
         this.dt.reset();
+      }
+    });
+  }
+
+  handleViewDetails(id: number) {
+    this.ref = this.dialogService.open(OutingCategoryDetailsComponent, {
+      header: this.translate.instant('outing category details'),
+      width: '60vw',
+      modal: true,
+      closable: true,
+      data: { id },
+      breakpoints: {
+        '960px': '75vw',
+        '640px': '90vw'
+      }
+    });
+  }
+
+  toggleStatus(id: number) {
+    this.OutingCategoryService.toggleStatus(id).subscribe({
+      next: (res: any) => {
+        this.ToastrService.success('Status updated successfully', 'Success');
+      },
+      error: (err: any) => {
+        this.dt.reset();
+        this.ToastrService.error('Failed to update status', 'Error');
+        console.error('Failed to toggle status:', err);
       }
     });
   }

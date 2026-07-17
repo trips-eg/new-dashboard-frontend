@@ -58,6 +58,14 @@ export interface CustomerWallet {
   user: CustomerWalletUser;
 }
 
+export interface SearchHistoryItem {
+  id: number;
+  query: string;
+  language: string;
+  resultCount: number;
+  searchDate: string;
+}
+
 export interface AnalyticsCustomer {
   id: string;
   userName: string;
@@ -74,6 +82,7 @@ export interface AnalyticsCustomer {
   outings?: any[];
   hajj?: any[];
   rooms?: any[];
+  searchHistory?: SearchHistoryItem[];
 }
 
 export interface CustomersByTypeData {

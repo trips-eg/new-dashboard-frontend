@@ -12,6 +12,9 @@ export class OutingCategoryServiseService {
   getAlloutingCategoty(filter: any): Observable<any> {
     return this.ApiCallerService.post(this.endPoints.GetAllOutingCategories, filter);
   }
+  getOutingCategoryById(id: number): Observable<any> {
+    return this.ApiCallerService.get(`${this.endPoints.GetOutingCategoryById}${id}`);
+  }
   setOutingCategory(data): Observable<any> {
     return this.ApiCallerService.post(this.endPoints.AddOutingCategory, data);
   }
@@ -21,6 +24,10 @@ export class OutingCategoryServiseService {
 
   deleteOutingCategory(id: number): Observable<any> {
     return this.ApiCallerService.delete(`${this.endPoints.delete}${id}`);
+  }
+
+  toggleStatus(id: number): Observable<any> {
+    return this.ApiCallerService.patch(`${this.endPoints.toggleStatus}${id}`,null);
   }
 
   constructor(private ApiCallerService: ApiCallerService) {}

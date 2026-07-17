@@ -236,7 +236,7 @@
     >
       <ng-template pTemplate="header">
         <tr>
-          <th style="width: 3rem" *ngIf="dialogType === 'booked' || dialogType === 'paid'"></th>
+          <th style="width: 3rem" *ngIf="dialogType === 'booked' || dialogType === 'paid' || dialogType === 'searched'"></th>
           <th style="width: 60px">{{ 'Avatar' | translate }}</th>
           <th>{{ 'Name' | translate }}</th>
           <th>{{ 'Email' | translate }}</th>
@@ -251,7 +251,7 @@
       <ng-template pTemplate="body" let-customer let-expanded="expanded">
         <tr>
           <!-- Row expansion toggle -->
-          <td *ngIf="dialogType === 'booked' || dialogType === 'paid'">
+          <td *ngIf="dialogType === 'booked' || dialogType === 'paid' || dialogType === 'searched'">
             <button
               type="button"
               pButton
@@ -259,7 +259,7 @@
               [pRowToggler]="customer"
               class="p-button-text p-button-rounded p-button-plain p-button-sm"
               [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-              *ngIf="hasSectors(customer)"
+              *ngIf="hasDetails(customer)"
             ></button>
           </td>
 
@@ -295,6 +295,12 @@
               </span>
               <span class="badge bg-purple-subtle px-2 py-0.5" style="font-size: 0.7rem;" *ngIf="customer.rooms?.length">
                 <i class="fas fa-hotel me-1"></i>{{ 'Rooms' | translate }} ({{ customer.rooms.length }})
+              </span>
+            </div>
+            <!-- Dynamic Search Badges -->
+            <div class="d-flex flex-wrap gap-1 mt-1 mb-1" *ngIf="dialogType === 'searched' && getSearchHistory(customer).length">
+              <span class="badge bg-secondary-subtle px-2 py-0.5" style="font-size: 0.7rem;">
+                <i class="fas fa-search me-1"></i>{{ 'Searches' | translate }} ({{ getSearchHistory(customer).length }})
               </span>
             </div>
             <small class="text-muted">#{{ customer.id }}</small>
@@ -355,14 +361,51 @@
       <!-- Row expansion for sector details -->
       <ng-template pTemplate="rowexpansion" let-customer>
         <tr>
-          <td [attr.colspan]="(dialogType === 'booked' || dialogType === 'paid') ? '9' : '8'" class="p-3">
+          <td [attr.colspan]="(dialogType === 'booked' || dialogType === 'paid' || dialogType === 'searched') ? '9' : '8'" class="p-3">
             <div class="bg-white p-3 rounded shadow-sm border border-light">
-              <h6 class="mb-3 text-secondary fw-bold">
-                <i class="fas fa-suitcase me-2 text-primary"></i>
-                {{ 'Reservations Sector Details' | translate }}
-              </h6>
-              
-              <p-tabView styleClass="customer-sectors-tabs">
+              <!-- If dialogType is searched, display Search History -->
+              <ng-container *ngIf="dialogType === 'searched'; else sectorDetails">
+                <h6 class="mb-3 text-secondary fw-bold">
+                  <i class="fas fa-search me-2 text-primary"></i>
+                  {{ 'Search History' | translate }}
+                </h6>
+                <div class="table-responsive">
+                  <table class="table table-bordered table-sm table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                      <tr>
+                        <th>{{ 'Search Query' | translate }}</th>
+                        <th>{{ 'Language' | translate }}</th>
+                        <th>{{ 'Result Count' | translate }}</th>
+                        <th>{{ 'Search Date' | translate }}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let search of getSearchHistory(customer)">
+                        <td class="fw-semibold text-primary">{{ search.query }}</td>
+                        <td>
+                          <span class="badge bg-info-subtle px-2 py-0.5" style="font-size: 0.75rem;">
+                            {{ search.language | uppercase }}
+                          </span>
+                        </td>
+                        <td>
+                          <span class="badge bg-success-subtle px-2 py-0.5" style="font-size: 0.75rem;">
+                            {{ search.resultCount }}
+                          </span>
+                        </td>
+                        <td>{{ search.searchDate | date:'dd/MM/yyyy hh:mm a' }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </ng-container>
+
+              <ng-template #sectorDetails>
+                <h6 class="mb-3 text-secondary fw-bold">
+                  <i class="fas fa-suitcase me-2 text-primary"></i>
+                  {{ 'Reservations Sector Details' | translate }}
+                </h6>
+                
+                <p-tabView styleClass="customer-sectors-tabs">
                 <!-- Trips Tab -->
                 <p-tabPanel *ngIf="customer.trips?.length">
                   <ng-template pTemplate="header">
@@ -519,6 +562,7 @@
                   </div>
                 </p-tabPanel>
               </p-tabView>
+              </ng-template>
             </div>
           </td>
         </tr>
@@ -526,7 +570,7 @@
 
       <ng-template pTemplate="empty">
         <tr>
-          <td [attr.colspan]="(dialogType === 'booked' || dialogType === 'paid') ? '9' : '8'" class="text-center py-4 text-muted">
+          <td [attr.colspan]="(dialogType === 'booked' || dialogType === 'paid' || dialogType === 'searched') ? '9' : '8'" class="text-center py-4 text-muted">
             <i class="fas fa-users fa-2x mb-2 d-block"></i>
             {{ 'No customers found for this category' | translate }}
           </td>

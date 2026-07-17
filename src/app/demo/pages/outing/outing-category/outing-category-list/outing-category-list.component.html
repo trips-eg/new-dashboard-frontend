@@ -1,11 +1,34 @@
 <p-confirmDialog></p-confirmDialog>
 <div class="card">
   <p-toolbar styleClass="mb-4">
-    <ng-template pTemplate="right">
-      <span class="p-input-icon-left">
-        <i class="pi pi-search"></i>
-        <input pInputText type="text" [(ngModel)]="searchTerm" (input)="onSearch()" [placeholder]="'search' | translate" />
-      </span>
+    <ng-template pTemplate="left">
+      <div class="flex flex-wrap gap-3 align-items-center">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" [(ngModel)]="searchTerm" (input)="onSearch()" [placeholder]="'search' | translate" class="w-16rem" />
+        </span>
+        <p-dropdown
+          [(ngModel)]="selectedStatus"
+          [options]="statusOptions"
+          [placeholder]="'Select Status' | translate"
+          [showClear]="true"
+          (onChange)="onStatusFilter()"
+          styleClass="w-12rem"
+          appendTo="body"
+        >
+          <ng-template let-option pTemplate="item">
+            <span>{{ option.label | translate }}</span>
+          </ng-template>
+        </p-dropdown>
+        <p-button
+          *ngIf="searchTerm || selectedStatus !== null"
+          icon="pi pi-filter-slash"
+          severity="secondary"
+          [text]="true"
+          (onClick)="clearFilters()"
+          pTooltip="{{ 'Clear Filters' | translate }}"
+        ></p-button>
+      </div>
     </ng-template>
   </p-toolbar>
   <p-table
@@ -20,46 +43,69 @@
     [rowsPerPageOptions]="[5, 10, 20, 50]"
     [showCurrentPageReport]="true"
     [currentPageReportTemplate]="'showingEntries' | translate"
-    [globalFilterFields]="['name', 'description']"
+    [globalFilterFields]="['id', 'name', 'description', 'sequence']"
   >
     <ng-template pTemplate="header">
       <tr>
+        <th style="width: 80px" pSortableColumn="id">
+          {{ '#ID' | translate }}
+          <p-sortIcon field="id"></p-sortIcon>
+        </th>
+        <th style="width: 100px">{{ 'image' | translate }}</th>
         <th style="min-width: 200px" pSortableColumn="name">
           {{ 'category name' | translate }}
           <p-sortIcon field="name"></p-sortIcon>
         </th>
-        <th style="min-width: 300px" pSortableColumn="description">
+        <th style="min-width: 250px" pSortableColumn="description">
           {{ 'category description' | translate }}
           <p-sortIcon field="description"></p-sortIcon>
         </th>
-        <th style="min-width: 150px">{{ 'action' | translate }}</th>
-      </tr>
-      <tr>
-        <th>
-          <p-columnFilter type="text" field="name" display="row" [showMenu]="false"></p-columnFilter>
+        <th style="width: 120px" pSortableColumn="sequence">
+          {{ 'Sequence' | translate }}
+          <p-sortIcon field="sequence"></p-sortIcon>
         </th>
-        <th>
-          <p-columnFilter type="text" field="description" display="row" [showMenu]="false"></p-columnFilter>
+        <th style="width: 120px" pSortableColumn="isActive">
+          {{ 'status' | translate }}
+          <p-sortIcon field="isActive"></p-sortIcon>
         </th>
-        <th></th>
+        <th style="width: 120px" class="text-center">{{ 'action' | translate }}</th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-category>
       <tr>
-        <td>{{ category.name }}</td>
-        <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis" [title]="category.description">
+        <td><span class="font-semibold text-color-secondary">#{{ category.id }}</span></td>
+        <td>
+          <img [src]="getImageUrl(category.imageUrl)" class="category-thumbnail shadow-1" [alt]="category.name" />
+        </td>
+        <td><span class="font-semibold text-900">{{ category.name }}</span></td>
+        <td style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis" [title]="category.description">
           {{ category.description }}
+        </td>
+        <td class="text-center">
+          <p-badge [value]="category.sequence" severity="info"></p-badge>
+        </td>
+        <td>
+          <p-inputSwitch [(ngModel)]="category.isActive" (onChange)="toggleStatus(category.id)"></p-inputSwitch>
         </td>
 
         <td>
           <div class="flex gap-1 justify-content-center">
             <p-button
               [raised]="true"
+              icon="pi pi-eye"
+              severity="info"
+              [rounded]="true"
+              (onClick)="handleViewDetails(category.id)"
+              pTooltip="{{ 'view details' | translate }}"
+              tooltipPosition="top"
+            ></p-button>
+            <p-button
+              [raised]="true"
               icon="pi pi-pencil"
               severity="success"
               [rounded]="true"
-              (onClick)="handleEdit(category.name, category.description, category.id, category.imageUrl)"
+              (onClick)="handleEdit(category.name, category.description, category.id, category.imageUrl, category.isActive, category.sequence)"
               pTooltip="{{ 'edit' | translate }}"
               tooltipPosition="top"
             ></p-button>
@@ -78,7 +124,7 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="3">
+        <td colspan="7">
           <div class="flex flex-column justify-content-center align-items-center py-5 w-full">
             <i class="pi pi-search" style="font-size: 3rem; color: var(--gray-400)"></i>
             <span class="mt-2 text-gray-500 font-medium">{{ 'No Data found' | translate }}</span>

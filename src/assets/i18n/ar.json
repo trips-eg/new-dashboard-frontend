@@ -718,5 +718,22 @@
   "Pricing Model Description": "وصف نموذج التسعير",
   "Percentage Rate: Charge a percentage commission on the total selling price of the trip.": "النسبة المئوية: فرض عمولة بنسبة مئوية على إجمالي سعر بيع الرحلة.",
   "Fixed Fee: Charge a flat, fixed fee per booking regardless of the trip price.": "الرسوم الثابتة: فرض رسوم ثابتة لكل حجز بغض النظر عن سعر الرحلة.",
-  "Committed Net Price: Set a fixed net price for the vendor; anything sold above this becomes Trips commission.": "صافي السعر الملتزم به: تحديد صافي سعر ثابت للمورد؛ وأي شيء يُباع فوق هذا يصبح عمولة للرحلات."
+  "Committed Net Price: Set a fixed net price for the vendor; anything sold above this becomes Trips commission.": "صافي السعر الملتزم به: تحديد صافي سعر ثابت للمورد؛ وأي شيء يُباع فوق هذا يصبح عمولة للرحلات.",
+  "Search History": "سجل البحث",
+  "Search Query": "كلمة البحث",
+  "Language": "اللغة",
+  "Result Count": "عدد النتائج",
+  "Search Date": "تاريخ البحث",
+  "Searches": "عمليات البحث",
+  "outing category": "تصنيف الفعاليات",
+  "add outing category": "إضافة تصنيف فعاليات",
+  "edit outing category": "تعديل تصنيف فعاليات",
+  "outing category name": "اسم التصنيف",
+  "enter outing category name": "أدخل اسم التصنيف",
+  "enter Description": "أدخل الوصف",
+  "category description": "وصف التصنيف",
+  "category name": "اسم التصنيف",
+  "bg image": "صورة الخلفية",
+  "enter background image": "اختر صورة الخلفية",
+  "Sequence": "ترتيب العرض"
 }

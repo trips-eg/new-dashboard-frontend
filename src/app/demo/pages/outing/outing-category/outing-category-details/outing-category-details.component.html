@@ -1,0 +1,99 @@
+<div class="category-details-container font-sans">
+  <div *ngIf="loading" class="flex justify-content-center align-items-center py-8">
+    <i class="pi pi-spin pi-spinner text-primary" style="font-size: 3rem;"></i>
+  </div>
+
+  <div *ngIf="!loading && category" class="dialog-content fadein animation-duration-300">
+    <!-- Hero Image Banner with overlay -->
+    <div class="hero-banner relative border-round-2xl overflow-hidden shadow-2">
+      <img 
+        [src]="getImageUrl(category.imageUrl)" 
+        [alt]="category.name"
+        class="banner-image w-full"
+      />
+      <div class="hero-overlay absolute top-0 left-0 w-full h-full"></div>
+    </div>
+
+    <!-- Floating Title Card (Overlaps the Banner) -->
+    <div class="details-card-overlap px-4">
+      <div class="info-card bg-surface border-round-2xl p-4 shadow-4 border-1 surface-border">
+        
+        <!-- Header Info (Title + Status Badge) -->
+        <div class="flex flex-column sm:flex-row justify-content-between align-items-start sm:align-items-center gap-3 pb-3 border-bottom-1 surface-border">
+          <div>
+            <span class="category-id font-bold text-xs uppercase text-primary bg-primary-100 px-3 py-1 border-round-pill">
+              Category #{{ category.id }}
+            </span>
+            <h2 class="category-name text-2xl font-extrabold text-900 mt-2 mb-0">
+              {{ category.name }}
+            </h2>
+          </div>
+          
+          <div class="status-indicator">
+            <span 
+              [class]="'status-badge px-3 py-2 border-round-xl text-xs font-bold flex align-items-center gap-2 ' + 
+                       (category.isActive ? 'active' : 'inactive')"
+            >
+              <span class="dot"></span>
+              {{ (category.isActive ? 'active' : 'inactive') | translate }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Details Grid Info -->
+        <div class="grid mt-4 gap-4 sm:gap-0">
+          
+          <!-- Description Block -->
+          <div class="col-12 md:col-8 pr-0 md:pr-4 border-right-none md:border-right-1 surface-border">
+            <h3 class="text-sm font-semibold text-500 uppercase tracking-wider mt-0 mb-2">
+              {{ 'category description' | translate }}
+            </h3>
+            <p class="description-text text-700 m-0 line-height-1.6 text-base">
+              {{ category.description }}
+            </p>
+          </div>
+
+          <!-- Metadata Sidebar -->
+          <div class="col-12 md:col-4 pl-0 md:pl-4 flex flex-column gap-3">
+            <div>
+              <h3 class="text-sm font-semibold text-500 uppercase tracking-wider mt-0 mb-2">
+                {{ 'Display Order' | translate }}
+              </h3>
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-sort-numeric-down text-primary text-xl"></i>
+                <span class="font-extrabold text-900 text-xl">{{ category.sequence }}</span>
+              </div>
+            </div>
+
+            <div *ngIf="category.icon">
+              <h3 class="text-sm font-semibold text-500 uppercase tracking-wider mt-0 mb-2">
+                {{ 'Icon' | translate }}
+              </h3>
+              <div class="flex align-items-center gap-2">
+                <i [class]="category.icon + ' text-primary text-xl'"></i>
+                <span class="text-700 font-medium text-sm">{{ category.icon }}</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="flex justify-content-end mt-4 pt-3 border-top-1 surface-border">
+          <p-button 
+            label="{{ 'Close' | translate }}" 
+            icon="pi pi-times" 
+            styleClass="p-button-secondary px-5 py-2 border-round-xl font-bold"
+            (onClick)="close()"
+          ></p-button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !category" class="text-center py-6 text-color-secondary">
+    <i class="pi pi-info-circle text-4xl mb-2"></i>
+    <p>{{ 'No Data found' | translate }}</p>
+  </div>
+</div>

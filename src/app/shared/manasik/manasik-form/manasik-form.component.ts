@@ -51,8 +51,8 @@ export class ManasikFormComponent implements OnInit {
   accommodationTypeList: { label: string; value: any }[] = [];
   displayAddAccommodationTypeDialog: boolean = false;
   accommodationTypeForm: FormGroup = this.fb.group({
-    nameEn: ['', Validators.required],
-    nameAr: ['', Validators.required]
+    name: ['', Validators.required],
+    description: ['', Validators.required]
   });
   isSavingAccommodationType: boolean = false;
 
@@ -157,7 +157,7 @@ export class ManasikFormComponent implements OnInit {
       IsIncludeVate: data.isIncludeVate,
       FromLocation: data.fromLocation || '',
       ToLocation: data.toLocation || '',
-      AccommodationTypeId: data.accommodationTypeId || null,
+      AccommodationTypeId: (data.accommodationTypes && data.accommodationTypes.length > 0) ? data.accommodationTypes[0].id : (data.accommodationTypeId || null),
       Features: data.features?.map((f: any) => f.id) || [],
       Type: data.type
     });

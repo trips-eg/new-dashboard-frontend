@@ -46,9 +46,11 @@ export class APIs {
   };
   public static outingCategoty = {
     GetAllOutingCategories: 'OutingCategories/GetAllOutingCategories',
+    GetOutingCategoryById: 'OutingCategories/GetOutingCategoryById?id=',
     AddOutingCategory: 'OutingCategories/AddOutingCategory',
     update: 'OutingCategories/UpdateOutingCategory',
-    delete: 'OutingCategories/DeleteOutingCategory?id='
+    delete: 'OutingCategories/DeleteOutingCategory?id=',
+    toggleStatus: 'OutingCategories/ToggleStatus?id='
   };
   public static notifications = {
     GetAllNotifications: 'Notification/GetAllNotifications',
