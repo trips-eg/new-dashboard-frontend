@@ -24,6 +24,7 @@ import { ManasikType } from 'src/app/shared/Enums/manasikType';
 import { ManasikBookingInfoComponent } from 'src/app/shared/tables-booking-info/manasik-booking-info/manasik-booking-info.component';
 import { ScannerPageComponent } from '../../../scanner-page/scanner-page.component';
 
+
 @Component({
   selector: 'app-vendor-detail',
   standalone: true,

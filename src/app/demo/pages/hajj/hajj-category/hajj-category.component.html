@@ -1,0 +1,9 @@
+<div class="hajj-category-page main">
+  <sub-header
+    [mainHeader]="'hajj categories'"
+    [actionButtons]="[{ label: 'Add', action: 'add', icon: 'pi pi-plus', class: 'btn-primary' }]"
+    (actionClicked)="handleAction($event)"
+  ></sub-header>
+
+  <app-hajj-category-list></app-hajj-category-list>
+</div>

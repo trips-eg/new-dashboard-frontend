@@ -176,6 +176,9 @@
         <th pSortableColumn="User.PhoneNumber" style="min-width: 200px;" class="text-nowrap">
           {{ 'Phone Number' | translate }} <p-sortIcon field="User.PhoneNumber"></p-sortIcon>
         </th>
+        <th pSortableColumn="Sataus" style="min-width: 200px;" class="text-nowrap">
+            {{ 'Status' | translate }} <p-sortIcon field="Sataus"></p-sortIcon>
+          </th>
         <th pSortableColumn="TotalPrice" style="min-width: 200px;" class="text-nowrap">
           {{ 'Total Pay' | translate }} <p-sortIcon field="TotalPrice"></p-sortIcon>
         </th>
@@ -184,12 +187,10 @@
         </th>
         <th pSortableColumn="totalPaidFromBonus" style="min-width: 220px;" class="text-nowrap">
           {{ 'totalPaidFromBonus' | translate }} <p-sortIcon field="totalPaidFromBonus"></p-sortIcon>
+          
         </th>
         <th pSortableColumn="totalPayAfterBonus" style="min-width: 220px;" class="text-nowrap">
           {{ 'totalPayAfterBonus' | translate }} <p-sortIcon field="totalPayAfterBonus"></p-sortIcon>
-        </th>
-        <th pSortableColumn="Sataus" style="min-width: 200px;" class="text-nowrap">
-          {{ 'Status' | translate }} <p-sortIcon field="Sataus"></p-sortIcon>
         </th>
         <th pSortableColumn="BookingRefernce" style="min-width: 250px;" class="text-nowrap">
           {{ 'booking Refernce' | translate }} <p-sortIcon field="BookingRefernce"></p-sortIcon>
@@ -229,15 +230,16 @@
           </a>
         </td>
         <td>{{ payment.user?.phoneNumber }}</td>
-        <td>{{ payment.totalPrice }}</td>
-        <td>{{ payment.totalTax }}</td>
-        <td>{{ payment.totalPaidFromBonus }}</td>
-        <td>{{ payment.totalPayAfterBonus }}</td>
         <td>
           <span [class]="'status-badge ' + getStatusClass(payment.bookingStatus || payment.sataus)">
             {{ getStatusLabel(payment.bookingStatus || payment.sataus) }}
           </span>
         </td>
+        <td>{{ payment.totalPrice }}</td>
+        <td>{{ payment.totalTax }}</td>
+        <td>{{ payment.totalPaidFromBonus }}</td>
+        <td>{{ payment.totalPayAfterBonus }}</td>
+        
         <td class="font-bold">{{ payment.bookingRefernce }}</td>
         <td>{{ payment.bookingDate || payment.createdDate | date: 'dd MMM yyyy, h:mm a' }}</td>
 

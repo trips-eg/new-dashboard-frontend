@@ -499,6 +499,109 @@
               </div>
             </div>
 
+            <!-- SECTION 3.6: Trip Pricing Periods -->
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-calendar-clock text-primary"></i>
+                  <h3>{{ 'Trip Pricing Periods' | translate }}</h3>
+                </div>
+                <button
+                  type="button"
+                  pButton
+                  icon="pi pi-plus"
+                  label="{{ 'Add Period' | translate }}"
+                  (click)="addTripPricingPeriod()"
+                  class="p-button-outlined p-button-sm"
+                ></button>
+              </div>
+
+              <small class="form-text text-info block mb-3" *ngIf="tripPricingPeriods.length === 0">
+                {{ 'No pricing periods defined. Default trip price will apply.' | translate }}
+              </small>
+
+              <div formArrayName="TripPricingPeriods" class="grid formgrid">
+                <div *ngFor="let group of tripPricingPeriods.controls; let i = index" [formGroupName]="i" class="col-12">
+                  <div class="date-period-card">
+                    <div class="grid align-items-center formgrid">
+                      <div class="col-12 col-md-3 field mb-0">
+                        <label>
+                          <i class="pi pi-calendar-plus mr-1 text-primary"></i>
+                          {{ 'From Date' | translate }}
+                        </label>
+                        <p-calendar
+                          formControlName="fromDate"
+                          placeholder="{{ 'From Date' | translate }}"
+                          [showIcon]="true"
+                          dateFormat="dd-mm-yy"
+                          [showTime]="false"
+                          [iconDisplay]="'input'"
+                          appendTo="body"
+                          class="w-full"
+                        ></p-calendar>
+                        <small class="p-error" *ngIf="group.get('fromDate')?.invalid && group.get('fromDate')?.touched">
+                          {{ 'This field is required' | translate }}
+                        </small>
+                      </div>
+
+                      <div class="col-12 col-md-1 text-center">
+                        <div class="connector-arrow">
+                          <i class="pi pi-arrow-right"></i>
+                        </div>
+                      </div>
+
+                      <div class="col-12 col-md-3 field mb-0">
+                        <label>
+                          <i class="pi pi-calendar-minus mr-1 text-primary"></i>
+                          {{ 'To Date' | translate }}
+                        </label>
+                        <p-calendar
+                          formControlName="toDate"
+                          placeholder="{{ 'To Date' | translate }}"
+                          [showIcon]="true"
+                          dateFormat="dd-mm-yy"
+                          [showTime]="false"
+                          [iconDisplay]="'input'"
+                          appendTo="body"
+                          class="w-full"
+                        ></p-calendar>
+                        <small class="p-error" *ngIf="group.get('toDate')?.invalid && group.get('toDate')?.touched">
+                          {{ 'This field is required' | translate }}
+                        </small>
+                      </div>
+
+                      <div class="col-12 col-md-3 field mb-0">
+                        <label>
+                          <i class="pi pi-dollar mr-1 text-primary"></i>
+                          {{ 'Price Per Person' | translate }}
+                        </label>
+                        <p-inputNumber
+                          formControlName="pricePerPerson"
+                          [min]="0"
+                          placeholder="{{ 'Price per person' | translate }}"
+                          styleClass="w-full"
+                          class="w-full"
+                        ></p-inputNumber>
+                        <small class="p-error" *ngIf="group.get('pricePerPerson')?.invalid && group.get('pricePerPerson')?.touched">
+                          {{ 'This field is required' | translate }}
+                        </small>
+                      </div>
+
+                      <div class="col-12 col-md-2 text-center text-md-right mt-3 mt-md-0">
+                        <button
+                          type="button"
+                          pButton
+                          icon="pi pi-trash"
+                          class="policy-delete-btn w-full"
+                          (click)="removeTripPricingPeriod(i)"
+                          label="{{ 'Delete' | translate }}"
+                        ></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <!-- SECTION 4: accommodation types / Accommodations -->
             <div class="ux-card">
               <div class="ux-card-header">
@@ -617,6 +720,7 @@
                           [showTime]="false"
                           [minDate]="minDate"
                           [iconDisplay]="'input'"
+                          appendTo="body"
                           class="w-full"
                           (onSelect)="onStartDateChange(group)"
                         ></p-calendar>
@@ -652,6 +756,7 @@
                           [iconDisplay]="'input'"
                           dateFormat="dd-mm-yy"
                           class="w-full"
+                          appendTo="body"
                           [minDate]="group.get('minEndDate')?.value || minDate"
                           [maxDate]="group.get('maxEndDate')?.value"
                         ></p-calendar>
@@ -937,6 +1042,7 @@
                       placeholder="Select a date"
                       [showIcon]="true"
                       class="w-full"
+                      appendTo="body"
                     ></p-calendar>
                   </div>
 

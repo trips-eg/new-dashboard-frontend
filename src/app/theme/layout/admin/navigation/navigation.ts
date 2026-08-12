@@ -318,24 +318,45 @@ const NavigationItems = [
     permissions: [Permissions.RoomsCreate]
   },
   {
-    id: 'hajj',
-    title: 'hajj',
-    type: 'item',
+    id: 'Manasik',
+    title: 'Manasik',
+    type: 'collapse',
     classes: 'nav-item',
-    url: '/hajj',
     icon: 'fas fa-solid fa-kaaba',
     breadcrumbs: false,
-    permissions: [Permissions.HajjCreate]
-  },
-  {
-    id: 'ummrah',
-    title: 'ummrah',
-    type: 'item',
-    classes: 'nav-item',
-    url: '/ummrah',
-    icon: 'fas fa-solid fa-mosque',
-    breadcrumbs: false,
-    permissions: [Permissions.HajjCreate]
+    permissions: [Permissions.HajjCreate],
+    children: [
+      {
+        id: 'hajj',
+        title: 'hajj',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/hajj',
+        icon: 'fas fa-solid fa-kaaba',
+        breadcrumbs: false,
+        permissions: [Permissions.HajjCreate]
+      },
+      {
+        id: 'ummrah',
+        title: 'ummrah',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/ummrah',
+        icon: 'fas fa-solid fa-mosque',
+        breadcrumbs: false,
+        permissions: [Permissions.HajjCreate]
+      } ,
+      {
+        id: 'hajjCategory',
+        title: 'hajj Category',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/hajj-category',
+        icon: 'fas fa-solid fa-folder-tree',
+        breadcrumbs: false,
+        permissions: [Permissions.HajjCreate]
+      } 
+    ]
   },
   {
     id: 'travels',

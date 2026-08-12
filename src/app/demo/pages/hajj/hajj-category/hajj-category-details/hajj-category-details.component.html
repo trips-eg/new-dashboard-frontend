@@ -1,0 +1,26 @@
+<div *ngIf="loading" class="details-loading">
+  <p-progressSpinner></p-progressSpinner>
+</div>
+
+<div *ngIf="!loading && category" class="details-shell">
+  <img [src]="getImageUrl()" [alt]="category.name" class="details-image" />
+
+  <div class="details-grid">
+    <div class="detail-item">
+      <span>{{ '#ID' | translate }}</span>
+      <strong>#{{ category.id }}</strong>
+    </div>
+    <div class="detail-item">
+      <span>{{ 'category name' | translate }}</span>
+      <strong>{{ category.name }}</strong>
+    </div>
+    <div class="detail-item">
+      <span>{{ 'Sequence' | translate }}</span>
+      <p-badge [value]="category.sequence" severity="info"></p-badge>
+    </div>
+    <div class="detail-item">
+      <span>{{ 'status' | translate }}</span>
+      <p-tag [value]="(category.isActive ? 'active' : 'inactive') | translate" [severity]="category.isActive ? 'success' : 'danger'"></p-tag>
+    </div>
+  </div>
+</div>

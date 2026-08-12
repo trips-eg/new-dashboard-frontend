@@ -1,0 +1,138 @@
+<p-confirmDialog></p-confirmDialog>
+<div class="card hajj-category-card">
+  <p-toolbar styleClass="mb-4 hajj-category-toolbar">
+    <ng-template pTemplate="left">
+      <div class="flex flex-wrap gap-3 align-items-center">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" [(ngModel)]="searchTerm" (input)="onSearch()" [placeholder]="'search' | translate" class="w-16rem" />
+        </span>
+        <p-dropdown
+          [(ngModel)]="selectedStatus"
+          [options]="statusOptions"
+          [placeholder]="'Select Status' | translate"
+          [showClear]="true"
+          (onChange)="onStatusFilter()"
+          styleClass="w-12rem"
+          appendTo="body"
+        >
+          <ng-template let-option pTemplate="item">
+            <span>{{ option.label | translate }}</span>
+          </ng-template>
+        </p-dropdown>
+        <p-button
+          *ngIf="searchTerm || selectedStatus !== null"
+          icon="pi pi-filter-slash"
+          severity="secondary"
+          [text]="true"
+          (onClick)="clearFilters()"
+          pTooltip="{{ 'Clear Filters' | translate }}"
+        ></p-button>
+      </div>
+    </ng-template>
+  </p-toolbar>
+
+  <p-table
+    #dt
+    styleClass="hajj-category-table"
+    [value]="categories"
+    [paginator]="true"
+    [rows]="10"
+    [lazy]="true"
+    (onLazyLoad)="loadCategories($event)"
+    [totalRecords]="totalRecords"
+    [loading]="loading"
+    [rowsPerPageOptions]="[5, 10, 20, 50]"
+    [showCurrentPageReport]="true"
+    [currentPageReportTemplate]="'showingEntries' | translate"
+    [globalFilterFields]="['id', 'name', 'sequence']"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 80px" pSortableColumn="id">
+          <span class="sortable-header">
+            {{ '#ID' | translate }}
+            <p-sortIcon field="id"></p-sortIcon>
+          </span>
+        </th>
+        <th style="width: 100px">{{ 'image' | translate }}</th>
+        <th style="min-width: 200px" pSortableColumn="name">
+          <span class="sortable-header">
+            {{ 'category name' | translate }}
+            <p-sortIcon field="name"></p-sortIcon>
+          </span>
+        </th>
+        <th style="width: 120px" pSortableColumn="sequence">
+          <span class="sortable-header justify-content-center">
+            {{ 'Sequence' | translate }}
+            <p-sortIcon field="sequence"></p-sortIcon>
+          </span>
+        </th>
+        <th style="width: 120px" pSortableColumn="isActive">
+          <span class="sortable-header">
+            {{ 'status' | translate }}
+            <p-sortIcon field="isActive"></p-sortIcon>
+          </span>
+        </th>
+        <th style="width: 120px" class="text-center">{{ 'action' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-category>
+      <tr>
+        <td><span class="font-semibold text-color-secondary">#{{ category.id }}</span></td>
+        <td>
+          <img [src]="getImageUrl(category)" class="category-thumbnail" [alt]="category.name" />
+        </td>
+        <td><span class="font-semibold text-900 category-name">{{ category.name }}</span></td>
+        <td class="text-center">
+          <p-badge [value]="category.sequence" severity="info"></p-badge>
+        </td>
+        <td>
+          <p-inputSwitch [(ngModel)]="category.isActive" (onChange)="toggleStatus(category.id)"></p-inputSwitch>
+        </td>
+        <td>
+          <div class="flex gap-1 justify-content-center action-buttons">
+            <p-button
+              [raised]="true"
+              icon="pi pi-eye"
+              severity="info"
+              [rounded]="true"
+              (onClick)="handleViewDetails(category.id)"
+              pTooltip="{{ 'view details' | translate }}"
+              tooltipPosition="top"
+            ></p-button>
+            <p-button
+              [raised]="true"
+              icon="pi pi-pencil"
+              severity="success"
+              [rounded]="true"
+              (onClick)="handleEdit(category)"
+              pTooltip="{{ 'edit' | translate }}"
+              tooltipPosition="top"
+            ></p-button>
+            <p-button
+              icon="pi pi-trash"
+              severity="danger"
+              [rounded]="true"
+              (onClick)="handleDelete(category.id)"
+              pTooltip="{{ 'delete' | translate }}"
+              tooltipPosition="top"
+            ></p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6">
+          <div class="flex flex-column justify-content-center align-items-center py-5 w-full empty-state">
+            <i class="pi pi-search"></i>
+            <span class="mt-2 text-gray-500 font-medium">{{ 'No Data found' | translate }}</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

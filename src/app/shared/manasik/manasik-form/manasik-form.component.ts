@@ -3,6 +3,9 @@ import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HajjUmmrahService } from 'src/app/shared/services/hajj-ummrah.service';
 import { TravelTripsService } from 'src/app/shared/services/travel-trips.service';
+import { CitiesService } from 'src/app/shared/services/cities.service';
+import { CountriesService } from 'src/app/shared/services/countries.service';
+import { HajjCategoryService } from 'src/app/shared/services/hajj-category.service';
 import { ManasikType } from '../../Enums/manasikType';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 import { ImgUploaderComponent } from '../../img-uploader/img-uploader.component';
@@ -56,6 +59,14 @@ export class ManasikFormComponent implements OnInit {
   });
   isSavingAccommodationType: boolean = false;
 
+  cityList: { label: string; value: any }[] = [];
+  countryList: { label: string; value: any }[] = [];
+  hajjCategoryList: { label: string; value: any }[] = [];
+  depositTypes = [
+    { label: 'Percentage (%)', value: 1 },
+    { label: 'Fixed Amount', value: 2 }
+  ];
+
   travelFeatureList: { label: string; value: any }[] = [];
   displayAddTravelFeatureDialog: boolean = false;
   travelFeatureForm: FormGroup = this.fb.group({
@@ -81,7 +92,10 @@ export class ManasikFormComponent implements OnInit {
     private service: HajjUmmrahService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private travelService: TravelTripsService
+    private travelService: TravelTripsService,
+    private cityService: CitiesService,
+    private countryService: CountriesService,
+    private hajjCategoryService: HajjCategoryService
   ) {}
 
   ngOnInit(): void {
@@ -153,14 +167,32 @@ export class ManasikFormComponent implements OnInit {
       IsRefundable: data.isRefundable,
       MinimumDaysToRefund: data.minimumDaysToRefund,
       IsAllowPaymentUponArrival: data.isAllowPaymentUponArrival,
+      DepositType: data.depositType || 1,
       depositRate: data.depositRate,
       IsIncludeVate: data.isIncludeVate,
+      CountryId: data.countryId || null,
+      CityId: data.cityId || null,
+      HajjCategoryId: data.hajjCategoryId || null,
       FromLocation: data.fromLocation || '',
       ToLocation: data.toLocation || '',
       AccommodationTypeId: (data.accommodationTypes && data.accommodationTypes.length > 0) ? data.accommodationTypes[0].id : (data.accommodationTypeId || null),
       Features: data.features?.map((f: any) => f.id) || [],
       Type: data.type
     });
+
+    if (data.countryId) {
+      this.getCitiesByCountryId(data.countryId);
+    }
+
+    this.dates.clear();
+    const dates = data.dates || data.hajjDates || [];
+    if (dates.length > 0) {
+      dates.forEach((dateItem: any) => {
+        this.dates.push(this.createDateGroup(dateItem));
+      });
+    } else if (data.startDate) {
+      this.dates.push(this.createDateGroup({ id: 0, startDate: data.startDate }));
+    }
 
     // Populate Descriptions
     this.descriptions.clear();
@@ -277,20 +309,49 @@ export class ManasikFormComponent implements OnInit {
       IsRefundable: [false],
       MinimumDaysToRefund: [0],
       IsAllowPaymentUponArrival: [false],
+      DepositType: [1, Validators.required],
       depositRate: [0],
       IsIncludeVate: [false],
+      CountryId: [null, Validators.required],
+      CityId: [null, Validators.required],
+      HajjCategoryId: [null, Validators.required],
       FromLocation: ['', Validators.required],
       ToLocation: ['', Validators.required],
       Descriptions: this.fb.array([]),
       Type: [this.type],
       AccommodationTypeId: [null],
       Features: [[]],
+      Dates: this.fb.array([this.createDateGroup()]),
       ChildPricingPolicies: this.fb.array([])
     });
   }
 
   get descriptions(): FormArray {
     return this.form.get('Descriptions') as FormArray;
+  }
+
+  get dates(): FormArray {
+    return this.form.get('Dates') as FormArray;
+  }
+
+  createDateGroup(dateItem?: any): FormGroup {
+    return this.fb.group({
+      id: [dateItem?.id || 0],
+      startDate: [dateItem?.startDate ? new Date(dateItem.startDate) : null, Validators.required]
+    });
+  }
+
+  addDate() {
+    this.dates.push(this.createDateGroup());
+  }
+
+  removeDate(index: number) {
+    if (this.dates.length === 1) {
+      this.dates.at(0).reset({ id: 0, startDate: null });
+      return;
+    }
+
+    this.dates.removeAt(index);
   }
 
   addDescription() {
@@ -478,7 +539,7 @@ export class ManasikFormComponent implements OnInit {
 
     // Append normal fields (excluding Descriptions, Features, ChildPricingPolicies)
     Object.keys(value).forEach((key) => {
-      if (key === 'Descriptions' || key === 'Features' || key === 'ChildPricingPolicies') return;
+      if (key === 'Descriptions' || key === 'Features' || key === 'ChildPricingPolicies' || key === 'Dates') return;
 
       // Convert dates to ISO string
       if (dateFields.includes(key) && value[key]) {
@@ -515,6 +576,21 @@ export class ManasikFormComponent implements OnInit {
     if (value.Features && value.Features.length > 0) {
       value.Features.forEach((id: any) => {
         formData.append('Features', id.toString());
+      });
+    }
+
+    // Append Dates as repeated JSON objects for FormData model binding
+    if (value.Dates && value.Dates.length > 0) {
+      value.Dates.forEach((dateItem: any) => {
+        if (!dateItem.startDate) return;
+
+        formData.append(
+          'Dates',
+          JSON.stringify({
+            id: dateItem.id || 0,
+            startDate: new Date(dateItem.startDate).toISOString()
+          })
+        );
       });
     }
 
@@ -751,8 +827,52 @@ export class ManasikFormComponent implements OnInit {
   }
 
   getDropDownList() {
+    this.getCountryList();
+    this.getHajjCategoryList();
     this.getAccommodationTypeList();
     this.getTravelFeatures();
+  }
+
+  getCountryList(search: string = '') {
+    this.countryService.getAllCountries({ pageIndex: 1, pageSize: 250, search }).subscribe((response) => {
+      const list = response?.data?.data || response?.data || [];
+      this.countryList = list.map((country: { name: string; id: any }) => ({
+        label: country.name,
+        value: country.id
+      }));
+    });
+  }
+
+  filterCountry(event: any) {
+    this.getCountryList(event.filter || '');
+  }
+
+  getCitiesByCountryId(countryId: any) {
+    this.form.get('CityId')?.reset();
+    if (!countryId) {
+      this.cityList = [];
+      return;
+    }
+
+    this.cityService.getAllCities({ pageIndex: 1, pageSize: 250, countryId }).subscribe((response) => {
+      const list = response?.data?.data || response?.data || [];
+      this.cityList = list.map((city: { name: string; id: any }) => ({
+        label: city.name,
+        value: city.id
+      }));
+    });
+  }
+
+  getHajjCategoryList() {
+    this.hajjCategoryService
+      .getAllHajjCategories({ pageIndex: 1, pageSize: 250, search: '', isPagingEnabled: true, filters: [] })
+      .subscribe((response) => {
+        const list = response?.data?.data || response?.data || [];
+        this.hajjCategoryList = list.map((category: { name: string; id: any }) => ({
+          label: category.name,
+          value: category.id
+        }));
+      });
   }
 
   getAccommodationTypeList() {

@@ -185,6 +185,62 @@
               </div>
             </div>
 
+            <!-- SECTION 1B: Manasik Dates -->
+            <div class="ux-card">
+              <div class="ux-card-header">
+                <div class="ux-card-title-group">
+                  <i class="pi pi-calendar"></i>
+                  <h3>{{ 'Dates' | translate }}</h3>
+                </div>
+                <p-button
+                  label="{{ 'Add Date' | translate }}"
+                  icon="pi pi-plus"
+                  [outlined]="true"
+                  styleClass="p-button-sm"
+                  (onClick)="addDate()"
+                ></p-button>
+              </div>
+
+              <div formArrayName="Dates" class="grid formgrid">
+                <div *ngFor="let dateGroup of dates.controls; let i = index" [formGroupName]="i" class="col-12">
+                  <div class="date-period-card">
+                    <div class="grid align-items-center formgrid">
+                      <div class="field col-12 col-md-10 mb-md-0">
+                        <label>
+                          <i class="pi pi-calendar-plus mr-1 text-primary"></i>
+                          {{ 'Start Date' | translate }}
+                          <span class="text-red-500">*</span>
+                        </label>
+                        <p-calendar
+                          formControlName="startDate"
+                          placeholder="{{ 'Start Date' | translate }}"
+                          [showIcon]="true"
+                          [showTime]="true"
+                          [showSeconds]="true"
+                          dateFormat="dd-mm-yy"
+                          [iconDisplay]="'input'"
+                          appendTo="body"
+                          class="w-full"
+                        ></p-calendar>
+                        <small class="p-error" *ngIf="dateGroup.get('startDate')?.invalid && dateGroup.get('startDate')?.touched">
+                          {{ 'This field is required' | translate }}
+                        </small>
+                      </div>
+
+                      <div class="col-12 col-md-2 text-end">
+                        <p-button
+                          icon="pi pi-trash"
+                          severity="danger"
+                          [text]="true"
+                          (onClick)="removeDate(i)"
+                          pTooltip="{{ 'delete' | translate }}"
+                        ></p-button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <!-- SECTION 2: Location Details -->
             <div class="ux-card">
               <div class="ux-card-header">
@@ -309,6 +365,80 @@
                   </small>
                 </div>
 
+
+                <!-- Country -->
+                <div class="field col-12 col-md-4">
+                  <label for="manasikCountry">
+                    <i class="pi pi-globe mr-1 text-primary"></i>
+                    {{ 'Country' | translate }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <p-dropdown
+                    id="manasikCountry"
+                    [options]="countryList"
+                    formControlName="CountryId"
+                    (onFilter)="filterCountry($event)"
+                    (onChange)="getCitiesByCountryId($event.value)"
+                    filter="true"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="{{ '-- Select --' | translate }}"
+                    [showClear]="true"
+                    class="w-full"
+                    styleClass="w-full"
+                  ></p-dropdown>
+                  <small class="p-error" *ngIf="form.get('CountryId')?.invalid && form.get('CountryId')?.touched">
+                    {{ 'This field is required' | translate }}
+                  </small>
+                </div>
+
+                <!-- City -->
+                <div class="field col-12 col-md-4">
+                  <label for="manasikCity">
+                    <i class="pi pi-building mr-1 text-primary"></i>
+                    {{ 'City' | translate }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <p-dropdown
+                    id="manasikCity"
+                    [options]="cityList"
+                    formControlName="CityId"
+                    filter="true"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="{{ '-- Select --' | translate }}"
+                    [showClear]="true"
+                    class="w-full"
+                    styleClass="w-full"
+                  ></p-dropdown>
+                  <small class="p-error" *ngIf="form.get('CityId')?.invalid && form.get('CityId')?.touched">
+                    {{ 'This field is required' | translate }}
+                  </small>
+                </div>
+
+                <!-- Hajj Category -->
+                <div class="field col-12 col-md-4">
+                  <label for="manasikHajjCategory">
+                    <i class="pi pi-tags mr-1 text-primary"></i>
+                    {{ 'Hajj Category' | translate }}
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <p-dropdown
+                    id="manasikHajjCategory"
+                    [options]="hajjCategoryList"
+                    formControlName="HajjCategoryId"
+                    filter="true"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="{{ '-- Select --' | translate }}"
+                    [showClear]="true"
+                    class="w-full"
+                    styleClass="w-full"
+                  ></p-dropdown>
+                  <small class="p-error" *ngIf="form.get('HajjCategoryId')?.invalid && form.get('HajjCategoryId')?.touched">
+                    {{ 'This field is required' | translate }}
+                  </small>
+                </div>
                 <!-- From Location -->
                 <div class="field col-12 col-md-6">
                   <label for="locFrom">
@@ -478,7 +608,24 @@
                   class="formgrid grid p-3 border-1 border-dashed surface-border border-round"
                   *ngIf="form.get('IsAllowPaymentUponArrival')?.value"
                 >
-                  <div class="field col-12 col-md-6 mx-auto mb-0">
+                  <div class="field col-12 col-md-6 mb-3 mb-md-0">
+                    <label for="depositType">
+                      {{ 'Deposit Type' | translate }}
+                      <span class="text-red-500">*</span>
+                    </label>
+                    <p-dropdown
+                      id="depositType"
+                      formControlName="DepositType"
+                      [options]="depositTypes"
+                      optionLabel="label"
+                      optionValue="value"
+                      placeholder="{{ '-- Select --' | translate }}"
+                      class="w-full"
+                      styleClass="w-full"
+                    ></p-dropdown>
+                  </div>
+
+                  <div class="field col-12 col-md-6 mb-0">
                     <label for="depositRate">
                       {{ 'Deposit Rate' | translate }}
                       <span class="text-red-500">*</span>
@@ -489,21 +636,20 @@
                       id="depositRate"
                       formControlName="depositRate"
                       [min]="0"
-                      [max]="100"
-                      suffix="%"
+                      [max]="form.get('DepositType')?.value === 1 ? 100 : null"
+                      [suffix]="form.get('DepositType')?.value === 1 ? '%' : ''"
                       class="w-full"
                       styleClass="w-full"
-                      placeholder="e.g. 20%"
+                      [placeholder]="form.get('DepositType')?.value === 1 ? 'e.g. 20%' : 'e.g. 500'"
                     />
                     <small
                       class="p-error block mt-1"
                       *ngIf="form.get('depositRate')?.invalid && (form.get('depositRate')?.touched || form.get('depositRate')?.dirty)"
                     >
-                      {{ 'Deposit Rate is required (0-100%)' | translate }}
+                      {{ 'Deposit Rate is required' | translate }}
                     </small>
                   </div>
-                </div>
-              </div>
+                </div>              </div>
 
               <!-- Cancellation Policy -->
               <div class="field col-12 p-0 mb-0">

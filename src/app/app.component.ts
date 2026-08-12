@@ -38,7 +38,7 @@ export class AppComponent implements OnInit {
   }
 
   private setupUpdateNotifications(): void {
-    // this.showUpdateDynamicDialog()
+    //this.showUpdateDynamicDialog()
     if (!this.swUpdate.isEnabled) {
       return;
     }
@@ -56,7 +56,7 @@ export class AppComponent implements OnInit {
       modal: false, // Non-blocking, lets user interact with page items/tabs
       showHeader: false, // Flat cookie-banner style
       styleClass: 'update-cookie-banner',
-      contentStyle: { 'padding': '0', 'border-radius': '8px' },
+      contentStyle: { 'padding': '0', 'border-radius': '10px' },
       closable: false,
       closeOnEscape: false,
       dismissableMask: false

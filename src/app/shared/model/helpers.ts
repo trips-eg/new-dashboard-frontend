@@ -35,6 +35,14 @@ export class APIs {
     toggleManasikBlockStatus: 'Hajj/BlockUnBlockHajj?id=',
     toggleManasikStatus: 'Hajj/ActiveUnActiveHajj?id='
   };
+  public static hajjCategories = {
+    GetAllHajjCategories: 'HajjCategories/GetAllHajjCategories',
+    GetHajjCategoryById: 'HajjCategories/GetHajjCategoryById?id=',
+    AddHajjCategory: 'HajjCategories/AddHajjCategory',
+    UpdateHajjCategory: 'HajjCategories/UpdateHajjCategory',
+    ToggleStatus: 'HajjCategories/ToggleStatus?id=',
+    DeleteHajjCategory: 'HajjCategories/DeleteHajjCategory?id='
+  };
   public static mobileSideBar = {
     GetAllMobileSideBar: 'SideBars/GetAllSideBars',
     GetMobileSideBarById: 'SideBars/GetSideBarById?id=',

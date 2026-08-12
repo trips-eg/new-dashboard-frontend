@@ -201,6 +201,10 @@ const routes: Routes = [
         loadComponent: () => import('./demo/pages/hajj/hajj.component').then((m) => m.HajjComponent)
       },
       {
+        path: 'hajj-category',
+        loadComponent: () => import('./demo/pages/hajj/hajj-category/hajj-category.component').then((m) => m.HajjCategoryComponent)
+      },
+      {
         path: 'details-manasik/:id',
         loadComponent: () =>
           import('../app/shared/manasik/manasik-details/manasik-details.component').then((m) => m.ManasikDetailsComponent)

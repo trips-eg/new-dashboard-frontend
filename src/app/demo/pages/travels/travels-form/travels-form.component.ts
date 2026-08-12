@@ -582,6 +582,14 @@ export class TravelsFormComponent implements OnInit {
             });
           }
 
+          // Clear and populate trip pricing periods
+          this.tripPricingPeriods.clear();
+          if (travelData.tripPricingPeriods && travelData.tripPricingPeriods.length > 0) {
+            travelData.tripPricingPeriods.forEach((period: any) => {
+              this.tripPricingPeriods.push(this.createTripPricingPeriod(period));
+            });
+          }
+
           // Clear and populate steps
           this.steps.clear();
           this.getProgramStepsByTripId(travelId);
@@ -681,7 +689,8 @@ export class TravelsFormComponent implements OnInit {
       TripType: [null, Validators.required],
       AccommodationTypeId: [null, Validators.required],
       Features: [[]],
-      ChildPricingPolicies: this.fb.array([])
+      ChildPricingPolicies: this.fb.array([]),
+      TripPricingPeriods: this.fb.array([])
     }));
   }
 
@@ -701,6 +710,27 @@ export class TravelsFormComponent implements OnInit {
 
   removeTripDate(index: number) {
     this.tripDatesArray.removeAt(index);
+  }
+
+  get tripPricingPeriods(): FormArray {
+    return this.travelForm.get('TripPricingPeriods') as FormArray;
+  }
+
+  createTripPricingPeriod(period?: any): FormGroup {
+    return this.fb.group({
+      id: [period?.id || 0],
+      fromDate: [period?.fromDate ? new Date(period.fromDate) : null, Validators.required],
+      toDate: [period?.toDate ? new Date(period.toDate) : null, Validators.required],
+      pricePerPerson: [period?.pricePerPerson ?? 0, [Validators.required, Validators.min(0)]]
+    });
+  }
+
+  addTripPricingPeriod(): void {
+    this.tripPricingPeriods.push(this.createTripPricingPeriod());
+  }
+
+  removeTripPricingPeriod(index: number): void {
+    this.tripPricingPeriods.removeAt(index);
   }
 
   private handleTripTypeChange() {
@@ -777,6 +807,10 @@ export class TravelsFormComponent implements OnInit {
         if (value && value.length > 0) {
           value.forEach((policy: any) => formData.append('ChildPricingPolicies', JSON.stringify(policy)));
         }
+      } else if (key === 'TripPricingPeriods') {
+        this.tripPricingPeriods.getRawValue().forEach((period: any) => {
+          formData.append('TripPricingPeriods', JSON.stringify(this.formatTripPricingPeriod(period)));
+        });
       } else {
         // ✅ معالجة القيم null أو undefined
         const safeValue = value === null || value === undefined ? '' : value;
@@ -846,6 +880,10 @@ export class TravelsFormComponent implements OnInit {
         if (value && value.length > 0) {
           value.forEach((policy: any) => formData.append('ChildPricingPolicies', JSON.stringify(policy)));
         }
+      } else if (key === 'TripPricingPeriods') {
+        this.tripPricingPeriods.getRawValue().forEach((period: any) => {
+          formData.append('TripPricingPeriods', JSON.stringify(this.formatTripPricingPeriod(period)));
+        });
       } else {
         // ✅ معالجة القيم null أو undefined
         const safeValue = value === null || value === undefined ? '' : value;
@@ -970,6 +1008,22 @@ export class TravelsFormComponent implements OnInit {
 
   //new method to handle travel type change
   //new method to handle travel type change
+  private formatTripPricingPeriod(period: any) {
+    return {
+      id: period.id || 0,
+      fromDate: this.toIsoString(period.fromDate),
+      toDate: this.toIsoString(period.toDate),
+      pricePerPerson: period.pricePerPerson ?? 0
+    };
+  }
+
+  private toIsoString(date: any): string | null {
+    if (!date) return null;
+    const parsed = new Date(date);
+    if (isNaN(parsed.getTime())) return null;
+    return parsed.toISOString();
+  }
+
   onTravelTypeChange(isExternal: boolean) {
     if (isExternal) {
       // لو الرحلة خارجية -> بنسيب الكونتري زي ما هو ونفضي المدن
