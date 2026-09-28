@@ -115,8 +115,20 @@ export class CouponSettingsComponent implements OnInit {
     });
   }
 
+  // Raw settings lists from API to preserve full schema when updating
+  rawWeekendSettings: any[] = [];
+  rawBirthdaySettings: any[] = [];
+  rawRecoverySettings: any[] = [];
+
   get settingsArray(): FormArray {
     return this.generalSettingsForm.get('settings') as FormArray;
+  }
+
+  get hasOtherSettings(): boolean {
+    return this.settingsArray.controls.some((item) => {
+      const name = (item.get('nameEn')?.value || '').toLowerCase();
+      return !name.includes('weekend') && !name.includes('birthday') && !name.includes('recovery');
+    });
   }
 
   loadAllData(): void {
@@ -129,6 +141,7 @@ export class CouponSettingsComponent implements OnInit {
   }
 
   loadGeneralSettings(): void {
+    this.loading.general = true;
     this.couponsService.getAllSettings().subscribe({
       next: (res) => {
         const settings = res?.data || res || [];
@@ -156,33 +169,88 @@ export class CouponSettingsComponent implements OnInit {
             })
           );
         });
+        this.loading.general = false;
       },
       error: (err) => {
         console.error('Error fetching general coupon settings:', err);
         this.toastr.error(this.translate.instant('Failed to load general settings'));
+        this.loading.general = false;
       }
     });
   }
 
+  private extractSettingData(list: any[], form: FormGroup): void {
+    if (!list || list.length === 0) return;
+
+    // Find setting with rate/percentage/discount
+    const discountSetting =
+      list.find((s: any) => {
+        const name = (s.nameEn || s.settingType || '').toLowerCase();
+        return name.includes('percentage') || name.includes('discount') || name.includes('rate') || (s.value !== null && s.value !== undefined && s.value > 0);
+      }) || list[0];
+
+    // Find setting with code/title
+    const codeSetting =
+      list.find((s: any) => {
+        const name = (s.nameEn || s.settingType || '').toLowerCase();
+        return name.includes('code') || name.includes('title') || name.includes('prefix') || (s.stringValue && s.stringValue.trim() !== '');
+      }) || discountSetting;
+
+    form.patchValue({
+      id: discountSetting.id,
+      value: discountSetting.value ?? 0,
+      stringValue: codeSetting.stringValue || discountSetting.stringValue || ''
+    });
+  }
+
+  private buildUpdatePayload(rawSettings: any[], formVal: any): any[] {
+    if (rawSettings.length > 1) {
+      return rawSettings.map((item: any) => {
+        const name = (item.nameEn || item.settingType || '').toLowerCase();
+        const isCode = name.includes('code') || name.includes('title') || name.includes('prefix');
+        return {
+          id: item.id,
+          value: isCode ? item.value : formVal.value,
+          stringValue: isCode ? formVal.stringValue : (item.stringValue || formVal.stringValue)
+        };
+      });
+    } else if (rawSettings.length === 1) {
+      return [
+        {
+          id: rawSettings[0].id,
+          value: formVal.value,
+          stringValue: formVal.stringValue
+        }
+      ];
+    } else {
+      return [
+        {
+          id: formVal.id || 0,
+          value: formVal.value,
+          stringValue: formVal.stringValue
+        }
+      ];
+    }
+  }
+
   loadWeekendSettings(): void {
+    this.loading.weekend = true;
     this.couponsService.getWeekendSettings().subscribe({
       next: (res) => {
         const data = res?.data || res;
-        if (data) {
-          this.weekendForm.patchValue({
-            id: data.id,
-            value: data.value,
-            stringValue: data.stringValue
-          });
-        }
+        this.rawWeekendSettings = Array.isArray(data) ? data : (data ? [data] : []);
+        this.extractSettingData(this.rawWeekendSettings, this.weekendForm);
+        this.loading.weekend = false;
       },
       error: (err) => {
         console.error('Error fetching weekend settings:', err);
+        this.loading.weekend = false;
       }
     });
   }
 
   loadWeekendItems(): void {
+    this.loading.weekendItems = true;
     this.couponsService.getWeekendItems().subscribe({
       next: (res) => {
         const data = res?.data || res;
@@ -195,32 +263,33 @@ export class CouponSettingsComponent implements OnInit {
             hajjIds: data.hajjIds || []
           });
         }
+        this.loading.weekendItems = false;
       },
       error: (err) => {
         console.error('Error fetching weekend items settings:', err);
+        this.loading.weekendItems = false;
       }
     });
   }
 
   loadBirthdaySettings(): void {
+    this.loading.birthday = true;
     this.couponsService.getBirthdaySettings().subscribe({
       next: (res) => {
         const data = res?.data || res;
-        if (data) {
-          this.birthdayForm.patchValue({
-            id: data.id,
-            value: data.value,
-            stringValue: data.stringValue
-          });
-        }
+        this.rawBirthdaySettings = Array.isArray(data) ? data : (data ? [data] : []);
+        this.extractSettingData(this.rawBirthdaySettings, this.birthdayForm);
+        this.loading.birthday = false;
       },
       error: (err) => {
         console.error('Error fetching birthday settings:', err);
+        this.loading.birthday = false;
       }
     });
   }
 
   loadBirthdayItems(): void {
+    this.loading.birthdayItems = true;
     this.couponsService.getBirthdayItems().subscribe({
       next: (res) => {
         const data = res?.data || res;
@@ -233,27 +302,27 @@ export class CouponSettingsComponent implements OnInit {
             hajjIds: data.hajjIds || []
           });
         }
+        this.loading.birthdayItems = false;
       },
       error: (err) => {
         console.error('Error fetching birthday items settings:', err);
+        this.loading.birthdayItems = false;
       }
     });
   }
 
   loadRecoverySettings(): void {
+    this.loading.recovery = true;
     this.couponsService.getRecoverySettings().subscribe({
       next: (res) => {
         const data = res?.data || res;
-        if (data) {
-          this.recoveryForm.patchValue({
-            id: data.id,
-            value: data.value,
-            stringValue: data.stringValue
-          });
-        }
+        this.rawRecoverySettings = Array.isArray(data) ? data : (data ? [data] : []);
+        this.extractSettingData(this.rawRecoverySettings, this.recoveryForm);
+        this.loading.recovery = false;
       },
       error: (err) => {
         console.error('Error fetching recovery settings:', err);
+        this.loading.recovery = false;
       }
     });
   }
@@ -280,7 +349,8 @@ export class CouponSettingsComponent implements OnInit {
   submitWeekendSettings(): void {
     if (this.weekendForm.invalid) return;
     this.loading.weekend = true;
-    this.couponsService.updateWeekendSettings(this.weekendForm.value).subscribe({
+    const payload = this.buildUpdatePayload(this.rawWeekendSettings, this.weekendForm.value);
+    this.couponsService.updateWeekendSettings(payload).subscribe({
       next: () => {
         this.toastr.success(this.translate.instant('Weekend coupon settings saved successfully'));
         this.loadWeekendSettings();
@@ -315,7 +385,8 @@ export class CouponSettingsComponent implements OnInit {
   submitBirthdaySettings(): void {
     if (this.birthdayForm.invalid) return;
     this.loading.birthday = true;
-    this.couponsService.updateBirthdaySettings(this.birthdayForm.value).subscribe({
+    const payload = this.buildUpdatePayload(this.rawBirthdaySettings, this.birthdayForm.value);
+    this.couponsService.updateBirthdaySettings(payload).subscribe({
       next: () => {
         this.toastr.success(this.translate.instant('Birthday coupon settings saved successfully'));
         this.loadBirthdaySettings();
@@ -350,7 +421,8 @@ export class CouponSettingsComponent implements OnInit {
   submitRecoverySettings(): void {
     if (this.recoveryForm.invalid) return;
     this.loading.recovery = true;
-    this.couponsService.updateRecoverySettings(this.recoveryForm.value).subscribe({
+    const payload = this.buildUpdatePayload(this.rawRecoverySettings, this.recoveryForm.value);
+    this.couponsService.updateRecoverySettings(payload).subscribe({
       next: () => {
         this.toastr.success(this.translate.instant('Recovery coupon settings saved successfully'));
         this.loadRecoverySettings();

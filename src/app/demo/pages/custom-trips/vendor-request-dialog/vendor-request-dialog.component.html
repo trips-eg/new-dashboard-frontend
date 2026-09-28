@@ -1,0 +1,388 @@
+<div class="request-dialog-container">
+  <!-- Loading Skeleton -->
+  <div *ngIf="isLoading" class="p-4">
+    <div class="row g-3">
+      <div class="col-12 col-lg-5">
+        <p-skeleton height="2.5rem" styleClass="mb-3"></p-skeleton>
+        <p-skeleton height="8rem" styleClass="mb-3"></p-skeleton>
+        <p-skeleton height="12rem"></p-skeleton>
+      </div>
+      <div class="col-12 col-lg-7">
+        <p-skeleton height="3rem" styleClass="mb-3"></p-skeleton>
+        <p-skeleton height="6rem" styleClass="mb-3"></p-skeleton>
+        <p-skeleton height="14rem"></p-skeleton>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content when loaded -->
+  <div *ngIf="!isLoading && request" class="p-2 p-md-3">
+    <div class="row g-4 align-items-stretch">
+      <!-- ═══════════ LEFT COLUMN: TRAVELER DOSSIER ═══════════ -->
+      <div class="col-12 col-lg-5">
+        <div class="dossier-card card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
+          <!-- Dossier Header -->
+          <div class="dossier-header p-3 p-md-4 border-bottom">
+            <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+              <span class="badge bg-primary-subtle text-primary fw-semibold px-2 py-1 rounded-pill fs-7">
+                {{ 'Request' | translate }} #{{ request.id }}
+              </span>
+              <p-tag [value]="statusLabel(request.status)" [severity]="statusSeverity(request.status)" styleClass="text-xs"></p-tag>
+            </div>
+
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <div class="pin-icon-box bg-primary text-white rounded-3 d-flex align-items-center justify-content-center flex-shrink-0">
+                <i class="pi pi-map-marker fs-5"></i>
+              </div>
+              <div>
+                <h4 class="fw-bold mb-0 text-dark">{{ request.destination }}</h4>
+                <span class="text-muted small fw-medium">
+                  <i class="pi pi-compass text-primary me-1"></i>
+                  {{ tripTypeLabel(request.tripType) }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Countdown Timer Capsule -->
+            <div class="mt-3 pt-2 border-top border-light-subtle d-flex align-items-center justify-content-between">
+              <span class="text-xs text-muted fw-semibold text-uppercase tracking-wider">
+                {{ 'Offer Window' | translate }}
+              </span>
+              <app-countdown-timer
+                [expiresAt]="request.offerWindowExpiresAt"
+                [accepting]="canOffer"
+                (onExpired)="onTimerExpired()"
+              ></app-countdown-timer>
+            </div>
+          </div>
+
+          <!-- Dossier Details Body -->
+          <div class="card-body p-3 p-md-4 d-flex flex-column gap-3">
+            <!-- Travel Metrics Grid -->
+            <div class="row g-2">
+              <!-- Travel Date -->
+              <div class="col-6">
+                <div class="spec-tile p-2 rounded-3 bg-light border">
+                  <span class="text-muted text-xs d-block mb-1">{{ 'Travel Date' | translate }}</span>
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="pi pi-calendar text-primary fs-6"></i>
+                    <span class="fw-bold text-dark fs-7">{{ request.travelDate | date: 'mediumDate' }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Duration -->
+              <div class="col-6">
+                <div class="spec-tile p-2 rounded-3 bg-light border">
+                  <span class="text-muted text-xs d-block mb-1">{{ 'Duration' | translate }}</span>
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="pi pi-sun text-warning fs-6"></i>
+                    <span class="fw-bold text-dark fs-7">{{ request.numberOfDays }} {{ 'days' | translate }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Travelers -->
+              <div class="col-12">
+                <div class="spec-tile p-2 rounded-3 bg-light border">
+                  <span class="text-muted text-xs d-block mb-1">{{ 'Travelers' | translate }}</span>
+                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-1">
+                    <div class="d-flex align-items-center gap-2">
+                      <i class="pi pi-users text-primary fs-6"></i>
+                      <span class="fw-bold text-dark fs-7">
+                        {{ request.numberOfAdults }} {{ 'Adults' | translate }}
+                        <span *ngIf="request.numberOfChildren > 0">, {{ request.numberOfChildren }} {{ 'Children' | translate }}</span>
+                      </span>
+                    </div>
+
+                    <!-- Children Ages Chips -->
+                    <div *ngIf="request.numberOfChildren > 0 && request.childrenAges?.length" class="d-flex gap-1 flex-wrap">
+                      <span *ngFor="let age of request.childrenAges" class="badge bg-info-subtle text-info border border-info-subtle rounded-pill text-xs">
+                        {{ age }} {{ 'yrs' | translate }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Preferred Hotel (if specified) -->
+            <div *ngIf="request.hotelName" class="hotel-spec-box p-3 rounded-3 border bg-white">
+              <span class="text-muted text-xs d-block mb-1 fw-medium">{{ 'Preferred Hotel' | translate }}</span>
+              <div class="d-flex align-items-center gap-2">
+                <div class="hotel-icon-circle bg-amber-50 text-amber-600 rounded-circle p-2 d-flex align-items-center justify-content-center">
+                  <i class="pi pi-building fs-6"></i>
+                </div>
+                <span class="fw-bold text-dark fs-7">{{ request.hotelName }}</span>
+              </div>
+            </div>
+
+            <!-- Required Add-on Services -->
+            <div class="services-box">
+              <span class="text-muted text-xs d-block mb-2 fw-medium">{{ 'Services Needed' | translate }}</span>
+              <div class="d-flex gap-2">
+                <div class="service-chip flex-1 d-flex align-items-center justify-content-center gap-2 p-2 rounded-3 border" [class.active]="request.needsFlight">
+                  <i class="pi pi-plane"></i>
+                  <span class="fs-7 fw-semibold">{{ 'Flight' | translate }}</span>
+                </div>
+                <div class="service-chip flex-1 d-flex align-items-center justify-content-center gap-2 p-2 rounded-3 border" [class.active]="request.needsVisa">
+                  <i class="pi pi-id-card"></i>
+                  <span class="fs-7 fw-semibold">{{ 'Visa' | translate }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Customer Notes / Remarks -->
+            <div *ngIf="request.additionalNotes" class="customer-notes-card p-3 rounded-3 border bg-light-subtle">
+              <div class="d-flex align-items-center gap-1 mb-1 text-primary fw-semibold text-xs text-uppercase tracking-wider">
+                <i class="pi pi-comment"></i>
+                <span>{{ 'Customer Notes' | translate }}</span>
+              </div>
+              <p class="mb-0 text-secondary fs-7 fst-italic line-height-3">
+                "{{ request.additionalNotes }}"
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════ RIGHT COLUMN: QUOTATION ENGINE ═══════════ -->
+      <div class="col-12 col-lg-7">
+        <div class="quotation-card card border-0 shadow-sm h-100 rounded-4 overflow-hidden">
+          <!-- Active Bid Banner (if already quoted) -->
+          <div *ngIf="!isAdmin && hasMyOffer" class="active-bid-banner p-3 border-bottom bg-success-subtle border-success-subtle">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+              <div class="d-flex align-items-center gap-2">
+                <i class="pi pi-check-circle text-success fs-5"></i>
+                <div>
+                  <h6 class="fw-bold text-success-emphasis mb-0">{{ 'Your Current Active Offer' | translate }}</h6>
+                  <span class="text-xs text-success-emphasis opacity-75">
+                    {{ 'Submitting again will replace your current quotation.' | translate }}
+                  </span>
+                </div>
+              </div>
+              <div class="text-end">
+                <span class="fw-bold fs-5 text-success-emphasis d-block">{{ request.myOfferPrice | number: '1.0-2' }} EGP</span>
+                <span class="badge bg-success text-white text-xs">{{ paymentTypeLabel(request.myOfferPaymentType ?? 0) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Can Offer Section -->
+          <div *ngIf="canOffer" class="card-body p-3 p-md-4">
+            <div class="mb-3">
+              <h5 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                <i class="pi pi-send text-primary fs-6"></i>
+                {{ isAdmin ? ('Submit Offer On Behalf Of Vendor' | translate) : (hasMyOffer ? ('Update Your Offer' | translate) : ('Submit Your Offer' | translate)) }}
+              </h5>
+              <p class="text-muted text-xs mb-0">
+                {{ 'Provide clear, competitive pricing and deposit terms to increase conversion.' | translate }}
+              </p>
+            </div>
+
+            <form [formGroup]="offerForm" (ngSubmit)="submitOffer()" class="d-flex flex-column gap-3">
+              <!-- Admin Only: Select Vendor -->
+              <div *ngIf="isAdmin">
+                <label class="form-label text-xs fw-semibold text-muted text-uppercase tracking-wider">
+                  {{ 'Vendor' | translate }} <span class="text-danger">*</span>
+                </label>
+                <p-dropdown
+                  formControlName="vendorId"
+                  [options]="vendorOptions"
+                  [placeholder]="'Select Vendor' | translate"
+                  filter
+                  styleClass="w-full"
+                ></p-dropdown>
+                <small class="text-danger d-block mt-1" *ngIf="offerForm.get('vendorId')?.invalid && offerForm.get('vendorId')?.touched">
+                  {{ 'Vendor is required' | translate }}
+                </small>
+              </div>
+
+              <!-- Total Price Input -->
+              <div>
+                <label class="form-label text-xs fw-semibold text-muted text-uppercase tracking-wider">
+                  {{ 'Total Price' | translate }} <span class="text-danger">*</span>
+                </label>
+                <div class="p-inputgroup">
+                  <span class="p-inputgroup-addon bg-light text-muted fw-bold">EGP</span>
+                  <p-inputNumber
+                    formControlName="price"
+                    mode="decimal"
+                    [min]="1"
+                    [minFractionDigits]="0"
+                    [maxFractionDigits]="2"
+                    [placeholder]="'e.g. 15000' | translate"
+                    styleClass="w-full"
+                  ></p-inputNumber>
+                </div>
+                <small class="text-danger d-block mt-1" *ngIf="offerForm.get('price')?.invalid && offerForm.get('price')?.touched">
+                  {{ 'Price is required (minimum 1 EGP)' | translate }}
+                </small>
+              </div>
+
+              <!-- Payment Method Selection Cards -->
+              <div>
+                <label class="form-label text-xs fw-semibold text-muted text-uppercase tracking-wider d-block mb-2">
+                  {{ 'Payment Method' | translate }} <span class="text-danger">*</span>
+                </label>
+                <div class="row g-2">
+                  <!-- Option 1: Deposit Required -->
+                  <div class="col-6">
+                    <div
+                      class="payment-option-card p-3 rounded-3 border cursor-pointer h-100 d-flex flex-column justify-content-between transition-all"
+                      [class.selected]="isDeposit"
+                      (click)="setPaymentType(OfferPaymentType.Deposit)"
+                    >
+                      <div class="d-flex align-items-center justify-content-between mb-1">
+                        <i class="pi pi-wallet fs-5" [class.text-primary]="isDeposit" [class.text-muted]="!isDeposit"></i>
+                        <span class="radio-dot" [class.active]="isDeposit"></span>
+                      </div>
+                      <div>
+                        <span class="fw-bold fs-7 d-block" [class.text-primary]="isDeposit">{{ 'Deposit' | translate }}</span>
+                        <span class="text-muted text-xs">{{ 'Advance payment + balance on arrival' | translate }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Option 2: Full Payment -->
+                  <div class="col-6">
+                    <div
+                      class="payment-option-card p-3 rounded-3 border cursor-pointer h-100 d-flex flex-column justify-content-between transition-all"
+                      [class.selected]="!isDeposit"
+                      (click)="setPaymentType(OfferPaymentType.FullPayment)"
+                    >
+                      <div class="d-flex align-items-center justify-content-between mb-1">
+                        <i class="pi pi-credit-card fs-5" [class.text-primary]="!isDeposit" [class.text-muted]="isDeposit"></i>
+                        <span class="radio-dot" [class.active]="!isDeposit"></span>
+                      </div>
+                      <div>
+                        <span class="fw-bold fs-7 d-block" [class.text-primary]="!isDeposit">{{ 'Full Payment' | translate }}</span>
+                        <span class="text-muted text-xs">{{ '100% upfront booking payment' | translate }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Deposit Amount Section (Visible when Deposit selected) -->
+              <div *ngIf="isDeposit" class="deposit-section p-3 rounded-3 bg-light border">
+                <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
+                  <label class="form-label text-xs fw-semibold text-muted text-uppercase tracking-wider mb-0">
+                    {{ 'Deposit Amount' | translate }} <span class="text-danger">*</span>
+                  </label>
+                  <!-- Fast Percentage Quick-fill Chips -->
+                  <div class="d-flex align-items-center gap-1">
+                    <span class="text-muted text-xs me-1">{{ 'Quick Calculate:' | translate }}</span>
+                    <button
+                      type="button"
+                      *ngFor="let pct of [10, 20, 30, 50]"
+                      class="btn btn-xs btn-outline-primary py-0 px-2 rounded-pill fs-8 fw-bold"
+                      (click)="applyDepositPercentage(pct)"
+                    >
+                      {{ pct }}%
+                    </button>
+                  </div>
+                </div>
+
+                <div class="p-inputgroup">
+                  <span class="p-inputgroup-addon bg-white text-muted fw-bold">EGP</span>
+                  <p-inputNumber
+                    formControlName="depositAmount"
+                    mode="decimal"
+                    [min]="1"
+                    [minFractionDigits]="0"
+                    [maxFractionDigits]="2"
+                    [placeholder]="'e.g. 3000' | translate"
+                    styleClass="w-full"
+                  ></p-inputNumber>
+                </div>
+                <small class="text-danger d-block mt-1" *ngIf="offerForm.get('depositAmount')?.invalid && offerForm.get('depositAmount')?.touched">
+                  {{ 'Deposit amount is required' | translate }}
+                </small>
+                <small class="text-danger d-block mt-1 fw-bold" *ngIf="offerForm.hasError('depositExceedsPrice')">
+                  <i class="pi pi-exclamation-triangle me-1"></i>
+                  {{ 'Deposit cannot exceed total price' | translate }}
+                </small>
+              </div>
+
+              <!-- Live Financial Breakdown Card -->
+              <div *ngIf="offerPrice > 0" class="financial-breakdown-card p-3 rounded-3 bg-primary-subtle border border-primary-subtle">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <span class="text-primary fw-bold text-xs text-uppercase tracking-wider d-flex align-items-center gap-1">
+                    <i class="pi pi-calculator"></i>
+                    {{ 'Financial Breakdown' | translate }}
+                  </span>
+                  <span class="text-primary opacity-75 text-xs fw-medium">{{ 'Customer View' | translate }}</span>
+                </div>
+                <div class="row g-2 text-center text-md-start">
+                  <div [ngClass]="isDeposit ? 'col-4' : 'col-12'">
+                    <span class="text-muted text-xs d-block mb-1">{{ 'Total Quotation' | translate }}</span>
+                    <span class="fw-bold fs-6 text-dark">{{ offerPrice | number: '1.0-2' }} EGP</span>
+                  </div>
+                  <div *ngIf="isDeposit" class="col-4 border-start border-primary-subtle">
+                    <span class="text-muted text-xs d-block mb-1">{{ 'Due Now' | translate }} ({{ depositPercent }}%)</span>
+                    <span class="fw-bold fs-6 text-primary">{{ depositAmountVal | number: '1.0-2' }} EGP</span>
+                  </div>
+                  <div *ngIf="isDeposit" class="col-4 border-start border-primary-subtle">
+                    <span class="text-muted text-xs d-block mb-1">{{ 'Balance on Travel' | translate }}</span>
+                    <span class="fw-bold fs-6 text-success">{{ remainingBalance | number: '1.0-2' }} EGP</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Notes / Terms Textarea -->
+              <div>
+                <label class="form-label text-xs fw-semibold text-muted text-uppercase tracking-wider">
+                  {{ 'Notes / Terms' | translate }}
+                </label>
+                <textarea
+                  pInputTextarea
+                  formControlName="vendorNotes"
+                  rows="3"
+                  class="w-full form-control rounded-3"
+                  [placeholder]="'State package inclusions, cancellation terms, or hotel room tier for the customer...' | translate"
+                ></textarea>
+              </div>
+
+              <!-- Modal Footer Action Buttons -->
+              <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top mt-2">
+                <p-button
+                  type="button"
+                  [label]="'Cancel' | translate"
+                  severity="secondary"
+                  [outlined]="true"
+                  (onClick)="ref.close()"
+                ></p-button>
+                <p-button
+                  type="submit"
+                  [label]="(!isAdmin && hasMyOffer ? ('Update Offer' | translate) : ('Submit Offer' | translate))"
+                  icon="pi pi-send"
+                  [loading]="isSubmitting"
+                  severity="primary"
+                ></p-button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Expired / Locked Message -->
+          <div *ngIf="!canOffer" class="card-body p-5 text-center d-flex flex-column align-items-center justify-content-center gap-3">
+            <div class="lock-icon-circle bg-light text-muted rounded-circle p-4 d-flex align-items-center justify-content-center">
+              <i class="pi pi-lock fs-1 text-secondary"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-1">{{ 'Offer Window Closed' | translate }}</h5>
+            <p class="text-muted fs-7 mb-0 max-w-sm">
+              {{ 'This custom trip request has expired or has already been booked. It is no longer accepting new vendor quotations.' | translate }}
+            </p>
+            <p-button
+              type="button"
+              [label]="'Close' | translate"
+              severity="secondary"
+              [outlined]="true"
+              (onClick)="ref.close()"
+            ></p-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

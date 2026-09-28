@@ -9,12 +9,13 @@ import { Router } from '@angular/router';
 import { ConfigureService } from 'src/app/theme/shared/services/configure.service';
 import { DialogService } from 'primeng/dynamicdialog';
 import { CustomerDialogComponent } from 'src/app/demo/pages/customers/customer-dialog/customer-dialog.component';
+import { MarkVendorSettledDialogComponent } from '../../components/mark-vendor-settled-dialog/mark-vendor-settled-dialog.component';
 
 @Component({
   selector: 'app-manasik-booking-info',
   standalone: true,
   imports: [SharedModule],
-  providers: [ConfirmationService],
+  providers: [ConfirmationService, DialogService],
   templateUrl: './manasik-booking-info.component.html',
   styleUrl: './manasik-booking-info.component.scss'
 })
@@ -163,10 +164,41 @@ export class ManasikBookingInfoComponent implements OnInit {
   }
   
   getStatusLabel(value: number): string {
-    const status = this.paymentStatus.find((s) => s.value === value);
+    const status = this.paymentStatus?.find((s) => s.value === value);
     const lang = this.translate.currentLang;
-    if (!status) return lang === 'ar' ? 'غير معروف' : 'Unknown';
-    return lang === 'ar' ? status.nameAr : status.nameEn;
+    if (status) {
+      return lang === 'ar' ? status.nameAr : status.nameEn;
+    }
+    switch (value) {
+      case 1:
+        return lang === 'ar' ? 'قيد الانتظار' : 'Pending';
+      case 2:
+        return lang === 'ar' ? 'مؤكد' : 'Confirmed';
+      case 3:
+        return lang === 'ar' ? 'ملغي' : 'Cancelled';
+      case 4:
+        return lang === 'ar' ? 'مكتمل' : 'Completed';
+      case 5:
+        return lang === 'ar' ? 'مسترجع' : 'Refunded';
+      default:
+        return lang === 'ar' ? 'غير معروف' : 'Unknown';
+    }
+  }
+
+  getBookingStatusSeverity(status: number): 'success' | 'info' | 'warning' | 'danger' | 'secondary' {
+    switch (status) {
+      case 2:
+      case 4:
+        return 'success';
+      case 1:
+        return 'warning';
+      case 3:
+        return 'danger';
+      case 5:
+        return 'info';
+      default:
+        return 'secondary';
+    }
   }
 
 
@@ -218,7 +250,50 @@ openUserDetails(user: any) {
           }
         });
       },
-      reject: () => { }
+      reject: () => {}
     });
+  }
+
+  openMarkVendorSettled(hajj: any): void {
+    const ref = this.DialogService.open(MarkVendorSettledDialogComponent, {
+      header: this.translate.instant('settlementDialogHeader') || 'Vendor Reservation Settlement',
+      width: '480px',
+      data: {
+        reservation: hajj,
+        moduleType: 4,
+        moduleName: 'Manasik / Hajj',
+        vendorName: hajj.companyDto?.name
+      },
+      closable: true,
+      dismissableMask: true
+    });
+
+    ref.onClose.subscribe((result) => {
+      if (result?.success) {
+        this.refundedSuccess.emit();
+      }
+    });
+  }
+
+  getVendorSettlementStatusLabel(status: number): string {
+    switch (status) {
+      case 1:
+        return this.translate.instant('partiallySettled') || 'Partially Settled';
+      case 2:
+        return this.translate.instant('fullySettled') || 'Fully Settled';
+      default:
+        return this.translate.instant('notSettled') || 'Not Settled';
+    }
+  }
+
+  getVendorSettlementStatusSeverity(status: number): 'success' | 'warning' | 'danger' {
+    switch (status) {
+      case 2:
+        return 'success';
+      case 1:
+        return 'warning';
+      default:
+        return 'danger';
+    }
   }
 }

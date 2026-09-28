@@ -22,9 +22,14 @@ export class TravelsComponent {
         break;
     }
   }
- isVendor(): boolean {
+  isVendor(): boolean {
     const roles = this.ConfigureService.userRoles();
     return roles.some((role) => role.startsWith('Vendor.'));
+  }
+
+  canAddTravel(): boolean {
+    const roles = this.ConfigureService.userRoles();
+    return roles.some((role) => role.startsWith('Vendor.') || role.startsWith('Admin') || role.startsWith('SuperAdmin'));
   }
   goToTravelForm() {
     console.log('work travels form ....');

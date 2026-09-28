@@ -30,7 +30,9 @@
       <th style="min-width: 200px">{{ 'endDate' | translate }}</th>
       <th style="min-width: 200px" *ngIf="showVendorColumn">{{ 'vendorName' | translate }}</th>
 
-      <th  style="min-width: 200px">{{ 'isVendorSettled' | translate }}</th>
+      <th style="min-width: 170px">{{ 'vendorSettlementStatus' | translate }}</th>
+      <th style="min-width: 170px">{{ 'vendorCalculatedAmount' | translate }}</th>
+      <th style="min-width: 170px">{{ 'vendorSettledAmount' | translate }}</th>
       <th style="min-width: 200px">{{ 'productPrice' | translate }}</th>
       <th style="min-width: 200px">{{ 'isVatIncluded' | translate }}</th>
       <th style="min-width: 200px">{{ 'salesTaxRate' | translate }}</th>
@@ -61,7 +63,7 @@
       <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'isSalesSettled' | translate }}</th>
 
       <th style="min-width: 250px">{{ 'countDetails' | translate }}</th>
-      <th style="min-width: 150px">{{ 'status' | translate }}</th>
+      <th style="min-width: 150px">{{ 'Booking Status' | translate }}</th>
       <th *ngIf="!isVendor()" style="min-width: 150px">{{ 'actions' | translate }}</th>
     </tr>
   </ng-template>
@@ -72,12 +74,12 @@
       <td *ngIf="!isVendor()" pFrozenColumn alignFrozen="left">
         <p-tableCheckbox
           [value]="room"
-          [disabled]="room.isVendorSettled || !room.allowedToSettlement"
+          [disabled]="room.vendorSettlementStatus === 2 || (!room.allowedToSettlement && room.isVendorSettled)"
           [ngClass]="{
-            'checkbox-disabled-green': room.isVendorSettled,
-            'checkbox-disabled-red': !room.allowedToSettlement && !room.isVendorSettled
+            'checkbox-disabled-green': room.vendorSettlementStatus === 2 || room.isVendorSettled,
+            'checkbox-disabled-red': !room.allowedToSettlement && !room.isVendorSettled && room.vendorSettlementStatus !== 2
           }"
-          [pTooltip]="room.isVendorSettled ? 'تمت تسويته' : !room.allowedToSettlement ? 'غير مسموح بالتسوية' : null"
+          [pTooltip]="(room.vendorSettlementStatus === 2 || room.isVendorSettled) ? ('fullySettled' | translate) : !room.allowedToSettlement ? ('غير مسموح بالتسوية' | translate) : null"
         />
       </td>
 
@@ -99,11 +101,17 @@
         </span>
       </td>
 
-      <td >
+      <td>
         <p-tag
-          [value]="room.isVendorSettled ? 'تم التسوية' : 'لم تُسوى '"
-          [severity]="room.isVendorSettled ? 'success' : 'warning'"
+          [value]="getVendorSettlementStatusLabel(room.vendorSettlementStatus !== undefined ? room.vendorSettlementStatus : (room.isVendorSettled ? 2 : 0))"
+          [severity]="getVendorSettlementStatusSeverity(room.vendorSettlementStatus !== undefined ? room.vendorSettlementStatus : (room.isVendorSettled ? 2 : 0))"
         ></p-tag>
+      </td>
+      <td class="font-bold text-blue-600">
+        {{ (room.vendorCalculatedAmount ?? room.vendorProfitAfterCoupon ?? room.productPrice ?? 0) | number:'1.2-2' }}
+      </td>
+      <td class="font-bold text-green-600">
+        {{ (room.vendorSettledAmount ?? 0) | number:'1.2-2' }}
       </td>
       <td>{{ room.productPrice }}</td>
 
@@ -159,9 +167,10 @@
       </td>
 
       <td>
-        <span [ngClass]="getStatusClass(room.status)" class="status-badge">
-          {{ getStatusLabel(room.status) }}
-        </span>
+        <p-tag
+          [value]="getStatusLabel(room.status)"
+          [severity]="getBookingStatusSeverity(room.status)"
+        ></p-tag>
       </td>
 
       <td *ngIf="!isVendor()" class="flex align-items-center gap-2">

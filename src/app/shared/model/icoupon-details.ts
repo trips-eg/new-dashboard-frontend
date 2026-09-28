@@ -2,6 +2,8 @@ export interface IcouponDetails {
   id: number;
   code: string;
   description: string;
+  warningMessage?: string | null;
+  scope?: number;
   discountType: number;
   discountAmount: number;
   usageNumber: number;

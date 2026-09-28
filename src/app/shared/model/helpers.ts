@@ -172,7 +172,11 @@ export class APIs {
     getManasikReservationForVendor: 'HajjReservations/GetAllHajjReservation',
     // ── InstaPay Admin Actions ──
     confirmInstaPayBooking: 'CustomerBooking/ConfirmInstaPayBooking?id=',
-    cancelInstaPayBooking: 'CustomerBooking/CancelInstaPayBooking?id='
+    cancelInstaPayBooking: 'CustomerBooking/CancelInstaPayBooking?id=',
+    // ── Mark Vendor Settled Endpoints ──
+    markTripVendorSettled: 'TripReservations/MarkVendorSettled',
+    markOutingVendorSettled: 'OutingBooking/MarkVendorSettled',
+    markManasikVendorSettled: 'HajjReservations/MarkVendorSettled'
   };
   public static useries = {
     createUser: 'Users/CreateUser',
@@ -360,5 +364,15 @@ export class APIs {
     GetCommissionPolicy: 'Pricing/GetCommissionPolicy',
     SaveCommissionPolicy: 'Pricing/SaveCommissionPolicy',
     GetPricingPolicyStatistics: 'Pricing/GetPricingPolicyStatistics'
+  };
+
+  public static customTrips = {
+    getSettings: 'CustomTripSetting/GetCustomTripSettings',
+    updateSettings: 'CustomTripSetting/UpdateCustomTripSettings',
+    allRequests: 'VendorTripRequests/all-requests',
+    requestById: 'VendorTripRequests/',
+    submitOffer: 'VendorTripRequests/Offers',
+    mySubmittedOffers: 'VendorTripRequests/my-submitted-offers',
+    adminAllRequests: 'VendorTripRequests/admin/all-requests'
   };
 }

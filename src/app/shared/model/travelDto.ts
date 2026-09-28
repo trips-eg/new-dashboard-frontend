@@ -21,6 +21,14 @@ export interface Travel {
   descriptions?: Description[]
   segments?: Segment[]
   images?: Image[]
+  tripDates?: TripDate[]
+  tripType?: number
+}
+
+export interface TripDate {
+  id?: number
+  startDate: string
+  endDate?: string | null
 }
 
 export interface Country {

@@ -1,12 +1,12 @@
 /* Premium UI Transitions & Animations */
 .animate-fadein {
-  animation: fadeIn 0.3s ease-in-out forwards;
+  animation: fadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -14,16 +14,71 @@
   }
 }
 
-/* Card hover styles */
+/* Card styling & hover effects */
 .card {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid var(--surface-border) !important;
   background-color: var(--surface-card);
+  border-radius: 12px !important;
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(149, 157, 165, 0.12) !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04) !important;
     border-color: var(--primary-color) !important;
+  }
+}
+
+/* Live Preview Cards */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.02em;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Section Borders and Accents */
+.border-left-3 {
+  border-left-width: 4px !important;
+  border-top: none;
+  border-bottom: none;
+  border-right: none;
+}
+
+/* RTL Support */
+[dir="rtl"] {
+  .border-left-3 {
+    border-left: none !important;
+    border-right-width: 4px !important;
+    border-right-style: solid !important;
+    padding-left: 0 !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .border-right-1 {
+    border-right: none !important;
+    border-left: 1px solid var(--surface-border) !important;
+  }
+
+  .text-end {
+    text-align: left !important;
+  }
+
+  .mr-1, .mr-2, .mr-3 {
+    margin-right: 0 !important;
+    margin-left: 0.5rem !important;
+  }
+
+  .ml-1, .ml-2 {
+    margin-left: 0 !important;
+    margin-right: 0.5rem !important;
+  }
+
+  .p-inputgroup-addon:first-child {
+    border-top-right-radius: 6px !important;
+    border-bottom-right-radius: 6px !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
   }
 }
 
@@ -31,32 +86,68 @@
 ::ng-deep {
   .p-tabview {
     .p-tabview-nav {
+      background: transparent;
       border-bottom: 2px solid var(--surface-border);
+      gap: 0.5rem;
+      
       li {
         .p-tabview-nav-link {
           font-weight: 600;
-          transition: color 0.2s, border-color 0.2s;
+          font-size: 0.95rem;
+          border-radius: 8px 8px 0 0;
+          transition: all 0.2s ease;
           display: flex;
           align-items: center;
+          padding: 1rem 1.25rem;
+          color: var(--text-color-secondary);
+          border: none;
+          border-bottom: 3px solid transparent;
+          
+          &:not(.p-disabled):hover {
+            color: var(--primary-color);
+            background: var(--surface-50);
+          }
+
           &:not(.p-disabled):focus {
             box-shadow: none;
           }
         }
+        
         &.p-highlight .p-tabview-nav-link {
           border-color: var(--primary-color);
           color: var(--primary-color);
+          background: transparent;
         }
       }
     }
+
     .p-tabview-panels {
       padding: 1.5rem 0 0 0;
+      background: transparent;
     }
   }
 
-  .p-inputgroup-addon {
-    background-color: var(--surface-100);
-    border-color: var(--surface-border);
-    color: var(--text-color-secondary);
+  .p-inputgroup {
+    border-radius: 8px;
+    overflow: hidden;
+
+    .p-inputgroup-addon {
+      background-color: var(--surface-100);
+      border-color: var(--surface-border);
+      color: var(--text-color-secondary);
+      font-weight: 600;
+    }
+    
+    .p-inputtext, .p-inputnumber-input {
+      border-color: var(--surface-border);
+      &:focus {
+        border-color: var(--primary-color);
+      }
+    }
+  }
+
+  .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+    background: var(--primary-color);
   }
 }
 
@@ -65,5 +156,5 @@
 }
 
 .max-w-20rem {
-  max-width: 25rem;
+  max-width: 28rem;
 }

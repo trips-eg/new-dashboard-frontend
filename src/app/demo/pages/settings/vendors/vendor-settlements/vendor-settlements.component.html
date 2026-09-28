@@ -1,0 +1,697 @@
+<div class="vendor-settlements-hub main">
+  <!-- Top Header Bar with Hub Mode Switcher -->
+  <div class="card p-3 mb-3 surface-card border-round-xl shadow-1 border-1 surface-border" *ngIf="!companyId">
+    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+      <div>
+        <h2 class="m-0 text-900 font-bold text-2xl d-flex align-items-center gap-2">
+          <i class="pi pi-file-invoice text-primary text-2xl"></i>
+          {{ 'Vendor Settlements Center' | translate }}
+        </h2>
+        <p class="m-0 text-500 text-sm mt-1">
+          {{ 'Manage and track vendor payouts, entitlements, and reconciliation' | translate }}
+        </p>
+      </div>
+
+      <!-- Hub Mode Switcher (Active Dues vs Payout History) -->
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <button
+          pButton
+          type="button"
+          [label]="'Active Dues & Settlements' | translate"
+          icon="pi pi-file-edit"
+          class="p-button-sm font-bold border-round-lg"
+          [ngClass]="activeViewMode === 'dues' ? 'p-button-primary shadow-2' : 'p-button-outlined p-button-secondary'"
+          (click)="switchViewMode('dues')"
+        ></button>
+        <button
+          pButton
+          type="button"
+          [label]="'Settlement & Payout Transactions History' | translate"
+          icon="pi pi-history"
+          class="p-button-sm font-bold border-round-lg"
+          [ngClass]="activeViewMode === 'history' ? 'p-button-primary shadow-2' : 'p-button-outlined p-button-secondary'"
+          (click)="switchViewMode('history')"
+        ></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 1. ACTIVE DUES & SETTLEMENTS VIEW          -->
+  <!-- ========================================== -->
+  <div *ngIf="activeViewMode === 'dues'">
+    <!-- Financial KPI Metrics (4 in a Row) -->
+    <div class="row g-3 mb-3">
+      <!-- 1. Total Entitlement -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-card kpi-blue p-3 h-100 d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-500 text-xs font-semibold uppercase tracking-wider block mb-1">
+              {{ 'Total Entitlements' | translate }}
+            </span>
+            <span class="text-900 font-bold text-2xl">
+              {{ totalEntitlement | number:'1.2-2' }} <small class="text-xs text-500 font-normal">EGP</small>
+            </span>
+            <span class="text-400 text-xs block mt-1">
+              <i class="pi pi-info-circle text-xs mr-1"></i>
+              <span *ngIf="selectedAllowedFilter === 'all'">{{ 'All bookings' | translate }}</span>
+              <span *ngIf="selectedAllowedFilter === 'true'">{{ 'Allowed to settle' | translate }}</span>
+              <span *ngIf="selectedAllowedFilter === 'false'">{{ 'Not allowed to settle' | translate }}</span>
+            </span>
+          </div>
+          <div class="kpi-icon-wrapper">
+            <i class="pi pi-calculator text-xl font-bold"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Total Settled -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-card kpi-green p-3 h-100 d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-500 text-xs font-semibold uppercase tracking-wider block mb-1">
+              {{ 'Total Settled to Date' | translate }}
+            </span>
+            <span class="text-green-600 font-bold text-2xl">
+              {{ totalSettled | number:'1.2-2' }} <small class="text-xs text-500 font-normal">EGP</small>
+            </span>
+            <span class="text-400 text-xs block mt-1">
+              <i class="pi pi-check text-xs mr-1"></i>{{ 'Paid to vendors' | translate }}
+            </span>
+          </div>
+          <div class="kpi-icon-wrapper">
+            <i class="pi pi-check-circle text-xl font-bold"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Outstanding Due Balance -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-card kpi-orange p-3 h-100 d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-500 text-xs font-semibold uppercase tracking-wider block mb-1">
+              {{ 'Outstanding Due Balance' | translate }}
+            </span>
+            <span class="text-orange-600 font-bold text-2xl">
+              {{ totalOutstandingDue | number:'1.2-2' }} <small class="text-xs text-500 font-normal">EGP</small>
+            </span>
+            <span class="text-400 text-xs block mt-1">
+              <i class="pi pi-clock text-xs mr-1"></i>{{ 'Remaining payable' | translate }}
+            </span>
+          </div>
+          <div class="kpi-icon-wrapper">
+            <i class="pi pi-wallet text-xl font-bold"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Pending Settlements Count -->
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="kpi-card kpi-red p-3 h-100 d-flex align-items-center justify-content-between">
+          <div>
+            <span class="text-500 text-xs font-semibold uppercase tracking-wider block mb-1">
+              {{ 'Pending Settlements' | translate }}
+            </span>
+            <span class="text-red-600 font-bold text-2xl">
+              {{ dueCount }} <small class="text-xs text-500 font-normal">{{ 'Bookings' | translate }}</small>
+            </span>
+            <span class="text-400 text-xs block mt-1">
+              <i class="pi pi-exclamation-circle text-xs mr-1"></i>{{ 'Awaiting payout' | translate }}
+            </span>
+          </div>
+          <div class="kpi-icon-wrapper">
+            <i class="pi pi-clock text-xl font-bold"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Unified Filter & Actions Toolbar -->
+    <div class="filter-hub-card p-3 mb-3">
+      <!-- Sector Tabs Row with Reset Button -->
+      <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2 pb-3 mb-3 border-bottom surface-border">
+        <!-- Sector Tabs -->
+        <div class="sector-tabs d-flex align-items-center gap-1 overflow-x-auto w-100 w-sm-auto pb-1 pb-sm-0">
+          <button
+            pButton
+            type="button"
+            [label]="'Travels / Trips' | translate"
+            icon="pi pi-compass"
+            class="p-button-sm font-semibold"
+            [ngClass]="activeSector === 1 ? 'p-button-primary shadow-1' : 'p-button-outlined p-button-secondary'"
+            (click)="onSectorChange(1)"
+          ></button>
+          <button
+            pButton
+            type="button"
+            [label]="'Rooms / Hotels' | translate"
+            icon="pi pi-building"
+            class="p-button-sm font-semibold"
+            [ngClass]="activeSector === 2 ? 'p-button-primary shadow-1' : 'p-button-outlined p-button-secondary'"
+            (click)="onSectorChange(2)"
+          ></button>
+          <button
+            pButton
+            type="button"
+            [label]="'Outings' | translate"
+            icon="pi pi-ticket"
+            class="p-button-sm font-semibold"
+            [ngClass]="activeSector === 3 ? 'p-button-primary shadow-1' : 'p-button-outlined p-button-secondary'"
+            (click)="onSectorChange(3)"
+          ></button>
+          <button
+            pButton
+            type="button"
+            [label]="'Manasik / Umrah' | translate"
+            icon="pi pi-sun"
+            class="p-button-sm font-semibold"
+            [ngClass]="activeSector === 4 ? 'p-button-primary shadow-1' : 'p-button-outlined p-button-secondary'"
+            (click)="onSectorChange(4)"
+          ></button>
+        </div>
+
+        <!-- Reset Filters Button (visible when any filter is applied) -->
+        <div class="d-flex align-items-center gap-2" *ngIf="hasActiveFilters">
+          <button
+            pButton
+            type="button"
+            [label]="'Reset Filters' | translate"
+            icon="pi pi-filter-slash"
+            class="p-button-outlined p-button-danger p-button-sm font-semibold"
+            (click)="resetAllFilters()"
+          ></button>
+        </div>
+      </div>
+
+      <!-- Filter Controls Grid / Row -->
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <!-- Search Input -->
+        <span class="p-input-icon-left flex-grow-1" style="min-width: 14rem;">
+          <i class="pi pi-search text-400"></i>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="searchQuery"
+            (input)="onSearch()"
+            [placeholder]="'Search reference, item, customer...' | translate"
+            class="w-100 p-inputtext-sm"
+          />
+        </span>
+
+        <!-- Vendor Selector Dropdown (Integrated for Admins) -->
+        <p-dropdown
+          *ngIf="!companyId && !isVendorRole()"
+          [options]="vendorsList"
+          [(ngModel)]="selectedVendorId"
+          optionLabel="name"
+          optionValue="id"
+          [placeholder]="'All Vendors' | translate"
+          [showClear]="true"
+          [filter]="true"
+          filterBy="name"
+          (onChange)="onVendorChange()"
+          styleClass="p-inputtext-sm w-100 w-md-auto"
+        >
+          <ng-template pTemplate="selectedItem" let-selected>
+            <div class="d-flex align-items-center gap-2">
+              <i class="pi pi-building text-primary text-xs"></i>
+              <span>{{ selected.name }}</span>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="item" let-vendor>
+            <div class="d-flex align-items-center gap-2">
+              <i class="pi pi-building text-500 text-xs"></i>
+              <span>{{ vendor.name }}</span>
+            </div>
+          </ng-template>
+        </p-dropdown>
+
+        <!-- Booking Status Filter Dropdown -->
+        <p-dropdown
+          [options]="bookingStatusOptions"
+          [(ngModel)]="selectedBookingStatus"
+          optionLabel="label"
+          optionValue="value"
+          [placeholder]="'Booking Status' | translate"
+          (onChange)="onBookingStatusChange()"
+          styleClass="p-inputtext-sm w-100 w-md-auto"
+        ></p-dropdown>
+
+        <!-- Allowed to Settlement Filter Dropdown -->
+        <p-dropdown
+          [options]="allowedFilterOptions"
+          [(ngModel)]="selectedAllowedFilter"
+          optionLabel="label"
+          optionValue="value"
+          (onChange)="onAllowedFilterChange()"
+          styleClass="p-inputtext-sm w-100 w-md-auto"
+        ></p-dropdown>
+
+        <!-- Settlement Status Filter (All / Due / Partial / Settled) -->
+        <div class="status-btn-group d-flex gap-1 flex-wrap">
+          <button
+            pButton
+            type="button"
+            [label]="'All' | translate"
+            class="p-button-xs font-semibold"
+            [ngClass]="selectedStatusFilter === -1 ? 'p-button-primary' : 'p-button-outlined p-button-secondary'"
+            (click)="onStatusFilterChange(-1)"
+          ></button>
+          <button
+            pButton
+            type="button"
+            [label]="'Due' | translate"
+            class="p-button-xs font-semibold"
+            [ngClass]="selectedStatusFilter === 0 ? 'p-button-danger' : 'p-button-outlined p-button-secondary'"
+            (click)="onStatusFilterChange(0)"
+          ></button>
+          <button
+            pButton
+            type="button"
+            [label]="'Partial' | translate"
+            class="p-button-xs font-semibold"
+            [ngClass]="selectedStatusFilter === 1 ? 'p-button-warning' : 'p-button-outlined p-button-secondary'"
+            (click)="onStatusFilterChange(1)"
+          ></button>
+          <button
+            pButton
+            type="button"
+            [label]="'Settled' | translate"
+            class="p-button-xs font-semibold"
+            [ngClass]="selectedStatusFilter === 2 ? 'p-button-success' : 'p-button-outlined p-button-secondary'"
+            (click)="onStatusFilterChange(2)"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Sticky Bulk Selection Toolbar -->
+    <div
+      class="sticky-selection-bar p-3 surface-card border-round-xl shadow-3 border-1 surface-border mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2 animate-fadein"
+      *ngIf="selectedItems && selectedItems.length > 0"
+    >
+      <div class="d-flex align-items-center gap-3">
+        <div class="border-circle bg-primary-100 text-primary-700 d-flex align-items-center justify-content-center p-2" style="width: 2.5rem; height: 2.5rem;">
+          <i class="pi pi-check-square font-bold text-base"></i>
+        </div>
+        <div>
+          <span class="font-bold text-900 text-base block">
+            {{ selectedItems.length }} {{ 'reservations selected' | translate }}
+          </span>
+          <span class="text-700 text-xs">
+            {{ 'Total Payout Sum' | translate }}: <strong class="text-primary font-bold">{{ selectedTotalPayout | number:'1.2-2' }} EGP</strong>
+          </span>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <button
+          pButton
+          type="button"
+          [label]="'Clear' | translate"
+          icon="pi pi-times"
+          class="p-button-outlined p-button-secondary p-button-sm"
+          (click)="clearSelections()"
+        ></button>
+        <button
+          pButton
+          type="button"
+          [label]="'Settle Selected Payouts' | translate"
+          icon="pi pi-wallet"
+          class="p-button-primary p-button-sm font-bold shadow-2"
+          (click)="processBatchSettlement()"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Settlements Ledger Table -->
+    <div class="card p-0 surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
+      <p-table
+        [value]="filteredItems"
+        [lazy]="true"
+        [paginator]="true"
+        [rows]="rows"
+        [first]="first"
+        [totalRecords]="totalRecords"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        [showCurrentPageReport]="true"
+        (onLazyLoad)="onLedgerLazyLoad($event)"
+        [(selection)]="selectedItems"
+        [scrollable]="true"
+        scrollDirection="both"
+        [loading]="isLoading"
+        responsiveLayout="scroll"
+        styleClass="p-datatable-sm p-datatable-striped"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th pFrozenColumn alignFrozen="left" style="width: 3.5rem">
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            </th>
+            <th pFrozenColumn alignFrozen="left" style="min-width: 140px">{{ 'Sector' | translate }}</th>
+            <th pFrozenColumn alignFrozen="left" style="min-width: 180px">{{ 'Booking Ref' | translate }}</th>
+            <th style="min-width: 220px">{{ 'Service / Item' | translate }}</th>
+            <th style="min-width: 180px">{{ 'Tickets & Count' | translate }}</th>
+            <!-- <th style="min-width: 180px" *ngIf="!companyId">{{ 'Vendor' | translate }}</th> -->
+            <th style="min-width: 160px">{{ 'Customer' | translate }}</th>
+            <th style="min-width: 140px">{{ 'Booking Date' | translate }}</th>
+            <th style="min-width: 150px">{{ 'Gross Value' | translate }}</th>
+            <th style="min-width: 170px">{{ 'Vendor Entitlement' | translate }}</th>
+            <th style="min-width: 150px">{{ 'Paid to Date' | translate }}</th>
+            <th style="min-width: 160px">{{ 'Remaining Due' | translate }}</th>
+            <th style="min-width: 140px">{{ 'Booking Status' | translate }}</th>
+            <th style="min-width: 150px">{{ 'Settlement Status' | translate }}</th>
+            <th pFrozenColumn alignFrozen="right" style="min-width: 120px">{{ 'Actions' | translate }}</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-item>
+          <tr [ngClass]="{'bg-green-50': item.vendorSettlementStatus === 2}">
+            <td pFrozenColumn alignFrozen="left">
+              <p-tableCheckbox
+                [value]="item"
+                [disabled]="item.vendorSettlementStatus === 2 || !item.allowedToSettlement"
+                [pTooltip]="item.vendorSettlementStatus === 2 ? ('fullySettled' | translate) : !item.allowedToSettlement ? ('notAllowedToSettle' | translate) : null"
+              ></p-tableCheckbox>
+            </td>
+
+            <!-- Sector Badge -->
+            <td pFrozenColumn alignFrozen="left">
+              <span
+                class="sector-badge"
+                [ngClass]="{
+                  'sector-travel': item.moduleType === 1,
+                  'sector-room': item.moduleType === 2,
+                  'sector-outing': item.moduleType === 3,
+                  'sector-manasik': item.moduleType === 4
+                }"
+              >
+                {{ item.moduleName | translate }}
+              </span>
+            </td>
+
+            <!-- Booking Ref -->
+            <td pFrozenColumn alignFrozen="left" class="font-bold text-900">
+              {{ item.bookingRefernce }}
+            </td>
+
+            <!-- Item Name -->
+            <td class="font-medium text-800">
+              {{ item.itemName }}
+            </td>
+
+            <!-- Tickets & Count -->
+            <td>
+              <!-- Outing Tickets -->
+              <div *ngIf="item.reservationOutingTickets && item.reservationOutingTickets.length > 0; else nonOutingCount">
+                <div class="d-flex flex-column gap-1">
+                  <div
+                    *ngFor="let t of item.reservationOutingTickets"
+                    class="d-flex align-items-center justify-content-between gap-2 p-1 px-2 rounded border bg-light"
+                  >
+                    <span class="fw-semibold text-primary text-xs text-truncate" style="max-width: 140px;" [title]="t.ticketType?.ticketType || t.ticketType?.description || ('Ticket' | translate)">
+                      <i class="pi pi-ticket me-1 text-primary"></i>
+                      {{ t.ticketType?.ticketType || t.ticketType?.description || ('Ticket' | translate) }}
+                    </span>
+                    <span class="badge bg-primary text-white rounded-pill px-2">
+                      x{{ t.count || t.quantity || 1 }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <!-- Fallback Count Details / Seats -->
+              <ng-template #nonOutingCount>
+                <div *ngIf="item.countDetails && (item.countDetails.adults || item.countDetails.childs || item.countDetails.total); else simpleQuantity" class="d-flex gap-1 flex-wrap">
+                  <span class="badge bg-primary text-white px-2 py-1" *ngIf="item.countDetails.adults">
+                    {{ 'Adults' | translate }}: {{ item.countDetails.adults }}
+                  </span>
+                  <span class="badge bg-info text-white px-2 py-1" *ngIf="item.countDetails.childs">
+                    {{ 'Childs' | translate }}: {{ item.countDetails.childs }}
+                  </span>
+                  <span class="badge bg-success text-white px-2 py-1 font-bold" *ngIf="item.countDetails.total">
+                    {{ 'Total' | translate }}: {{ item.countDetails.total }}
+                  </span>
+                </div>
+                <ng-template #simpleQuantity>
+                  <span *ngIf="item.quantity" class="badge bg-primary text-white px-2 py-1">
+                    {{ 'Seats' | translate }}: {{ item.quantity }}
+                  </span>
+                  <span *ngIf="!item.quantity" class="text-muted text-xs">--</span>
+                </ng-template>
+              </ng-template>
+            </td>
+
+            <!-- Vendor Name (when in global view) -->
+            <!-- <td *ngIf="!companyId">
+              <span
+                *ngIf="item.vendorId; else plainVendorText"
+                class="cursor-pointer text-primary hover:underline font-medium d-inline-flex align-items-center gap-1"
+                (click)="goToVendor(item.vendorId)"
+              >
+                <i class="pi pi-building text-xs"></i>
+                {{ item.vendorName }}
+              </span>
+              <ng-template #plainVendorText>
+                <span class="font-medium text-700">
+                  {{ item.vendorName }}
+                </span>
+              </ng-template>
+            </td> -->
+
+            <!-- Customer -->
+            <td class="text-700">
+              {{ item.customerName }}
+            </td>
+
+            <!-- Booking Date -->
+            <td class="text-600 text-sm">
+              {{ item.reservationDate | date:'mediumDate' }}
+            </td>
+
+            <!-- Gross Value -->
+            <td class="text-600">
+              {{ item.productPrice | number:'1.2-2' }} EGP
+            </td>
+
+            <!-- Vendor Entitlement -->
+            <td class="font-bold text-blue-600">
+              {{ item.vendorCalculatedAmount | number:'1.2-2' }} EGP
+            </td>
+
+            <!-- Paid to Date -->
+            <td class="font-bold text-green-600">
+              {{ item.vendorSettledAmount | number:'1.2-2' }} EGP
+            </td>
+
+            <!-- Remaining Due -->
+            <td class="font-bold" [ngClass]="item.remainingToSettle > 0 ? 'text-orange-600' : 'text-500'">
+              {{ item.remainingToSettle | number:'1.2-2' }} EGP
+            </td>
+
+            <!-- Booking Status Badge -->
+            <td>
+              <p-tag
+                [value]="getBookingStatusLabel(item.bookingStatus)"
+                [severity]="getBookingStatusSeverity(item.bookingStatus)"
+              ></p-tag>
+            </td>
+
+            <!-- Settlement Status Badge -->
+            <td>
+              <p-tag
+                [value]="getVendorSettlementStatusLabel(item.vendorSettlementStatus)"
+                [severity]="getVendorSettlementStatusSeverity(item.vendorSettlementStatus)"
+              ></p-tag>
+            </td>
+
+            <!-- Action Button -->
+            <td pFrozenColumn alignFrozen="right">
+              <button
+                pButton
+                type="button"
+                icon="pi pi-wallet"
+                [label]="'Settle' | translate"
+                class="p-button-sm p-button-rounded p-button-success font-semibold text-xs shadow-1"
+                (click)="openSingleSettlement(item)"
+                [disabled]="item.vendorSettlementStatus === 2 || !item.allowedToSettlement"
+                [pTooltip]="item.vendorSettlementStatus === 2 ? ('fullySettled' | translate) : !item.allowedToSettlement ? ('notAllowedToSettle' | translate) : null"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Empty State -->
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="100%" class="text-center py-6">
+              <div class="empty-state-wrapper flex flex-column align-items-center justify-content-center">
+                <i class="pi pi-check-circle text-green-500 text-5xl mb-3"></i>
+                <h4 class="text-900 font-bold mb-1">{{ 'No Pending Settlements' | translate }}</h4>
+                <p class="text-500 text-sm m-0">{{ 'All reservations matching your filter are completely settled.' | translate }}</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. SETTLEMENT & PAYOUT HISTORY VIEW        -->
+  <!-- ========================================== -->
+  <div *ngIf="activeViewMode === 'history'" class="animate-fadein">
+    <!-- History Filter Bar -->
+    <div class="card p-3 mb-3 surface-card border-round-xl shadow-1 border-1 surface-border">
+      <div class="flex flex-column md:flex-row align-items-start md:align-items-center justify-content-between gap-3">
+        <div>
+          <h3 class="m-0 text-900 font-bold text-lg flex align-items-center gap-2">
+            <i class="pi pi-history text-primary"></i>
+            {{ 'Settlement & Payout Transactions History' | translate }}
+          </h3>
+          <p class="m-0 text-500 text-xs mt-1">
+            {{ 'Official ledger of all payouts, disbursements, and wallet adjustments' | translate }}
+          </p>
+        </div>
+
+        <div class="flex align-items-center gap-2 w-full md:w-auto">
+          <span class="p-input-icon-left w-full md:w-18rem">
+            <i class="pi pi-search"></i>
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="historySearch"
+              (input)="onHistorySearch()"
+              [placeholder]="'Search account, bank, user...' | translate"
+              class="w-full p-inputtext-sm"
+            />
+          </span>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-refresh"
+            class="p-button-outlined p-button-secondary p-button-sm"
+            (click)="loadWalletHistory()"
+            [loading]="historyLoading"
+            [pTooltip]="'Refresh' | translate"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- History Transactions Table -->
+    <div class="card p-0 surface-card border-round-xl shadow-1 border-1 surface-border overflow-hidden">
+      <p-table
+        [value]="walletHistory"
+        [lazy]="true"
+        [first]="historyFirst"
+        [rows]="historyRows"
+        [totalRecords]="historyTotalRecords"
+        [paginator]="true"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        [showCurrentPageReport]="true"
+        (onLazyLoad)="onHistoryLazyLoad($event)"
+        [loading]="historyLoading"
+        [scrollable]="true"
+        scrollDirection="both"
+        responsiveLayout="scroll"
+        styleClass="p-datatable-sm p-datatable-striped"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="min-width: 100px"># ID</th>
+            <th style="min-width: 170px">{{ 'Transaction Date' | translate }}</th>
+            <th style="min-width: 180px" *ngIf="!companyId">{{ 'Vendor' | translate }}</th>
+            <th style="min-width: 160px">{{ 'Processed By' | translate }}</th>
+            <th style="min-width: 160px">{{ 'Payout (Amount Out)' | translate }}</th>
+            <th style="min-width: 160px">{{ 'Amount In' | translate }}</th>
+            <th style="min-width: 160px">{{ 'Net Balance' | translate }}</th>
+            <th style="min-width: 180px">{{ 'Bank / Account' | translate }}</th>
+            <th style="min-width: 140px">{{ 'Receipt' | translate }}</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-tx>
+          <tr>
+            <!-- ID -->
+            <td class="font-bold text-700">#{{ tx.id }}</td>
+
+            <!-- Date -->
+            <td class="text-600 text-sm">
+              {{ tx.createdDate | date:'medium' }}
+            </td>
+
+            <!-- Vendor (when in global view) -->
+            <td *ngIf="!companyId">
+              <span class="cursor-pointer text-primary hover:underline font-bold" (click)="goToVendor(tx.companyId || tx.company?.id)">
+                {{ tx.company?.name || '--' }}
+              </span>
+            </td>
+
+            <!-- Processed By -->
+            <td>
+              <div class="flex flex-column">
+                <span class="font-semibold text-800 text-sm">{{ tx.user?.name || '--' }}</span>
+                <small class="text-500 text-xs" *ngIf="tx.user?.email">{{ tx.user?.email }}</small>
+              </div>
+            </td>
+
+            <!-- Amount Out (Payout) -->
+            <td class="font-bold text-red-600 text-base">
+              <span *ngIf="tx.amountOut > 0">-{{ tx.amountOut | number:'1.2-2' }} EGP</span>
+              <span *ngIf="!tx.amountOut || tx.amountOut === 0" class="text-400 font-normal">0.00 EGP</span>
+            </td>
+
+            <!-- Amount In -->
+            <td class="font-bold text-green-600 text-base">
+              <span *ngIf="tx.amountIn > 0">+{{ tx.amountIn | number:'1.2-2' }} EGP</span>
+              <span *ngIf="!tx.amountIn || tx.amountIn === 0" class="text-400 font-normal">0.00 EGP</span>
+            </td>
+
+            <!-- Total / Net Balance -->
+            <td class="font-bold text-primary text-base">
+              {{ tx.totalAmount | number:'1.2-2' }} EGP
+            </td>
+
+            <!-- Bank / Account -->
+            <td>
+              <div *ngIf="tx.bankName || tx.accountNumber || tx.accountName" class="text-xs">
+                <span class="font-bold block text-700">{{ tx.bankName }}</span>
+                <span class="text-500 block">{{ tx.accountNumber }}</span>
+                <span class="text-600 block">{{ tx.accountName }}</span>
+              </div>
+              <span *ngIf="!tx.bankName && !tx.accountNumber && !tx.accountName" class="text-400 text-xs">--</span>
+            </td>
+
+            <!-- Receipt Image -->
+            <td>
+              <p-image
+                *ngIf="tx.imageUrl"
+                [src]="imgBaseUrl + tx.imageUrl"
+                [preview]="true"
+                alt="Receipt"
+                width="48"
+                appendTo="body"
+                imageClass="border-round shadow-1 cursor-pointer"
+              ></p-image>
+              <span *ngIf="!tx.imageUrl" class="text-400 text-xs">{{ 'No Image' | translate }}</span>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Empty History State -->
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="100%" class="text-center py-6">
+              <div class="empty-state-wrapper flex flex-column align-items-center justify-content-center">
+                <i class="pi pi-inbox text-400 text-5xl mb-3"></i>
+                <h4 class="text-900 font-bold mb-1">{{ 'No Transaction History Found' | translate }}</h4>
+                <p class="text-500 text-sm m-0">{{ 'No payouts or wallet settlement records match your search criteria.' | translate }}</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<p-confirmDialog></p-confirmDialog>

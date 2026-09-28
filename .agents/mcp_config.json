@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "openapi": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "OPENAPI_SPEC_URL=https://web-api.trips.eg/swagger/v1/swagger.json",
+        "ghcr.io/sagenkoder/go-openapi-exploration-mcp-server:latest"
+      ]
+    }
+  }
+}

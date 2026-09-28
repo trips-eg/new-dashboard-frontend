@@ -1,0 +1,53 @@
+.settlement-dialog-container {
+  min-width: 320px;
+  max-width: 540px;
+  font-family: inherit;
+
+  .reservation-banner {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.04) 0%, rgba(248, 250, 252, 0.9) 100%);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  }
+
+  .metric-card {
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.06);
+      border-color: #cbd5e1;
+    }
+  }
+
+  .settlement-progress {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+  }
+
+  .preview-box {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.06) 0%, rgba(239, 246, 255, 0.7) 100%);
+    border: 1px dashed #93c5fd;
+    border-radius: 8px;
+    animation: fadeIn 0.25s ease-in-out;
+  }
+
+  .p-inputgroup {
+    input {
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

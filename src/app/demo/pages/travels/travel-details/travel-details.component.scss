@@ -1,3 +1,318 @@
-::ng-deep .customized-timeline .p-timeline-event-content {
-  padding: 1rem 0.5rem;
+.hero-trip-card {
+  background: #ffffff;
+  border: 1px solid #eef2f6 !important;
 }
+
+.trip-empty-gallery {
+  background: linear-gradient(135deg, #f0fdfa 0%, #e0f2fe 100%);
+  border: 2px dashed #bae6fd;
+  min-height: 280px;
+
+  .gallery-icon-circle {
+    width: 64px;
+    height: 64px;
+    background: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.12);
+  }
+}
+
+.route-banner {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.description-callout {
+  background-color: #f8fafc;
+  border-left: 4px solid var(--bs-primary, #2db9be);
+}
+
+[dir='rtl'] .description-callout {
+  border-left: none;
+  border-right: 4px solid var(--bs-primary, #2db9be);
+}
+
+.metric-card {
+  background: #ffffff;
+  border: 1px solid #eef2f6;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  .metric-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+}
+
+.trip-date-card {
+  background: #ffffff;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(45, 185, 190, 0.12);
+    border-color: var(--bs-primary, #2db9be) !important;
+  }
+
+  .date-window-box {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+  }
+}
+
+.accommodation-item-box {
+  background-color: #f8fafc;
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-color: #cbd5e1;
+  }
+}
+
+.cancellation-policy-box {
+  background-color: #fefce8;
+  border: 1px solid #fef08a;
+  line-height: 1.6;
+
+  p {
+    margin-bottom: 0.5rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// ── Trip Program & Itinerary Timeline Styling ──
+.itinerary-card {
+  background: #ffffff;
+}
+
+.itinerary-timeline-wrapper {
+  padding: 0.5rem 0;
+}
+
+// Marker Circles
+.itinerary-marker-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 1rem;
+  z-index: 2;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: scale(1.08);
+  }
+
+  &.segment-type-transport {
+    background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+  }
+
+  &.segment-type-hotel {
+    background: linear-gradient(135deg, #d946ef 0%, #ec4899 100%);
+    box-shadow: 0 4px 14px rgba(217, 70, 239, 0.4);
+  }
+
+  &.segment-type-flight {
+    background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+  }
+
+  &.segment-type-tour {
+    background: linear-gradient(135deg, #059669 0%, #34d399 100%);
+    box-shadow: 0 4px 14px rgba(5, 150, 105, 0.4);
+  }
+
+  &.segment-type-meal {
+    background: linear-gradient(135deg, #ea580c 0%, #f59e0b 100%);
+    box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4);
+  }
+
+  &.segment-type-default {
+    background: linear-gradient(135deg, #2db9be 0%, #06b6d4 100%);
+    box-shadow: 0 4px 14px rgba(45, 185, 190, 0.4);
+  }
+}
+
+// Opposite Stamp (Date & Step Counter)
+.itinerary-opposite-stamp {
+  display: flex;
+  flex-direction: column;
+  padding: 0.25rem 0.5rem;
+
+  .itinerary-step-number {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.2rem;
+  }
+
+  .itinerary-date-text {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .itinerary-time-text {
+    font-size: 0.75rem;
+    color: #0284c7;
+    font-weight: 600;
+  }
+}
+
+// Card Item
+.itinerary-card-item {
+  background: #ffffff;
+  border: 1px solid #eef2f6;
+  border-inline-start-width: 4px !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  &.segment-type-transport {
+    border-inline-start-color: #0284c7 !important;
+    .itinerary-type-badge {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+  }
+
+  &.segment-type-hotel {
+    border-inline-start-color: #d946ef !important;
+    .itinerary-type-badge {
+      background: #fdf4ff;
+      color: #a21caf;
+    }
+  }
+
+  &.segment-type-flight {
+    border-inline-start-color: #6366f1 !important;
+    .itinerary-type-badge {
+      background: #eef2ff;
+      color: #4338ca;
+    }
+  }
+
+  &.segment-type-tour {
+    border-inline-start-color: #059669 !important;
+    .itinerary-type-badge {
+      background: #ecfdf5;
+      color: #047857;
+    }
+  }
+
+  &.segment-type-meal {
+    border-inline-start-color: #ea580c !important;
+    .itinerary-type-badge {
+      background: #fff7ed;
+      color: #c2410c;
+    }
+  }
+
+  &.segment-type-default {
+    border-inline-start-color: #2db9be !important;
+    .itinerary-type-badge {
+      background: #f0fdfa;
+      color: #0f766e;
+    }
+  }
+
+  .itinerary-type-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+  }
+
+  .itinerary-step-title {
+    color: #0f172a;
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+
+  .itinerary-route-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+  }
+
+  .itinerary-timerange-box {
+    color: #64748b;
+  }
+
+  .itinerary-substep-item {
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+    transition: background 0.15s;
+
+    &:hover {
+      background: #f1f5f9;
+    }
+
+    .itinerary-substep-index {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--bs-primary, #2db9be);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+  }
+}
+
+// Timeline Connector and Container
+::ng-deep .itinerary-custom-timeline {
+  .p-timeline-event-content {
+    padding: 0 1rem 1.5rem 1rem;
+    flex: 1;
+  }
+
+  .p-timeline-event-opposite {
+    padding: 0 1rem;
+    flex: 0 0 130px;
+  }
+
+  .p-timeline-event-connector {
+    background: linear-gradient(to bottom, #cbd5e1, #94a3b8);
+    width: 3px;
+  }
+}
+
+[dir='rtl'] ::ng-deep .itinerary-custom-timeline {
+  .p-timeline-event-opposite {
+    text-align: left;
+  }
+}
+
+[dir='ltr'] ::ng-deep .itinerary-custom-timeline {
+  .p-timeline-event-opposite {
+    text-align: right;
+  }
+}
+

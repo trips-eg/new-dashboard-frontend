@@ -64,6 +64,11 @@ const routes: Routes = [
           import('./demo/pages/settings/vendors/vendor-detail/vendor-detail.component').then((m) => m.VendorDetailComponent)
       },
       {
+        path: 'vendor-settlements',
+        loadComponent: () =>
+          import('./demo/pages/settings/vendors/vendor-settlements/vendor-settlements.component').then((m) => m.VendorSettlementsComponent)
+      },
+      {
         path: 'users',
         loadComponent: () => import('./demo/pages/settings/users/users.component').then((m) => m.UsersComponent)
       },
@@ -248,6 +253,34 @@ const routes: Routes = [
         loadComponent: () =>
           import('./demo/pages/reservations/travels/travels-reservation-details/travels-reservation-details.component').then(
             (m) => m.TravelsReservationDetailsComponent
+          )
+      },
+
+      // Custom Trips (vendor offers marketplace)
+      {
+        path: 'custom-trip-settings',
+        loadComponent: () =>
+          import('./demo/pages/custom-trips/custom-trip-settings/custom-trip-settings.component').then(
+            (m) => m.CustomTripSettingsComponent
+          )
+      },
+      {
+        path: 'custom-trip-requests',
+        loadComponent: () =>
+          import('./demo/pages/custom-trips/vendor-trip-requests/vendor-trip-requests.component').then(
+            (m) => m.VendorTripRequestsComponent
+          )
+      },
+      {
+        path: 'custom-trip-my-offers',
+        loadComponent: () =>
+          import('./demo/pages/custom-trips/vendor-my-offers/vendor-my-offers.component').then((m) => m.VendorMyOffersComponent)
+      },
+      {
+        path: 'admin-custom-trip-requests',
+        loadComponent: () =>
+          import('./demo/pages/custom-trips/admin-trip-requests/admin-trip-requests.component').then(
+            (m) => m.AdminTripRequestsComponent
           )
       },
 

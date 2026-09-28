@@ -202,30 +202,23 @@ export class TravelsFormComponent implements OnInit {
   //   }
   // }
   onStartDateChange(group: any) {
-    // Use 'any' or the specific FormGroup/AbstractControl type
     const tripType = this.travelForm.get('TripType')?.value;
-    const startDateControl = group.get('startDate'); // Get the start date control
+    const startDateControl = group.get('startDate');
     const startDate = startDateControl?.value;
     const days = +this.travelForm.get('NumberOfDays')?.value;
 
     const endDateControl = group.get('endDate');
-    const minEndDateControl = group.get('minEndDate'); // Get the new control
+    const minEndDateControl = group.get('minEndDate');
 
-    // 🆕 Update the minimum allowed End Date to be the selected Start Date
     if (minEndDateControl) {
-      // Set the min date for endDate to be the selected startDate
-      // This effectively locks out dates before the start date
       minEndDateControl.setValue(startDate, { emitEvent: false });
     }
 
-    // Optional: If startDate is cleared, clear minEndDate as well
     if (!startDate && minEndDateControl) {
       minEndDateControl.reset({ emitEvent: false });
     }
 
     if (tripType === 1) {
-      // ... (Your existing logic for TripType 1: auto-calculate end date)
-
       endDateControl?.disable({ emitEvent: false });
 
       if (startDate && days && days > 0) {
@@ -237,14 +230,15 @@ export class TravelsFormComponent implements OnInit {
       } else {
         endDateControl?.reset({ emitEvent: false });
       }
-    } else {
-      // 🔓 ممكن المستخدم يعدّل عليها
+    } else if (tripType === 2) {
       endDateControl?.enable({ emitEvent: false });
 
-      // Optional: If the current endDate is before the new startDate, clear it
       if (startDate && endDateControl?.value && new Date(endDateControl.value) < new Date(startDate)) {
         endDateControl.reset({ emitEvent: false });
       }
+    } else if (tripType === 3) {
+      endDateControl?.setValue(null, { emitEvent: false });
+      endDateControl?.disable({ emitEvent: false });
     }
   }
 
@@ -268,8 +262,11 @@ export class TravelsFormComponent implements OnInit {
         } else {
           endDateControl?.reset({ emitEvent: false });
         }
-      } else {
+      } else if (tripType === 2) {
         endDateControl?.enable({ emitEvent: false });
+      } else if (tripType === 3) {
+        endDateControl?.setValue(null, { emitEvent: false });
+        endDateControl?.disable({ emitEvent: false });
       }
     });
   }
@@ -487,25 +484,19 @@ export class TravelsFormComponent implements OnInit {
           // تحديد TripType
           const tripType = travelData.tripType;
 
-          // تحضير التواريخ بناءً على TripType
-          let tripDates = null;
-          let startDate = null;
-
-          if (tripType === 1 || tripType === 2) {
-            // Weekly or Monthly - محتاجين range
-            if (travelData.startDate && travelData.endDate) {
-              const dateGroup = this.fb.group({
-                startDate: [new Date(travelData.startDate), Validators.required],
-                endDate: [new Date(travelData.endDate), Validators.required]
-              });
-              this.tripDatesArray.push(dateGroup);
-            }
-          } else if (tripType === 3) {
-            // Daily - محتاجين تاريخ واحد بس
-            const dateGroup = this.fb.group({
-              startDate: [new Date(travelData.startDate), Validators.required]
+          // تحضير التواريخ بناءً على TripDates من الـ API
+          this.tripDatesArray.clear();
+          if (travelData.tripDates && travelData.tripDates.length > 0) {
+            travelData.tripDates.forEach((td: any) => {
+              this.addTripDate(td);
             });
-            this.tripDatesArray.push(dateGroup);
+          } else if (travelData.startDate) {
+            // Fallback for trips that only have legacy single dates
+            this.addTripDate({
+              id: 0,
+              startDate: travelData.startDate,
+              endDate: travelData.endDate
+            });
           }
 
           // Bind travel data to travelForm
@@ -526,7 +517,7 @@ export class TravelsFormComponent implements OnInit {
             PriceBefore: travelData.priceBefore || null, // Added PriceBefore field
             Rating: travelData.rating,
             TripType: tripType,
-            StartDate: startDate,
+            StartDate: travelData.startDate,
             IsActive: travelData.isActive,
             IsRecommended: travelData.isRecommended,
             IsFake: travelData.isFake,
@@ -665,7 +656,7 @@ export class TravelsFormComponent implements OnInit {
       CityId: [null, Validators.required],
       FromLocation: ['', Validators.required],
       ToLocation: ['', Validators.required],
-      Address: [''],
+      Address: ['', Validators.required],
       ExternalLink: [''],
       Name: ['', Validators.required],
       Descriptions: this.fb.array([]),
@@ -698,13 +689,29 @@ export class TravelsFormComponent implements OnInit {
     return this.travelForm.get('TripDates') as FormArray;
   }
 
-  addTripDate() {
+  addTripDate(dateObj?: any) {
+    const tripType = this.travelForm.get('TripType')?.value;
+    const days = +this.travelForm.get('NumberOfDays')?.value;
+    const startDate = dateObj?.startDate ? new Date(dateObj.startDate) : null;
+    let endDate = dateObj?.endDate ? new Date(dateObj.endDate) : null;
+
+    if (tripType === 1 && startDate && days && days > 0 && !endDate) {
+      endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + (days - 1));
+    }
+
     const group = this.fb.group({
-      startDate: [null, Validators.required],
-      endDate: [null],
-      minEndDate: [null],
+      id: [dateObj?.id || 0],
+      startDate: [startDate, Validators.required],
+      endDate: [endDate, (tripType === 1 || tripType === 2) ? Validators.required : null],
+      minEndDate: [startDate || null],
       maxEndDate: [null]
     });
+
+    if (tripType === 1 || tripType === 3) {
+      group.get('endDate')?.disable({ emitEvent: false });
+    }
+
     this.tripDatesArray.push(group);
   }
 
@@ -742,20 +749,21 @@ export class TravelsFormComponent implements OnInit {
   private updateValidators(type: number) {
     const tripDatesArray = this.travelForm.get('TripDates') as FormArray;
 
-    // تأكد دايمًا فيه عنصر واحد على الأقل
-    // if (tripDatesArray.length === 0) {
-    //   this.addTripDate();
-    // }
-
     tripDatesArray.controls.forEach((control) => {
       const g = control as FormGroup;
       g.get('startDate')?.setValidators([Validators.required]);
 
       if (type === 1 || type === 2) {
         g.get('endDate')?.setValidators([Validators.required]);
+        if (type === 1) {
+          g.get('endDate')?.disable({ emitEvent: false });
+        } else {
+          g.get('endDate')?.enable({ emitEvent: false });
+        }
       } else {
         g.get('endDate')?.clearValidators();
-        g.get('endDate')?.setValue(null);
+        g.get('endDate')?.setValue(null, { emitEvent: false });
+        g.get('endDate')?.disable({ emitEvent: false });
       }
 
       g.get('startDate')?.updateValueAndValidity();
@@ -777,11 +785,16 @@ export class TravelsFormComponent implements OnInit {
   removeDescription(index: number): void {
     this.descriptions.removeAt(index);
   }
-  addTravel(nextCallback?: EventEmitter<void>) {
-    if (this.travelForm.invalid) {
-      this.updateValidators(this.travelForm.get('TripType')?.value);
 
-      this.travelForm.markAllAsTouched();
+  addTravel(nextCallback?: EventEmitter<void>) {
+    this.updateValidators(this.travelForm.get('TripType')?.value);
+    this.travelForm.markAllAsTouched();
+    this.descriptions.markAllAsTouched();
+    this.tripDatesArray.markAllAsTouched();
+    this.tripPricingPeriods.markAllAsTouched();
+    this.childPricingPolicies.markAllAsTouched();
+
+    if (this.travelForm.invalid) {
       this.toast.error('Please fill all required fields', 'Error');
       return;
     }
@@ -798,7 +811,8 @@ export class TravelsFormComponent implements OnInit {
       if (key === 'ImagesFiles' && this.selectedImages.length > 0) {
         this.selectedImages.forEach((file) => formData.append('ImagesFiles', file));
       } else if (key === 'Descriptions' && value?.length > 0) {
-        value.forEach((desc: any) => formData.append('Descriptions', JSON.stringify(desc)));
+        const validDescriptions = value.filter((desc: any) => desc && desc.description && desc.description.trim() !== '');
+        validDescriptions.forEach((desc: any) => formData.append('Descriptions', JSON.stringify(desc)));
       } else if (key === 'Features') {
         if (value && value.length > 0) {
           value.forEach((id: any) => formData.append('Features', id.toString()));
@@ -818,10 +832,12 @@ export class TravelsFormComponent implements OnInit {
       }
     });
 
-    // ✅ TripDates الموحد (يدعم تايب 1 و 2)
+    // ✅ TripDates الموحد (يدعم تايب 1 و 2 و 3)
     const tripDates = this.tripDatesArray.getRawValue(); // علشان يشمل disabled controls
     tripDates.forEach((range: any) => {
-      const dateObj: any = {};
+      const dateObj: any = {
+        id: 0
+      };
 
       if (range.startDate) {
         dateObj.startDate = this.toDateOnlyString(range.startDate);
@@ -829,37 +845,47 @@ export class TravelsFormComponent implements OnInit {
 
       if ((tripType === 1 || tripType === 2) && range.endDate) {
         dateObj.endDate = this.toDateOnlyString(range.endDate);
+      } else if (tripType === 3) {
+        dateObj.endDate = null;
       }
 
       formData.append('TripDates', JSON.stringify(dateObj));
     });
 
-    this.travelService.addTravel(formData).subscribe(
-      (response) => {
-        if (response.success) {
-          this.toast.success('Travel added successfully', 'Success');
-          this.tripId = response.data;
-          if (nextCallback) nextCallback.emit();
+    this.travelService.addTravel(formData).subscribe({
+      next: (response: any) => {
+        if (response?.success) {
+          this.toast.success(response.message || 'Travel added successfully', 'Success');
+          const createdId = Array.isArray(response.data) ? response.data[0] : response.data;
+          this.tripId = createdId;
+          this.travelId = createdId;
+          if (nextCallback) {
+            setTimeout(() => nextCallback.emit(), 100);
+          }
         }
       },
-      (error) => {
-        this.toast.error('Error adding travel', 'Error');
+      error: (error) => {
+        this.toast.error(error.error?.message || 'Error adding travel', 'Error');
         console.error('Error adding travel:', error);
       }
-    );
+    });
   }
 
   updateTravel(nextCallback?: EventEmitter<void>) {
-    if (this.travelForm.invalid) {
-      this.updateValidators(this.travelForm.get('TripType')?.value);
+    this.updateValidators(this.travelForm.get('TripType')?.value);
+    this.travelForm.markAllAsTouched();
+    this.descriptions.markAllAsTouched();
+    this.tripDatesArray.markAllAsTouched();
+    this.tripPricingPeriods.markAllAsTouched();
+    this.childPricingPolicies.markAllAsTouched();
 
-      this.travelForm.markAllAsTouched();
+    if (this.travelForm.invalid) {
       this.toast.error('Please fill all required fields', 'Error');
       return;
     }
 
     const formData = new FormData();
-    formData.append('Id', this.travelId.toString());
+    formData.append('Id', this.travelId ? this.travelId.toString() : '');
     const tripType = this.travelForm.get('TripType')?.value;
 
     // باقي الحقول
@@ -871,7 +897,8 @@ export class TravelsFormComponent implements OnInit {
       if (key === 'ImagesFiles' && this.selectedImages.length > 0) {
         this.selectedImages.forEach((file) => formData.append('ImagesFiles', file));
       } else if (key === 'Descriptions' && value?.length > 0) {
-        value.forEach((desc: any) => formData.append('Descriptions', JSON.stringify(desc)));
+        const validDescriptions = value.filter((desc: any) => desc && desc.description && desc.description.trim() !== '');
+        validDescriptions.forEach((desc: any) => formData.append('Descriptions', JSON.stringify(desc)));
       } else if (key === 'Features') {
         if (value && value.length > 0) {
           value.forEach((id: any) => formData.append('Features', id.toString()));
@@ -891,10 +918,12 @@ export class TravelsFormComponent implements OnInit {
       }
     });
 
-    // ✅ TripDates الموحد (يدعم تايب 1 و 2)
+    // ✅ TripDates الموحد (يدعم تايب 1 و 2 و 3)
     const tripDates = this.tripDatesArray.getRawValue(); // علشان يشمل disabled controls
     tripDates.forEach((range: any) => {
-      const dateObj: any = {};
+      const dateObj: any = {
+        id: range.id || 0
+      };
 
       if (range.startDate) {
         dateObj.startDate = this.toDateOnlyString(range.startDate);
@@ -902,112 +931,29 @@ export class TravelsFormComponent implements OnInit {
 
       if ((tripType === 1 || tripType === 2) && range.endDate) {
         dateObj.endDate = this.toDateOnlyString(range.endDate);
+      } else if (tripType === 3) {
+        dateObj.endDate = null;
       }
 
       formData.append('TripDates', JSON.stringify(dateObj));
     });
 
-    this.travelService.updateTravel(formData).subscribe(
-      (response) => {
-        if (response.success) {
-          this.toast.success('Travel updated successfully', 'Success');
-          if (nextCallback) nextCallback.emit();
+    this.travelService.updateTravel(formData).subscribe({
+      next: (response: any) => {
+        if (response?.success) {
+          this.toast.success(response.message || 'Travel updated successfully', 'Success');
+          if (nextCallback) {
+            setTimeout(() => nextCallback.emit(), 100);
+          }
         }
       },
-      (error) => {
-        this.toast.error('Error updating travel', 'Error');
+      error: (error) => {
+        this.toast.error(error.error?.message || 'Error updating travel', 'Error');
         console.error('Error updating travel:', error);
       }
-    );
+    });
   }
 
-  // addTravel(nextCallback?: EventEmitter<void>) {
-  //   if (this.travelForm.invalid) {
-  //     this.updateValidators(this.travelForm.get('TripType')?.value);
-
-  //     this.travelForm.markAllAsTouched();
-  //     this.toast.error('Please fill all required fields', 'Error');
-  //     return;
-  //   }
-
-  //   const formData = new FormData();
-  //   const tripType = this.travelForm.get('TripType')?.value;
-
-  //   // باقي الحقول
-  //   Object.keys(this.travelForm.controls).forEach((key) => {
-  //     if (key === 'TripDates') return;
-
-  //     const value = this.travelForm.get(key)?.value;
-  //     if (key === 'ImagesFiles' && this.selectedImages.length > 0) {
-  //       this.selectedImages.forEach((file) => formData.append('ImagesFiles', file));
-  //     } else if (key === 'Descriptions' && value?.length > 0) {
-  //       value.forEach((desc: any) => formData.append('Descriptions', JSON.stringify(desc)));
-  //     } else {
-  //       formData.append(key, value);
-  //     }
-  //   });
-
-  //   // TripDates الموحد
-  //   const tripDates = this.tripDatesArray.value;
-  //   tripDates.forEach((range: any) => {
-  //     const dateObj: any = {};
-  //    if (range.startDate) dateObj.startDate =this.toDateOnlyString( range.startDate);
-  //     if (range.endDate) dateObj.endDate =this.toDateOnlyString( range.endDate);
-  //     formData.append('TripDates', JSON.stringify(dateObj));
-  //   });
-
-  //   this.travelService.addTravel(formData).subscribe((response) => {
-  //     if (response.success) {
-  //       this.toast.success('Travel added successfully', 'Success');
-  //       this.tripId = response.data;
-  //       if (nextCallback) nextCallback.emit();
-  //     }
-  //   });
-  // }
-
-  // updateTravel(nextCallback?: EventEmitter<void>) {
-  //   if (this.travelForm.invalid) {
-  //     this.updateValidators(this.travelForm.get('TripType')?.value);
-
-  //     this.travelForm.markAllAsTouched();
-  //     this.toast.error('Please fill all required fields', 'Error');
-  //     return;
-  //   }
-
-  //   const formData = new FormData();
-  //   formData.append('Id', this.travelId.toString());
-
-  //   Object.keys(this.travelForm.controls).forEach((key) => {
-  //     if (key === 'TripDates') return;
-  //     const value = this.travelForm.get(key)?.value;
-
-  //     if (key === 'ImagesFiles' && this.selectedImages.length > 0) {
-  //       this.selectedImages.forEach((file) => formData.append('ImagesFiles', file));
-  //     } else if (key === 'Descriptions' && value?.length > 0) {
-  //       value.forEach((desc: any) => formData.append('Descriptions', JSON.stringify(desc)));
-  //     } else {
-  //       formData.append(key, value);
-  //     }
-  //   });
-
-  //   // TripDates الموحد
-  //   this.tripDatesArray.value.forEach((range: any) => {
-  //     const dateObj: any = {};
-  //     if (range.startDate) dateObj.startDate =this.toDateOnlyString( range.startDate);
-  //     if (range.endDate) dateObj.endDate =this.toDateOnlyString( range.endDate);
-  //     formData.append('TripDates', JSON.stringify(dateObj));
-  //   });
-
-  //   this.travelService.updateTravel(formData).subscribe((response) => {
-  //     if (response.success) {
-  //       this.toast.success('Travel updated successfully', 'Success');
-  //       if (nextCallback) nextCallback.emit();
-  //     }
-  //   });
-  // }
-
-  //new method to handle travel type change
-  //new method to handle travel type change
   private formatTripPricingPeriod(period: any) {
     return {
       id: period.id || 0,
@@ -1017,33 +963,21 @@ export class TravelsFormComponent implements OnInit {
     };
   }
 
-  private toIsoString(date: any): string | null {
-    if (!date) return null;
-    const parsed = new Date(date);
-    if (isNaN(parsed.getTime())) return null;
-    return parsed.toISOString();
-  }
-
   onTravelTypeChange(isExternal: boolean) {
     if (isExternal) {
-      // لو الرحلة خارجية -> بنسيب الكونتري زي ما هو ونفضي المدن
       this.travelForm.get('CountryId')?.setValidators([Validators.required]);
       this.travelForm.get('CityId')?.setValidators([Validators.required]);
 
-      // نفضي ليست المدن لحد ما المستخدم يختار دولة
       this.cityList = [];
       this.travelForm.get('CityId')?.reset();
     } else {
-      // لو الرحلة داخلية -> نفرغ الكونتري والسيتي ونجيب مدن مصر
       this.travelForm.get('CityId')?.reset();
       this.travelForm.get('CountryId')?.reset();
 
-      // نشيل الفاليديشن من الكونتري
       this.travelForm.get('CountryId')?.clearValidators();
       this.travelForm.get('CountryId')?.setValue(null);
       this.travelForm.get('CityId')?.setValidators([Validators.required]);
 
-      // نجيب مدن مصر مباشرة
       this.cityList = [];
       const egyptCriteria = {
         pageIndex: 1,
@@ -1059,7 +993,6 @@ export class TravelsFormComponent implements OnInit {
       });
     }
 
-    // نعمل تحديث للفاليديشن
     this.travelForm.get('CountryId')?.updateValueAndValidity();
     this.travelForm.get('CityId')?.updateValueAndValidity();
   }
@@ -1068,31 +1001,33 @@ export class TravelsFormComponent implements OnInit {
     this.selectedImages = Array.from(event);
     this.travelForm.patchValue({ ImagesFiles: this.selectedImages });
   }
-  removeImageFromDB(id) {
-    console.log(id);
-    this.travelService.deleteTravelImage(id).subscribe(
-      (response) => {
+
+  removeImageFromDB(id: any) {
+    this.travelService.deleteTravelImage(id).subscribe({
+      next: (response) => {
         if (response.success) {
           this.toast.success('Successfully Deleted');
         }
       },
-      (error) => {}
-    );
+      error: () => {}
+    });
   }
+
   shouldShowError(controlName: string): boolean {
     const control = this.travelForm.get(controlName);
-    return !!control && control.invalid && control.touched;
+    return !!control && control.invalid && (control.touched || control.dirty || this.travelForm.touched);
   }
-  ///////////////////////////// ---------------- Programs --------------------------//////////////////////  //
+
+  ///////////////////////////// ---------------- Programs --------------------------//////////////////////
 
   isInvalid(controlName: string, stepIndex: number): boolean {
     const control = (this.steps.at(stepIndex) as FormGroup).get(controlName);
-    return (control?.invalid && (control?.dirty || control?.touched)) || false;
+    return (control?.invalid && (control?.dirty || control?.touched || this.tripForm.touched)) || false;
   }
 
   getProgramForm(): FormGroup {
     return (this.tripForm = this.fb.group({
-      tripIds: this.fb.array([]), // تبدأ فاضية، وهنضيف فيها بعد الريسبونس
+      tripIds: this.fb.array([]),
       steps: this.fb.array([this.createStep()])
     }));
   }
@@ -1122,27 +1057,28 @@ export class TravelsFormComponent implements OnInit {
     this.steps.push(this.createStep());
   }
 
-  removeStep(index: number, event): void {
+  removeStep(index: number, event: any): void {
     event.stopPropagation();
     this.steps.removeAt(index);
   }
-  removeStepDB(index, dbIndex, event) {
-  event.stopPropagation();
-  this.travelService.deleteProgramStep(dbIndex).subscribe(
-    (response) => {
-      this.steps.removeAt(index);
-    },
-    (error) => {
-      this.toast.error(error.error.message);
-    }
-  );
-}
+
+  removeStepDB(index: number, dbIndex: any, event: any) {
+    event.stopPropagation();
+    this.travelService.deleteProgramStep(dbIndex).subscribe({
+      next: (response) => {
+        this.steps.removeAt(index);
+      },
+      error: (error) => {
+        this.toast.error(error.error?.message || 'Error deleting step');
+      }
+    });
+  }
 
   getStepDescriptions(index: number): FormArray {
     return this.steps.at(index).get('stepDescriptions') as FormArray;
   }
 
-  addDescriptionStep(stepIndex: number): void {
+  addStepDescription(stepIndex: number): void {
     this.getStepDescriptions(stepIndex).push(
       this.fb.group({
         id: [0],
@@ -1151,8 +1087,16 @@ export class TravelsFormComponent implements OnInit {
     );
   }
 
-  removeDescriptionStep(stepIndex: number, descIndex: number): void {
+  addDescriptionStep(stepIndex: number): void {
+    this.addStepDescription(stepIndex);
+  }
+
+  removeStepDescription(stepIndex: number, descIndex: number): void {
     this.getStepDescriptions(stepIndex).removeAt(descIndex);
+  }
+
+  removeDescriptionStep(stepIndex: number, descIndex: number): void {
+    this.removeStepDescription(stepIndex, descIndex);
   }
 
   dateRangeValidator(form: FormGroup) {
@@ -1166,14 +1110,24 @@ export class TravelsFormComponent implements OnInit {
   }
 
   addProgramToTravel(nextCallback?: EventEmitter<void>) {
-  if (this.tripForm.invalid) {
-  this.steps.markAllAsTouched();
-  return;  // ← إضافة return
-}
-const tripFormValue = this.tripForm.value;
+    if (this.tripForm.invalid) {
+      this.tripForm.markAllAsTouched();
+      this.steps.markAllAsTouched();
+      this.toast.error('Please fill all required program fields', 'Error');
+      return;
+    }
+
+    const tripFormValue = this.tripForm.value;
+    const ids = Array.isArray(this.tripId)
+      ? this.tripId
+      : this.tripId
+        ? [this.tripId]
+        : this.travelId
+          ? [this.travelId]
+          : [];
 
     const formattedData = {
-      tripIds: this.tripId,
+      tripIds: ids,
       steps: tripFormValue.steps.map((step: any) => ({
         type: step.type,
         title: step.title,
@@ -1191,73 +1145,81 @@ const tripFormValue = this.tripForm.value;
       }))
     };
 
-    this.travelService.addProgramSteps(formattedData).subscribe(
-      (response) => {
-        if (response.success) {
+    this.travelService.addProgramSteps(formattedData).subscribe({
+      next: (response: any) => {
+        if (response?.success) {
+          this.toast.success(response.message || 'Programs saved successfully', 'Success');
           if (nextCallback) {
-            nextCallback.emit();
+            setTimeout(() => nextCallback.emit(), 100);
           }
         }
       },
-      (error) => {
-        this.toast.error('error in adding program to travel', 'error');
+      error: (error) => {
+        this.toast.error(error.error?.message || 'Error adding program to travel', 'Error');
       }
-    );
+    });
   }
 
   updateProgramToTravel(nextCallback?: EventEmitter<void>) {
     if (this.tripForm.invalid) {
+      this.tripForm.markAllAsTouched();
       this.steps.markAllAsTouched();
+      this.toast.error('Please fill all required program fields', 'Error');
+      return;
     }
-    const tripFormValue = this.tripForm.value;
 
+    const tripFormValue = this.tripForm.value;
     const formattedData = tripFormValue.steps.map((step: any) => ({
       id: step.id ?? 0,
       type: step.type,
       title: step.title,
       details: step.details,
       time: this.toDateOnlyString(step.time),
-      //fromLocation: step.fromLocation,
-      //toLocation: step.toLocation,
-      //fromTime: step.fromTime,
-      //toTime: step.toTime,
-      //latitude: step.latitude,
-      //longitude: step.longitude,
       stepDescriptions: step.stepDescriptions.map((desc: any) => ({
         id: desc.id ?? 0,
         description: desc.description
       }))
     }));
 
-    // لو مفيش ولا step ليه id > 0 يبقى Add
     const isNewProgram = !formattedData.some((step) => step.id && step.id > 0);
 
     if (isNewProgram) {
-      this.travelService.addProgramSteps({ tripIds: [this.travelId], steps: formattedData }).subscribe(
-        (response) => {
-          if (response.success) {
-            nextCallback?.emit();
+      this.travelService.addProgramSteps({ tripIds: [this.travelId], steps: formattedData }).subscribe({
+        next: (response: any) => {
+          if (response?.success) {
+            this.toast.success(response.message || 'Programs saved successfully', 'Success');
+            if (nextCallback) {
+              setTimeout(() => nextCallback.emit(), 100);
+            }
           }
         },
-        (error) => {
-          this.toast.error('error in adding program to travel', 'error');
+        error: (error) => {
+          this.toast.error(error.error?.message || 'Error adding program to travel', 'Error');
         }
-      );
+      });
     } else {
-      this.travelService.updateProgramSteps(this.travelId, formattedData).subscribe(
-        (response) => {
-          if (response.success) {
-            nextCallback?.emit();
+      this.travelService.updateProgramSteps(this.travelId, formattedData).subscribe({
+        next: (response: any) => {
+          if (response?.success) {
+            this.toast.success(response.message || 'Programs updated successfully', 'Success');
+            if (nextCallback) {
+              setTimeout(() => nextCallback.emit(), 100);
+            }
           }
         },
-        (error) => {
-          this.toast.error('error in adding program to travel', 'error');
+        error: (error) => {
+          this.toast.error(error.error?.message || 'Error updating program to travel', 'Error');
         }
-      );
+      });
     }
   }
 
-  // /////////////////------------------ Discard changes and Go back ---------------/////////////////////
+  private toIsoString(date: any): string | null {
+    if (!date) return null;
+    const parsed = new Date(date);
+    if (isNaN(parsed.getTime())) return null;
+    return parsed.toISOString();
+  }
 
   onCancel(): void {
     this.travelForm.reset();

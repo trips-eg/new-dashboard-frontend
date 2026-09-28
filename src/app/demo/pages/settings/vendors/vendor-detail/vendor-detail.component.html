@@ -832,16 +832,42 @@
   </div>
   <div class="mb-4" *ngIf="CompanyId || vendorId">
     <p-panel header="{{ 'Reservation History' | translate }}" [toggleable]="true" class="mt-4">
-      <div class="flex justify-end mb-3" *ngIf="!isVendor()">
-        <p-button
-          [label]="'payments' | translate"
-          pTooltip="archive payments"
-          tooltipPosition="bottom"
-          icon="pi pi-pen-to-square"
-          class="p-button-primary"
-          (onClick)="openPaymentsForm()"
-          [disabled]="!selectedItems || selectedItems.length === 0"
-        ></p-button>
+      <!-- Floating Selection Action Bar -->
+      <div
+        class="sticky-selection-bar p-3 surface-card border-round-lg shadow-2 border-1 surface-border mb-3 flex align-items-center justify-content-between flex-wrap gap-2 animate-fadein"
+        *ngIf="!isVendor() && selectedItems && selectedItems.length > 0"
+      >
+        <div class="flex align-items-center gap-3">
+          <div class="border-circle bg-primary-100 text-primary-700 flex align-items-center justify-content-center p-2" style="width: 2.25rem; height: 2.25rem;">
+            <i class="pi pi-check-square font-bold text-sm"></i>
+          </div>
+          <div>
+            <span class="font-bold text-900 text-sm block">
+              {{ selectedItems.length }} {{ 'itemsSelected' | translate }}
+            </span>
+            <span class="text-500 text-xs">
+              {{ 'Ready for settlement processing' | translate }}
+            </span>
+          </div>
+        </div>
+        <div class="flex align-items-center gap-2">
+          <button
+            pButton
+            type="button"
+            [label]="'Clear Selection' | translate"
+            icon="pi pi-times"
+            class="p-button-outlined p-button-secondary p-button-sm text-xs"
+            (click)="clearAllSelections()"
+          ></button>
+          <button
+            pButton
+            type="button"
+            [label]="'Process Selected Payout' | translate"
+            icon="pi pi-wallet"
+            class="p-button-primary p-button-sm font-bold shadow-1 text-xs"
+            (click)="openPaymentsForm()"
+          ></button>
+        </div>
       </div>
       <p-tabView>
         <!--  Travel -->
@@ -875,6 +901,7 @@
         <p-tabPanel [header]="'outing' | translate" *ngIf="isOutingVendor">
           <ng-template pTemplate="content">
             <app-outing-booking-info
+              #outingsBookingsInfo
               [consumerOutingDetailReserved]="outingsList"
               [totalRecords]="totalRecorsOfOutings"
               [reservationUser]="VendorData"
@@ -888,6 +915,7 @@
         <p-tabPanel [header]="'manasik' | translate" *ngIf="isManasikVendor">
           <ng-template pTemplate="content">
             <app-manasik-booking-info
+              #manasikBookingsInfo
               [consumerHajjDetailReserved]="manasikList"
               [totalRecords]="totalRecorsOfManasik"
               [reservationUser]="VendorData"
@@ -907,6 +935,13 @@
           </ng-template>
         </p-tabPanel> -->
       </p-tabView>
+    </p-panel>
+  </div>
+
+  <!-- Dedicated Vendor Settlements Hub -->
+  <div class="mb-4" *ngIf="CompanyId || vendorId">
+    <p-panel header="{{ 'Vendor Settlements Center' | translate }}" [toggleable]="true" class="mt-4">
+      <app-vendor-settlements *ngIf="VendorData?.id" [companyId]="VendorData.id"></app-vendor-settlements>
     </p-panel>
   </div>
 

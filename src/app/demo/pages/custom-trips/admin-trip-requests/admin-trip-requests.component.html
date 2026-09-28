@@ -1,0 +1,899 @@
+<div class="main custom-trips-page">
+  <sub-header
+    [mainHeader]="'Custom Trips' | translate"
+    [mainSection]="'All Requests' | translate"
+    [subSection]="'Requests Monitor' | translate"
+  ></sub-header>
+
+  <!-- Metric KPI Summary Strip -->
+  <div class="row g-3 mt-1 mb-4">
+    <!-- Card 1: Total Traveler Requests -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card shadow-sm rounded-4 p-3 bg-white border h-100 d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted fw-semibold text-xs text-uppercase tracking-wider d-block mb-1">
+            {{ 'Total Requests' | translate }}
+          </span>
+          <div class="text-dark fw-bold fs-3">{{ metrics.total }}</div>
+          <span class="text-xs text-primary fw-medium mt-1 d-inline-flex align-items-center gap-1">
+            <i class="pi pi-users text-xs"></i>
+            {{ 'All Inquiries' | translate }}
+          </span>
+        </div>
+        <div class="kpi-icon-wrapper bg-blue-50 text-blue-600 rounded-3 d-flex align-items-center justify-content-center">
+          <i class="pi pi-compass fs-4"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Active Bidding Windows -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card shadow-sm rounded-4 p-3 bg-white border h-100 d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted fw-semibold text-xs text-uppercase tracking-wider d-block mb-1">
+            {{ 'Receiving Offers' | translate }}
+          </span>
+          <div class="text-dark fw-bold fs-3">{{ metrics.activeWindows }}</div>
+          <span class="text-xs text-success fw-medium mt-1 d-inline-flex align-items-center gap-1">
+            <span class="live-pulse"></span>
+            {{ 'Active Windows' | translate }}
+          </span>
+        </div>
+        <div class="kpi-icon-wrapper bg-green-50 text-green-600 rounded-3 d-flex align-items-center justify-content-center">
+          <i class="pi pi-clock fs-4"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Total Offers Placed Across Marketplace -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card shadow-sm rounded-4 p-3 bg-white border h-100 d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted fw-semibold text-xs text-uppercase tracking-wider d-block mb-1">
+            {{ 'Total Vendor Offers' | translate }}
+          </span>
+          <div class="text-dark fw-bold fs-3">{{ metrics.totalOffers }}</div>
+          <span class="text-xs text-indigo-600 fw-medium mt-1 d-inline-flex align-items-center gap-1">
+            <i class="pi pi-briefcase text-xs"></i>
+            {{ 'Vendor Bids' | translate }}
+          </span>
+        </div>
+        <div class="kpi-icon-wrapper bg-indigo-50 text-indigo-600 rounded-3 d-flex align-items-center justify-content-center">
+          <i class="pi pi-send fs-4"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: Total Traveler Views -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card shadow-sm rounded-4 p-3 bg-white border h-100 d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted fw-semibold text-xs text-uppercase tracking-wider d-block mb-1">
+            {{ 'Total Traveler Views' | translate }}
+          </span>
+          <div class="text-dark fw-bold fs-3">{{ metrics.totalViews }}</div>
+          <span class="text-xs text-purple-600 fw-medium mt-1 d-inline-flex align-items-center gap-1">
+            <i class="pi pi-eye text-xs"></i>
+            {{ 'Market Reach' | translate }}
+          </span>
+        </div>
+        <div class="kpi-icon-wrapper bg-purple-50 text-purple-600 rounded-3 d-flex align-items-center justify-content-center">
+          <i class="pi pi-eye fs-4"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="card shadow-sm rounded-4 border">
+    <!-- Toolbar -->
+    <div class="toolbar-wrapper p-3 bg-light border-bottom">
+      <div class="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center justify-content-between gap-3">
+        <!-- Search and Dropdowns -->
+        <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 flex-grow-1">
+          <div class="p-inputgroup search-group flex-grow-1">
+            <span class="p-inputgroup-addon bg-white">
+              <i class="pi pi-search text-muted"></i>
+            </span>
+            <input
+              pInputText
+              type="text"
+              [(ngModel)]="destinationFilter"
+              (ngModelChange)="onDestinationChange($event)"
+              [placeholder]="'Search destination or customer...' | translate"
+              class="w-full"
+            />
+            <button
+              *ngIf="destinationFilter"
+              pButton
+              type="button"
+              icon="pi pi-times"
+              class="p-button-text p-button-secondary p-button-sm"
+              (click)="clearSearch()"
+              [pTooltip]="'Clear search' | translate"
+            ></button>
+          </div>
+
+          <!-- Trip Type Dropdown -->
+          <p-dropdown
+            [options]="tripTypeOptions"
+            [(ngModel)]="tripTypeFilter"
+            (ngModelChange)="onFilterChange()"
+            [placeholder]="'All Trip Types' | translate"
+            [showClear]="true"
+            styleClass="w-full sm:w-12rem"
+          ></p-dropdown>
+
+          <!-- Status Dropdown (Real Backend Column) -->
+          <p-dropdown
+            [options]="statusOptions"
+            [(ngModel)]="statusFilter"
+            (ngModelChange)="onFilterChange()"
+            [placeholder]="'All Statuses' | translate"
+            [showClear]="true"
+            styleClass="w-full sm:w-12rem"
+          ></p-dropdown>
+        </div>
+
+        <!-- Real Column Filters & Controls -->
+        <div class="d-flex align-items-center gap-2 flex-wrap justify-content-between justify-content-lg-end">
+          <div class="quick-filter-pills d-flex align-items-center gap-1 flex-wrap">
+            <button
+              pButton
+              type="button"
+              [label]="'Flight Required' | translate"
+              icon="pi pi-send"
+              [class.p-button-outlined]="!needsFlightFilter"
+              severity="info"
+              class="p-button-sm rounded-pill"
+              (click)="toggleFlightFilter()"
+            ></button>
+            <button
+              pButton
+              type="button"
+              [label]="'Visa Required' | translate"
+              icon="pi pi-id-card"
+              [class.p-button-outlined]="!needsVisaFilter"
+              severity="help"
+              class="p-button-sm rounded-pill"
+              (click)="toggleVisaFilter()"
+            ></button>
+          </div>
+
+          <div class="d-flex align-items-center gap-1">
+            <p-button
+              [icon]="hasExpandedRows ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+              [label]="hasExpandedRows ? ('Collapse All' | translate) : ('Expand All' | translate)"
+              [outlined]="true"
+              severity="secondary"
+              size="small"
+              styleClass="rounded-pill"
+              (onClick)="toggleAllRows()"
+            ></p-button>
+            <p-button
+              icon="pi pi-filter-slash"
+              [text]="true"
+              severity="secondary"
+              [rounded]="true"
+              (onClick)="resetFilters()"
+              [pTooltip]="'Reset all filters' | translate"
+              tooltipPosition="top"
+            ></p-button>
+            <p-button
+              icon="pi pi-refresh"
+              [text]="true"
+              [rounded]="true"
+              (onClick)="refresh()"
+              [pTooltip]="'Refresh' | translate"
+              tooltipPosition="top"
+            ></p-button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Filters Badge Strip -->
+    <div *ngIf="hasActiveFilters" class="active-filters-bar d-flex align-items-center gap-2 px-3 py-2 bg-light border-bottom flex-wrap">
+      <span class="text-xs fw-semibold text-muted text-uppercase d-flex align-items-center me-1">
+        <i class="pi pi-filter text-xs me-1"></i>{{ 'Active Filters' | translate }}:
+      </span>
+      <span *ngIf="destinationFilter" class="badge rounded-pill bg-white text-dark border d-inline-flex align-items-center gap-1 py-1 px-2 shadow-xs">
+        <span class="text-muted">{{ 'Destination' | translate }}:</span> {{ destinationFilter }}
+        <i class="pi pi-times text-xs cursor-pointer text-muted hover-text-dark" (click)="clearSearch()"></i>
+      </span>
+      <span *ngIf="tripTypeFilter !== null" class="badge rounded-pill bg-white text-dark border d-inline-flex align-items-center gap-1 py-1 px-2 shadow-xs">
+        <span class="text-muted">{{ 'Type' | translate }}:</span> {{ getTripTypeLabel(tripTypeFilter) }}
+        <i class="pi pi-times text-xs cursor-pointer text-muted hover-text-dark" (click)="clearTripType()"></i>
+      </span>
+      <span *ngIf="statusFilter !== null" class="badge rounded-pill bg-white text-success border border-success-subtle d-inline-flex align-items-center gap-1 py-1 px-2 shadow-xs">
+        <span class="text-muted">{{ 'Status' | translate }}:</span> {{ getStatusLabel(statusFilter) }}
+        <i class="pi pi-times text-xs cursor-pointer" (click)="clearStatus()"></i>
+      </span>
+      <span *ngIf="needsFlightFilter" class="badge rounded-pill bg-white text-primary border border-primary-subtle d-inline-flex align-items-center gap-1 py-1 px-2 shadow-xs">
+        <i class="pi pi-send text-xs"></i> {{ 'Flight Required' | translate }}
+        <i class="pi pi-times text-xs cursor-pointer" (click)="clearFlight()"></i>
+      </span>
+      <span *ngIf="needsVisaFilter" class="badge rounded-pill bg-white text-purple-600 border border-purple-subtle d-inline-flex align-items-center gap-1 py-1 px-2 shadow-xs">
+        <i class="pi pi-id-card text-xs"></i> {{ 'Visa Required' | translate }}
+        <i class="pi pi-times text-xs cursor-pointer" (click)="clearVisa()"></i>
+      </span>
+      <button pButton type="button" class="p-button-link p-button-sm text-xs text-danger p-0 ms-auto text-decoration-none d-inline-flex align-items-center gap-1" (click)="resetFilters()">
+        <i class="pi pi-trash text-xs"></i>{{ 'Clear All' | translate }}
+      </button>
+    </div>
+
+    <!-- Data Table -->
+    <p-table
+      #dt
+      [value]="requests"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [totalRecords]="totalRecords"
+      [loading]="isLoading"
+      [lazy]="true"
+      (onLazyLoad)="loadRequests($event)"
+      [responsiveLayout]="'scroll'"
+      dataKey="id"
+      [showCurrentPageReport]="true"
+      [currentPageReportTemplate]="'showingEntries' | translate"
+      [expandedRowKeys]="expandedRows"
+      styleClass="p-datatable-sm modern-table"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 2.75rem" class="text-center"></th>
+          <th pSortableColumn="customerName" style="min-width: 9.5rem">
+            {{ 'Customer' | translate }}
+            <p-sortIcon field="customerName"></p-sortIcon>
+          </th>
+          <th pSortableColumn="destination" style="min-width: 8.5rem">
+            {{ 'Destination' | translate }}
+            <p-sortIcon field="destination"></p-sortIcon>
+          </th>
+          <th pSortableColumn="tripType" style="min-width: 6.5rem">
+            {{ 'Trip Type' | translate }}
+            <p-sortIcon field="tripType"></p-sortIcon>
+          </th>
+          <th pSortableColumn="travelDate" style="min-width: 7rem">
+            {{ 'Travel Date' | translate }}
+            <p-sortIcon field="travelDate"></p-sortIcon>
+          </th>
+          <th style="min-width: 5.5rem">{{ 'Travelers' | translate }}</th>
+          <th pSortableColumn="status" style="min-width: 7rem">
+            {{ 'Status' | translate }}
+            <p-sortIcon field="status"></p-sortIcon>
+          </th>
+          <th pSortableColumn="viewsCount" style="width: 3.5rem" class="text-center">
+            {{ 'Views' | translate }}
+            <p-sortIcon field="viewsCount"></p-sortIcon>
+          </th>
+          <th pSortableColumn="offersCount" style="width: 3.5rem" class="text-center">
+            {{ 'Offers' | translate }}
+            <p-sortIcon field="offersCount"></p-sortIcon>
+          </th>
+          <th pSortableColumn="offerWindowExpiresAt" style="min-width: 7.5rem">
+            {{ 'Offer Window' | translate }}
+            <p-sortIcon field="offerWindowExpiresAt"></p-sortIcon>
+          </th>
+          <th style="width: 3.5rem" class="text-center">{{ 'actions' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-expanded="expanded" let-request>
+        <tr class="request-row" [class.row-expanded]="expanded">
+          <!-- Expand Row Toggle -->
+          <td class="text-center">
+            <button
+              pButton
+              type="button"
+              [pRowToggler]="request"
+              [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+              class="p-button-text p-button-rounded p-button-secondary p-button-sm expand-btn"
+              [pTooltip]="expanded ? ('Hide Details' | translate) : ('View Details' | translate)"
+              tooltipPosition="top"
+            ></button>
+          </td>
+
+          <!-- Customer Dossier -->
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="customer-avatar d-flex align-items-center justify-content-center">
+                <span>{{ getCustomerInitials(request.customerName) }}</span>
+              </div>
+              <div class="d-flex flex-column">
+                <span class="fw-bold text-dark text-sm">{{ request.customerName }}</span>
+                <a
+                  *ngIf="request.customerPhone"
+                  [href]="'tel:' + request.customerPhone"
+                  class="text-xs text-muted hover-text-primary transition-colors d-flex align-items-center gap-1 text-decoration-none mt-1"
+                  (click)="$event.stopPropagation()"
+                >
+                  <i class="pi pi-phone text-xs"></i>
+                  <span>{{ request.customerPhone }}</span>
+                </a>
+              </div>
+            </div>
+          </td>
+
+          <!-- Destination -->
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="destination-pin-bubble d-flex align-items-center justify-content-center">
+                <i class="pi pi-map-marker text-primary"></i>
+              </div>
+              <div class="d-flex flex-column">
+                <span class="fw-bold text-dark text-sm">{{ request.destination }}</span>
+                <span class="text-xs text-muted mt-1" *ngIf="request.hotelName">
+                  <i class="pi pi-building text-xs me-1"></i>{{ request.hotelName }}
+                </span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Trip Type -->
+          <td>
+            <p-tag
+              [value]="tripTypeLabel(request)"
+              [severity]="request.tripType === 1 ? 'info' : 'warning'"
+              styleClass="text-xs text-uppercase fw-semibold"
+            ></p-tag>
+          </td>
+
+          <!-- Travel Date -->
+          <td>
+            <div class="d-flex flex-column">
+              <span class="d-flex align-items-center gap-1 text-sm text-dark fw-medium">
+                <i class="pi pi-calendar text-muted text-xs"></i>
+                {{ request.travelDate | date: 'mediumDate' }}
+              </span>
+              <span class="text-xs text-muted mt-1">
+                {{ request.numberOfDays }} {{ 'days' | translate }}
+              </span>
+            </div>
+          </td>
+
+          <!-- Travelers -->
+          <td>
+            <div class="d-flex flex-column gap-1">
+              <span class="text-sm fw-semibold text-dark">
+                {{ request.numberOfAdults }} {{ 'Adults' | translate }}
+              </span>
+              <span class="text-xs text-muted" *ngIf="request.numberOfChildren > 0">
+                + {{ request.numberOfChildren }} {{ 'Children' | translate }}
+              </span>
+            </div>
+          </td>
+
+          <!-- Status -->
+          <td>
+            <p-tag
+              [value]="statusLabel(request)"
+              [severity]="statusSeverity(request.status)"
+              styleClass="text-xs fw-semibold px-2 py-1"
+            ></p-tag>
+          </td>
+
+          <!-- Views -->
+          <td class="text-center">
+            <span class="stat-badge text-muted text-xs d-inline-flex align-items-center gap-1">
+              <i class="pi pi-eye text-xs"></i>
+              {{ request.viewsCount }}
+            </span>
+          </td>
+
+          <!-- Offers Count -->
+          <td class="text-center">
+            <p-badge
+              [value]="request.offersCount"
+              [severity]="request.offersCount > 0 ? 'success' : 'secondary'"
+              styleClass="fw-semibold"
+            ></p-badge>
+          </td>
+
+          <!-- Offer Window -->
+          <td>
+            <div class="d-flex flex-column gap-1">
+              <app-countdown-timer
+                [expiresAt]="request.offerWindowExpiresAt"
+                [remainingSeconds]="request.remainingSeconds"
+                [accepting]="request.status === CustomTripRequestStatus.ReceivingOffers || request.isAcceptingOffers"
+              ></app-countdown-timer>
+              <span
+                class="text-2xs text-muted d-flex align-items-center gap-1"
+                *ngIf="request.offerWindowExpiresAt && !request.offerWindowExpiresAt.startsWith('0001')"
+                [pTooltip]="('Expires' | translate) + ': ' + (request.offerWindowExpiresAt | date: 'medium')"
+                tooltipPosition="top"
+              >
+                <i class="pi pi-calendar text-2xs"></i>
+                <span>{{ request.offerWindowExpiresAt | date: 'shortDate' }}</span>
+              </span>
+            </div>
+          </td>
+
+          <!-- Actions -->
+          <td class="text-center">
+            <p-button
+              icon="pi pi-plus"
+              [rounded]="true"
+              [text]="true"
+              severity="primary"
+              (onClick)="openAdminOffer(request, $event)"
+              [pTooltip]="'Add Offer On Behalf Of Vendor' | translate"
+              tooltipPosition="top"
+              *ngIf="request.status === CustomTripRequestStatus.ReceivingOffers || request.isAcceptingOffers"
+            ></p-button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Row Expansion / Request Dossier -->
+      <ng-template pTemplate="rowexpansion" let-request>
+        <tr>
+          <td colspan="11" class="p-0">
+            <div class="expansion-dossier-wrapper bg-slate-50 border-bottom">
+              <!-- 1. Dossier Command Banner -->
+              <div class="dossier-banner px-3 py-2 bg-white border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <div class="d-flex align-items-center flex-wrap gap-2">
+                  <span class="badge bg-dark text-white rounded-pill px-3 py-1 fw-semibold text-xs tracking-wider shadow-xs">
+                    REQ #{{ request.id }}
+                  </span>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="fw-bold text-dark fs-6">{{ request.destination }}</span>
+                    <p-tag
+                      [value]="tripTypeLabel(request)"
+                      [severity]="request.tripType === 1 ? 'info' : 'warning'"
+                      styleClass="text-xs text-uppercase fw-semibold"
+                    ></p-tag>
+                  </div>
+                  <span class="text-muted text-xs ms-1 d-none d-md-inline">•</span>
+                  <span class="text-muted text-xs d-none d-md-inline d-flex align-items-center gap-1">
+                    <i class="pi pi-calendar-plus text-xs"></i>
+                    {{ 'Submitted On' | translate }}: {{ request.createdDate | date: 'medium' }}
+                  </span>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 flex-wrap ms-auto">
+                  <div class="d-flex align-items-center gap-1 px-2 py-1 bg-light rounded border text-xs text-muted">
+                    <i class="pi pi-eye text-primary"></i>
+                    <span class="fw-semibold text-dark">{{ request.viewsCount }}</span> {{ 'Views' | translate }}
+                  </div>
+                  <div class="d-flex align-items-center gap-1 px-2 py-1 bg-light rounded border text-xs text-muted">
+                    <i class="pi pi-briefcase text-success"></i>
+                    <span class="fw-semibold text-dark">{{ request.offers?.length || 0 }}</span> {{ 'Offers' | translate }}
+                  </div>
+                  <div class="d-flex flex-column align-items-end">
+                    <app-countdown-timer
+                      [expiresAt]="request.offerWindowExpiresAt"
+                      [remainingSeconds]="request.remainingSeconds"
+                      [accepting]="request.status === CustomTripRequestStatus.ReceivingOffers || request.isAcceptingOffers"
+                    ></app-countdown-timer>
+                    <span class="text-2xs text-muted mt-1" *ngIf="request.offerWindowExpiresAt && !request.offerWindowExpiresAt.startsWith('0001')">
+                      {{ 'Expires' | translate }}: {{ request.offerWindowExpiresAt | date: 'medium' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Main Content Split: Left (Traveler Specs Bento) & Right (Vendor Offers Hub) -->
+              <div class="p-2 p-md-3">
+                <div class="row g-3">
+                  <!-- Left Column: Traveler Specifications Bento Grid -->
+                  <div class="col-12 col-xl-4 col-lg-5">
+                    <div class="dossier-card card rounded-3 bg-white border shadow-xs h-100 p-0 overflow-hidden">
+                      <!-- Traveler Identity Header -->
+                      <div class="p-2 px-3 bg-light border-bottom">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                          <div class="d-flex align-items-center gap-2">
+                            <div class="customer-avatar-large d-flex align-items-center justify-content-center shadow-xs">
+                              <span>{{ getCustomerInitials(request.customerName) }}</span>
+                            </div>
+                            <div class="d-flex flex-column">
+                              <span class="fw-bold text-dark fs-6 text-truncate" style="max-width: 180px;">{{ request.customerName }}</span>
+                              <span class="text-xs text-muted">ID: #{{ request.customerId }}</span>
+                            </div>
+                          </div>
+                          <span class="badge rounded-pill bg-white text-dark border px-2 py-1 text-xs">
+                            {{ 'Traveler' | translate }}
+                          </span>
+                        </div>
+
+                        <!-- Direct Contact Actions (Call & WhatsApp) -->
+                        <div class="d-flex align-items-center gap-2 mt-2" *ngIf="request.customerPhone">
+                          <a
+                            [href]="'tel:' + request.customerPhone"
+                            class="btn btn-outline-secondary btn-sm flex-fill d-inline-flex align-items-center justify-content-center gap-1 rounded-pill text-xs py-1"
+                            [pTooltip]="'Call Customer' | translate"
+                            tooltipPosition="top"
+                          >
+                            <i class="pi pi-phone text-xs"></i>
+                            <span>{{ request.customerPhone }}</span>
+                          </a>
+                          <a
+                            [href]="getWhatsAppUrl(request.customerPhone)"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="btn btn-whatsapp btn-sm d-inline-flex align-items-center justify-content-center gap-1 rounded-pill text-xs py-1 px-3 shadow-xs"
+                            [pTooltip]="'Chat on WhatsApp' | translate"
+                            tooltipPosition="top"
+                          >
+                            <i class="pi pi-whatsapp text-sm"></i>
+                            <span class="d-none d-sm-inline">{{ 'WhatsApp' | translate }}</span>
+                          </a>
+                        </div>
+                      </div>
+
+                      <!-- 2x2 Bento Spec Tiles -->
+                      <div class="p-2 px-3">
+                        <div class="bento-grid">
+                          <!-- Tile 1: Trip Schedule -->
+                          <div class="bento-tile p-2 rounded-2 border bg-light">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                              <div class="bento-icon-box text-primary bg-primary-subtle">
+                                <i class="pi pi-calendar"></i>
+                              </div>
+                              <span class="text-xs text-muted fw-semibold text-uppercase">{{ 'Trip Schedule' | translate }}</span>
+                            </div>
+                            <div class="fw-bold text-dark text-sm">{{ request.travelDate | date: 'mediumDate' }}</div>
+                            <div class="text-xs text-muted">{{ request.numberOfDays }} {{ 'days' | translate }}</div>
+                          </div>
+
+                          <!-- Tile 2: Party Composition -->
+                          <div class="bento-tile p-2 rounded-2 border bg-light">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                              <div class="bento-icon-box text-info bg-info-subtle">
+                                <i class="pi pi-users"></i>
+                              </div>
+                              <span class="text-xs text-muted fw-semibold text-uppercase">{{ 'Party Composition' | translate }}</span>
+                            </div>
+                            <div class="fw-bold text-dark text-sm">
+                              {{ request.numberOfAdults }} {{ 'Adults' | translate }}
+                            </div>
+                            <div class="text-xs text-muted" *ngIf="request.numberOfChildren > 0">
+                              + {{ request.numberOfChildren }} {{ 'Children' | translate }}
+                            </div>
+                            <div class="text-xs text-muted" *ngIf="!request.numberOfChildren">
+                              {{ 'No children' | translate }}
+                            </div>
+                          </div>
+
+                          <!-- Tile 3: Accommodation -->
+                          <div class="bento-tile p-2 rounded-2 border bg-light">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                              <div class="bento-icon-box text-warning bg-warning-subtle">
+                                <i class="pi pi-building"></i>
+                              </div>
+                              <span class="text-xs text-muted fw-semibold text-uppercase">{{ 'Accommodation' | translate }}</span>
+                            </div>
+                            <div class="fw-bold text-dark text-sm text-truncate" [title]="request.hotelName || ('No specific preference' | translate)">
+                              {{ request.hotelName || ('No specific preference' | translate) }}
+                            </div>
+                            <div class="text-xs text-muted" *ngIf="request.hotelName">{{ 'Preferred Hotel' | translate }}</div>
+                            <div class="text-xs text-muted" *ngIf="!request.hotelName">{{ 'Flexible' | translate }}</div>
+                          </div>
+
+                          <!-- Tile 4: Required Services -->
+                          <div class="bento-tile p-2 rounded-2 border bg-light">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                              <div class="bento-icon-box text-purple-600 bg-purple-subtle">
+                                <i class="pi pi-shield"></i>
+                              </div>
+                              <span class="text-xs text-muted fw-semibold text-uppercase">{{ 'Services' | translate }}</span>
+                            </div>
+                            <div class="d-flex flex-column gap-1">
+                              <div class="d-flex align-items-center justify-content-between text-xs">
+                                <span class="text-muted">{{ 'Flight' | translate }}:</span>
+                                <span class="badge rounded-pill" [ngClass]="request.needsFlight ? 'bg-primary-subtle text-primary border border-primary-subtle' : 'bg-secondary-subtle text-muted'">
+                                  {{ (request.needsFlight ? 'Included' : 'Not Needed') | translate }}
+                                </span>
+                              </div>
+                              <div class="d-flex align-items-center justify-content-between text-xs">
+                                <span class="text-muted">{{ 'Visa' | translate }}:</span>
+                                <span class="badge rounded-pill" [ngClass]="request.needsVisa ? 'bg-purple-subtle text-purple-600 border border-purple-subtle' : 'bg-secondary-subtle text-muted'">
+                                  {{ (request.needsVisa ? 'Included' : 'Not Needed') | translate }}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Children Ages Chips if present -->
+                        <div *ngIf="request.numberOfChildren > 0 && request.childrenAges?.length" class="mt-2 pt-2 border-top">
+                          <span class="text-muted text-xs d-block mb-1">{{ 'Children Ages' | translate }}:</span>
+                          <div class="d-flex flex-wrap gap-1">
+                            <p-tag *ngFor="let age of request.childrenAges" [value]="age + ' ' + ('yrs' | translate)" severity="info" styleClass="text-xs"></p-tag>
+                          </div>
+                        </div>
+
+                        <!-- Customer Special Notes Quote Box -->
+                        <div class="mt-2 pt-2 border-top">
+                          <div class="d-flex align-items-center gap-1 mb-1">
+                            <i class="pi pi-comment text-primary text-xs"></i>
+                            <span class="text-muted text-xs fw-semibold text-uppercase">{{ 'Customer Notes' | translate }}:</span>
+                          </div>
+                          <div class="customer-quote-callout p-2 rounded-2 text-xs" *ngIf="request.additionalNotes; else noCustomerNotesTpl">
+                            "{{ request.additionalNotes }}"
+                          </div>
+                          <ng-template #noCustomerNotesTpl>
+                            <div class="text-muted text-xs fst-italic p-2 bg-light rounded border border-dashed">
+                              {{ 'No special requests noted by traveler' | translate }}
+                            </div>
+                          </ng-template>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Right Column: Vendor Offers & Intelligence Hub -->
+                  <div class="col-12 col-xl-8 col-lg-7">
+                    <div class="dossier-card card rounded-3 bg-white border shadow-xs h-100 p-0 overflow-hidden">
+                      <!-- Header with Action Button -->
+                      <div class="p-2 px-3 bg-light border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                          <div class="hub-icon-circle text-primary bg-white border shadow-xs d-flex align-items-center justify-content-center">
+                            <i class="pi pi-briefcase"></i>
+                          </div>
+                          <div>
+                            <h6 class="m-0 fw-bold text-dark d-flex align-items-center gap-2">
+                              {{ 'Vendor Offers' | translate }}
+                              <span class="badge rounded-pill bg-primary text-white text-xs px-2">{{ request.offers?.length || 0 }}</span>
+                            </h6>
+                            <span class="text-muted text-xs">{{ 'Review proposals, pricing spread, and vendor inclusions' | translate }}</span>
+                          </div>
+                        </div>
+
+                        <p-button
+                          *ngIf="request.status === CustomTripRequestStatus.ReceivingOffers || request.isAcceptingOffers"
+                          [label]="'Add Offer On Behalf Of Vendor' | translate"
+                          icon="pi pi-plus"
+                          size="small"
+                          styleClass="rounded-pill p-button-primary shadow-xs"
+                          (onClick)="openAdminOffer(request, $event)"
+                        ></p-button>
+                      </div>
+
+                      <div class="p-2 px-3">
+                        <!-- Marketplace Financial Spread Overview Bar (When offers > 0) -->
+                        <div class="marketplace-spread-bar mb-2 p-2 px-3 rounded-2 border" *ngIf="request.offers?.length">
+                          <div class="row g-2 text-center text-md-start">
+                            <!-- Lowest Bid / Best Rate -->
+                            <div class="col-12 col-md-4">
+                              <div class="d-flex align-items-center gap-2">
+                                <div class="spread-icon-badge bg-success-subtle text-success">
+                                  <i class="pi pi-star-fill"></i>
+                                </div>
+                                <div>
+                                  <div class="text-xs text-muted text-uppercase fw-semibold">{{ 'Lowest Quote' | translate }}</div>
+                                  <div class="fw-bold text-success fs-6">
+                                    {{ getLowestOffer(request.offers) | number: '1.0-0' }} <span class="text-xs fw-normal text-muted">EGP</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <!-- Market Average -->
+                            <div class="col-12 col-md-4 border-md-start border-md-end px-md-3">
+                              <div class="d-flex align-items-center gap-2">
+                                <div class="spread-icon-badge bg-primary-subtle text-primary">
+                                  <i class="pi pi-chart-line"></i>
+                                </div>
+                                <div>
+                                  <div class="text-xs text-muted text-uppercase fw-semibold">{{ 'Average Quote' | translate }}</div>
+                                  <div class="fw-bold text-primary fs-6">
+                                    {{ getAverageOffer(request.offers) | number: '1.0-0' }} <span class="text-xs fw-normal text-muted">EGP</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <!-- Highest Bid -->
+                            <div class="col-12 col-md-4 px-md-2">
+                              <div class="d-flex align-items-center gap-2">
+                                <div class="spread-icon-badge bg-warning-subtle text-warning">
+                                  <i class="pi pi-arrow-up"></i>
+                                </div>
+                                <div>
+                                  <div class="text-xs text-muted text-uppercase fw-semibold">{{ 'Highest Quote' | translate }}</div>
+                                  <div class="fw-bold text-dark fs-6">
+                                    {{ getHighestOffer(request.offers) | number: '1.0-0' }} <span class="text-xs fw-normal text-muted">EGP</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Offers Table -->
+                        <div class="table-responsive rounded-2 border nested-offers-scroll-wrapper" *ngIf="request.offers?.length; else noOffersDossierTpl">
+                          <p-table [value]="request.offers || []" [responsiveLayout]="'scroll'" styleClass="p-datatable-sm nested-offers-table">
+                            <ng-template pTemplate="header">
+                              <tr>
+                                <th style="min-width: 110px;">{{ 'Vendor' | translate }}</th>
+                                <th style="min-width: 95px;">{{ 'Price' | translate }}</th>
+                                <th style="min-width: 85px;">{{ 'Payment Type' | translate }}</th>
+                                <th style="min-width: 85px;">{{ 'Deposit' | translate }}</th>
+                                <th style="min-width: 80px;">{{ 'Offer Status' | translate }}</th>
+                                <th style="min-width: 85px;">{{ 'Submitted At' | translate }}</th>
+                                <th style="width: 50px;" class="text-center">{{ 'Proposal' | translate }}</th>
+                              </tr>
+                            </ng-template>
+
+                            <ng-template pTemplate="body" let-offer>
+                              <tr [class.highlight-best-rate]="isLowestOffer(offer, request.offers)">
+                                <!-- Vendor -->
+                                <td>
+                                  <div class="d-flex align-items-center gap-2">
+                                    <img
+                                      *ngIf="offer.vendorLogoUrl; else vendorMonogramTpl"
+                                      [src]="offer.vendorLogoUrl"
+                                      [alt]="offer.vendorName"
+                                      class="vendor-avatar-img shadow-xs"
+                                    />
+                                    <ng-template #vendorMonogramTpl>
+                                      <div class="vendor-avatar-monogram d-flex align-items-center justify-content-center">
+                                        <span>{{ getCustomerInitials(offer.vendorName) }}</span>
+                                      </div>
+                                    </ng-template>
+                                    <div class="d-flex flex-column">
+                                      <span class="fw-bold text-dark text-sm">{{ offer.vendorName }}</span>
+                                      <span *ngIf="isLowestOffer(offer, request.offers)" class="badge bg-success-subtle text-success border border-success-subtle text-2xs rounded-pill d-inline-flex align-items-center gap-1 mt-1">
+                                        <i class="pi pi-star-fill text-2xs"></i> {{ 'Best Rate' | translate }}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </td>
+
+                                <!-- Price -->
+                                <td>
+                                  <div class="d-flex flex-column">
+                                    <span class="fw-bold fs-6 text-dark" [class.text-success]="isLowestOffer(offer, request.offers)">
+                                      {{ offer.price | number: '1.0-2' }} <span class="text-xs fw-normal text-muted">EGP</span>
+                                    </span>
+                                  </div>
+                                </td>
+
+                                <!-- Payment Type -->
+                                <td>
+                                  <span class="badge rounded-pill bg-light text-dark border text-xs">
+                                    {{ paymentTypeLabel(offer.paymentType, offer.paymentTypeName) }}
+                                  </span>
+                                </td>
+
+                                <!-- Deposit -->
+                                <td>
+                                  <div *ngIf="offer.depositAmount; else noDepositTpl" class="d-flex flex-column">
+                                    <span class="fw-semibold text-primary text-sm">{{ offer.depositAmount | number: '1.0-2' }} EGP</span>
+                                    <span class="text-2xs text-muted">{{ 'Deposit' | translate }}</span>
+                                  </div>
+                                  <ng-template #noDepositTpl>
+                                    <span class="text-muted text-xs">—</span>
+                                  </ng-template>
+                                </td>
+
+                                <!-- Status -->
+                                <td>
+                                  <p-tag
+                                    [value]="offerStatusLabel(offer.status, offer.statusName)"
+                                    [severity]="offerStatusSeverity(offer.status)"
+                                    styleClass="text-xs fw-semibold px-2 py-1"
+                                  ></p-tag>
+                                </td>
+
+                                <!-- Submitted At -->
+                                <td>
+                                  <span class="text-xs text-muted">{{ offer.createdDate | date: 'shortDate' }}</span>
+                                  <span class="text-2xs text-muted d-block">{{ offer.createdDate | date: 'shortTime' }}</span>
+                                </td>
+
+                                <!-- Notes Toggle -->
+                                <td class="text-center">
+                                  <button
+                                    pButton
+                                    type="button"
+                                    [icon]="isOfferNotesExpanded(offer.id) ? 'pi pi-chevron-up' : 'pi pi-file-edit'"
+                                    class="p-button-text p-button-rounded p-button-sm"
+                                    [class.p-button-secondary]="!isOfferNotesExpanded(offer.id)"
+                                    [class.p-button-primary]="isOfferNotesExpanded(offer.id)"
+                                    (click)="toggleOfferNotes(offer.id, $event)"
+                                    [pTooltip]="(isOfferNotesExpanded(offer.id) ? 'Hide Notes' : 'View Notes') | translate"
+                                    tooltipPosition="top"
+                                  ></button>
+                                </td>
+                              </tr>
+
+                              <!-- Expandable Offer Proposal Notes Row -->
+                              <tr *ngIf="isOfferNotesExpanded(offer.id)" class="vendor-proposal-notes-row">
+                                <td colspan="7" class="p-3 bg-light border-bottom">
+                                  <div class="vendor-proposal-container p-3 rounded-2 bg-white border shadow-xs">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                      <span class="fw-bold text-dark text-xs d-flex align-items-center gap-1">
+                                        <i class="pi pi-file-edit text-primary"></i>
+                                        {{ 'Vendor Proposal Inclusions & Terms' | translate }} ({{ offer.vendorName }})
+                                      </span>
+                                      <span class="badge rounded-pill bg-light text-muted border text-2xs">
+                                        {{ offer.createdDate | date: 'medium' }}
+                                      </span>
+                                    </div>
+                                    <div *ngIf="offer.vendorNotes; else noOfferNotesTpl" class="text-sm text-secondary proposal-notes-content">
+                                      {{ offer.vendorNotes }}
+                                    </div>
+                                    <ng-template #noOfferNotesTpl>
+                                      <span class="text-muted text-xs fst-italic">
+                                        {{ 'No specific proposal notes or exclusions provided with this quotation.' | translate }}
+                                      </span>
+                                    </ng-template>
+                                  </div>
+                                </td>
+                              </tr>
+                            </ng-template>
+                          </p-table>
+                        </div>
+
+                        <!-- Empty State for Offers -->
+                        <ng-template #noOffersDossierTpl>
+                          <div class="empty-offers-dossier text-center py-5 px-3 rounded-2 border border-dashed bg-light">
+                            <div class="empty-icon-circle mx-auto mb-3 d-flex align-items-center justify-content-center">
+                              <i class="pi pi-inbox text-3xl text-primary"></i>
+                            </div>
+                            <h6 class="fw-bold text-dark m-0 mb-1">{{ 'No vendor proposals submitted yet' | translate }}</h6>
+                            <p class="text-muted text-xs m-0 mb-3 max-w-24rem mx-auto">
+                              {{ 'Vendors are reviewing this request. You can also submit a proposal on behalf of a partner vendor.' | translate }}
+                            </p>
+                            <button
+                              *ngIf="request.status === CustomTripRequestStatus.ReceivingOffers || request.isAcceptingOffers"
+                              pButton
+                              type="button"
+                              [label]="'Add Offer On Behalf Of Vendor' | translate"
+                              icon="pi pi-plus"
+                              class="p-button-sm rounded-pill p-button-primary shadow-xs"
+                              (click)="openAdminOffer(request, $event)"
+                            ></button>
+                          </div>
+                        </ng-template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Empty State -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="11" class="p-0">
+            <div class="empty-state-wrapper text-center py-6 px-4">
+              <div class="empty-icon-circle mx-auto mb-3 d-flex align-items-center justify-content-center">
+                <i class="pi pi-compass text-4xl text-primary"></i>
+              </div>
+              <h5 class="fw-bold text-dark m-0 mb-2">{{ 'No trip requests found' | translate }}</h5>
+              <p class="text-muted text-sm m-0 mb-4 max-w-26rem mx-auto">
+                {{ 'No custom traveler inquiries match your current filters. Adjust your search or clear filters to monitor all requests.' | translate }}
+              </p>
+              <div class="d-flex align-items-center justify-content-center gap-2">
+                <button
+                  pButton
+                  type="button"
+                  [label]="'Reset Filters' | translate"
+                  icon="pi pi-filter-slash"
+                  class="p-button-outlined p-button-sm rounded-pill"
+                  (click)="resetFilters()"
+                ></button>
+                <button
+                  pButton
+                  type="button"
+                  [label]="'Refresh' | translate"
+                  icon="pi pi-refresh"
+                  class="p-button-sm rounded-pill"
+                  (click)="refresh()"
+                ></button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

@@ -87,4 +87,31 @@ export class ReservationsService {
   cancelInstaPayBooking(id: number): Observable<any> {
     return this.ApiCallerService.put(`${this.endPoints.cancelInstaPayBooking}${id}`, {});
   }
+
+  // ── Mark Vendor Settled Actions ──
+  markTripVendorSettled(payload: { reservationId: number; settledAmount: number }): Observable<any> {
+    return this.ApiCallerService.post(this.endPoints.markTripVendorSettled, payload);
+  }
+
+  markOutingVendorSettled(payload: { reservationId: number; settledAmount: number }): Observable<any> {
+    return this.ApiCallerService.post(this.endPoints.markOutingVendorSettled, payload);
+  }
+
+  markManasikVendorSettled(payload: { reservationId: number; settledAmount: number }): Observable<any> {
+    return this.ApiCallerService.post(this.endPoints.markManasikVendorSettled, payload);
+  }
+
+  markVendorSettledByModule(moduleType: number, payload: { reservationId: number; settledAmount: number }): Observable<any> {
+    switch (moduleType) {
+      case 1: // Travel / Trip
+        return this.markTripVendorSettled(payload);
+      case 3: // Outing
+        return this.markOutingVendorSettled(payload);
+      case 4: // Manasik / Hajj
+        return this.markManasikVendorSettled(payload);
+      default:
+        return this.markTripVendorSettled(payload);
+    }
+  }
 }
+

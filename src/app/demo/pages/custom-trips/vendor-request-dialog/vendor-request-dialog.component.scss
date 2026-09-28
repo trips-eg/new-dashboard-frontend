@@ -1,0 +1,124 @@
+.request-dialog-container {
+  .fs-7 {
+    font-size: 0.825rem;
+  }
+  .fs-8 {
+    font-size: 0.725rem;
+  }
+  .text-xs {
+    font-size: 0.75rem;
+  }
+
+  .dossier-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0 !important;
+
+    .dossier-header {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+
+    .pin-icon-box {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+    }
+
+    .spec-tile {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+      }
+    }
+
+    .hotel-spec-box {
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+
+      .hotel-icon-circle {
+        width: 32px;
+        height: 32px;
+      }
+    }
+
+    .service-chip {
+      background: #f8fafc;
+      color: #94a3b8;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+
+      &.active {
+        background: #ecfdf5;
+        color: #059669;
+        border-color: #a7f3d0;
+        box-shadow: 0 2px 6px rgba(5, 150, 105, 0.1);
+
+        i {
+          color: #059669;
+        }
+      }
+    }
+
+    .customer-notes-card {
+      background: #f8fafc;
+      border-inline-start: 3px solid #0284c7 !important;
+      border: 1px solid #e2e8f0;
+    }
+  }
+
+  .quotation-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0 !important;
+
+    .payment-option-card {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0 !important;
+      min-height: 90px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: #cbd5e1 !important;
+        background: #f1f5f9;
+      }
+
+      &.selected {
+        background: #f0f9ff;
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 0 1px #0284c7, 0 4px 12px rgba(2, 132, 199, 0.12);
+
+        .radio-dot {
+          border-color: #0284c7;
+          background: #0284c7;
+          box-shadow: inset 0 0 0 3px #ffffff;
+        }
+      }
+
+      .radio-dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid #cbd5e1;
+        display: inline-block;
+        transition: all 0.2s ease;
+      }
+    }
+
+    .deposit-section {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
+
+    .financial-breakdown-card {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border: 1px solid #bae6fd;
+    }
+  }
+
+  .cursor-pointer {
+    cursor: pointer;
+  }
+}

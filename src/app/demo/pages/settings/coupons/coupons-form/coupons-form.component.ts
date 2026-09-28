@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 import { OutingService } from 'src/app/shared/services/outing.service';
 import { HajjUmmrahService } from 'src/app/shared/services/hajj-ummrah.service';
 import { CustomerService } from 'src/app/shared/services/customer.service';
+import { CouponScope } from 'src/app/shared/model/icoupon';
 
 @Component({
   selector: 'app-coupons-form',
@@ -36,6 +37,24 @@ export class CouponsFormComponent implements OnInit {
   HajjUmmrahService = inject(HajjUmmrahService);
   CustomerService = inject(CustomerService);
   lang = this.TranslateService.currentLang;
+
+  // خيارات نطاق الكوبون
+  scopeOptions = [
+    { label: 'General', labelAr: 'عام على كل المنتجات', value: CouponScope.General },
+    { label: 'Applied On Specific Items', labelAr: 'مطبق على منتجات محددة', value: CouponScope.AppliedOnSpecificItems },
+    { label: 'Specific', labelAr: 'محدد لمنتج واحد', value: CouponScope.Specific }
+  ];
+
+  get scopeOptionsTranslated() {
+    return this.scopeOptions.map(opt => ({
+      label: this.lang === 'ar' ? opt.labelAr : opt.label,
+      value: opt.value
+    }));
+  }
+
+  get isGeneralScope(): boolean {
+    return this.couponForm?.get('scope')?.value === CouponScope.General;
+  }
 
   // خيارات نوع الخصم
   discountTypeOptions = [
@@ -101,11 +120,13 @@ export class CouponsFormComponent implements OnInit {
     this.couponForm = this.fb.group({
       code: ['', Validators.required],
       description: [''],
+      warningMessage: [''],
       discountType: [2, Validators.required],
       discountAmount: [0, [Validators.required, Validators.min(1), Validators.max(100)]],
       usageNumber: [0, [Validators.required, Validators.min(1)]],
       startDate: [new Date().toISOString().slice(0, 16), Validators.required],
       endDate: [new Date().toISOString().slice(0, 16), Validators.required],
+      scope: [CouponScope.General, Validators.required],
       isGenral: [true],
       userLimit: [2, [Validators.required, Validators.min(1)]],
       tripIds: [[]],
@@ -127,6 +148,11 @@ export class CouponsFormComponent implements OnInit {
       buyQuantity: [null],
       getQuantity: [null],
       maxFreeQuantity: [null]
+    });
+
+    // عند تغيير نطاق الكوبون نحدث isGenral للتوافق
+    this.couponForm.get('scope')?.valueChanges.subscribe(scopeVal => {
+      this.couponForm.get('isGenral')?.setValue(scopeVal === CouponScope.General, { emitEvent: false });
     });
 
     // عند تغيير نوع الخصم نحدث الـ validation ديناميكياً
@@ -249,20 +275,23 @@ export class CouponsFormComponent implements OnInit {
 
     const formValue = this.couponForm.value;
     const isAll = formValue.audienceType === 'all';
+    const isGeneral = formValue.scope === CouponScope.General;
 
     const trimmedValue = {
       ...formValue,
       code: formValue.code?.trim() || '',
       description: formValue.description?.trim() || '',
+      warningMessage: formValue.warningMessage?.trim() || null,
+      scope: formValue.scope ?? CouponScope.General,
       buyQuantity: formValue.buyQuantity ?? 0,
       getQuantity: formValue.getQuantity ?? 0,
       maxFreeQuantity: formValue.maxFreeQuantity ?? 0,
       startDate: formValue.startDate ? new Date(formValue.startDate).toISOString() : new Date().toISOString(),
       endDate: formValue.endDate ? new Date(formValue.endDate).toISOString() : new Date().toISOString(),
-      tripIds: formValue.tripIds || [],
-      roomIds: formValue.roomIds || [],
-      outingIds: formValue.outingIds || [],
-      hajjIds: formValue.hajjIds || [],
+      tripIds: isGeneral ? [] : (formValue.tripIds || []),
+      roomIds: isGeneral ? [] : (formValue.roomIds || []),
+      outingIds: isGeneral ? [] : (formValue.outingIds || []),
+      hajjIds: isGeneral ? [] : (formValue.hajjIds || []),
       usersId: isAll ? [] : (formValue.usersId || []),
       loginUser: isAll ? true : (formValue.loginUser ?? false),
       anonymous: isAll ? true : (formValue.anonymous ?? false),

@@ -98,6 +98,15 @@
                     tooltipPosition="top">
                 <i class="pi pi-user"></i> {{ 'Targeted' | translate }}
               </span>
+              <span class="mini-tag" *ngIf="coupon.scope === 1" [pTooltip]="'Specific' | translate" tooltipPosition="top" style="background: #e0e7ff; color: #4338ca;">
+                <i class="pi pi-box"></i> {{ 'Specific' | translate }}
+              </span>
+              <span class="mini-tag" *ngIf="coupon.scope === 3" [pTooltip]="'Applied On Specific Items' | translate" tooltipPosition="top" style="background: #ecfdf5; color: #047857;">
+                <i class="pi pi-tags"></i> {{ 'Items' | translate }}
+              </span>
+              <span class="mini-tag" *ngIf="coupon.warningMessage" [pTooltip]="coupon.warningMessage" tooltipPosition="top" style="background: #fef3c7; color: #b45309;">
+                <i class="pi pi-exclamation-triangle"></i>
+              </span>
             </div>
           </div>
         </td>

@@ -1,0 +1,202 @@
+<div class="settlement-dialog-container">
+  <!-- Reservation Context Banner -->
+  <div class="reservation-banner mb-3 p-3 surface-card border-round shadow-1">
+    <div class="flex align-items-center justify-content-between flex-wrap gap-2">
+      <div>
+        <div class="flex align-items-center gap-2 mb-1">
+          <span class="badge bg-primary text-white px-2 py-1 border-round font-semibold text-xs">
+            {{ moduleName }}
+          </span>
+          <span class="text-900 font-bold text-lg">
+            #{{ reservation?.bookingRefernce || reservation?.bookingId || reservation?.id }}
+          </span>
+        </div>
+        <div class="text-600 text-sm flex align-items-center gap-3">
+          <span *ngIf="reservation?.user?.name || reservation?.userdto?.name">
+            <i class="pi pi-user mr-1 text-xs"></i>
+            {{ reservation?.user?.name || reservation?.userdto?.name }}
+          </span>
+          <span *ngIf="vendorName">
+            <i class="pi pi-building mr-1 text-xs text-blue-500"></i>
+            {{ vendorName }}
+          </span>
+        </div>
+      </div>
+      <div>
+        <p-tag
+          [value]="reservation?.vendorSettlementStatus === 2 ? ('fullySettled' | translate) : reservation?.vendorSettlementStatus === 1 ? ('partiallySettled' | translate) : ('notSettled' | translate)"
+          [severity]="reservation?.vendorSettlementStatus === 2 ? 'success' : reservation?.vendorSettlementStatus === 1 ? 'warning' : 'danger'"
+        ></p-tag>
+      </div>
+    </div>
+  </div>
+
+  <!-- Metric Summary Cards -->
+  <div class="grid mb-3">
+    <!-- Calculated Total -->
+    <div class="col-12 md:col-4">
+      <div class="metric-card p-3 border-round surface-50 border-1 surface-border h-full">
+        <div class="flex align-items-center justify-content-between mb-1">
+          <span class="text-500 text-xs font-medium">{{ 'totalCalculated' | translate }}</span>
+          <i class="pi pi-calculator text-blue-500 text-base"></i>
+        </div>
+        <div class="text-900 font-bold text-xl">
+          {{ calculatedAmount | number:'1.2-2' }} <small class="text-xs text-500">EGP</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Already Settled -->
+    <div class="col-12 md:col-4">
+      <div class="metric-card p-3 border-round surface-50 border-1 surface-border h-full">
+        <div class="flex align-items-center justify-content-between mb-1">
+          <span class="text-500 text-xs font-medium">{{ 'currentPaid' | translate }}</span>
+          <i class="pi pi-check-circle text-green-500 text-base"></i>
+        </div>
+        <div class="text-green-600 font-bold text-xl">
+          {{ alreadySettledAmount | number:'1.2-2' }} <small class="text-xs text-500">EGP</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Remaining Balance -->
+    <div class="col-12 md:col-4">
+      <div class="metric-card p-3 border-round surface-50 border-1 surface-border h-full">
+        <div class="flex align-items-center justify-content-between mb-1">
+          <span class="text-500 text-xs font-medium">{{ 'remainingToSettle' | translate }}</span>
+          <i class="pi pi-wallet text-orange-500 text-base"></i>
+        </div>
+        <div class="text-orange-600 font-bold text-xl">
+          {{ remainingAmount | number:'1.2-2' }} <small class="text-xs text-500">EGP</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visual Settlement Progress Bar -->
+  <div class="settlement-progress mb-3 p-2 border-round surface-50 border-1 surface-border">
+    <div class="flex justify-content-between align-items-center mb-1 text-xs font-medium text-600">
+      <span>Settlement Progress</span>
+      <span class="font-bold" [ngClass]="newProgressPercent >= 100 ? 'text-green-600' : 'text-blue-600'">
+        {{ newProgressPercent }}%
+      </span>
+    </div>
+    <div class="progress-track" style="height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; position: relative;">
+      <div
+        class="progress-fill-current"
+        [style.width.%]="currentProgressPercent"
+        style="height: 100%; background: #10b981; position: absolute; left: 0; top: 0; transition: width 0.3s ease;"
+      ></div>
+      <div
+        class="progress-fill-new"
+        [style.width.%]="newProgressPercent"
+        style="height: 100%; background: #3b82f6; opacity: 0.6; position: absolute; left: 0; top: 0; transition: width 0.3s ease;"
+      ></div>
+    </div>
+  </div>
+
+  <!-- Settlement Action Form -->
+  <form [formGroup]="settlementForm" (ngSubmit)="onSubmit()" class="mt-2">
+    <div class="field mb-3">
+      <div class="flex align-items-center justify-content-between mb-2">
+        <label for="settledAmount" class="font-bold text-700 m-0">
+          {{ 'settleAmount' | translate }} <span class="text-danger">*</span>
+        </label>
+        <div class="flex gap-1">
+          <button
+            type="button"
+            pButton
+            label="25%"
+            class="p-button-outlined p-button-secondary p-button-xs py-1 px-2 text-xs"
+            (click)="fillPercentage(0.25)"
+          ></button>
+          <button
+            type="button"
+            pButton
+            label="50%"
+            class="p-button-outlined p-button-secondary p-button-xs py-1 px-2 text-xs"
+            (click)="fillPercentage(0.5)"
+          ></button>
+          <button
+            type="button"
+            pButton
+            label="75%"
+            class="p-button-outlined p-button-secondary p-button-xs py-1 px-2 text-xs"
+            (click)="fillPercentage(0.75)"
+          ></button>
+          <button
+            type="button"
+            pButton
+            [label]="'fillRemainingAmount' | translate"
+            icon="pi pi-bolt"
+            class="p-button-primary p-button-xs py-1 px-2 text-xs"
+            (click)="fillFullRemaining()"
+          ></button>
+        </div>
+      </div>
+
+      <div class="p-inputgroup">
+        <span class="p-inputgroup-addon font-bold text-600">EGP</span>
+        <input
+          id="settledAmount"
+          type="number"
+          pInputText
+          formControlName="settledAmount"
+          [placeholder]="'enterSettledAmount' | translate"
+          class="w-full font-bold text-lg text-900"
+          min="0.01"
+          step="0.01"
+        />
+      </div>
+
+      <small
+        class="text-danger d-block mt-1"
+        *ngIf="settlementForm.get('settledAmount')?.invalid && (settlementForm.get('settledAmount')?.dirty || settlementForm.get('settledAmount')?.touched)"
+      >
+        {{ 'Value must be greater than 0' | translate }}
+      </small>
+    </div>
+
+    <!-- Live Settlement Preview -->
+    <div class="preview-box p-3 border-round surface-100 mb-3" *ngIf="enteredAmount > 0">
+      <div class="flex align-items-center justify-content-between text-sm mb-1">
+        <span class="text-600">{{ 'vendorSettledAmount' | translate }}:</span>
+        <span class="font-bold text-900">{{ newTotalSettled | number:'1.2-2' }} EGP</span>
+      </div>
+      <div class="flex align-items-center justify-content-between text-sm">
+        <span class="text-600">{{ 'remainingToSettle' | translate }}:</span>
+        <span class="font-bold" [ngClass]="remainingAfterAction === 0 ? 'text-green-600' : 'text-orange-600'">
+          {{ remainingAfterAction | number:'1.2-2' }} EGP
+        </span>
+      </div>
+    </div>
+
+    <!-- Alert if Exceeding Calculated -->
+    <div *ngIf="isExceedingCalculated" class="alert alert-warning py-2 px-3 text-xs mb-3 border-round flex align-items-center gap-2">
+      <i class="pi pi-exclamation-triangle text-orange-500 text-base"></i>
+      <span>The entered amount will cause total settled amount to exceed the calculated entitlement.</span>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-content-end align-items-center gap-2 mt-4 pt-3 border-top-1 surface-border">
+      <button
+        pButton
+        type="button"
+        [label]="'Cancel' | translate"
+        icon="pi pi-times"
+        class="p-button-outlined p-button-secondary"
+        (click)="onCancel()"
+        [disabled]="isSubmitting"
+      ></button>
+      <button
+        pButton
+        type="submit"
+        [label]="'confirmSettlement' | translate"
+        icon="pi pi-check"
+        class="p-button-primary font-bold"
+        [loading]="isSubmitting"
+        [disabled]="settlementForm.invalid"
+      ></button>
+    </div>
+  </form>
+</div>

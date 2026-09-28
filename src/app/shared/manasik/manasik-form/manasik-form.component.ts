@@ -626,7 +626,10 @@ export class ManasikFormComponent implements OnInit {
     apiCall.subscribe({
       next: (res: any) => {
         if (!this.isEditMode) {
-          this.manasikId = res.data;
+          const createdId = Array.isArray(res?.data)
+            ? res.data[0]
+            : (res?.data?.id ?? res?.data ?? res?.id);
+          this.manasikId = createdId;
           this.isEditMode = true; // Switch to edit mode after creation
         }
 
@@ -641,7 +644,7 @@ export class ManasikFormComponent implements OnInit {
 
         // Go to step 2
         if (nextCallback) {
-          nextCallback.emit();
+          setTimeout(() => nextCallback.emit(), 100);
         }
       },
       error: (err) => {
@@ -650,7 +653,7 @@ export class ManasikFormComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to save manasik information'
+          detail: err.error?.message || 'Failed to save manasik information'
         });
       }
     });
@@ -660,11 +663,23 @@ export class ManasikFormComponent implements OnInit {
   // Submit Step 2
   // -------------------------
   submitStep2(nextCallback?: EventEmitter<void>) {
-    if (!this.manasikId) {
+    const singleManasikId = Array.isArray(this.manasikId) ? this.manasikId[0] : this.manasikId;
+
+    if (!singleManasikId) {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
         detail: 'Please complete Step 1 first'
+      });
+      return;
+    }
+
+    if (this.stepsForm.invalid) {
+      this.stepsForm.markAllAsTouched();
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'Please fill all required program step fields'
       });
       return;
     }
@@ -700,14 +715,17 @@ export class ManasikFormComponent implements OnInit {
     });
 
     const payload = {
-      tripIds: [this.manasikId],
+      tripIds: [singleManasikId],
       steps: stepsWithIsoDates
     };
 
     this.isLoading = true;
 
-    // Use different API based on mode
-    const apiCall = this.isEditMode ? this.service.updateManasikProgram(payload) : this.service.addManasikProgram(payload);
+    // Use add vs update based on whether steps already have database IDs
+    const hasExistingSteps = stepsWithIsoDates.some((step: any) => step.id && step.id > 0);
+    const apiCall = hasExistingSteps
+      ? this.service.updateManasikProgram(payload)
+      : this.service.addManasikProgram(payload);
 
     apiCall.subscribe({
       next: () => {
@@ -722,7 +740,7 @@ export class ManasikFormComponent implements OnInit {
 
         // Go to step 3
         if (nextCallback) {
-          nextCallback.emit();
+          setTimeout(() => nextCallback.emit(), 100);
         }
       },
       error: (err) => {
@@ -731,7 +749,7 @@ export class ManasikFormComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to save program steps'
+          detail: err.error?.message || 'Failed to save program steps'
         });
       }
     });
@@ -741,7 +759,9 @@ export class ManasikFormComponent implements OnInit {
   // Submit Step 3 (Final)
   // -------------------------
   submitStep3() {
-    if (!this.manasikId) {
+    const singleManasikId = Array.isArray(this.manasikId) ? this.manasikId[0] : this.manasikId;
+
+    if (!singleManasikId) {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
@@ -750,11 +770,26 @@ export class ManasikFormComponent implements OnInit {
       return;
     }
 
+    // If user filled the top buffer without clicking Add to List, automatically add it
+    if (this.ticketsForm.valid && this.ticketsForm.get('ticketType')?.value) {
+      this.addTicket();
+    }
+
     if (this.tickets.length === 0) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Warning',
-        detail: 'Please add at least one ticket'
+        detail: 'Please add at least one ticket to the list'
+      });
+      return;
+    }
+
+    if (this.tickets.invalid) {
+      this.tickets.markAllAsTouched();
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'Please ensure all ticket rows have valid values'
       });
       return;
     }
@@ -784,14 +819,15 @@ export class ManasikFormComponent implements OnInit {
     });
 
     const payload = {
-      hajjId: this.manasikId,
+      hajjId: singleManasikId,
       tickets: ticketsPayload
     };
 
     this.isLoading = true;
-    const apiCall = this.isEditMode
-      ? this.service.updateManasikTicket(payload) // ✅ NEW - Uses POST
-      : this.service.addManasikTicket(payload); // Existing - Uses POST
+    const hasExistingTickets = ticketsPayload.some((ticket: any) => ticket.id && ticket.id > 0);
+    const apiCall = hasExistingTickets
+      ? this.service.updateManasikTicket(payload)
+      : this.service.addManasikTicket(payload);
 
     apiCall.subscribe({
       next: () => {
@@ -806,10 +842,9 @@ export class ManasikFormComponent implements OnInit {
 
         // Navigate back to list after 1 second
         setTimeout(() => {
-          debugger;
           if (this.type == ManasikType.Hajj) {
             this.router.navigate(['/hajj']);
-          } else if (this.type == ManasikType.Umrah) {
+          } else {
             this.router.navigate(['/ummrah']);
           }
         }, 1000);
@@ -820,7 +855,7 @@ export class ManasikFormComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to save tickets'
+          detail: err.error?.message || 'Failed to save tickets'
         });
       }
     });

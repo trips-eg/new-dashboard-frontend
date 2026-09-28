@@ -172,6 +172,23 @@
             </div>
           </div>
         </div>
+
+        <!-- Warning Message -->
+        <div class="field col-12">
+          <label for="warningMessage" class="font-semibold mb-1 flex align-items-center gap-1">
+            <i class="pi pi-exclamation-triangle text-warning"></i>
+            <span>{{ 'Warning Message' | translate }}</span>
+            <small class="text-500 font-normal">({{ 'Optional warning shown to customer' | translate }})</small>
+          </label>
+          <input
+            id="warningMessage"
+            type="text"
+            formControlName="warningMessage"
+            pInputText
+            class="w-full"
+            placeholder="{{ 'e.g. This coupon is non-refundable' | translate }}"
+          />
+        </div>
       </div>
     </div>
 
@@ -183,19 +200,30 @@
       </div>
 
       <div class="formgrid grid">
-        <!-- Is General -->
-        <div class="field col-12 flex justify-content-between align-items-center mb-3">
-          <div>
-            <h5 class="m-0 font-bold">{{ 'General Coupon' | translate }}</h5>
-            <small class="text-500">{{ 'Apply this coupon to all items across the platform' | translate }}</small>
-          </div>
-          <p-inputSwitch formControlName="isGenral"></p-inputSwitch>
+        <!-- Coupon Scope Selection -->
+        <div class="field col-12 col-md-6 mb-3">
+          <label for="scope" class="font-semibold mb-1 block">{{ 'Coupon Scope' | translate }}</label>
+          <p-dropdown
+            id="scope"
+            [options]="scopeOptionsTranslated"
+            formControlName="scope"
+            optionLabel="label"
+            optionValue="value"
+            class="w-full"
+            placeholder="{{ 'Select Scope' | translate }}"
+            appendTo="body"
+          ></p-dropdown>
+          <small class="text-500 block mt-1">
+            {{ couponForm.get('scope')?.value === 2 
+                ? ('Apply this coupon to all items across the platform' | translate) 
+                : ('Select the specific items this coupon applies to' | translate) }}
+          </small>
         </div>
 
-        <!-- Trips & Rooms if not isGenral -->
+        <!-- Trips & Rooms if not General Scope -->
         <div
           class="col-12 grid border-1 border-dashed surface-border border-round p-3 bg-light mx-0 mb-2 mt-2"
-          *ngIf="!couponForm.get('isGenral')?.value"
+          *ngIf="!isGeneralScope"
         >
           <div class="field col-12 md:col-6">
             <span class="p-fluid">

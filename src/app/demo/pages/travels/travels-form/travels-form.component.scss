@@ -800,3 +800,103 @@ h2 {
   }
 }
 
+// Trip Dates & Schedules High-End UX Styling
+.trip-dates-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  background: rgba(45, 185, 190, 0.07);
+  border: 1px solid rgba(45, 185, 190, 0.25);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+
+  .notice-icon {
+    font-size: 1.35rem;
+    color: var(--main-color, #2db9be);
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+  }
+
+  .notice-text {
+    font-size: 0.875rem;
+    color: #334155;
+    line-height: 1.5;
+    strong {
+      color: var(--secondary, #21345c);
+    }
+  }
+}
+
+.date-period-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+
+  &:hover {
+    border-color: var(--main-color, #2db9be);
+    box-shadow: 0 4px 14px rgba(45, 185, 190, 0.08);
+  }
+
+  .schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px dashed #e2e8f0;
+
+    .schedule-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--secondary, #21345c);
+    }
+  }
+
+  .connector-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    margin-top: 1.75rem;
+    color: var(--main-color, #2db9be);
+    font-size: 1.25rem;
+    opacity: 0.8;
+  }
+}
+
+.empty-dates-state {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+
+  .empty-icon {
+    font-size: 2.5rem;
+    color: #94a3b8;
+    margin-bottom: 0.75rem;
+  }
+
+  .empty-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.25rem;
+  }
+
+  .empty-subtitle {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-bottom: 1rem;
+  }
+}
+

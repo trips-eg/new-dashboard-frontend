@@ -150,6 +150,48 @@
               </div>
             </div>
 
+            <!-- SECTION 4: ADDITIONAL / OTHER SETTINGS -->
+            <div class="col-12 mb-4 animate-fadein" *ngIf="settingsArray.length > 0 && hasOtherSettings">
+              <h6 class="font-bold text-lg text-teal-700 flex align-items-center mb-3 border-left-3 border-teal-500 pl-2">
+                <i class="pi pi-cog mr-2 text-teal-500"></i>
+                {{ 'Additional Coupon Settings' | translate }}
+              </h6>
+              <div class="grid">
+                <ng-container *ngFor="let item of settingsArray.controls; let i = index">
+                  <div *ngIf="!item.get('nameEn')?.value?.toLowerCase()?.includes('weekend') && !item.get('nameEn')?.value?.toLowerCase()?.includes('birthday') && !item.get('nameEn')?.value?.toLowerCase()?.includes('recovery')" [formGroupName]="i" class="col-12 md:col-6 lg:col-3 p-2">
+                    <div class="card p-3 border-1 surface-border border-round shadow-1 bg-surface-50 h-full flex flex-column justify-content-between">
+                      <div>
+                        <label class="block font-bold mb-2 text-700">
+                          {{ translate.currentLang === 'ar' ? (item.get('nameAr')?.value || item.get('nameEn')?.value) : (item.get('nameEn')?.value || item.get('nameAr')?.value) }}
+                        </label>
+                        <div class="field mb-0">
+                          <ng-container *ngIf="item.get('nameEn')?.value?.toLowerCase()?.includes('enabled') || item.get('nameEn')?.value?.toLowerCase()?.includes('general'); else defaultNumber">
+                            <p-dropdown 
+                              [options]="[{label: 'Enabled' | translate, value: 1}, {label: 'Disabled' | translate, value: 0}]" 
+                              formControlName="value"
+                              optionLabel="label"
+                              optionValue="value"
+                              class="w-full"
+                              styleClass="w-full"
+                              appendTo="body"
+                            ></p-dropdown>
+                          </ng-container>
+                          <ng-template #defaultNumber>
+                            <div class="p-inputgroup">
+                              <span class="p-inputgroup-addon">
+                                <i [class]="item.get('nameEn')?.value?.toLowerCase()?.includes('percentage') ? 'pi pi-percentage text-teal-500' : 'pi pi-hashtag text-teal-500'"></i>
+                              </span>
+                              <p-inputNumber formControlName="value" class="w-full" styleClass="w-full"></p-inputNumber>
+                            </div>
+                          </ng-template>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+
             <div *ngIf="settingsArray.length === 0" class="col-12 text-center p-5 surface-50 border-round border-1 surface-border">
               <i class="pi pi-inbox text-5xl text-400 mb-3 block"></i>
               <span class="text-600 font-semibold text-lg block">{{ 'No settings records retrieved' | translate }}</span>
@@ -188,6 +230,22 @@
                   {{ 'Weekend Coupon Config' | translate }}
                 </h5>
                 <p class="text-600 fs-6 mt-1">{{ 'Define base rates and code triggers triggered during weekends.' | translate }}</p>
+              </div>
+
+              <!-- Live Preview Card -->
+              <div class="card p-3 mb-4 border-round bg-indigo-50 border-indigo-200 border-1 flex align-items-center justify-content-between">
+                <div class="flex align-items-center">
+                  <div class="border-circle bg-indigo-100 p-2 mr-3 flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                    <i class="pi pi-bolt text-indigo-700 text-xl"></i>
+                  </div>
+                  <div>
+                    <span class="text-xs text-indigo-600 font-semibold block">{{ 'Current Trigger' | translate }}</span>
+                    <span class="font-bold text-indigo-900 text-base">{{ weekendForm.get('stringValue')?.value || ('Not Set' | translate) }}</span>
+                  </div>
+                </div>
+                <span class="badge bg-indigo-600 text-white font-bold px-3 py-1 border-round-lg text-sm">
+                  {{ weekendForm.get('value')?.value || 0 }}% {{ 'OFF' | translate }}
+                </span>
               </div>
 
               <div class="field mb-3">
@@ -363,6 +421,22 @@
                 <p class="text-600 fs-6 mt-1">{{ 'Configure reward rates automatically applied for users celebrating birthdays.' | translate }}</p>
               </div>
 
+              <!-- Live Preview Card -->
+              <div class="card p-3 mb-4 border-round bg-pink-50 border-pink-200 border-1 flex align-items-center justify-content-between">
+                <div class="flex align-items-center">
+                  <div class="border-circle bg-pink-100 p-2 mr-3 flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                    <i class="pi pi-gift text-pink-700 text-xl"></i>
+                  </div>
+                  <div>
+                    <span class="text-xs text-pink-600 font-semibold block">{{ 'Birthday Code' | translate }}</span>
+                    <span class="font-bold text-pink-900 text-base">{{ birthdayForm.get('stringValue')?.value || ('Not Set' | translate) }}</span>
+                  </div>
+                </div>
+                <span class="badge bg-pink-600 text-white font-bold px-3 py-1 border-round-lg text-sm">
+                  {{ birthdayForm.get('value')?.value || 0 }}% {{ 'OFF' | translate }}
+                </span>
+              </div>
+
               <div class="field mb-3">
                 <label for="birthdayVal" class="block font-semibold mb-1 text-700">{{ 'Discount Rate (%)' | translate }}</label>
                 <div class="p-inputgroup">
@@ -534,6 +608,22 @@
               </div>
 
               <div class="card p-4 border-1 surface-border border-round shadow-2 bg-surface-50 mb-4">
+                <!-- Live Preview Card -->
+                <div class="card p-3 mb-4 border-round bg-orange-50 border-orange-200 border-1 flex align-items-center justify-content-between">
+                  <div class="flex align-items-center">
+                    <div class="border-circle bg-orange-100 p-2 mr-3 flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                      <i class="pi pi-shopping-bag text-orange-700 text-xl"></i>
+                    </div>
+                    <div>
+                      <span class="text-xs text-orange-600 font-semibold block">{{ 'Recovery Code Prefix' | translate }}</span>
+                      <span class="font-bold text-orange-900 text-base">{{ recoveryForm.get('stringValue')?.value || ('Not Set' | translate) }}</span>
+                    </div>
+                  </div>
+                  <span class="badge bg-orange-600 text-white font-bold px-3 py-1 border-round-lg text-sm">
+                    {{ recoveryForm.get('value')?.value || 0 }}% {{ 'Recovery' | translate }}
+                  </span>
+                </div>
+
                 <div class="field mb-4">
                   <label for="recoveryVal" class="block font-semibold mb-2 text-700">{{ 'Discount Rate (%)' | translate }}</label>
                   <div class="p-inputgroup">

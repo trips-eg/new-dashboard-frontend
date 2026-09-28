@@ -28,13 +28,28 @@ export class TravelsListComponent {
   searchedWord: string = '';
   lang: string;
 
-  // Additional filter state
+  // Enhanced filter state
   isExternalTrip: boolean | null = null;
+  selectedTripType: number | null = null;
+  selectedStatus: boolean | null = null;
 
-  travelType = [
-    { label: 'All', value: null },
-    { label: 'Internal', value: false },
-    { label: 'External', value: true }
+  scopeOptions = [
+    { label: 'All Scopes', value: null },
+    { label: 'Internal Trips', value: false },
+    { label: 'External Trips', value: true }
+  ];
+
+  tripTypeOptions = [
+    { label: 'All Types', value: null },
+    { label: 'Normal Trip', value: 1 },
+    { label: 'Periodic Trip', value: 2 },
+    { label: 'Day Use Trip', value: 3 }
+  ];
+
+  statusOptions = [
+    { label: 'All Statuses', value: null },
+    { label: 'Active', value: true },
+    { label: 'Inactive', value: false }
   ];
 
   constructor(
@@ -63,21 +78,85 @@ export class TravelsListComponent {
     return roles.some((role) => role.startsWith('Admin') || role.startsWith('SuperAdmin'));
   }
 
+  canCreate(): boolean {
+    return this.isVendor() || this.isAdmin();
+  }
+
+  isValidDate(dateString?: string): boolean {
+    if (!dateString || dateString.startsWith('0001-01-01')) return false;
+    const d = new Date(dateString);
+    return !isNaN(d.getTime()) && d.getFullYear() > 2000;
+  }
+
+  isMultiDateTrip(travel: any): boolean {
+    if (travel.tripDates && travel.tripDates.length > 0) return true;
+    return !!(travel.startDate && travel.startDate.startsWith('0001-01-01'));
+  }
+
+  getTripTypeBadge(type?: number): { label: string; severity: 'info' | 'warning' | 'success' | 'secondary'; icon: string } {
+    switch (type) {
+      case 1:
+        return { label: 'Normal', severity: 'info', icon: 'pi pi-calendar' };
+      case 2:
+        return { label: 'Periodic', severity: 'warning', icon: 'pi pi-clock' };
+      case 3:
+        return { label: 'Day Use', severity: 'success', icon: 'pi pi-sun' };
+      default:
+        return { label: 'Normal', severity: 'secondary', icon: 'pi pi-tag' };
+    }
+  }
+
   isOldTravel(travel: Travel): boolean {
-    if (!travel.startDate) return false;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+
+    if (travel.tripDates && travel.tripDates.length > 0) {
+      const hasUpcoming = travel.tripDates.some((td: any) => {
+        const targetDate = td.endDate ? new Date(td.endDate) : new Date(td.startDate);
+        targetDate.setHours(0, 0, 0, 0);
+        return targetDate >= today;
+      });
+      return !hasUpcoming;
+    }
+
+    if (!this.isValidDate(travel.startDate)) return false;
     const startDate = new Date(travel.startDate);
     startDate.setHours(0, 0, 0, 0);
     return startDate < today;
+  }
+
+  getDatesTooltip(tripDates: any[]): string {
+    if (!tripDates || !tripDates.length) return '';
+    return tripDates
+      .map((td, index) => {
+        const start = new Date(td.startDate).toLocaleDateString();
+        const end = td.endDate ? new Date(td.endDate).toLocaleDateString() : '';
+        return end ? `#${index + 1}: ${start} ➔ ${end}` : `#${index + 1}: ${start}`;
+      })
+      .join('\n');
+  }
+
+  createTravel() {
+    this.router.navigate(['/travel-form']);
   }
 
   loadTravels(event: TableLazyLoadEvent) {
     this.isLoading = true;
     const basePayload = TableRequestBuilder.build(event, this.searchedWord);
 
+    const customFilters = [...(basePayload.filters || [])];
+
+    if (this.selectedTripType !== null && this.selectedTripType !== undefined) {
+      customFilters.push({ column: 'tripType', value: this.selectedTripType });
+    }
+
+    if (this.selectedStatus !== null && this.selectedStatus !== undefined) {
+      customFilters.push({ column: 'isActive', value: this.selectedStatus });
+    }
+
     const payload = {
       ...basePayload,
+      filters: customFilters,
       CompanyId: this.CompanyId,
       IsExternalTrip: this.isExternalTrip
     };
@@ -97,13 +176,43 @@ export class TravelsListComponent {
     });
   }
 
-  onSearch(event?: any) {
-    this.dt.reset();
+  hasActiveFilters(): boolean {
+    return !!(
+      (this.searchedWord && this.searchedWord.trim().length > 0) ||
+      this.isExternalTrip !== null ||
+      this.selectedTripType !== null ||
+      this.selectedStatus !== null
+    );
   }
 
-  onSelectType(event: any) {
-    this.isExternalTrip = event.value;
-    this.dt.reset();
+  getActiveFilterCount(): number {
+    let count = 0;
+    if (this.searchedWord && this.searchedWord.trim().length > 0) count++;
+    if (this.isExternalTrip !== null) count++;
+    if (this.selectedTripType !== null) count++;
+    if (this.selectedStatus !== null) count++;
+    return count;
+  }
+
+  onSearch(event?: any) {
+    if (this.dt) this.dt.reset();
+  }
+
+  clearSearch() {
+    this.searchedWord = '';
+    if (this.dt) this.dt.reset();
+  }
+
+  onFilterChange() {
+    if (this.dt) this.dt.reset();
+  }
+
+  resetFilters() {
+    this.searchedWord = '';
+    this.isExternalTrip = null;
+    this.selectedTripType = null;
+    this.selectedStatus = null;
+    if (this.dt) this.dt.reset();
   }
 
   goToCompany(companyId: number) {

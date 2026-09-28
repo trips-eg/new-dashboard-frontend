@@ -30,7 +30,9 @@
       <th style="min-width: 200px">{{ 'reservationDate' | translate }}</th>
       <th style="min-width: 200px" *ngIf="showVendorColumn">{{ 'vendorName' | translate }}</th>
 
-      <th style="min-width: 200px">{{ 'isVendorSettled' | translate }}</th>
+      <th style="min-width: 170px">{{ 'vendorSettlementStatus' | translate }}</th>
+      <th style="min-width: 170px">{{ 'vendorCalculatedAmount' | translate }}</th>
+      <th style="min-width: 170px">{{ 'vendorSettledAmount' | translate }}</th>
       <th style="min-width: 200px">{{ 'productPrice' | translate }}</th>
       <th style="min-width: 200px">{{ 'isVatIncluded' | translate }}</th>
       <th style="min-width: 200px">{{ 'salesTaxRate' | translate }}</th>
@@ -61,8 +63,8 @@
       <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'isSalesSettled' | translate }}</th>
 
       <th style="min-width: 250px">{{ 'countDetails' | translate }}</th>
-      <th style="min-width: 150px">{{ 'status' | translate }}</th>
-      <th *ngIf="!isVendor()" style="min-width: 150px">{{ 'actions' | translate }}</th>
+      <th style="min-width: 150px">{{ 'Booking Status' | translate }}</th>
+      <th *ngIf="!isVendor()" style="min-width: 180px">{{ 'actions' | translate }}</th>
     </tr>
   </ng-template>
 
@@ -71,12 +73,12 @@
       <td *ngIf="!isVendor()" pFrozenColumn alignFrozen="left">
         <p-tableCheckbox
           [value]="hajj"
-          [disabled]="hajj.isVendorSettled || !hajj.allowedToSettlement"
+          [disabled]="hajj.vendorSettlementStatus === 2 || !hajj.allowedToSettlement"
           [ngClass]="{
-            'checkbox-disabled-green': hajj.isVendorSettled,
-            'checkbox-disabled-red': !hajj.allowedToSettlement && !hajj.isVendorSettled
+            'checkbox-disabled-green': hajj.vendorSettlementStatus === 2,
+            'checkbox-disabled-red': !hajj.allowedToSettlement && hajj.vendorSettlementStatus !== 2
           }"
-          [pTooltip]="hajj.isVendorSettled ? 'تمت تسويته' : !hajj.allowedToSettlement ? 'غير مسموح بالتسوية' : null"
+          [pTooltip]="hajj.vendorSettlementStatus === 2 ? ('fullySettled' | translate) : !hajj.allowedToSettlement ? ('غير مسموح بالتسوية' | translate) : null"
         />
       </td>
 
@@ -97,9 +99,15 @@
       </td>
       <td>
         <p-tag
-          [value]="hajj.isVendorSettled ? 'تم التسوية' : 'لم تُسوى '"
-          [severity]="hajj.isVendorSettled ? 'success' : 'warning'"
+          [value]="getVendorSettlementStatusLabel(hajj.vendorSettlementStatus)"
+          [severity]="getVendorSettlementStatusSeverity(hajj.vendorSettlementStatus)"
         ></p-tag>
+      </td>
+      <td class="font-bold text-blue-600">
+        {{ (hajj.vendorCalculatedAmount ?? hajj.vendorProfitAfterCoupon ?? hajj.productPrice ?? 0) | number:'1.2-2' }}
+      </td>
+      <td class="font-bold text-green-600">
+        {{ (hajj.vendorSettledAmount ?? 0) | number:'1.2-2' }}
       </td>
 
       <td>{{ hajj.productPrice }}</td>
@@ -142,12 +150,21 @@
       </td>
 
       <td>
-        <span [ngClass]="getStatusClass(hajj.status)" class="status-badge">
-          {{ getStatusLabel(hajj.status) }}
-        </span>
+        <p-tag
+          [value]="getStatusLabel(hajj.status)"
+          [severity]="getBookingStatusSeverity(hajj.status)"
+        ></p-tag>
       </td>
 
       <td *ngIf="!isVendor()" class="flex align-items-center gap-2">
+        <p-button icon="pi pi-wallet"
+                  [text]="true"
+                  severity="success"
+                  (onClick)="openMarkVendorSettled(hajj)"
+                  [disabled]="hajj.vendorSettlementStatus === 2 || !hajj.allowedToSettlement"
+                  [pTooltip]="'settleVendor' | translate"
+                  tooltipPosition="top"
+                  styleClass="p-button-rounded" />
         <p-button label="refund"
                   [text]="true"
                   severity="warning"

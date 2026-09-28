@@ -1,0 +1,429 @@
+<div class="main custom-trips-page">
+  <sub-header
+    [mainHeader]="'Custom Trips' | translate"
+    [mainSection]="'Trip Requests' | translate"
+    [subSection]="'Available Requests' | translate"
+  ></sub-header>
+
+  <!-- Metric KPI Summary Strip -->
+  <div class="row g-3 mt-1 mb-4">
+    <!-- Card 1: Total Available Requests -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card shadow-sm rounded-4 p-3 bg-white border h-100 d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted fw-semibold text-xs text-uppercase tracking-wider d-block mb-1">
+            {{ 'Total Requests' | translate }}
+          </span>
+          <div class="text-dark fw-bold fs-3">{{ metrics.total }}</div>
+          <span class="text-xs text-primary fw-medium mt-1 d-inline-flex align-items-center gap-1">
+            <i class="pi pi-arrow-up-right text-xs"></i>
+            {{ 'In Marketplace' | translate }}
+          </span>
+        </div>
+        <div class="kpi-icon-wrapper bg-blue-50 text-blue-600 rounded-3 d-flex align-items-center justify-content-center">
+          <i class="pi pi-compass fs-4"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Active Offer Windows -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card shadow-sm rounded-4 p-3 bg-white border h-100 d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted fw-semibold text-xs text-uppercase tracking-wider d-block mb-1">
+            {{ 'Receiving Offers' | translate }}
+          </span>
+          <div class="text-dark fw-bold fs-3">{{ metrics.accepting }}</div>
+          <span class="text-xs text-success fw-medium mt-1 d-inline-flex align-items-center gap-1">
+            <span class="live-pulse"></span>
+            {{ 'Open for bidding' | translate }}
+          </span>
+        </div>
+        <div class="kpi-icon-wrapper bg-green-50 text-green-600 rounded-3 d-flex align-items-center justify-content-center">
+          <i class="pi pi-clock fs-4"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Flight Requests -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card shadow-sm rounded-4 p-3 bg-white border h-100 d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted fw-semibold text-xs text-uppercase tracking-wider d-block mb-1">
+            {{ 'Flights Requested' | translate }}
+          </span>
+          <div class="text-dark fw-bold fs-3">{{ metrics.flights }}</div>
+          <span class="text-xs text-indigo-600 fw-medium mt-1 d-inline-flex align-items-center gap-1">
+            <i class="pi pi-send text-xs"></i>
+            {{ 'Flight Required' | translate }}
+          </span>
+        </div>
+        <div class="kpi-icon-wrapper bg-indigo-50 text-indigo-600 rounded-3 d-flex align-items-center justify-content-center">
+          <i class="pi pi-send fs-4"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: Visa Requests -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card shadow-sm rounded-4 p-3 bg-white border h-100 d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-muted fw-semibold text-xs text-uppercase tracking-wider d-block mb-1">
+            {{ 'Visas Requested' | translate }}
+          </span>
+          <div class="text-dark fw-bold fs-3">{{ metrics.visas }}</div>
+          <span class="text-xs text-purple-600 fw-medium mt-1 d-inline-flex align-items-center gap-1">
+            <i class="pi pi-id-card text-xs"></i>
+            {{ 'Visa Required' | translate }}
+          </span>
+        </div>
+        <div class="kpi-icon-wrapper bg-purple-50 text-purple-600 rounded-3 d-flex align-items-center justify-content-center">
+          <i class="pi pi-id-card fs-4"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Card with Toolbar & Table -->
+  <div class="card shadow-sm rounded-4 border">
+    <!-- Enhanced Toolbar -->
+    <div class="toolbar-wrapper p-3 bg-light border-bottom">
+      <div class="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center justify-content-between gap-3">
+        <!-- Search and Dropdown -->
+        <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 flex-grow-1">
+          <!-- Destination Search -->
+          <div class="p-inputgroup search-group flex-grow-1">
+            <span class="p-inputgroup-addon bg-white">
+              <i class="pi pi-search text-muted"></i>
+            </span>
+            <input
+              pInputText
+              type="text"
+              [(ngModel)]="destinationFilter"
+              (ngModelChange)="onDestinationChange($event)"
+              [placeholder]="'Search destination (e.g. Dubai, Istanbul, Sharm)...' | translate"
+              class="w-full"
+            />
+            <button
+              *ngIf="destinationFilter"
+              pButton
+              type="button"
+              icon="pi pi-times"
+              class="p-button-text p-button-secondary p-button-sm"
+              (click)="clearSearch()"
+              [pTooltip]="'Clear search' | translate"
+            ></button>
+          </div>
+
+          <!-- Trip Type Dropdown -->
+          <p-dropdown
+            [options]="tripTypeOptions"
+            [(ngModel)]="tripTypeFilter"
+            (ngModelChange)="onFilterChange()"
+            [placeholder]="'All Trip Types' | translate"
+            [showClear]="true"
+            styleClass="w-full sm:w-13rem"
+          ></p-dropdown>
+        </div>
+
+        <!-- Real Column Filters & Actions -->
+        <div class="d-flex align-items-center gap-2 flex-wrap justify-content-between justify-content-lg-end">
+          <div class="quick-filter-pills d-flex align-items-center gap-1 flex-wrap">
+            <button
+              pButton
+              type="button"
+              [label]="'All Statuses' | translate"
+              [class.p-button-outlined]="statusFilter !== null || needsFlightFilter || needsVisaFilter"
+              class="p-button-sm rounded-pill"
+              (click)="setQuickFilter('all')"
+            ></button>
+            <button
+              pButton
+              type="button"
+              [label]="'Receiving Offers' | translate"
+              icon="pi pi-clock"
+              [class.p-button-outlined]="statusFilter !== CustomTripRequestStatus.ReceivingOffers"
+              severity="success"
+              class="p-button-sm rounded-pill"
+              (click)="setQuickFilter('receiving')"
+            ></button>
+            <button
+              pButton
+              type="button"
+              [label]="'Flight Required' | translate"
+              icon="pi pi-send"
+              [class.p-button-outlined]="!needsFlightFilter"
+              severity="info"
+              class="p-button-sm rounded-pill"
+              (click)="setQuickFilter('flight')"
+            ></button>
+            <button
+              pButton
+              type="button"
+              [label]="'Visa Required' | translate"
+              icon="pi pi-id-card"
+              [class.p-button-outlined]="!needsVisaFilter"
+              severity="help"
+              class="p-button-sm rounded-pill"
+              (click)="setQuickFilter('visa')"
+            ></button>
+          </div>
+
+          <div class="d-flex align-items-center gap-1">
+            <p-button
+              icon="pi pi-filter-slash"
+              [text]="true"
+              severity="secondary"
+              [rounded]="true"
+              (onClick)="resetFilters()"
+              [pTooltip]="'Reset all filters' | translate"
+              tooltipPosition="top"
+            ></p-button>
+            <p-button
+              icon="pi pi-refresh"
+              [text]="true"
+              [rounded]="true"
+              (onClick)="refresh()"
+              [pTooltip]="'Refresh' | translate"
+              tooltipPosition="top"
+            ></p-button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Filters Badge Strip -->
+    <div *ngIf="hasActiveFilters" class="active-filters-bar d-flex align-items-center gap-2 px-3 py-2 bg-light border-bottom flex-wrap">
+      <span class="text-xs fw-semibold text-muted text-uppercase d-flex align-items-center me-1">
+        <i class="pi pi-filter text-xs me-1"></i>{{ 'Active Filters' | translate }}:
+      </span>
+      <span *ngIf="destinationFilter" class="badge rounded-pill bg-white text-dark border d-inline-flex align-items-center gap-1 py-1 px-2 shadow-xs">
+        <span class="text-muted">{{ 'Destination' | translate }}:</span> {{ destinationFilter }}
+        <i class="pi pi-times text-xs cursor-pointer text-muted hover-text-dark" (click)="clearSearch()"></i>
+      </span>
+      <span *ngIf="tripTypeFilter !== null" class="badge rounded-pill bg-white text-dark border d-inline-flex align-items-center gap-1 py-1 px-2 shadow-xs">
+        <span class="text-muted">{{ 'Type' | translate }}:</span> {{ getTripTypeLabel(tripTypeFilter) }}
+        <i class="pi pi-times text-xs cursor-pointer text-muted hover-text-dark" (click)="clearTripType()"></i>
+      </span>
+      <span *ngIf="statusFilter !== null" class="badge rounded-pill bg-white text-success border border-success-subtle d-inline-flex align-items-center gap-1 py-1 px-2 shadow-xs">
+        <span class="text-muted">{{ 'Status' | translate }}:</span> {{ getStatusLabel(statusFilter) }}
+        <i class="pi pi-times text-xs cursor-pointer" (click)="clearStatus()"></i>
+      </span>
+      <span *ngIf="needsFlightFilter" class="badge rounded-pill bg-white text-primary border border-primary-subtle d-inline-flex align-items-center gap-1 py-1 px-2 shadow-xs">
+        <i class="pi pi-send text-xs"></i> {{ 'Flight Required' | translate }}
+        <i class="pi pi-times text-xs cursor-pointer" (click)="clearFlight()"></i>
+      </span>
+      <span *ngIf="needsVisaFilter" class="badge rounded-pill bg-white text-purple-600 border border-purple-subtle d-inline-flex align-items-center gap-1 py-1 px-2 shadow-xs">
+        <i class="pi pi-id-card text-xs"></i> {{ 'Visa Required' | translate }}
+        <i class="pi pi-times text-xs cursor-pointer" (click)="clearVisa()"></i>
+      </span>
+      <button pButton type="button" class="p-button-link p-button-sm text-xs text-danger p-0 ms-auto text-decoration-none d-inline-flex align-items-center gap-1" (click)="resetFilters()">
+        <i class="pi pi-trash text-xs"></i>{{ 'Clear All' | translate }}
+      </button>
+    </div>
+
+    <!-- Data Table -->
+    <p-table
+      #dt
+      [value]="requests"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [totalRecords]="totalRecords"
+      [loading]="isLoading"
+      [lazy]="true"
+      (onLazyLoad)="loadRequests($event)"
+      [responsiveLayout]="'scroll'"
+      dataKey="id"
+      [showCurrentPageReport]="true"
+      [currentPageReportTemplate]="'showingEntries' | translate"
+      styleClass="p-datatable-sm modern-table"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="destination" style="min-width: 14rem">
+            {{ 'Destination' | translate }}
+            <p-sortIcon field="destination"></p-sortIcon>
+          </th>
+          <th pSortableColumn="tripType" style="min-width: 9rem">
+            {{ 'Trip Type' | translate }}
+            <p-sortIcon field="tripType"></p-sortIcon>
+          </th>
+          <th pSortableColumn="travelDate" style="min-width: 10rem">
+            {{ 'Travel Date' | translate }}
+            <p-sortIcon field="travelDate"></p-sortIcon>
+          </th>
+          <th pSortableColumn="numberOfDays" style="min-width: 8rem">
+            {{ 'Duration' | translate }}
+            <p-sortIcon field="numberOfDays"></p-sortIcon>
+          </th>
+          <th style="min-width: 10rem">{{ 'Travelers' | translate }}</th>
+          <th style="min-width: 11rem">{{ 'Services Needed' | translate }}</th>
+          <th pSortableColumn="offerWindowExpiresAt" style="min-width: 11rem">
+            {{ 'Offer Window' | translate }}
+            <p-sortIcon field="offerWindowExpiresAt"></p-sortIcon>
+          </th>
+          <th style="min-width: 10rem">{{ 'My Offer' | translate }}</th>
+          <th style="min-width: 7rem" class="text-center">{{ 'actions' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-request>
+        <tr class="request-row" (click)="openRequest(request)">
+          <!-- Destination -->
+          <td>
+            <div class="flex align-items-center gap-2">
+              <div class="destination-pin-bubble flex align-items-center justify-content-center">
+                <i class="pi pi-map-marker text-primary"></i>
+              </div>
+              <div class="flex flex-column">
+                <span class="font-bold text-900 line-height-2">{{ request.destination }}</span>
+                <span class="text-xs text-500" *ngIf="request.hotelName">
+                  <i class="pi pi-building text-xs mr-1"></i>{{ request.hotelName }}
+                </span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Trip Type -->
+          <td>
+            <p-tag
+              [value]="tripTypeLabel(request.tripType)"
+              [severity]="request.tripType === 1 ? 'info' : 'warning'"
+              styleClass="text-xs uppercase font-semibold"
+            ></p-tag>
+          </td>
+
+          <!-- Travel Date -->
+          <td>
+            <div class="flex align-items-center gap-2 text-700">
+              <i class="pi pi-calendar text-400"></i>
+              <span>{{ request.travelDate | date: 'mediumDate' }}</span>
+            </div>
+          </td>
+
+          <!-- Duration -->
+          <td>
+            <span class="duration-badge font-semibold text-700">
+              <i class="pi pi-sun text-amber-500 mr-1"></i>
+              {{ request.numberOfDays }} {{ 'days' | translate }}
+            </span>
+          </td>
+
+          <!-- Travelers -->
+          <td>
+            <div class="flex flex-column gap-1">
+              <span class="text-sm font-semibold text-800 flex align-items-center gap-1">
+                <i class="pi pi-users text-500 text-xs"></i>
+                {{ request.numberOfAdults }} {{ 'Adults' | translate }}
+                <span *ngIf="request.numberOfChildren > 0">, {{ request.numberOfChildren }} {{ 'Children' | translate }}</span>
+              </span>
+              <span class="text-xs text-500" *ngIf="request.numberOfChildren > 0 && request.childrenAges?.length">
+                {{ 'Ages' | translate }}: {{ request.childrenAges.join(', ') }}
+              </span>
+            </div>
+          </td>
+
+          <!-- Services Needed -->
+          <td>
+            <div class="flex align-items-center gap-1 flex-wrap">
+              <span
+                class="service-pill"
+                [class.active]="request.needsFlight"
+                [pTooltip]="(request.needsFlight ? 'Flight Required' : 'No Flight Needed') | translate"
+                tooltipPosition="top"
+              >
+                <i class="pi pi-plane"></i>
+                <span class="text-xs">{{ 'Flight' | translate }}</span>
+              </span>
+              <span
+                class="service-pill"
+                [class.active]="request.needsVisa"
+                [pTooltip]="(request.needsVisa ? 'Visa Required' : 'No Visa Needed') | translate"
+                tooltipPosition="top"
+              >
+                <i class="pi pi-id-card"></i>
+                <span class="text-xs">{{ 'Visa' | translate }}</span>
+              </span>
+            </div>
+          </td>
+
+          <!-- Offer Window -->
+          <td>
+            <app-countdown-timer
+              [expiresAt]="request.offerWindowExpiresAt"
+              [accepting]="request.status === CustomTripRequestStatus.ReceivingOffers || request.isAcceptingOffers"
+            ></app-countdown-timer>
+          </td>
+
+          <!-- My Offer Status -->
+          <td>
+            <ng-container *ngIf="request.myOfferStatus !== undefined && request.myOfferStatus !== null; else noOffer">
+              <div class="flex flex-column gap-1">
+                <p-tag
+                  [value]="offerStatusLabel(request.myOfferStatus)"
+                  [severity]="offerStatusSeverity(request.myOfferStatus)"
+                  styleClass="text-xs"
+                ></p-tag>
+                <span class="text-sm font-bold text-900">{{ request.myOfferPrice | number: '1.0-2' }} EGP</span>
+              </div>
+            </ng-container>
+            <ng-template #noOffer>
+              <span class="no-offer-badge text-xs">{{ 'Not Quoted' | translate }}</span>
+            </ng-template>
+          </td>
+
+          <!-- Actions -->
+          <td class="text-center">
+            <p-button
+              [label]="request.myOfferStatus !== null && request.myOfferStatus !== undefined ? ('View' | translate) : ('Offer' | translate)"
+              [icon]="request.myOfferStatus !== null && request.myOfferStatus !== undefined ? 'pi pi-eye' : 'pi pi-send'"
+              [severity]="request.myOfferStatus !== null && request.myOfferStatus !== undefined ? 'secondary' : 'primary'"
+              [outlined]="request.myOfferStatus !== null && request.myOfferStatus !== undefined"
+              size="small"
+              styleClass="border-round-lg px-3 action-cta"
+              (onClick)="openRequest(request); $event.stopPropagation()"
+              [pTooltip]="(request.myOfferStatus !== null && request.myOfferStatus !== undefined ? 'Review / Edit Your Offer' : 'Submit Competitive Offer') | translate"
+              tooltipPosition="top"
+            ></p-button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Rich Empty State -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="9" class="p-0">
+            <div class="empty-state-wrapper text-center py-6 px-4">
+              <div class="empty-icon-circle mx-auto mb-3 flex align-items-center justify-content-center">
+                <i class="pi pi-compass text-4xl text-primary"></i>
+              </div>
+              <h5 class="font-bold text-900 m-0 mb-2">{{ 'No trip requests found' | translate }}</h5>
+              <p class="text-600 text-sm m-0 mb-4 max-w-26rem mx-auto line-height-3">
+                {{ 'No custom traveler requests match your current filters. Adjust your search or clear filters to view all opportunities.' | translate }}
+              </p>
+              <div class="flex align-items-center justify-content-center gap-2">
+                <button
+                  pButton
+                  type="button"
+                  [label]="'Reset Filters' | translate"
+                  icon="pi pi-filter-slash"
+                  class="p-button-outlined p-button-sm border-round-lg"
+                  (click)="resetFilters()"
+                ></button>
+                <button
+                  pButton
+                  type="button"
+                  [label]="'Refresh' | translate"
+                  icon="pi pi-refresh"
+                  class="p-button-sm border-round-lg"
+                  (click)="refresh()"
+                ></button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

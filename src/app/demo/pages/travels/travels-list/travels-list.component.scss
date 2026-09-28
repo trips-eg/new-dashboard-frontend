@@ -89,32 +89,40 @@
   align-items: center !important;
   gap: 0.75rem !important;
 }
-// Table styling - compact size
+// Table styling - compact and refined
 :host ::ng-deep .p-datatable-table {
   width: 100%;
-  min-width: 2000px;
+  min-width: 1450px;
   table-layout: fixed;
 }
 
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr {
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #f0fdfa !important;
+  }
+}
+
 :host ::ng-deep .p-datatable .p-datatable-tbody > tr > td {
-  padding: 0.4rem 0.5rem !important;
+  padding: 0.65rem 0.75rem !important;
   font-size: 13px;
+  vertical-align: middle;
 }
 
 :host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
-  padding: 0.5rem 0.5rem !important;
-  font-size: 14px;
-}
-
-// Align table headings to left
-:host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
-  text-align: left !important;
+  padding: 0.75rem 0.75rem !important;
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+  background-color: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
 }
 
 // Compact filter row styling
 :host ::ng-deep .p-datatable .p-datatable-thead > tr:nth-child(2) > th {
-  padding: 0.25rem 0.5rem !important;
-  background: #f8f9fa;
+  padding: 0.35rem 0.5rem !important;
+  background: #f1f5f9;
 }
 
 :host ::ng-deep .p-datatable .p-column-filter-row {
@@ -126,13 +134,14 @@
 
 :host ::ng-deep .p-datatable .p-column-filter-row .p-inputtext {
   padding: 0.35rem 0.5rem !important;
-  font-size: 13px;
+  font-size: 12px;
+  border-radius: 6px;
 }
 
 :host ::ng-deep .p-datatable .p-column-filter-row .p-column-filter-menu-button,
 :host ::ng-deep .p-datatable .p-column-filter-row .p-column-filter-clear-button {
-  width: 1.75rem !important;
-  height: 1.75rem !important;
+  width: 1.5rem !important;
+  height: 1.5rem !important;
 }
 
 // Hide increase/decrease spinner buttons on numeric filters
@@ -144,16 +153,66 @@
   border-radius: 6px !important;
 }
 
-// Old travel row styling (past check-in date)
+// Old travel row styling (subtle indicator instead of washed out)
 :host ::ng-deep .p-datatable .old-travel-row {
-  background-color: #f5f5f5 !important;
-  color: #888 !important;
-
-  td {
-    color: #888 !important;
-  }
+  background-color: rgba(241, 245, 249, 0.6) !important;
+  opacity: 0.82;
 
   &:hover {
-    background-color: #ebebeb !important;
+    background-color: #f1f5f9 !important;
   }
 }
+
+// ── Filter Card Styling ──
+.filter-card {
+  border: 1px solid #eef2f6 !important;
+  background: #ffffff;
+  border-radius: 12px;
+
+  &__header {
+    background: #f8fafc;
+    border-bottom: 1px solid #eef2f6;
+  }
+
+  &__title {
+    color: #1e293b;
+    font-size: 0.92rem;
+    letter-spacing: -0.01em;
+  }
+
+  &__icon {
+    font-size: 1rem;
+  }
+
+  &__reset {
+    color: #64748b !important;
+    border: 1px solid #cbd5e1 !important;
+    background: transparent !important;
+    font-weight: 500 !important;
+    padding: 0.35rem 0.75rem !important;
+    font-size: 0.8rem !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+
+    &:hover {
+      background: #f1f5f9 !important;
+      color: #0f172a !important;
+      border-color: #94a3b8 !important;
+    }
+  }
+}
+
+.clear-search-icon {
+  z-index: 2;
+  font-size: 0.75rem;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background 0.15s;
+
+  &:hover {
+    background: #e2e8f0;
+    color: #0f172a !important;
+  }
+}
+
+

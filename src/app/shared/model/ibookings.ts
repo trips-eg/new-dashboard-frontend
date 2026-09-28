@@ -1107,6 +1107,23 @@ export interface OutingReservation {
   isAutoCancelled: boolean
   tecket: Ticket
   outingTicketSerialNumbers: OutingTicketSerialNumber[]
+  reservationOutingTickets?: ReservationOutingTicket[]
+}
+
+export interface ReservationOutingTicket {
+  id: number
+  ticketTypeId?: number
+  count?: number
+  price?: number
+  ticketType?: {
+    id?: number
+    ticketType?: string
+    description?: string
+    price?: number
+    availableQuantity?: number
+    isActive?: boolean
+    outingId?: number
+  }
 }
 
 export interface Outing {

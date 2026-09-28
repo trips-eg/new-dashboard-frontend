@@ -97,6 +97,9 @@
                     [showClear]="true"
                     class="w-full"
                   ></p-dropdown>
+                  <small class="p-error" *ngIf="shouldShowError('CountryId')">
+                    {{ 'This field is required' | translate }}
+                  </small>
                 </div>
 
                 <!-- City -->
@@ -162,6 +165,7 @@
                   <label for="gatheringPoint">
                     <i class="pi pi-map-marker mr-1 text-primary"></i>
                     {{ 'Gathering Point Address' | translate }}
+                    <span class="text-danger">*</span>
                   </label>
                   <input
                     id="gatheringPoint"
@@ -685,9 +689,11 @@
                 <div class="ux-card-title-group">
                   <i class="pi pi-calendar"></i>
                   <h3>{{ 'Trip Dates & Schedule' | translate }}</h3>
+                  <span class="badge bg-primary text-white rounded-pill px-2 py-1 text-xs" *ngIf="tripDatesArray.length > 0">
+                    {{ tripDatesArray.length }} {{ (tripDatesArray.length === 1 ? 'Date' : 'Dates') | translate }}
+                  </span>
                 </div>
                 <button
-                  *ngIf="mode !== 'edit'"
                   type="button"
                   pButton
                   icon="pi pi-plus"
@@ -697,24 +703,92 @@
                 ></button>
               </div>
 
-              <!-- Hint Text -->
-              <small class="form-text text-info block mb-3" *ngIf="tripDatesArray.length === 0">
+              <!-- Contextual Type Guidance Notice -->
+              <div class="trip-dates-notice" *ngIf="travelForm.get('TripType')?.value === 1">
+                <i class="pi pi-info-circle notice-icon"></i>
+                <div class="notice-text">
+                  <strong>{{ 'Normal Trip Schedules' | translate }}:</strong>
+                  {{ 'Each departure date lasts for' | translate }} {{ travelForm.get('NumberOfDays')?.value || 1 }} {{ 'days' | translate }}.
+                  {{ 'The return date is automatically calculated. You can add multiple departure dates for this trip.' | translate }}
+                </div>
+              </div>
+
+              <div class="trip-dates-notice" *ngIf="travelForm.get('TripType')?.value === 2">
+                <i class="pi pi-info-circle notice-icon"></i>
+                <div class="notice-text">
+                  <strong>{{ 'Periodic Booking Windows' | translate }}:</strong>
+                  {{ 'Define the start and end dates for each period when travelers are allowed to book this trip.' | translate }}
+                </div>
+              </div>
+
+              <div class="trip-dates-notice" *ngIf="travelForm.get('TripType')?.value === 3">
+                <i class="pi pi-info-circle notice-icon"></i>
+                <div class="notice-text">
+                  <strong>{{ 'Day Use Trip Dates' | translate }}:</strong>
+                  {{ 'This is a single-day excursion (starts and ends on the same day). Add each individual date this trip is available.' | translate }}
+                </div>
+              </div>
+
+              <!-- Empty State -->
+              <div *ngIf="tripDatesArray.length === 0" class="empty-dates-state">
+                <i class="pi pi-calendar-times empty-icon"></i>
+                <div class="empty-title">{{ 'No departure dates added yet' | translate }}</div>
+                <div class="empty-subtitle">{{ 'Add at least one scheduled date so travelers can discover and book this trip' | translate }}</div>
+                <button
+                  type="button"
+                  pButton
+                  icon="pi pi-plus"
+                  label="{{ 'Add First Date' | translate }}"
+                  (click)="addTripDate()"
+                  class="p-button-primary p-button-sm"
+                ></button>
+              </div>
+
+              <!-- Error Text if array is touched and empty -->
+              <small class="p-error block mb-3 font-semibold" *ngIf="tripDatesArray.length === 0 && (travelForm.get('TripDates')?.touched || travelForm.touched)">
+                <i class="pi pi-exclamation-triangle mr-1"></i>
                 {{ 'You must add at least one period' | translate }}
               </small>
 
-              <div formArrayName="TripDates" class="grid formgrid">
+              <!-- Dynamic Dates List -->
+              <div formArrayName="TripDates" class="grid formgrid" *ngIf="tripDatesArray.length > 0">
                 <div *ngFor="let group of tripDatesArray.controls; let i = index" [formGroupName]="i" class="col-12">
                   <div class="date-period-card">
+                    <!-- Schedule Header -->
+                    <div class="schedule-header">
+                      <div class="schedule-title">
+                        <i class="pi pi-calendar text-primary"></i>
+                        <span>{{ 'Schedule' | translate }} #{{ i + 1 }}</span>
+                        <span class="badge bg-light text-secondary border rounded-pill px-2 py-1 text-xs ml-2" *ngIf="travelForm.get('TripType')?.value === 1">
+                          {{ travelForm.get('NumberOfDays')?.value || 1 }} {{ 'Days' | translate }}
+                        </span>
+                        <span class="badge bg-light text-secondary border rounded-pill px-2 py-1 text-xs ml-2" *ngIf="travelForm.get('TripType')?.value === 3">
+                          {{ 'Single Day' | translate }}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        pButton
+                        icon="pi pi-trash"
+                        [text]="true"
+                        (click)="removeTripDate(i)"
+                        class="p-button-danger p-button-rounded p-button-sm"
+                        pTooltip="{{ 'Remove Schedule' | translate }}"
+                        tooltipPosition="top"
+                      ></button>
+                    </div>
+
+                    <!-- Date Pickers Grid -->
                     <div class="grid align-items-center formgrid">
                       <!-- Start Date -->
-                      <div class="col-12 col-md-5 field mb-0">
+                      <div [ngClass]="(travelForm.get('TripType')?.value === 1 || travelForm.get('TripType')?.value === 2) ? 'col-12 col-md-5' : 'col-12 col-md-6'" class="field mb-0">
                         <label>
                           <i class="pi pi-calendar-plus mr-1 text-primary"></i>
-                          {{ 'Start Date' | translate }}
+                          {{ (travelForm.get('TripType')?.value === 3 ? 'Trip Date' : 'Start Date') | translate }}
                         </label>
                         <p-calendar
                           formControlName="startDate"
-                          placeholder="{{ 'Start Date' | translate }}"
+                          placeholder="{{ (travelForm.get('TripType')?.value === 3 ? 'Trip Date' : 'Start Date') | translate }}"
                           [showIcon]="true"
                           dateFormat="dd-mm-yy"
                           [showTime]="false"
@@ -724,14 +798,18 @@
                           class="w-full"
                           (onSelect)="onStartDateChange(group)"
                         ></p-calendar>
-                        <small class="p-error" *ngIf="group.get('startDate')?.invalid && group.get('startDate')?.touched">
-                          {{ 'This field is required' | translate }}
+                        <small class="p-error" *ngIf="group.get('startDate')?.invalid && (group.get('startDate')?.touched || travelForm.touched)">
+                          {{ 'Start Date is required' | translate }}
+                        </small>
+                        <small class="text-muted block mt-1" *ngIf="travelForm.get('TripType')?.value === 3">
+                          <i class="pi pi-sun mr-1"></i>
+                          {{ 'Single day trip (starts and ends on the same day)' | translate }}
                         </small>
                       </div>
 
-                      <!-- Connector Icon (Visual indicator for range) -->
+                      <!-- Connector Icon (For Normal or Periodic trips) -->
                       <div
-                        class="col-12 col-md-1 text-center"
+                        class="col-12 col-md-2 text-center"
                         *ngIf="travelForm.get('TripType')?.value === 1 || travelForm.get('TripType')?.value === 2"
                       >
                         <div class="connector-arrow">
@@ -760,24 +838,28 @@
                           [minDate]="group.get('minEndDate')?.value || minDate"
                           [maxDate]="group.get('maxEndDate')?.value"
                         ></p-calendar>
-                        <small class="p-error" *ngIf="group.get('endDate')?.invalid && group.get('endDate')?.touched">
-                          {{ 'This field is required' | translate }}
+                        <small class="p-error" *ngIf="group.get('endDate')?.invalid && (group.get('endDate')?.touched || travelForm.touched)">
+                          {{ 'End Date is required' | translate }}
                         </small>
-                      </div>
-
-                      <!-- Actions (Delete) -->
-                      <div class="col-12 col-md-1 text-end" *ngIf="mode !== 'edit'">
-                        <button
-                          type="button"
-                          pButton
-                          icon="pi pi-trash"
-                          [text]="true"
-                          (click)="removeTripDate(i)"
-                          class="p-button-danger p-button-rounded mt-2"
-                        ></button>
+                        <small class="text-muted block mt-1" *ngIf="travelForm.get('TripType')?.value === 1">
+                          <i class="pi pi-lock mr-1"></i>
+                          {{ 'Auto-calculated based on trip duration' | translate }}
+                        </small>
                       </div>
                     </div>
                   </div>
+                </div>
+
+                <!-- Bottom Add Date Button -->
+                <div class="col-12 flex justify-content-end mt-2">
+                  <button
+                    type="button"
+                    pButton
+                    icon="pi pi-plus"
+                    label="{{ 'Add Another Date' | translate }}"
+                    (click)="addTripDate()"
+                    class="p-button-outlined p-button-sm"
+                  ></button>
                 </div>
               </div>
             </div>
@@ -800,14 +882,19 @@
               </div>
 
               <div formArrayName="Descriptions">
-                <div *ngFor="let description of descriptions.controls; let i = index" [formGroupName]="i" class="instruction-item">
+                <div *ngFor="let description of descriptions.controls; let i = index" [formGroupName]="i" class="instruction-item mb-2">
                   <div class="instruction-number">#{{ i + 1 }}</div>
-                  <textarea
-                    formControlName="description"
-                    rows="2"
-                    placeholder="{{ 'Enter general instruction (e.g., Bring passport)...' | translate }}"
-                    class="w-full"
-                  ></textarea>
+                  <div class="flex-grow-1">
+                    <textarea
+                      formControlName="description"
+                      rows="2"
+                      placeholder="{{ 'Enter general instruction (e.g., Bring passport)...' | translate }}"
+                      class="w-full"
+                    ></textarea>
+                    <small class="p-error block mt-1" *ngIf="description.get('description')?.invalid && (description.get('description')?.touched || travelForm.touched)">
+                      {{ 'Instruction text is required, or delete this row' | translate }}
+                    </small>
+                  </div>
                   <button
                     type="button"
                     pButton
@@ -917,7 +1004,7 @@
 
               <!-- Form Buttons -->
               <div class="buttonsm">
-                <p-button label="{{ 'Cancel' | translate }}" severity="secondary" type="button" (click)="onCancel()"></p-button>
+                <p-button label="{{ 'Cancel' | translate }}" severity="secondary" type="button" (onClick)="onCancel()"></p-button>
 
                 <p-button
                   label="{{ 'Next' | translate }}"
@@ -925,7 +1012,7 @@
                   severity="success"
                   class="shadow"
                   type="button"
-                  (click)="addTravel(nextCallback)"
+                  (onClick)="addTravel(nextCallback)"
                 ></p-button>
 
                 <p-button
@@ -934,7 +1021,7 @@
                   severity="success"
                   class="shadow"
                   type="button"
-                  (click)="updateTravel(nextCallback)"
+                  (onClick)="updateTravel(nextCallback)"
                 ></p-button>
 
                 <p-button
@@ -980,7 +1067,7 @@
                     </div>
                     <div class="flex align-items-center gap-2">
                       <button
-                        *ngIf="!step.get('id').value"
+                        *ngIf="!step.get('id')?.value"
                         pButton
                         type="button"
                         icon="pi pi-trash"
@@ -989,13 +1076,13 @@
                         (click)="removeStep(i, $event)"
                       ></button>
                       <button
-                        *ngIf="step.get('id').value"
+                        *ngIf="step.get('id')?.value"
                         pButton
                         type="button"
                         icon="pi pi-trash"
                         class="p-button-rounded p-button-text p-button-danger p-0"
                         style="width: 2.2rem; height: 2.2rem"
-                        (click)="removeStepDB(i, step.get('id').value, $event)"
+                        (click)="removeStepDB(i, step.get('id')?.value, $event)"
                       ></button>
                     </div>
                   </div>
@@ -1065,7 +1152,7 @@
                           icon="pi pi-trash"
                           [text]="true"
                           class="p-button-danger p-button-rounded"
-                          (click)="removeDescriptionStep(i, j)"
+                          (click)="removeStepDescription(i, j)"
                         ></button>
                       </div>
 
@@ -1075,7 +1162,7 @@
                         label="{{ 'Add Description' | translate }}"
                         icon="pi pi-plus"
                         class="p-button-text p-button-sm mt-2"
-                        (click)="addDescriptionStep(i)"
+                        (click)="addStepDescription(i)"
                       ></button>
                     </div>
                   </div>
@@ -1093,7 +1180,7 @@
                 severity="success"
                 class="shadow"
                 type="button"
-                (click)="addProgramToTravel(nextCallback)"
+                (onClick)="addProgramToTravel(nextCallback)"
               ></p-button>
 
               <p-button
@@ -1101,7 +1188,7 @@
                 *ngIf="travelId"
                 severity="secondary"
                 type="button"
-                (click)="onCancel()"
+                (onClick)="onCancel()"
               ></p-button>
 
               <p-button
@@ -1110,7 +1197,7 @@
                 severity="success"
                 class="shadow"
                 type="button"
-                (click)="updateProgramToTravel(nextCallback)"
+                (onClick)="updateProgramToTravel(nextCallback)"
               ></p-button>
             </div>
           </form>

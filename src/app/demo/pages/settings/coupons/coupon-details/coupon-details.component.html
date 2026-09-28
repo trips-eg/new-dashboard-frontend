@@ -18,6 +18,9 @@
         <span class="coupon-badge coupon-badge--targeted" *ngIf="coupon.userId">
           <i class="pi pi-user"></i> {{ 'Targeted' | translate }}
         </span>
+        <span class="coupon-badge" style="background: rgba(255,255,255,0.25); color: #fff;">
+          <i class="pi pi-tag"></i> {{ getScopeLabel(coupon.scope) }}
+        </span>
       </div>
 
       <div class="card-top">
@@ -190,9 +193,17 @@
             }}.
           </span>
         </div>
+        <div class="condition-item">
+          <i class="pi pi-tags"></i>
+          <span>{{ 'Scope' | translate }}: <strong>{{ getScopeLabel(coupon.scope) }}</strong></span>
+        </div>
         <div class="condition-item" *ngIf="coupon.description">
           <i class="pi pi-info-circle"></i>
           <span>{{ coupon.description }}</span>
+        </div>
+        <div class="condition-item" *ngIf="coupon.warningMessage" style="color: #b45309; background: #fffbeb; border: 1px solid #fde68a; padding: 8px 12px; border-radius: 6px;">
+          <i class="pi pi-exclamation-triangle" style="color: #d97706; font-size: 1.1rem;"></i>
+          <span><strong>{{ 'Warning' | translate }}:</strong> {{ coupon.warningMessage }}</span>
         </div>
       </div>
 

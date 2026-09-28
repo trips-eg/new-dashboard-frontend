@@ -23,6 +23,7 @@ import { ManasikListComponent } from 'src/app/shared/manasik/manasik-list/manasi
 import { ManasikType } from 'src/app/shared/Enums/manasikType';
 import { ManasikBookingInfoComponent } from 'src/app/shared/tables-booking-info/manasik-booking-info/manasik-booking-info.component';
 import { ScannerPageComponent } from '../../../scanner-page/scanner-page.component';
+import { VendorSettlementsComponent } from '../vendor-settlements/vendor-settlements.component';
 
 
 @Component({
@@ -39,7 +40,8 @@ import { ScannerPageComponent } from '../../../scanner-page/scanner-page.compone
     OutingListComponent,
     ManasikListComponent,
     ManasikBookingInfoComponent,
-    ScannerPageComponent
+    ScannerPageComponent,
+    VendorSettlementsComponent
   ],
   providers: [DialogService],
   templateUrl: './vendor-detail.component.html',
@@ -47,10 +49,11 @@ import { ScannerPageComponent } from '../../../scanner-page/scanner-page.compone
 })
 export class VendorDetailComponent {
   @Input() CompanyId: any;
-  @ViewChild(PaymentsForVendorListComponent) PaymentsForVendorListComponent;
-  @ViewChild('travelsBookingsInfo') travelsBookingsInfo: TravelBookingInfoComponent;
-  @ViewChild('roomsBookingsInfo') roomsBookingsInfo: RoomBookingInfoComponent;
-  paymentsListComp!: PaymentsForVendorListComponent;
+  @ViewChild(PaymentsForVendorListComponent) paymentsListComp!: PaymentsForVendorListComponent;
+  @ViewChild('travelsBookingsInfo') travelsBookingsInfo?: TravelBookingInfoComponent;
+  @ViewChild('roomsBookingsInfo') roomsBookingsInfo?: RoomBookingInfoComponent;
+  @ViewChild('outingsBookingsInfo') outingsBookingsInfo?: OutingBookingInfoComponent;
+  @ViewChild('manasikBookingsInfo') manasikBookingsInfo?: ManasikBookingInfoComponent;
   ref: DynamicDialogRef | undefined;
   isTravelVendor = false;
 
@@ -369,6 +372,14 @@ createvendorSectorStatisticsForm() {
     });
   }
 
+  clearAllSelections(): void {
+    this.selectedItems = [];
+    this.travelsBookingsInfo?.restSelected();
+    this.roomsBookingsInfo?.restSelected();
+    this.outingsBookingsInfo?.restSelected();
+    this.manasikBookingsInfo?.restSelected();
+  }
+
   openPaymentsForm() {
     this.CompaniesWalletService.CallculateSattlements(this.selectedItems).subscribe({
       next: (res) => {
@@ -385,13 +396,16 @@ createvendorSectorStatisticsForm() {
 
         this.ref.onClose.subscribe({
           next: (res) => {
-            this.travelsBookingsInfo.restSelected();
-            this.roomsBookingsInfo.restSelected();
+            this.travelsBookingsInfo?.restSelected();
+            this.roomsBookingsInfo?.restSelected();
+            this.outingsBookingsInfo?.restSelected();
+            this.manasikBookingsInfo?.restSelected();
             this.selectedItems = [];
-            this.paymentsListComp.getPaymentsForVendor();
-            this.getRoomReservationForVendor();
-            this.getTravelReservationForVendor();
-            this.getOutingReservationForVendor();
+            this.paymentsListComp?.getPaymentsForVendor();
+            if (this.isRoomlVendor) this.getRoomReservationForVendor();
+            if (this.isTravelVendor) this.getTravelReservationForVendor();
+            if (this.isOutingVendor) this.getOutingReservationForVendor();
+            if (this.isManasikVendor) this.getManasikReservationForVendor();
           }
         });
       },

@@ -33,7 +33,9 @@
       <th style="min-width: 120px">{{ 'endTime' | translate }}</th>
       <th style="min-width: 200px" *ngIf="showVendorColumn">{{ 'vendorName' | translate }}</th>
       
-      <th style="min-width: 200px">{{ 'isVendorSettled' | translate }}</th>
+      <th style="min-width: 170px">{{ 'vendorSettlementStatus' | translate }}</th>
+      <th style="min-width: 170px">{{ 'vendorCalculatedAmount' | translate }}</th>
+      <th style="min-width: 170px">{{ 'vendorSettledAmount' | translate }}</th>
       <th style="min-width: 200px">{{ 'productPrice' | translate }}</th>
       <th style="min-width: 200px">{{ 'isVatIncluded' | translate }}</th>
       <th style="min-width: 200px">{{ 'salesTaxRate' | translate }}</th>
@@ -64,8 +66,8 @@
       <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'isSalesSettled' | translate }}</th>
       
       <th style="min-width: 250px">{{ 'countDetails' | translate }}</th>
-      <th style="min-width: 150px">{{ 'status' | translate }}</th>
-      <th *ngIf="!isVendor()" style="min-width: 150px">{{ 'actions' | translate }}</th>
+      <th style="min-width: 150px">{{ 'Booking Status' | translate }}</th>
+      <th *ngIf="!isVendor()" style="min-width: 180px">{{ 'actions' | translate }}</th>
     </tr>
   </ng-template>
 
@@ -74,12 +76,12 @@
       <td *ngIf="!isVendor()" pFrozenColumn alignFrozen="left">
         <p-tableCheckbox
           [value]="outing"
-          [disabled]="outing.isVendorSettled || !outing.allowedToSettlement"
+          [disabled]="outing.vendorSettlementStatus === 2 || !outing.allowedToSettlement"
           [ngClass]="{
-            'checkbox-disabled-green': outing.isVendorSettled,
-            'checkbox-disabled-red': !outing.allowedToSettlement && !outing.isVendorSettled
+            'checkbox-disabled-green': outing.vendorSettlementStatus === 2,
+            'checkbox-disabled-red': !outing.allowedToSettlement && outing.vendorSettlementStatus !== 2
           }"
-          [pTooltip]="outing.isVendorSettled ? 'تمت تسويته' : !outing.allowedToSettlement ? 'غير مسموح بالتسوية' : null"
+          [pTooltip]="outing.vendorSettlementStatus === 2 ? ('fullySettled' | translate) : !outing.allowedToSettlement ? ('غير مسموح بالتسوية' | translate) : null"
         />
       </td>
 
@@ -103,9 +105,15 @@
       </td>
       <td>
         <p-tag
-          [value]="outing.isVendorSettled ? 'تم التسوية' : 'لم تُسوى '"
-          [severity]="outing.isVendorSettled ? 'success' : 'warning'"
+          [value]="getVendorSettlementStatusLabel(outing.vendorSettlementStatus)"
+          [severity]="getVendorSettlementStatusSeverity(outing.vendorSettlementStatus)"
         ></p-tag>
+      </td>
+      <td class="font-bold text-blue-600">
+        {{ (outing.vendorCalculatedAmount ?? outing.vendorProfitAfterCoupon ?? outing.productPrice ?? 0) | number:'1.2-2' }}
+      </td>
+      <td class="font-bold text-green-600">
+        {{ (outing.vendorSettledAmount ?? 0) | number:'1.2-2' }}
       </td>
 
       <td>{{ outing.productPrice }}</td>
@@ -143,20 +151,47 @@
       <td *ngIf="!isVendor()">{{ outing.isSalesSettled }}</td>
 
       <td>
-        <div class="flex gap-2">
-          <span class="badge bg-primary text-white px-2 py-1 rounded">Adults: {{ outing.countDetails?.adults || 0 }}</span>
-          <span class="badge bg-info text-white px-2 py-1 rounded">Childs: {{ outing.countDetails?.childs || 0 }}</span>
-          <span class="badge bg-success text-white px-2 py-1 rounded font-bold">Total: {{ outing.countDetails?.total || 0 }}</span>
+        <div *ngIf="outing.reservationOutingTickets && outing.reservationOutingTickets.length > 0; else defaultCountDetails">
+          <div class="d-flex flex-column gap-1">
+            <div
+              *ngFor="let t of outing.reservationOutingTickets"
+              class="d-flex align-items-center justify-content-between gap-2 p-1 px-2 rounded border bg-light"
+            >
+              <span class="fw-semibold text-primary text-xs text-truncate" style="max-width: 170px;" [title]="t.ticketType?.ticketType || t.ticketType?.description || ('Ticket' | translate)">
+                <i class="pi pi-ticket me-1 text-primary"></i>
+                {{ t.ticketType?.ticketType || t.ticketType?.description || ('Ticket' | translate) }}
+              </span>
+              <span class="badge bg-primary text-white rounded-pill px-2 py-1">
+                x{{ t.count || t.quantity || 1 }}
+              </span>
+            </div>
+          </div>
         </div>
+        <ng-template #defaultCountDetails>
+          <div class="d-flex gap-2">
+            <span class="badge bg-primary text-white px-2 py-1 rounded">Adults: {{ outing.countDetails?.adults || 0 }}</span>
+            <span class="badge bg-info text-white px-2 py-1 rounded">Childs: {{ outing.countDetails?.childs || 0 }}</span>
+            <span class="badge bg-success text-white px-2 py-1 rounded font-bold">Total: {{ outing.countDetails?.total || outing.numberOfSeats || outing.quantity || 0 }}</span>
+          </div>
+        </ng-template>
       </td>
 
       <td>
-        <span [ngClass]="getStatusClass(outing.status)" class="status-badge">
-          {{ getStatusLabel(outing.status) }}
-        </span>
+        <p-tag
+          [value]="getStatusLabel(outing.status)"
+          [severity]="getBookingStatusSeverity(outing.status)"
+        ></p-tag>
       </td>
 
       <td *ngIf="!isVendor()" class="flex align-items-center gap-2">
+        <p-button icon="pi pi-wallet"
+                  [text]="true"
+                  severity="success"
+                  (onClick)="openMarkVendorSettled(outing)"
+                  [disabled]="outing.vendorSettlementStatus === 2 || !outing.allowedToSettlement"
+                  [pTooltip]="'settleVendor' | translate"
+                  tooltipPosition="top"
+                  styleClass="p-button-rounded" />
         <p-button label="refund"
                   [text]="true"
                   severity="warning"

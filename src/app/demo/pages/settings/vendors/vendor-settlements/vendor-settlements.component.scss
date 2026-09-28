@@ -1,0 +1,184 @@
+.vendor-settlements-hub {
+  font-family: inherit;
+
+  /* ============================================================
+     1. KPI CARDS (4-IN-A-ROW MODERN DESIGN)
+     ============================================================ */
+  .kpi-card {
+    background: #ffffff;
+    border-radius: 1rem;
+    border: 1px solid #e2e8f0;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.09);
+      border-color: #cbd5e1;
+    }
+
+    &.kpi-blue {
+      &::before {
+        background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      }
+      .kpi-icon-wrapper {
+        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        color: #2563eb;
+        border: 1px solid #bfdbfe;
+      }
+    }
+
+    &.kpi-green {
+      &::before {
+        background: linear-gradient(90deg, #10b981, #34d399);
+      }
+      .kpi-icon-wrapper {
+        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        color: #059669;
+        border: 1px solid #a7f3d0;
+      }
+    }
+
+    &.kpi-orange {
+      &::before {
+        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+      }
+      .kpi-icon-wrapper {
+        background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        color: #d97706;
+        border: 1px solid #fde68a;
+      }
+    }
+
+    &.kpi-red {
+      &::before {
+        background: linear-gradient(90deg, #ef4444, #f87171);
+      }
+      .kpi-icon-wrapper {
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        color: #dc2626;
+        border: 1px solid #fecaca;
+      }
+    }
+
+    .kpi-icon-wrapper {
+      width: 3.25rem;
+      height: 3.25rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+
+    &:hover .kpi-icon-wrapper {
+      transform: scale(1.08);
+    }
+  }
+
+  /* ============================================================
+     2. FILTER & ACTIONS TOOLBAR
+     ============================================================ */
+  .filter-hub-card {
+    background: #ffffff;
+    border-radius: 1rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05);
+
+    .filter-label {
+      font-size: 0.725rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #64748b;
+      margin-bottom: 0.25rem;
+      display: block;
+    }
+  }
+
+  .sector-tabs {
+    button {
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      border-radius: 0.6rem;
+    }
+  }
+
+  .status-btn-group {
+    button {
+      font-size: 0.75rem;
+      padding: 0.35rem 0.65rem;
+    }
+  }
+
+  /* ============================================================
+     3. STICKY SELECTION & BADGES
+     ============================================================ */
+  .sticky-selection-bar {
+    background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    border: 1px solid #93c5fd;
+    backdrop-filter: blur(8px);
+    animation: slideDown 0.3s ease-out;
+  }
+
+  .sector-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+
+    &.sector-travel {
+      background-color: #e0f2fe;
+      color: #0284c7;
+      border: 1px solid #bae6fd;
+    }
+    &.sector-room {
+      background-color: #f3e8ff;
+      color: #9333ea;
+      border: 1px solid #e9d5ff;
+    }
+    &.sector-outing {
+      background-color: #ccfbf1;
+      color: #0d9488;
+      border: 1px solid #99f6e4;
+    }
+    &.sector-manasik {
+      background-color: #fef3c7;
+      color: #d97706;
+      border: 1px solid #fde68a;
+    }
+  }
+
+  p-table {
+    td, th {
+      font-variant-numeric: tabular-nums;
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -14,6 +14,8 @@ export interface NavigationItem {
   breadcrumbs?: boolean;
   children?: NavigationItem[];
   permissions?: string[]; // to manage permissions instead of roles
+  adminOnly?: boolean;
+  vendorOnly?: boolean;
 }
 
 export interface Navigation extends NavigationItem {
@@ -288,6 +290,16 @@ const NavigationItems = [
     permissions: [Permissions.CompanyCreate]
   },
   {
+    id: 'vendor-settlements',
+    title: 'Vendor Settlements',
+    type: 'item',
+    classes: 'nav-item',
+    url: '/vendor-settlements',
+    icon: 'fas fa-file-invoice-dollar',
+    breadcrumbs: false,
+    permissions: [Permissions.CompanyCreate]
+  },
+  {
     id: 'overallReservations',
     title: 'Reservations',
     type: 'item',
@@ -367,6 +379,61 @@ const NavigationItems = [
     icon: 'fas fa-plane-departure',
     breadcrumbs: false,
     permissions: [Permissions.TravelCreate]
+  },
+  {
+    id: 'custom-trips',
+    title: 'Custom Trips',
+    type: 'collapse',
+    classes: 'nav-item',
+    icon: 'fas fa-suitcase-rolling',
+    breadcrumbs: false,
+    permissions: [],
+    children: [
+      {
+        id: 'custom-trip-requests',
+        title: 'Trip Requests',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/custom-trip-requests',
+        icon: 'fas fa-envelope-open-text',
+        breadcrumbs: false,
+        permissions: [],
+        vendorOnly: true
+      },
+      {
+        id: 'custom-trip-my-offers',
+        title: 'My Offers',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/custom-trip-my-offers',
+        icon: 'fas fa-hand-holding-dollar',
+        breadcrumbs: false,
+        permissions: [],
+        vendorOnly: true
+      },
+      {
+        id: 'admin-custom-trip-requests',
+        title: 'All Requests',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/admin-custom-trip-requests',
+        icon: 'fas fa-chart-simple',
+        breadcrumbs: false,
+        permissions: [],
+        adminOnly: true
+      },
+      {
+        id: 'custom-trip-settings',
+        title: 'Settings',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/custom-trip-settings',
+        icon: 'fas fa-gear',
+        breadcrumbs: false,
+        permissions: [],
+        adminOnly: true
+      }
+    ]
   },
   {
     id: 'Outing',
@@ -784,6 +851,8 @@ export class NavigationItem {
   private getFilteredNavigation() {
     const userPermissions = this._configService.userPermissions();
     const user = this._configService.User();
+    const userRoles = this._configService.userRoles();
+    const isVendor = userRoles.some((role: string) => role.startsWith('Vendor.'));
     console.log('User Permissions:....................', userPermissions);
     if (!user || !userPermissions || userPermissions.length === 0) {
       return [];
@@ -793,6 +862,13 @@ export class NavigationItem {
 
     const filterItems = (items) => {
       return items.filter((item) => {
+        if (item.vendorOnly && !isVendor) {
+          return false;
+        }
+        if (item.adminOnly && isVendor) {
+          return false;
+        }
+
         // Debug للـ Settings
         if (item.id === 'settings') {
           console.log('🔧 Settings item check:');

@@ -1,8 +1,16 @@
 
+export enum CouponScope {
+  Specific = 1,
+  General = 2,
+  AppliedOnSpecificItems = 3
+}
+
 export interface ICoupon {
   id:             number;
   code:           string;
   description:    string;
+  warningMessage?: string | null;
+  scope?:         CouponScope;
   discountType:   number;
   discountAmount: number;
   usageNumber:    number;

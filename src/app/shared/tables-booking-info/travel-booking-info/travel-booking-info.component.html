@@ -31,7 +31,9 @@
       <th style="min-width: 200px">{{ 'reservationDate' | translate }}</th>
       <th style="min-width: 200px" *ngIf="showVendorColumn">{{ 'vendorName' | translate }}</th>
 
-      <th style="min-width: 200px">{{ 'isVendorSettled' | translate }}</th>
+      <th style="min-width: 170px">{{ 'vendorSettlementStatus' | translate }}</th>
+      <th style="min-width: 170px">{{ 'vendorCalculatedAmount' | translate }}</th>
+      <th style="min-width: 170px">{{ 'vendorSettledAmount' | translate }}</th>
       <th style="min-width: 200px">{{ 'productPrice' | translate }}</th>
       <th style="min-width: 200px">{{ 'isVatIncluded' | translate }}</th>
       <th style="min-width: 200px">{{ 'salesTaxRate' | translate }}</th>
@@ -64,8 +66,8 @@
       <th *ngIf="!isVendor()" style="min-width: 200px">{{ 'isSalesSettled' | translate }}</th>
 
       <th style="min-width: 250px">{{ 'countDetails' | translate }}</th>
-      <th style="min-width: 150px">{{ 'status' | translate }}</th>
-      <th *ngIf="!isVendor()" style="min-width: 150px">{{ 'actions' | translate }}</th>
+      <th style="min-width: 150px">{{ 'Booking Status' | translate }}</th>
+      <th *ngIf="!isVendor()" style="min-width: 180px">{{ 'actions' | translate }}</th>
     </tr>
   </ng-template>
 
@@ -73,12 +75,12 @@
     <tr [ngClass]="getStatusClass(travel.status)" [pContextMenuRow]="travel">
       <td *ngIf="!isVendor()" pFrozenColumn alignFrozen="left">
         <p-tableCheckbox [value]="travel"
-                         [disabled]="travel.isVendorSettled || !travel.allowedToSettlement"
+                         [disabled]="travel.vendorSettlementStatus === 2 || !travel.allowedToSettlement"
                          [ngClass]="{
-            'checkbox-disabled-green': travel.isVendorSettled,
-            'checkbox-disabled-red': !travel.allowedToSettlement && !travel.isVendorSettled
+            'checkbox-disabled-green': travel.vendorSettlementStatus === 2,
+            'checkbox-disabled-red': !travel.allowedToSettlement && travel.vendorSettlementStatus !== 2
           }"
-                         [pTooltip]="travel.isVendorSettled ? 'تمت تسويته' : !travel.allowedToSettlement ? 'غير مسموح بالتسوية' : null" />
+                         [pTooltip]="travel.vendorSettlementStatus === 2 ? ('fullySettled' | translate) : !travel.allowedToSettlement ? ('غير مسموح بالتسوية' | translate) : null" />
       </td>
 
       <td pFrozenColumn alignFrozen="left" style="min-width: 200px">
@@ -110,8 +112,14 @@
         </span>
       </td>
       <td>
-        <p-tag [value]="travel.isVendorSettled ? 'تم التسوية' : 'لم تُسوى '"
-               [severity]="travel.isVendorSettled ? 'success' : 'warning'"></p-tag>
+        <p-tag [value]="getVendorSettlementStatusLabel(travel.vendorSettlementStatus)"
+               [severity]="getVendorSettlementStatusSeverity(travel.vendorSettlementStatus)"></p-tag>
+      </td>
+      <td class="font-bold text-blue-600">
+        {{ (travel.vendorCalculatedAmount ?? travel.vendorProfitAfterCoupon ?? travel.productPrice ?? 0) | number:'1.2-2' }}
+      </td>
+      <td class="font-bold text-green-600">
+        {{ (travel.vendorSettledAmount ?? 0) | number:'1.2-2' }}
       </td>
 
       <td>{{ travel.productPrice }}</td>
@@ -157,12 +165,21 @@
       </td>
 
       <td>
-        <span [ngClass]="getStatusClass(travel.status)" class="status-badge">
-          {{ getStatusLabel(travel.status) }}
-        </span>
+        <p-tag
+          [value]="getStatusLabel(travel.status)"
+          [severity]="getBookingStatusSeverity(travel.status)"
+        ></p-tag>
       </td>
 
       <td *ngIf="!isVendor()" class="flex align-items-center gap-2">
+        <p-button icon="pi pi-wallet"
+                  [text]="true"
+                  severity="success"
+                  (onClick)="openMarkVendorSettled(travel)"
+                  [disabled]="travel.vendorSettlementStatus === 2 || !travel.allowedToSettlement"
+                  [pTooltip]="'settleVendor' | translate"
+                  tooltipPosition="top"
+                  styleClass="p-button-rounded" />
         <p-button label="refund"
                   [text]="true"
                   severity="warning"

@@ -369,6 +369,7 @@
                     <th>{{ 'outingDate' | translate }}</th>
                     <th>{{ 'startTime' | translate }}</th>
                     <th>{{ 'endTime' | translate }}</th>
+                    <th>{{ 'Tickets & Count' | translate }}</th>
                     <th>{{ 'Count Details' | translate }}</th>
                     <th>{{ 'Status' | translate }}</th>
                   </tr>
@@ -389,11 +390,33 @@
                     <td>{{ outing.startTime || '--' }}</td>
                     <td>{{ outing.endTime || '--' }}</td>
                     <td>
+                      <!-- Ticket Name and Count from reservationOutingTickets -->
+                      <div *ngIf="outing.reservationOutingTickets && outing.reservationOutingTickets.length > 0; else noOutingTickets">
+                        <div class="d-flex flex-column gap-1">
+                          <div
+                            *ngFor="let t of outing.reservationOutingTickets"
+                            class="d-flex align-items-center justify-content-between gap-2 p-1 px-2 rounded border bg-light"
+                          >
+                            <span class="fw-semibold text-primary text-xs text-truncate" style="max-width: 170px;" [title]="t.ticketType?.ticketType || t.ticketType?.description || ('Ticket' | translate)">
+                              <i class="pi pi-ticket me-1 text-primary"></i>
+                              {{ t.ticketType?.ticketType || t.ticketType?.description || ('Ticket' | translate) }}
+                            </span>
+                            <span class="badge bg-primary text-white rounded-pill px-2 py-1">
+                              x{{ t.count || t.quantity || 1 }}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <ng-template #noOutingTickets>
+                        <span class="text-muted text-xs">--</span>
+                      </ng-template>
+                    </td>
+                    <td>
                       <div class="d-flex gap-2 justify-content-center">
                         <span class="badge bg-primary text-white px-2 py-1 rounded">Adults: {{ outing.countDetails?.adults || 0 }}</span>
                         <span class="badge bg-info text-white px-2 py-1 rounded">Childs: {{ outing.countDetails?.childs || 0 }}</span>
                         <span class="badge bg-success text-white px-2 py-1 rounded font-bold">
-                          Total: {{ outing.countDetails?.total || 0 }}
+                          Total: {{ outing.countDetails?.total || outing.numberOfSeats || outing.quantity || 0 }}
                         </span>
                       </div>
                     </td>

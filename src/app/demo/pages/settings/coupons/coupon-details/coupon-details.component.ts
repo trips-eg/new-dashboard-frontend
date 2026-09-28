@@ -109,6 +109,20 @@ export class CouponDetailsComponent {
     return option ? option.label : value.toString();
   }
 
+  getScopeLabel(scope?: number): string {
+    const isAr = this.currentLang === 'ar';
+    switch (scope) {
+      case 1:
+        return isAr ? 'محدد لمنتج واحد' : 'Specific';
+      case 2:
+        return isAr ? 'عام على كل المنتجات' : 'General';
+      case 3:
+        return isAr ? 'مطبق على منتجات محددة' : 'Applied On Specific Items';
+      default:
+        return isAr ? (this.coupon?.isGenral ? 'عام على كل المنتجات' : 'محدد') : (this.coupon?.isGenral ? 'General' : 'Specific');
+    }
+  }
+
   navigateTo(type: 'trip' | 'outing' | 'room' | 'hajj', id: number) {
     let route = '';
     switch (type) {
