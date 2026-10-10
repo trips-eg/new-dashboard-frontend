@@ -1,0 +1,80 @@
+<div class="main trip-star-editor">
+  <div class="tse-shell">
+    <header class="tse-hero">
+      <div class="tse-hero-top">
+        <button type="button" class="tse-back" (click)="cancel()"><i class="pi pi-arrow-left" aria-hidden="true"></i>{{ 'TripStar.backToCards' | translate }}</button>
+        <span *ngIf="isEdit" class="tse-id">{{ 'TripStar.cardNumber' | translate:{ id: id } }}</span>
+      </div>
+      <div class="tse-hero-main">
+        <span class="tse-hero-mark" aria-hidden="true"><i class="pi pi-star"></i></span>
+        <div class="tse-hero-copy"><span class="tse-eyebrow">{{ 'TripStar.workspace' | translate }}</span><h1>{{ (isEdit ? 'TripStar.edit' : 'TripStar.add') | translate }}</h1><p>{{ 'TripStar.editorIntro' | translate }}</p></div>
+        <button *ngIf="!loading" type="submit" form="trip-star-form" class="tse-button tse-button-primary tse-hero-save" [disabled]="saving"><i [class]="saving ? 'pi pi-spin pi-spinner' : 'pi pi-check'" aria-hidden="true"></i>{{ (saving ? 'TripStar.saving' : (isEdit ? 'TripStar.saveChanges' : 'TripStar.createCard')) | translate }}</button>
+      </div>
+    </header>
+
+    <div *ngIf="loading" class="tse-loading" role="status"><i class="pi pi-spin pi-spinner" aria-hidden="true"></i>{{ 'TripStar.loading' | translate }}</div>
+
+    <app-trip-star-mobile-preview *ngIf="!loading" [titleEn]="form.controls.title.value" [titleAr]="form.controls.titleAr.value" [descriptionEn]="form.controls.description.value" [descriptionAr]="form.controls.descriptionAr.value" [image]="imagePreview || oldImage" [linkUrl]="form.controls.linkUrl.value" [expiryDate]="form.controls.expiryDate.value" [items]="selectedItems"></app-trip-star-mobile-preview>
+
+    <form *ngIf="!loading" id="trip-star-form" [formGroup]="form" (ngSubmit)="save()" class="tse-editor-grid">
+      <div class="tse-main">
+        <section class="tse-panel" aria-labelledby="tse-content-heading">
+          <div class="tse-panel-heading"><span class="tse-step">01</span><div><h2 id="tse-content-heading">{{ 'TripStar.content' | translate }}</h2><p>{{ 'TripStar.contentHint' | translate }}</p></div></div>
+          <div class="tse-panel-body">
+            <div class="tse-language-grid">
+              <div class="tse-language-card"><div class="tse-language-heading"><span class="tse-language-badge">EN</span><span>{{ 'TripStar.englishContent' | translate }}</span></div><div class="tse-field"><label for="trip-star-title">{{ 'TripStar.titleEn' | translate }}</label><input id="trip-star-title" pInputText formControlName="title" /></div><div class="tse-field"><label for="trip-star-description">{{ 'TripStar.descriptionEn' | translate }}</label><textarea id="trip-star-description" pInputTextarea rows="4" formControlName="description"></textarea></div></div>
+              <div class="tse-language-card"><div class="tse-language-heading"><span class="tse-language-badge">AR</span><span>{{ 'TripStar.arabicContent' | translate }}</span></div><div class="tse-field"><label for="trip-star-title-ar">{{ 'TripStar.titleAr' | translate }}</label><input id="trip-star-title-ar" pInputText formControlName="titleAr" dir="rtl" /></div><div class="tse-field"><label for="trip-star-description-ar">{{ 'TripStar.descriptionAr' | translate }}</label><textarea id="trip-star-description-ar" pInputTextarea rows="4" formControlName="descriptionAr" dir="rtl"></textarea></div></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="tse-panel" aria-labelledby="tse-media-heading">
+          <div class="tse-panel-heading"><span class="tse-step">02</span><div><h2 id="tse-media-heading">{{ 'TripStar.mediaPlacement' | translate }}</h2><p>{{ 'TripStar.mediaHint' | translate }}</p></div></div>
+          <div class="tse-panel-body">
+            <div class="tse-media-grid">
+              <div class="tse-upload"><div class="tse-upload-preview"><img *ngIf="imagePreview || oldImage; else noMedia" [src]="imagePreview || oldImage" [alt]="'TripStar.imagePreview' | translate" /><ng-template #noMedia><div class="tse-upload-placeholder" role="img" [attr.aria-label]="'TripStar.noImage' | translate"><i class="pi pi-image" aria-hidden="true"></i><span>{{ 'TripStar.noImage' | translate }}</span></div></ng-template></div><div class="tse-upload-copy"><label for="trip-star-image">{{ 'TripStar.chooseImage' | translate }}</label><p>{{ 'TripStar.imageHint' | translate }}</p><input id="trip-star-image" type="file" accept="image/*" (change)="onImageSelect($event)" /></div></div>
+              <div class="tse-settings"><div class="tse-field"><label for="trip-star-link">{{ 'TripStar.link' | translate }}</label><input id="trip-star-link" pInputText formControlName="linkUrl" dir="ltr" [placeholder]="'TripStar.linkPlaceholder' | translate" /></div><div class="tse-settings-row"><div class="tse-field"><label for="trip-star-display-order">{{ 'TripStar.order' | translate }}</label><p-inputNumber inputId="trip-star-display-order" styleClass="w-full" formControlName="displayOrder"></p-inputNumber></div><div class="tse-field"><label for="trip-star-expiry">{{ 'TripStar.expiry' | translate }}</label><p-calendar inputId="trip-star-expiry" styleClass="w-full" formControlName="expiryDate" [showTime]="true" [showIcon]="true" [showButtonBar]="true" dateFormat="yy-mm-dd"></p-calendar></div></div><small class="tse-help"><i class="pi pi-info-circle" aria-hidden="true"></i>{{ 'TripStar.expiryHint' | translate }}</small></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="tse-panel" aria-labelledby="tse-catalog-heading">
+          <div class="tse-panel-heading"><span class="tse-step">03</span><div><h2 id="tse-catalog-heading">{{ 'TripStar.catalog' | translate }}</h2><p>{{ 'TripStar.catalogHint' | translate }}</p></div></div>
+          <div class="tse-catalog-tabs" role="tablist" [attr.aria-label]="'TripStar.catalog' | translate"><button *ngFor="let type of tabTypes" type="button" role="tab" [id]="'trip-star-tab-' + type" aria-controls="trip-star-catalog-panel" class="tse-catalog-tab" [class.is-active]="activeType === type" [attr.aria-selected]="activeType === type" [attr.tabindex]="activeType === type ? 0 : -1" (click)="selectType(type)" (keydown.arrowright)="onTabArrow($event, 1)" (keydown.arrowleft)="onTabArrow($event, -1)"><i [class]="typeIcon(type)" aria-hidden="true"></i>{{ typeKeys[type] | translate }}</button></div>
+          <div id="trip-star-catalog-panel" role="tabpanel" [attr.aria-labelledby]="'trip-star-tab-' + activeType" class="tse-panel-body tse-catalog-body">
+            <div class="tse-catalog-toolbar"><div class="tse-field tse-catalog-search"><label for="trip-star-catalog-search">{{ 'TripStar.catalogSearch' | translate }}</label><div class="tse-search-input"><i class="pi pi-search" aria-hidden="true"></i><input id="trip-star-catalog-search" pInputText [(ngModel)]="catalogSearch" [ngModelOptions]="{ standalone: true }" (keyup.enter)="onCatalogSearch()" [placeholder]="'TripStar.catalogSearch' | translate" /></div></div><button type="button" class="tse-button tse-button-outline" [disabled]="catalogLoading" (click)="onCatalogSearch()">{{ 'TripStar.searchButton' | translate }}</button></div>
+            <div *ngIf="catalogLoading" class="tse-catalog-state" role="status"><i class="pi pi-spin pi-spinner" aria-hidden="true"></i>{{ 'TripStar.loading' | translate }}</div>
+            <div *ngIf="!catalogLoading && catalogError" class="tse-catalog-state tse-catalog-error" role="alert"><i class="pi pi-exclamation-triangle" aria-hidden="true"></i><strong>{{ 'TripStar.loadFailed' | translate }}</strong><span>{{ catalogError }}</span><button type="button" class="tse-button tse-button-outline" (click)="loadCatalog()">{{ 'TripStar.retry' | translate }}</button></div>
+            <div *ngIf="!catalogLoading && !catalogError && !catalog.length" class="tse-catalog-state"><i class="pi pi-search" aria-hidden="true"></i><strong>{{ 'TripStar.noCatalog' | translate }}</strong><span>{{ 'TripStar.emptyCatalogHint' | translate }}</span></div>
+            <div *ngIf="!catalogLoading && !catalogError && catalog.length" class="tse-catalog-list">
+              <div *ngFor="let entity of catalog" class="tse-catalog-row">
+                <div class="tse-catalog-thumb"><img *ngIf="catalogImage(entity); else noCatalogImage" [src]="catalogImage(entity)" [alt]="catalogName(entity)" loading="lazy" /><ng-template #noCatalogImage><i class="pi pi-image" aria-hidden="true"></i></ng-template></div>
+                <div class="tse-catalog-info">
+                  <div class="tse-catalog-keyline"><span class="tse-kind">{{ catalogTypeKey(entity) | translate }}</span><span class="tse-entity-id">#{{ entity.id }}</span></div>
+                  <strong>{{ catalogName(entity) }}</strong>
+                  <div class="tse-catalog-meta">
+                    <span *ngIf="catalogPlace(entity) as place"><i class="pi pi-map-marker" aria-hidden="true"></i>{{ place }}</span>
+                    <span *ngIf="catalogCategory(entity) as category"><i class="pi pi-tag" aria-hidden="true"></i>{{ category }}</span>
+                    <span *ngIf="entity.numberOfDays"><i class="pi pi-clock" aria-hidden="true"></i>{{ entity.numberOfDays }} {{ 'TripStar.days' | translate }}</span>
+                    <span *ngIf="entity.startDate"><i class="pi pi-calendar" aria-hidden="true"></i>{{ entity.startDate | date:'mediumDate' }}</span>
+                    <span *ngIf="activeType === types.Room && entity.bedCount"><i class="pi pi-home" aria-hidden="true"></i>{{ entity.bedCount }} {{ 'TripStar.beds' | translate }}</span>
+                    <span *ngIf="activeType === types.Room && entity.size"><i class="pi pi-expand" aria-hidden="true"></i>{{ entity.size }} {{ 'TripStar.squareMeters' | translate }}</span>
+                    <span *ngIf="activeType !== types.Room && entity.remainingSeats !== null && entity.remainingSeats !== undefined"><i class="pi pi-users" aria-hidden="true"></i>{{ entity.remainingSeats }} {{ 'TripStar.seatsLeft' | translate }}</span>
+                  </div>
+                  <small *ngIf="catalogWarning(entity)" class="tse-warning"><i class="pi pi-exclamation-circle" aria-hidden="true"></i>{{ catalogWarning(entity) | translate }}</small>
+                </div>
+                <button type="button" class="tse-add-item" [disabled]="isSelected(entity)" (click)="addItem(entity)"><i [class]="isSelected(entity) ? 'pi pi-check' : 'pi pi-plus'" aria-hidden="true"></i>{{ (isSelected(entity) ? 'TripStar.selected' : 'TripStar.select') | translate }}</button>
+              </div>
+            </div>
+            <div class="tse-catalog-pager"><span>{{ 'TripStar.catalogResults' | translate:{ count: catalogTotal } }} · {{ 'TripStar.catalogPage' | translate:{ page: catalogPage } }}</span><div><button type="button" class="tse-icon-button" [disabled]="catalogPage === 1 || catalogLoading" [attr.aria-label]="'TripStar.previous' | translate" (click)="nextCatalogPage(-1)"><i class="pi pi-angle-left" aria-hidden="true"></i></button><button type="button" class="tse-icon-button" [disabled]="!hasMoreCatalog || catalogLoading" [attr.aria-label]="'TripStar.next' | translate" (click)="nextCatalogPage(1)"><i class="pi pi-angle-right" aria-hidden="true"></i></button></div></div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="tse-side">
+        <section class="tse-panel tse-carousel-panel" aria-labelledby="tse-carousel-heading"><div class="tse-panel-heading"><span class="tse-step">04</span><div><h2 id="tse-carousel-heading">{{ 'TripStar.carousel' | translate }} <span class="tse-count">{{ selectedItems.length }}</span></h2><p>{{ 'TripStar.carouselHint' | translate }}</p></div></div><div class="tse-panel-body tse-carousel-body"><div *ngIf="!selectedItems.length" class="tse-carousel-empty"><span><i class="pi pi-clone" aria-hidden="true"></i></span><strong>{{ 'TripStar.noItems' | translate }}</strong><p>{{ 'TripStar.carouselEmptyHint' | translate }}</p></div><div cdkDropList class="tse-selected-list" (cdkDropListDropped)="dropItems($event)"><div *ngFor="let item of selectedItems; let i = index" cdkDrag class="tse-selected-row"><div class="tse-selected-top"><span class="tse-item-index">{{ i + 1 }}</span><div class="tse-selected-info"><strong>{{ itemName(item) }}</strong><span>{{ typeKeys[item.type] | translate }} · #{{ item.entityId }}</span></div><span cdkDragHandle class="tse-drag-handle pi pi-bars" aria-hidden="true"></span></div><div *ngIf="warning(item)" class="tse-warning"><i class="pi pi-exclamation-circle" aria-hidden="true"></i>{{ warning(item) | translate }}</div><div class="tse-selected-actions"><button type="button" class="tse-icon-button" [disabled]="i === 0" [attr.aria-label]="('TripStar.moveUp' | translate) + ' ' + itemName(item)" (click)="moveItem(i,-1)"><i class="pi pi-arrow-up" aria-hidden="true"></i></button><button type="button" class="tse-icon-button" [disabled]="i === selectedItems.length - 1" [attr.aria-label]="('TripStar.moveDown' | translate) + ' ' + itemName(item)" (click)="moveItem(i,1)"><i class="pi pi-arrow-down" aria-hidden="true"></i></button><button type="button" class="tse-remove" [attr.aria-label]="('TripStar.remove' | translate) + ' ' + itemName(item)" (click)="removeItem(i)"><i class="pi pi-times" aria-hidden="true"></i>{{ 'TripStar.remove' | translate }}</button></div></div></div></div></section>
+        <div class="tse-submit"><button type="button" class="tse-button tse-button-outline" (click)="cancel()">{{ 'Cancel' | translate }}</button><button type="submit" class="tse-button tse-button-primary" [disabled]="saving"><i [class]="saving ? 'pi pi-spin pi-spinner' : 'pi pi-check'" aria-hidden="true"></i>{{ (saving ? 'TripStar.saving' : (isEdit ? 'TripStar.saveChanges' : 'TripStar.createCard')) | translate }}</button></div>
+      </aside>
+    </form>
+  </div>
+</div>

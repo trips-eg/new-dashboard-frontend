@@ -124,12 +124,15 @@ export class APIs {
     getAllPermissionsForROle: 'Permissions/GetPermissionsForRole',
     AddPermissionsToRole: 'Permissions/AddPermissionsToRole'
   };
-  public static advertisings = {
-    getAlladvertisings: 'AD/GetAllADs',
-    getadvertisingsById: 'AD/GetADById?id=',
-    updateadvertisings: 'AD/UpdateAD',
-    Addadvertisings: 'AD/AddAD',
-    deleteadvertisings: 'AD/DeleteAD?id='
+  public static tripStars = {
+    list: 'TripStar/GetAllTripStars/',
+    get: 'TripStar/GetTripStarById/',
+    create: 'TripStar/AddTripStar/',
+    replace: 'TripStar/UpdateTripStar',
+    delete: 'TripStar/DeleteTripStar',
+    toggle: 'TripStar/ToggleTripStarStatus',
+    reorderCards: 'TripStar/ReorderTripStars/',
+    reorderItems: 'TripStar/ReorderTripStarItems'
   };
   public static companyWallet = {
     AddToCompanyWallet: 'CompaniesWallet/AddCompanyWallet',

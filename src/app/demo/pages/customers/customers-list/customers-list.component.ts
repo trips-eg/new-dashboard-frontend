@@ -4,11 +4,12 @@ import { CustomerService } from 'src/app/shared/services/customer.service';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 import { TableRequestBuilder } from 'src/app/shared/utils/table-request-builder';
 import { Table, TableLazyLoadEvent } from 'primeng/table';
+import { CustomerFinancialSummaryComponent } from 'src/app/shared/components/customer-financial-summary/customer-financial-summary.component';
 
 @Component({
   selector: 'app-customers-list',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, CustomerFinancialSummaryComponent],
   templateUrl: './customers-list.component.html',
   styleUrl: './customers-list.component.scss'
 })
@@ -22,6 +23,7 @@ export class CustomersListComponent implements OnInit {
   customers: any[] = [];
   totalRecords = 0;
   loading: boolean = false;
+  expandedRowKeys: Record<string, boolean> = {};
   searchTerm: string = '';
   sortField: string | null | undefined = undefined;
   sortOrder: number = 1;
@@ -41,6 +43,7 @@ export class CustomersListComponent implements OnInit {
     this.lastSortField = sortFieldStr;
 
     this.loading = true;
+    this.expandedRowKeys = {};
     const payload = TableRequestBuilder.build(event, this.searchTerm);
 
     this.CustomerService.getAllCustomers(payload).subscribe({

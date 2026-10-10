@@ -1,0 +1,113 @@
+<div class="main trip-star-page">
+  <div class="ts-shell">
+    <header class="ts-hero">
+      <div class="ts-hero-main">
+        <span class="ts-hero-mark" aria-hidden="true"><i class="pi pi-star"></i></span>
+        <div class="ts-hero-copy">
+          <span class="ts-eyebrow">{{ 'TripStar.workspace' | translate }}</span>
+          <h1>{{ 'TripStar.title' | translate }}</h1>
+          <p>{{ 'TripStar.listIntro' | translate }}</p>
+        </div>
+      </div>
+      <div class="ts-hero-actions">
+        <button *ngIf="canEdit" type="button" class="ts-button ts-button-outline" [disabled]="loading || saving" (click)="openCardOrder()">
+          <i class="pi pi-sort-alt" aria-hidden="true"></i>{{ 'TripStar.reorderCards' | translate }}
+        </button>
+        <button *ngIf="canCreate" type="button" class="ts-button ts-button-primary" (click)="create()">
+          <i class="pi pi-plus" aria-hidden="true"></i>{{ 'TripStar.add' | translate }}
+        </button>
+      </div>
+    </header>
+
+    <section class="ts-panel" [attr.aria-label]="'TripStar.cardLibrary' | translate">
+      <div class="ts-panel-heading">
+        <div>
+          <span class="ts-section-label">{{ 'TripStar.collection' | translate }}</span>
+          <h2>{{ 'TripStar.cardLibrary' | translate }}</h2>
+          <p>{{ 'TripStar.libraryHint' | translate }}</p>
+        </div>
+        <span class="ts-count" [attr.aria-label]="totalRecords + ' ' + ('TripStar.cardsCount' | translate)">{{ totalRecords }} {{ 'TripStar.cardsCount' | translate }}</span>
+      </div>
+
+      <div class="ts-filter-bar">
+        <div class="ts-field ts-search-field">
+          <label for="trip-star-search">{{ 'TripStar.search' | translate }}</label>
+          <div class="ts-input-icon"><i class="pi pi-search" aria-hidden="true"></i><input id="trip-star-search" pInputText [(ngModel)]="search" (ngModelChange)="filterChanged()" [placeholder]="'TripStar.search' | translate" /></div>
+        </div>
+        <div class="ts-field">
+          <label for="trip-star-status">{{ 'TripStar.status' | translate }}</label>
+          <select id="trip-star-status" class="form-select" [(ngModel)]="activeFilter" (ngModelChange)="filterChanged()">
+            <option [ngValue]="null">{{ 'TripStar.allStatuses' | translate }}</option>
+            <option [ngValue]="true">{{ 'TripStar.active' | translate }}</option>
+            <option [ngValue]="false">{{ 'TripStar.inactive' | translate }}</option>
+          </select>
+        </div>
+        <div class="ts-field">
+          <label for="trip-star-direction">{{ 'TripStar.sort' | translate }}</label>
+          <select id="trip-star-direction" class="form-select" [(ngModel)]="direction" (ngModelChange)="filterChanged()">
+            <option value="Asc">{{ 'TripStar.ascending' | translate }}</option>
+            <option value="Desc">{{ 'TripStar.descending' | translate }}</option>
+          </select>
+        </div>
+        <button *ngIf="hasFilters" type="button" class="ts-clear" (click)="clearFilters()">{{ 'TripStar.clearFilters' | translate }}</button>
+      </div>
+
+      <div class="ts-list-head" aria-hidden="true">
+        <span>{{ 'TripStar.card' | translate }}</span><span>{{ 'TripStar.items' | translate }}</span><span>{{ 'TripStar.order' | translate }}</span><span>{{ 'TripStar.expiry' | translate }}</span><span>{{ 'TripStar.status' | translate }}</span><span>{{ 'TripStar.actions' | translate }}</span>
+      </div>
+
+      <div *ngIf="loading" class="ts-loading" role="status" aria-live="polite">
+        <span class="visually-hidden">{{ 'TripStar.loading' | translate }}</span>
+        <div *ngFor="let row of [1,2,3]" class="ts-skeleton-row"><p-skeleton width="5.5rem" height="4.5rem"></p-skeleton><div class="ts-skeleton-copy"><p-skeleton width="65%" height="1.2rem"></p-skeleton><p-skeleton width="40%" height=".8rem"></p-skeleton></div><p-skeleton width="8rem" height="1rem"></p-skeleton></div>
+      </div>
+
+      <div *ngIf="!loading && loadError" class="ts-empty ts-error" role="alert"><span class="ts-empty-icon"><i class="pi pi-exclamation-triangle" aria-hidden="true"></i></span><h3>{{ 'TripStar.loadFailed' | translate }}</h3><p>{{ loadError }}</p><button type="button" class="ts-button ts-button-outline" (click)="load()">{{ 'TripStar.retry' | translate }}</button></div>
+
+      <div *ngIf="!loading && !loadError && !cards.length" class="ts-empty" role="status">
+        <span class="ts-empty-icon"><i class="pi pi-images" aria-hidden="true"></i></span>
+        <h3>{{ 'TripStar.empty' | translate }}</h3>
+        <p>{{ (hasFilters ? 'TripStar.emptyFilteredHint' : 'TripStar.emptyStartHint') | translate }}</p>
+        <button *ngIf="hasFilters" type="button" class="ts-button ts-button-outline" (click)="clearFilters()">{{ 'TripStar.clearFilters' | translate }}</button>
+        <button *ngIf="!hasFilters && canCreate" type="button" class="ts-button ts-button-primary" (click)="create()"><i class="pi pi-plus" aria-hidden="true"></i>{{ 'TripStar.add' | translate }}</button>
+      </div>
+
+      <div *ngIf="!loading && !loadError && cards.length" class="ts-card-list">
+        <article *ngFor="let card of cards" class="ts-card-row">
+          <div class="ts-card-identity">
+            <img *ngIf="image(card.imageUrl); else imageFallback" class="ts-thumb" [src]="image(card.imageUrl)" [alt]="title(card)" loading="lazy" />
+            <ng-template #imageFallback><span class="ts-thumb ts-thumb-empty" role="img" [attr.aria-label]="'TripStar.noImage' | translate"><i class="pi pi-image" aria-hidden="true"></i></span></ng-template>
+            <div class="ts-card-copy"><h3><button type="button" class="ts-card-detail-link" [attr.aria-label]="('TripStar.viewDetails' | translate) + ': ' + title(card)" (click)="details(card.id)">{{ title(card) }}</button></h3><span class="ts-card-id">#{{ card.id }}</span><p *ngIf="card.description || card.descriptionAr">{{ (isArabic ? card.descriptionAr || card.description : card.description || card.descriptionAr) }}</p></div>
+          </div>
+          <div class="ts-card-meta"><span class="ts-meta-label">{{ 'TripStar.items' | translate }}</span><span class="ts-meta-value"><i class="pi pi-th-large" aria-hidden="true"></i>{{ card.items?.length || 0 }}</span></div>
+          <div class="ts-card-meta"><span class="ts-meta-label">{{ 'TripStar.order' | translate }}</span><span class="ts-order-chip">{{ card.displayOrder }}</span></div>
+          <div class="ts-card-meta"><span class="ts-meta-label">{{ 'TripStar.expiry' | translate }}</span><span class="ts-meta-value">{{ card.expiryDate ? (card.expiryDate | date:'mediumDate') : ('TripStar.never' | translate) }}</span></div>
+          <div class="ts-card-meta"><span class="ts-meta-label">{{ 'TripStar.status' | translate }}</span><span class="ts-status" [ngClass]="'ts-status-' + statusKey(card)"><span class="ts-status-dot"></span>{{ status(card) | translate }}</span></div>
+          <div class="ts-row-actions">
+            <button *ngIf="canEdit" type="button" class="ts-action ts-edit-action" [attr.aria-label]="('TripStar.edit' | translate) + ' ' + title(card)" (click)="edit(card.id)"><i class="pi pi-pencil" aria-hidden="true"></i><span>{{ 'TripStar.editAction' | translate }}</span></button>
+            <button *ngIf="canEdit" type="button" class="ts-action" [disabled]="saving" [attr.aria-label]="('TripStar.reorderItems' | translate) + ' ' + title(card)" [title]="'TripStar.reorderItems' | translate" (click)="openItemOrder(card)"><i class="pi pi-sort-alt" aria-hidden="true"></i></button>
+            <button *ngIf="canEdit" type="button" class="ts-action" [disabled]="saving" [attr.aria-label]="('TripStar.toggle' | translate) + ' ' + title(card)" [title]="'TripStar.toggle' | translate" (click)="toggle(card)"><i class="pi pi-power-off" aria-hidden="true"></i></button>
+            <button *ngIf="canDelete" type="button" class="ts-action ts-action-danger" [disabled]="saving" [attr.aria-label]="('TripStar.delete' | translate) + ' ' + title(card)" [title]="'TripStar.delete' | translate" (click)="delete(card)"><i class="pi pi-trash" aria-hidden="true"></i></button>
+          </div>
+        </article>
+      </div>
+      <div *ngIf="!loading && !loadError && totalRecords" class="ts-list-footer"><span>{{ 'TripStar.results' | translate:{ count: totalRecords } }}</span><p-paginator [first]="first" [rows]="rows" [totalRecords]="totalRecords" [rowsPerPageOptions]="[10,20,50]" (onPageChange)="pageChanged($event)"></p-paginator></div>
+    </section>
+  </div>
+
+  <p-confirmDialog></p-confirmDialog>
+  <p-dialog [(visible)]="cardOrderVisible" [modal]="true" [style]="{ width: 'min(42rem, 95vw)' }" [header]="'TripStar.reorderCards' | translate" styleClass="ts-order-dialog">
+    <p class="ts-dialog-hint">{{ 'TripStar.reorderHelp' | translate }}</p>
+    <div cdkDropList class="ts-order-list" (cdkDropListDropped)="dropCards($event)">
+      <div *ngFor="let card of orderedCards; let i = index" cdkDrag class="ts-order-row"><span class="ts-order-number">{{ i + 1 }}</span><span cdkDragHandle class="pi pi-bars ts-drag-handle" aria-hidden="true"></span><span class="ts-order-name">{{ title(card) }}</span><button type="button" class="ts-icon-button" [disabled]="i === 0" [attr.aria-label]="('TripStar.moveUp' | translate) + ' ' + title(card)" (click)="moveCard(i,-1)"><i class="pi pi-arrow-up" aria-hidden="true"></i></button><button type="button" class="ts-icon-button" [disabled]="i === orderedCards.length - 1" [attr.aria-label]="('TripStar.moveDown' | translate) + ' ' + title(card)" (click)="moveCard(i,1)"><i class="pi pi-arrow-down" aria-hidden="true"></i></button></div>
+    </div>
+    <ng-template pTemplate="footer"><div class="ts-dialog-actions"><span class="ts-dialog-count">{{ orderedCards.length }} {{ 'TripStar.cardsCount' | translate }}</span><div class="ts-dialog-buttons"><button type="button" class="ts-button ts-button-outline" (click)="cardOrderVisible=false">{{ 'Cancel' | translate }}</button><button type="button" class="ts-button ts-button-primary" [disabled]="saving || !orderedCards.length" (click)="saveCardOrder()">{{ (saving ? 'TripStar.saving' : 'TripStar.saveOrder') | translate }}</button></div></div></ng-template>
+  </p-dialog>
+
+  <p-dialog [(visible)]="itemOrderVisible" [modal]="true" [style]="{ width: 'min(42rem, 95vw)' }" [header]="'TripStar.reorderItems' | translate" styleClass="ts-order-dialog">
+    <p class="ts-dialog-hint">{{ 'TripStar.reorderHelp' | translate }}</p>
+    <div cdkDropList class="ts-order-list" (cdkDropListDropped)="dropItems($event)">
+      <div *ngFor="let item of orderedItems; let i = index" cdkDrag class="ts-order-row"><span class="ts-order-number">{{ i + 1 }}</span><span cdkDragHandle class="pi pi-bars ts-drag-handle" aria-hidden="true"></span><span class="ts-order-name">{{ item.title || ('#' + item.entityId) }}</span><button type="button" class="ts-icon-button" [disabled]="i === 0" [attr.aria-label]="('TripStar.moveUp' | translate) + ' ' + (item.title || item.entityId)" (click)="moveItem(i,-1)"><i class="pi pi-arrow-up" aria-hidden="true"></i></button><button type="button" class="ts-icon-button" [disabled]="i === orderedItems.length - 1" [attr.aria-label]="('TripStar.moveDown' | translate) + ' ' + (item.title || item.entityId)" (click)="moveItem(i,1)"><i class="pi pi-arrow-down" aria-hidden="true"></i></button></div>
+    </div>
+    <ng-template pTemplate="footer"><div class="ts-dialog-actions"><span class="ts-dialog-count">{{ orderedItems.length }} {{ 'TripStar.items' | translate }}</span><div class="ts-dialog-buttons"><button type="button" class="ts-button ts-button-outline" (click)="itemOrderVisible=false">{{ 'Cancel' | translate }}</button><button type="button" class="ts-button ts-button-primary" [disabled]="saving || !orderedItems.length" (click)="saveItemOrder()">{{ (saving ? 'TripStar.saving' : 'TripStar.saveOrder') | translate }}</button></div></div></ng-template>
+  </p-dialog>
+</div>

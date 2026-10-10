@@ -1,0 +1,68 @@
+<section class="tsp-preview" [attr.aria-label]="'TripStar.mobilePreview' | translate">
+  <div class="tsp-toolbar">
+    <div><span class="tsp-kicker"><i class="pi pi-mobile" aria-hidden="true"></i>{{ 'TripStar.mobilePreview' | translate }}</span><p>{{ 'TripStar.previewHint' | translate }}</p></div>
+    <div class="tsp-language-switch" role="group" [attr.aria-label]="'TripStar.previewLanguage' | translate">
+      <button type="button" [class.is-active]="language() === 'en'" [attr.aria-pressed]="language() === 'en'" (click)="setLanguage('en')">EN</button>
+      <button type="button" [class.is-active]="language() === 'ar'" [attr.aria-pressed]="language() === 'ar'" (click)="setLanguage('ar')">AR</button>
+    </div>
+  </div>
+
+  <article class="tsp-parent-card" [class.has-items]="items().length > 0" [attr.dir]="language() === 'ar' ? 'rtl' : 'ltr'" [attr.aria-label]="collectionTitle() || ('TripStar.parentCard' | translate)">
+    <header *ngIf="items().length" class="tsp-parent-header">
+      <div class="tsp-parent-image">
+        <img *ngIf="image(); else noParentImage" [src]="image()" [alt]="collectionTitle() || ('TripStar.imagePreview' | translate)" />
+        <ng-template #noParentImage><i class="pi pi-star" role="img" [attr.aria-label]="'TripStar.noImage' | translate"></i></ng-template>
+      </div>
+      <div class="tsp-parent-copy">
+        <span class="tsp-parent-eyebrow"><i class="pi pi-clone" aria-hidden="true"></i>{{ 'TripStar.parentCard' | translate }}</span>
+        <h2>{{ collectionTitle() || ('TripStar.untitledCard' | translate) }}</h2>
+        <p *ngIf="collectionDescription()" class="tsp-parent-description">{{ collectionDescription() }}</p>
+        <div class="tsp-parent-meta">
+          <span class="tsp-parent-count"><i class="pi pi-th-large" aria-hidden="true"></i>{{ 'TripStar.includedExperiences' | translate:{ count: items().length } }}</span>
+          <span class="tsp-parent-expiry"><i class="pi pi-calendar" aria-hidden="true"></i><span>{{ 'TripStar.expiry' | translate }}: {{ expiryDate() ? (expiryDate() | date:'mediumDate') : ('TripStar.never' | translate) }}</span></span>
+        </div>
+        <div *ngIf="linkUrl()" class="tsp-parent-link"><i class="pi pi-link" aria-hidden="true"></i><span class="tsp-parent-link-label">{{ 'TripStar.parentLink' | translate }}</span><span class="tsp-parent-link-value" dir="ltr">{{ linkUrl() }}</span></div>
+      </div>
+    </header>
+    <div class="tsp-carousel" role="region" aria-roledescription="carousel" [attr.aria-label]="'TripStar.previewItems' | translate">
+    <div class="tsp-stage" [attr.dir]="language() === 'ar' ? 'rtl' : 'ltr'">
+      <span class="tsp-corner-brand" aria-hidden="true"><i class="pi pi-star-fill"></i>{{ brand() }}</span>
+      <div class="tsp-card" aria-live="polite" aria-atomic="true">
+        <div class="tsp-copy">
+          <div class="tsp-keyline">
+            <span class="tsp-brand"><i class="pi pi-star-fill" aria-hidden="true"></i>{{ featured() }}</span>
+            <span *ngIf="activeItem() as item" class="tsp-slide-type">{{ typeKeys[item.type] | translate }}</span>
+          </div>
+          <h3>{{ previewTitle() }}</h3>
+          <p *ngIf="previewDescription()" class="tsp-description">{{ previewDescription() }}</p>
+          <div *ngIf="activeItem() as item" class="tsp-slide-meta">
+            <span *ngIf="item.entity?.numberOfDays"><i class="pi pi-clock" aria-hidden="true"></i>{{ item.entity?.numberOfDays }} {{ 'TripStar.days' | translate }}</span>
+            <span *ngIf="item.type === 3 && item.entity?.bedCount"><i class="pi pi-home" aria-hidden="true"></i>{{ item.entity?.bedCount }} {{ 'TripStar.beds' | translate }}</span>
+            <small *ngIf="itemWarning(item)" class="tsp-warning"><i class="pi pi-exclamation-circle" aria-hidden="true"></i>{{ itemWarning(item) | translate }}</small>
+          </div>
+          <div class="tsp-card-footer">
+            <span *ngIf="activeItem() || linkUrl()" class="tsp-cta"><i class="pi pi-arrow-left" aria-hidden="true"></i>{{ explore() }}</span>
+            <span *ngIf="slideDate() as date" class="tsp-date"><i class="pi pi-calendar" aria-hidden="true"></i>{{ date | date:'mediumDate' }}</span>
+          </div>
+        </div>
+        <div class="tsp-visual" [class.tsp-visual-landscape]="visual() && artworkRatio() > 1" [style.aspect-ratio]="visual() ? artworkRatio() : 4 / 5">
+          <img *ngIf="visual(); else visualPlaceholder" [src]="visual()" [alt]="previewTitle()" (load)="onArtworkLoad($event)" />
+          <ng-template #visualPlaceholder><div class="tsp-image-placeholder"><i class="pi pi-image" aria-hidden="true"></i><span>{{ activeItem() ? ('TripStar.noImage' | translate) : imagePlaceholder() }}</span></div></ng-template>
+        </div>
+      </div>
+      <ng-container *ngIf="items().length > 1">
+        <button type="button" class="tsp-arrow tsp-arrow-previous" [attr.aria-label]="'TripStar.previousItem' | translate" (click)="step(-1)"><i class="pi pi-chevron-left" aria-hidden="true"></i></button>
+        <button type="button" class="tsp-arrow tsp-arrow-next" [attr.aria-label]="'TripStar.nextItem' | translate" (click)="step(1)"><i class="pi pi-chevron-right" aria-hidden="true"></i></button>
+      </ng-container>
+    </div>
+
+    <div *ngIf="items().length; else noItems" class="tsp-navigation">
+      <span class="tsp-item-number" aria-live="polite">{{ visibleIndex() + 1 }} / {{ items().length }}</span>
+      <div *ngIf="items().length > 1" class="tsp-dots" role="group" [attr.aria-label]="'TripStar.previewItems' | translate">
+        <button *ngFor="let item of items(); let i = index" type="button" [class.is-active]="visibleIndex() === i" [attr.aria-label]="('TripStar.previewItemNumber' | translate:{ number: i + 1 }) + ': ' + itemName(item)" [attr.aria-current]="visibleIndex() === i ? 'true' : null" (click)="selectItem(i)"></button>
+      </div>
+    </div>
+    <ng-template #noItems><p class="tsp-empty"><i class="pi pi-info-circle" aria-hidden="true"></i>{{ 'TripStar.previewNoItems' | translate }}</p></ng-template>
+    </div>
+  </article>
+</section>

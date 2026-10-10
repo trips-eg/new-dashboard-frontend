@@ -745,14 +745,14 @@ const NavigationItems = [
       },
 
       {
-        id: 'advertisings',
-        title: 'advertisings',
+        id: 'trip-stars',
+        title: 'TripStar.title',
         type: 'item',
         classes: 'nav-item',
-        url: '/advertisings',
-        icon: 'fa-solid fa-rectangle-ad',
+        url: '/trip-stars',
+        icon: 'fa-solid fa-star',
         breadcrumbs: false,
-        permissions: [Permissions.ADCreate]
+        permissions: [Permissions.ADView]
       },
       {
         id: 'Sales-Agencies',

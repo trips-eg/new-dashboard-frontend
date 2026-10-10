@@ -1,5 +1,8 @@
 <div class="card">
   <p-toolbar styleClass="mb-4">
+    <ng-template pTemplate="right">
+      <span class="text-muted small">{{ 'CustomerFinancials.expandHint' | translate }}</span>
+    </ng-template>
     <ng-template pTemplate="left">
       <span class="p-input-icon-left">
         <i class="pi pi-search"></i>
@@ -11,6 +14,8 @@
     #dt
     styleClass="customers-table customers-table--compact"
     [value]="customers"
+    dataKey="id"
+    [expandedRowKeys]="expandedRowKeys"
     [scrollable]="true"
     scrollDirection="horizontal"
     [tableStyle]="{ width: '100%' }"
@@ -29,6 +34,9 @@
   >
     <ng-template pTemplate="header">
       <tr>
+        <th style="width: 60px">
+          <span class="visually-hidden">{{ 'CustomerFinancials.viewDetails' | translate }}</span>
+        </th>
         <th pSortableColumn="name" pFrozenColumn alignFrozen="left" style="min-width: 200px" class="text-nowrap">
           {{ 'name' | translate }}
           <p-sortIcon field="name"></p-sortIcon>
@@ -56,6 +64,7 @@
         <th style="min-width: 120px" class="text-nowrap">{{ 'actions' | translate }}</th>
       </tr>
       <tr>
+        <th></th>
         <th pFrozenColumn alignFrozen="left" style="min-width: 200px" class="text-nowrap">
           <p-columnFilter type="text" field="FirstName" display="row" [showMenu]="false"></p-columnFilter>
         </th>
@@ -73,8 +82,20 @@
         <th style="min-width: 120px" class="text-nowrap"></th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-customer>
+    <ng-template pTemplate="body" let-customer let-expanded="expanded">
       <tr>
+        <td>
+          <button
+            type="button"
+            pButton
+            [pRowToggler]="customer"
+            class="p-button-text p-button-rounded"
+            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+            [attr.aria-label]="'CustomerFinancials.viewFor' | translate: { name: customer.name }"
+            [attr.aria-expanded]="expanded"
+            style="min-width: 44px; min-height: 44px"
+          ></button>
+        </td>
         <td pFrozenColumn alignFrozen="left" style="min-width: 200px" class="text-nowrap">{{ customer.name }}</td>
         <td style="min-width: 250px" class="text-nowrap">{{ customer.email }}</td>
         <td style="min-width: 180px" class="text-nowrap">{{ customer.phoneNumber }}</td>
@@ -97,9 +118,16 @@
         </td>
       </tr>
     </ng-template>
+    <ng-template pTemplate="rowexpansion" let-customer>
+      <tr>
+        <td colspan="8" class="financial-expansion">
+          <app-customer-financial-summary [financials]="customer.financials" [compact]="true"></app-customer-financial-summary>
+        </td>
+      </tr>
+    </ng-template>
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="7">
+        <td colspan="8">
           <div class="flex flex-column justify-content-center align-items-center py-5 w-full">
             <i class="pi pi-inbox" style="font-size: 3rem; color: var(--gray-400)"></i>
             <span class="mt-2 text-gray-500 font-medium">{{ 'No Data found' | translate }}</span>

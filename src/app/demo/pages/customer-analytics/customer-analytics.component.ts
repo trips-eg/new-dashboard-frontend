@@ -1,8 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { CustomerFinancialSummaryComponent } from 'src/app/shared/components/customer-financial-summary/customer-financial-summary.component';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
-import { SubHeaderComponent } from 'src/app/shared/components/sub-header/sub-header.component';
 import { ConfigureService } from 'src/app/theme/shared/services/configure.service';
 import { CustomerAnalyticsService } from 'src/app/shared/services/customer-analytics.service';
 import {
@@ -11,7 +12,8 @@ import {
   AnalyticsCustomer,
   CustomersByTypeRequest
 } from 'src/app/shared/model/customer-analytics.model';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { BookingFinancialsDto } from 'src/app/shared/model/booking-financials.model';
 import { environment } from 'src/environments/environment';
 
 export interface SearchHistoryItem {
@@ -33,20 +35,28 @@ interface FunnelStep {
 @Component({
   selector: 'app-customer-analytics',
   standalone: true,
-  imports: [SharedModule, SubHeaderComponent, TranslateModule],
+  imports: [SharedModule, RouterLink, TranslateModule, CustomerFinancialSummaryComponent],
   templateUrl: './customer-analytics.component.html',
   styleUrls: ['./customer-analytics.component.scss']
 })
-export class CustomerAnalyticsComponent implements OnInit {
+export class CustomerAnalyticsComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private configService = inject(ConfigureService);
   private analyticsService = inject(CustomerAnalyticsService);
+  private translate = inject(TranslateService);
 
   filterForm!: FormGroup;
   isLoading = false;
   isVendor = false;
   analyticsData: CustomerAnalyticsData | null = null;
+  appliedPeriod: { from: string; to: string } | null = null;
+  analyticsError = '';
+  dialogError = '';
+  private analyticsSubscription?: Subscription;
+  private dialogSubscription?: Subscription;
+  datePreset: 'week' | 'month' | 'thisMonth' | 'custom' = 'week';
+  readonly datePresets = ['week', 'month', 'thisMonth'] as const;
 
   // Funnel steps
   funnelSteps: FunnelStep[] = [];
@@ -61,7 +71,6 @@ export class CustomerAnalyticsComponent implements OnInit {
 
   // Dialog state
   dialogVisible = false;
-  dialogTitle = '';
   dialogType: AnalyticsType = 'registered';
   dialogCustomers: AnalyticsCustomer[] = [];
   dialogLoading = false;
@@ -69,9 +78,54 @@ export class CustomerAnalyticsComponent implements OnInit {
   dialogPageIndex = 1;
   dialogPageSize = 10;
   dialogFirst = 0;
+  dialogExpandedRows: Record<string, boolean> = {};
+
+  get locale(): string {
+    return this.translate.currentLang === 'ar' ? 'ar-EG' : 'en-US';
+  }
+
+  get dialogLabel(): string {
+    return this.funnelSteps.find((step) => step.key === this.dialogType)?.label ?? 'Registered';
+  }
+
+  get filtersChanged(): boolean {
+    if (!this.appliedPeriod || !this.filterForm?.valid) return false;
+    return (
+      this.formatDate(this.filterForm.value.fromDate) !== this.appliedPeriod.from ||
+      this.formatDate(this.filterForm.value.toDate) !== this.appliedPeriod.to
+    );
+  }
+
+  applyDatePreset(preset: 'week' | 'month' | 'thisMonth'): void {
+    const to = new Date();
+    const from = new Date(to);
+    if (preset === 'thisMonth') {
+      from.setDate(1);
+      from.setHours(0, 0, 0, 0);
+    } else {
+      from.setDate(from.getDate() - (preset === 'week' ? 7 : 30));
+    }
+    this.datePreset = preset;
+    this.filterForm.patchValue({ fromDate: from, toDate: to });
+    this.loadAnalytics();
+  }
+
+  financialAmount(customer: AnalyticsCustomer, key: keyof BookingFinancialsDto): number | null {
+    const value = customer.financials?.[key];
+    return typeof value === 'number' && Number.isFinite(value) ? value : null;
+  }
+
+  expandDialogPage(): void {
+    this.dialogExpandedRows = Object.fromEntries(this.dialogCustomers.map((customer) => [customer.id, true]));
+  }
+
+  collapseDialogPage(): void {
+    this.dialogExpandedRows = {};
+  }
 
   ngOnInit(): void {
     this.checkUserRole();
+    if (this.isVendor) return;
     this.initForm();
     this.loadAnalytics();
   }
@@ -96,33 +150,49 @@ export class CustomerAnalyticsComponent implements OnInit {
   }
 
   loadAnalytics(): void {
+    if (this.isVendor) return;
     if (this.filterForm.invalid) {
       this.filterForm.markAllAsTouched();
       return;
     }
 
-    this.isLoading = true;
     const formValue = this.filterForm.value;
+    if (formValue.fromDate > formValue.toDate) {
+      this.analyticsError = 'CustomerFinancials.invalidPeriod';
+      return;
+    }
 
     const request = {
       from: this.formatDate(formValue.fromDate),
       to: this.formatDate(formValue.toDate)
     };
 
-    this.analyticsService.getCustomerAnalytics(request).subscribe({
+    this.analyticsSubscription?.unsubscribe();
+    this.dialogSubscription?.unsubscribe();
+    this.dialogVisible = false;
+    this.isLoading = true;
+    this.analyticsError = '';
+    this.analyticsData = null;
+    this.appliedPeriod = null;
+
+    this.analyticsSubscription = this.analyticsService.getCustomerAnalytics(request).subscribe({
       next: (response: any) => {
         if (response?.success && response?.data) {
           this.analyticsData = response.data;
+          this.appliedPeriod = request;
           this.buildFunnelSteps();
           this.registeredToBookedPct = response.data.registeredToBookedPercentage || 0;
           this.bookedToPaidPct = response.data.bookedToPaidPercentage || 0;
           this.bookingsLast7Days = response.data.bookingsLast7Days || 0;
           this.bookingsLast7DaysPaid = response.data.bookingsLast7DaysPaid || 0;
+        } else {
+          this.analyticsError = 'CustomerFinancials.analyticsError';
         }
         this.isLoading = false;
       },
       error: (err) => {
         console.error('Error fetching analytics:', err);
+        this.analyticsError = err.status === 401 ? 'CustomerFinancials.sessionExpired' : 'CustomerFinancials.analyticsError';
         this.isLoading = false;
       }
     });
@@ -180,6 +250,7 @@ export class CustomerAnalyticsComponent implements OnInit {
   }
 
   onReset(): void {
+    this.datePreset = 'week';
     const today = new Date();
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(today.getDate() - 7);
@@ -195,13 +266,18 @@ export class CustomerAnalyticsComponent implements OnInit {
     this.bookedToPaidPct = 0;
     this.bookingsLast7Days = 0;
     this.bookingsLast7DaysPaid = 0;
+    this.loadAnalytics();
+  }
+
+  ngOnDestroy(): void {
+    this.analyticsSubscription?.unsubscribe();
+    this.dialogSubscription?.unsubscribe();
   }
 
   // ─── Dialog Methods ────────────────────────────────────
 
   openCustomerDialog(step: FunnelStep): void {
     this.dialogType = step.key;
-    this.dialogTitle = step.label + ' Customers';
     this.dialogPageIndex = 1;
     this.dialogFirst = 0;
     this.dialogVisible = true;
@@ -209,28 +285,36 @@ export class CustomerAnalyticsComponent implements OnInit {
   }
 
   loadDialogCustomers(): void {
+    if (!this.appliedPeriod) return;
+    this.dialogSubscription?.unsubscribe();
     this.dialogLoading = true;
-    const formValue = this.filterForm.value;
+    this.dialogError = '';
+    this.dialogCustomers = [];
+    this.dialogTotalRecords = 0;
+    this.dialogExpandedRows = {};
 
     const request: CustomersByTypeRequest = {
-      from: this.formatDate(formValue.fromDate),
-      to: this.formatDate(formValue.toDate),
+      from: this.appliedPeriod.from,
+      to: this.appliedPeriod.to,
       type: this.dialogType,
       pageIndex: this.dialogPageIndex,
       pageSize: this.dialogPageSize
     };
 
-    this.analyticsService.getCustomersByAnalyticsType(request).subscribe({
+    this.dialogSubscription = this.analyticsService.getCustomersByAnalyticsType(request).subscribe({
       next: (response: any) => {
         if (response?.success && response?.data) {
           this.dialogCustomers = response.data.data || [];
           this.dialogTotalRecords = response.data.itemsCount || 0;
+        } else {
+          this.dialogError = 'CustomerFinancials.customersError';
         }
         this.dialogLoading = false;
       },
       error: (err) => {
         console.error('Error fetching customers:', err);
         this.dialogCustomers = [];
+        this.dialogError = err.status === 401 ? 'CustomerFinancials.sessionExpired' : 'CustomerFinancials.customersError';
         this.dialogLoading = false;
       }
     });
@@ -278,13 +362,6 @@ export class CustomerAnalyticsComponent implements OnInit {
     return date.toISOString();
   }
 
-  // SVG circle helpers for conversion rings
-  getCircleDashArray(percentage: number): string {
-    const circumference = 2 * Math.PI * 54; // radius = 54
-    const filled = (percentage / 100) * circumference;
-    return `${filled} ${circumference}`;
-  }
-
   hasSectors(customer: AnalyticsCustomer): boolean {
     return !!(
       (customer.trips && customer.trips.length > 0) ||
@@ -296,12 +373,6 @@ export class CustomerAnalyticsComponent implements OnInit {
 
   hasDetails(customer: any): boolean {
     const history = this.getSearchHistory(customer);
-    console.log('hasDetails check for customer:', customer.name || customer.id, {
-      dialogType: this.dialogType,
-      hasHistory: history.length > 0,
-      historyData: history,
-      customerObj: customer
-    });
     if (this.dialogType === 'searched') {
       return history.length > 0;
     }

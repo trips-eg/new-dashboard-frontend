@@ -26,6 +26,7 @@ export class HttpInterceptorInterceptor implements HttpInterceptor {
     const token = this._configService.UserToken();
     let Lang = this._translation.currentLang;
     Lang = Lang === 'ar' ? 'ar' : 'en';
+    const languageHeader = /\/TripStar\//i.test(req.url) ? (Lang === 'ar' ? 'ar-EG' : 'en-US') : Lang;
 
     if (token !== null && token !== undefined && token !== '') {
       authReq = req.clone({
@@ -35,22 +36,14 @@ export class HttpInterceptorInterceptor implements HttpInterceptor {
           // withCredentials: 'true',
           //  cookies: `Bearer ${token}`,
 
-          'Accept-Language': `${Lang}`
+          'Accept-Language': languageHeader
         }
       });
     }
 
     return next.handle(authReq).pipe(
       catchError((err) => {
-        if ((err && err.status === 403) || err.status === 0) {
-          err.error = { Message: '', status: 0 };
-          err.error.status = 401;
-          // this._configService.Logout();
-          // this.toast.error('Unauthorized access', 'Error');
-          //this.router.navigate(['/unauthorized']);
-        }
-        const error = err.error.message || err.statusText;
-        return throwError(err);
+        return throwError(() => err);
       }),
       // Hide spinner when request finishes (success or error)
       finalize(() => this.spinner.hide())

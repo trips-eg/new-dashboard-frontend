@@ -5,6 +5,12 @@
   max-width: 150px; /* Adjust this value based on your design */
 }
 
+:host ::ng-deep .customers-table--compact .p-datatable-tbody > tr > td.financial-expansion {
+  white-space: normal;
+  overflow: visible;
+  padding: 16px !important;
+}
+
 ::ng-deep .p-splitbutton {
   border-radius: 1.5rem !important; // يخليه rounded
   font-size: 0.8rem !important; // يصغره
@@ -21,7 +27,6 @@
 }
 ::ng-deep .p-menuitem {
   cursor: pointer;
-  
 }
 
 ::ng-deep .p-menuitem:hover {

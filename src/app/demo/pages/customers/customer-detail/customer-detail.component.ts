@@ -11,17 +11,20 @@ import { ChargeTransaction, ChargeTransactionResponse } from 'src/app/shared/mod
 import { FilterMap } from 'src/app/shared/mapping/filterMap';
 import { EmailListComponent } from '../../emails/email-list/email-list.component';
 import { MessageService } from 'primeng/api';
+import { CustomerFinancialSummaryComponent } from 'src/app/shared/components/customer-financial-summary/customer-financial-summary.component';
 
 @Component({
   selector: 'app-customer-detail',
   standalone: true,
-  imports: [SharedModule, SubHeaderComponent, EmailListComponent],
+  imports: [SharedModule, SubHeaderComponent, EmailListComponent, CustomerFinancialSummaryComponent],
   providers: [MessageService],
   templateUrl: './customer-detail.component.html',
   styleUrl: './customer-detail.component.scss'
 })
 export class CustomerDetailComponent implements OnInit {
   customer: Icustomer = {} as Icustomer;
+  isLoadingCustomer = false;
+  customerError = '';
   customerId: number | null = null;
   baseUrl = environment.imgUrl;
 
@@ -62,7 +65,7 @@ export class CustomerDetailComponent implements OnInit {
 
     if (!url) return fallback;
     url = url.trim();
-    
+
     if (url === 'NULL' || url.includes('Default/avatar')) return fallback;
 
     if (url.startsWith('http')) return url;
@@ -88,14 +91,23 @@ export class CustomerDetailComponent implements OnInit {
   }
 
   getCustomerById(id: number) {
+    this.isLoadingCustomer = true;
+    this.customerError = '';
+    this.customer = {} as Icustomer;
     this.CustomerService.getCustomerById(id).subscribe({
       next: (res) => {
-        console.log('Customer data:', res.data);
-        this.customer = res.data;
-        this.walletBalance = res.data.wallet.currentBalance || 0;
+        if (res?.success && res.data) {
+          this.customer = res.data;
+          this.walletBalance = res.data.wallet?.currentBalance ?? 0;
+        } else {
+          this.customerError = 'CustomerFinancials.profileError';
+        }
+        this.isLoadingCustomer = false;
       },
       error: (err) => {
         console.error('Error fetching customer:', err);
+        this.customerError = err.status === 401 ? 'CustomerFinancials.sessionExpired' : 'CustomerFinancials.profileError';
+        this.isLoadingCustomer = false;
       }
     });
   }
@@ -217,7 +229,7 @@ export class CustomerDetailComponent implements OnInit {
 
   submitAdjustment() {
     if (!this.customerId || !this.adjustAmount || this.adjustAmount === 0) return;
-    if (this.adjustAmount < 0 && (this.walletBalance + this.adjustAmount < 0)) {
+    if (this.adjustAmount < 0 && this.walletBalance + this.adjustAmount < 0) {
       this.messageService.add({
         severity: 'error',
         summary: 'Error',

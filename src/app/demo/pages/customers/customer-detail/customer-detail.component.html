@@ -39,7 +39,7 @@
 
           <!-- Wallet Balance -->
           <div class="col-12 col-md-auto mt-3 mt-md-0">
-            <div class="wallet-balance-card flex-column align-items-stretch gap-2" style="min-width: 220px;">
+            <div class="wallet-balance-card flex-column align-items-stretch gap-2" style="min-width: 220px">
               <div class="d-flex align-items-center gap-3">
                 <div class="wallet-icon">
                   <i class="pi pi-wallet"></i>
@@ -49,7 +49,10 @@
                   <h3 class="wallet-amount mb-0">{{ walletBalance | currency: 'EGP' }}</h3>
                 </div>
               </div>
-              <button class="btn btn-warning btn-sm mt-2 w-full d-flex align-items-center justify-content-center gap-2 font-bold py-2 shadow-sm" (click)="openAdjustBalanceDialog()">
+              <button
+                class="btn btn-warning btn-sm mt-2 w-full d-flex align-items-center justify-content-center gap-2 font-bold py-2 shadow-sm"
+                (click)="openAdjustBalanceDialog()"
+              >
                 <i class="pi pi-plus-circle"></i>
                 <span>{{ 'Add Balance' | translate }}</span>
               </button>
@@ -58,6 +61,16 @@
         </div>
       </div>
     </div>
+
+    <app-customer-financial-summary
+      class="mb-4"
+      [financials]="customer.financials"
+      [loading]="isLoadingCustomer"
+      [error]="customerError"
+    ></app-customer-financial-summary>
+    <button *ngIf="customerError" type="button" pButton class="p-button-outlined mb-4" (click)="loadCustomerData()">
+      {{ 'CustomerFinancials.retry' | translate }}
+    </button>
 
     <!-- Information Cards Grid -->
     <div class="row g-3 mb-4">
@@ -305,9 +318,9 @@
   </div>
 </div>
 
-<p-dialog 
-  [modal]="true" 
-  [(visible)]="displayAdjustDialog" 
+<p-dialog
+  [modal]="true"
+  [(visible)]="displayAdjustDialog"
   [style]="{ width: '30rem' }"
   [draggable]="false"
   [resizable]="false"
@@ -315,21 +328,33 @@
 >
   <ng-template pTemplate="header">
     <div class="d-flex align-items-center gap-2">
-      <div class="wallet-icon-circle rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: rgba(255, 152, 0, 0.15); color: #f57c00;">
+      <div
+        class="wallet-icon-circle rounded-circle p-2 d-flex align-items-center justify-content-center"
+        style="width: 40px; height: 40px; background-color: rgba(255, 152, 0, 0.15); color: #f57c00"
+      >
         <i class="pi pi-wallet text-xl"></i>
       </div>
-      <span class="font-bold text-xl text-dark" style="font-weight: 700;">{{ 'Adjust Wallet Balance' | translate }}</span>
+      <span class="font-bold text-xl text-dark" style="font-weight: 700">{{ 'Adjust Wallet Balance' | translate }}</span>
     </div>
   </ng-template>
 
   <div class="p-fluid py-2">
     <!-- Balance Preview Panel -->
-    <div class="card border-0 mb-4 p-3 shadow-none" style="background: linear-gradient(135deg, #fffcf6 0%, #fff8e7 100%); border-radius: 12px; border: 1px solid rgba(255, 152, 0, 0.15) !important;">
+    <div
+      class="card border-0 mb-4 p-3 shadow-none"
+      style="
+        background: linear-gradient(135deg, #fffcf6 0%, #fff8e7 100%);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 152, 0, 0.15) !important;
+      "
+    >
       <div class="row align-items-center g-2 text-center text-md-start">
         <!-- Current Balance -->
         <div class="col-5">
-          <p class="text-muted small mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.75rem;">{{ 'Current Balance' | translate }}</p>
-          <span class="fw-bold text-dark text-lg" style="font-size: 1.1rem;">{{ walletBalance | currency: 'EGP' }}</span>
+          <p class="text-muted small mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.75rem">
+            {{ 'Current Balance' | translate }}
+          </p>
+          <span class="fw-bold text-dark text-lg" style="font-size: 1.1rem">{{ walletBalance | currency: 'EGP' }}</span>
         </div>
         <!-- Plus/Minus sign -->
         <div class="col-2 text-center text-muted">
@@ -337,50 +362,63 @@
         </div>
         <!-- Amount to Add/Deduct -->
         <div class="col-5 text-end">
-          <p class="text-muted small mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.75rem;">
+          <p class="text-muted small mb-1 text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.75rem">
             {{ ((adjustAmount || 0) >= 0 ? 'Amount to Add' : 'Amount to Deduct') | translate }}
           </p>
-          <span class="fw-bold text-lg animate-fade" [ngClass]="(adjustAmount || 0) >= 0 ? 'text-success' : 'text-danger'" style="font-size: 1.1rem;">
-            {{ (adjustAmount || 0) >= 0 ? '+' : '' }}{{ (adjustAmount || 0) | currency: 'EGP' }}
+          <span
+            class="fw-bold text-lg animate-fade"
+            [ngClass]="(adjustAmount || 0) >= 0 ? 'text-success' : 'text-danger'"
+            style="font-size: 1.1rem"
+          >
+            {{ (adjustAmount || 0) >= 0 ? '+' : '' }}{{ adjustAmount || 0 | currency: 'EGP' }}
           </span>
         </div>
       </div>
-      
-      <hr class="my-2" style="border-top: 1px dashed rgba(245, 124, 0, 0.25);" />
-      
+
+      <hr class="my-2" style="border-top: 1px dashed rgba(245, 124, 0, 0.25)" />
+
       <!-- New Projected Balance -->
       <div class="d-flex justify-content-between align-items-center pt-1">
-        <span class="fw-bold text-secondary text-sm" style="font-size: 0.85rem;">{{ 'New Balance Preview' | translate }}</span>
-        <span class="fw-bolder text-xl" [ngClass]="(adjustAmount || 0) >= 0 ? 'text-success' : 'text-danger'" style="font-weight: 800; font-size: 1.35rem;">
-          {{ (walletBalance + (adjustAmount || 0)) | currency: 'EGP' }}
+        <span class="fw-bold text-secondary text-sm" style="font-size: 0.85rem">{{ 'New Balance Preview' | translate }}</span>
+        <span
+          class="fw-bolder text-xl"
+          [ngClass]="(adjustAmount || 0) >= 0 ? 'text-success' : 'text-danger'"
+          style="font-weight: 800; font-size: 1.35rem"
+        >
+          {{ walletBalance + (adjustAmount || 0) | currency: 'EGP' }}
         </span>
       </div>
     </div>
 
     <!-- Error Alert: Overdraft -->
-    <div class="alert alert-danger py-2 px-3 mb-3 d-flex align-items-center gap-2 border-round text-sm" *ngIf="adjustAmount && adjustAmount < 0 && (walletBalance + adjustAmount < 0)">
+    <div
+      class="alert alert-danger py-2 px-3 mb-3 d-flex align-items-center gap-2 border-round text-sm"
+      *ngIf="adjustAmount && adjustAmount < 0 && walletBalance + adjustAmount < 0"
+    >
       <i class="pi pi-exclamation-triangle"></i>
       <span>{{ 'Cannot deduct more than the current balance' | translate }}</span>
     </div>
 
     <!-- Input Field -->
     <div class="mb-2">
-      <label for="adjustAmount" class="form-label fw-bold mb-2 text-dark" style="font-size: 0.95rem;">{{ 'Amount (EGP)' | translate }}</label>
-      <p-inputNumber 
-        id="adjustAmount" 
-        [(ngModel)]="adjustAmount" 
-        mode="currency" 
-        currency="EGP" 
-        locale="en-EG" 
+      <label for="adjustAmount" class="form-label fw-bold mb-2 text-dark" style="font-size: 0.95rem">
+        {{ 'Amount (EGP)' | translate }}
+      </label>
+      <p-inputNumber
+        id="adjustAmount"
+        [(ngModel)]="adjustAmount"
+        mode="currency"
+        currency="EGP"
+        locale="en-EG"
         [min]="-1000000"
         [max]="1000000"
         placeholder="0.00"
         styleClass="w-full"
-        [inputStyle]="{ 'font-size': '1.15rem', 'padding': '0.75rem 1rem', 'font-weight': 'bold' }"
+        [inputStyle]="{ 'font-size': '1.15rem', padding: '0.75rem 1rem', 'font-weight': 'bold' }"
         [showButtons]="false"
         [autofocus]="true"
       ></p-inputNumber>
-      <small class="text-muted mt-1 d-block" style="font-size: 0.825rem;">
+      <small class="text-muted mt-1 d-block" style="font-size: 0.825rem">
         <i class="pi pi-info-circle me-1"></i>
         {{ 'Enter a negative value (e.g., -100) to deduct balance.' | translate }}
       </small>
@@ -389,21 +427,20 @@
 
   <ng-template pTemplate="footer">
     <div class="d-flex justify-content-end gap-2 pt-2 pb-1">
-      <p-button 
-        [label]="'Cancel' | translate" 
-        severity="secondary" 
-        (onClick)="closeAdjustDialog()" 
+      <p-button
+        [label]="'Cancel' | translate"
+        severity="secondary"
+        (onClick)="closeAdjustDialog()"
         [disabled]="isSubmittingAdjustment"
         styleClass="p-button-outlined"
       ></p-button>
-      <p-button 
-        [label]="'Confirm' | translate" 
-        (onClick)="submitAdjustment()" 
-        [disabled]="isSubmittingAdjustment || !adjustAmount || adjustAmount === 0 || (adjustAmount < 0 && (walletBalance + adjustAmount < 0))"
+      <p-button
+        [label]="'Confirm' | translate"
+        (onClick)="submitAdjustment()"
+        [disabled]="isSubmittingAdjustment || !adjustAmount || adjustAmount === 0 || (adjustAmount < 0 && walletBalance + adjustAmount < 0)"
         [loading]="isSubmittingAdjustment"
         [severity]="(adjustAmount || 0) >= 0 ? 'warning' : 'danger'"
       ></p-button>
     </div>
   </ng-template>
 </p-dialog>
-

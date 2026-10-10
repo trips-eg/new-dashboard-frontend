@@ -3,6 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { AdminComponent } from './theme/layout/admin/admin.component';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { DeletionComponent } from './shared/components/New folder/delation.component';
+import { tripStarPermissionGuard } from './shared/guards/trip-star-permission.guard';
+import { Permissions } from './theme/layout/admin/navigation/navigation';
 
 const routes: Routes = [
   {
@@ -376,30 +378,33 @@ const routes: Routes = [
           import('./demo/pages/settings/room-groups/room-group-form/room-group-form.component').then((m) => m.RoomGroupFormComponent)
       },
       {
-        path: 'advertisings',
-        loadComponent: () => import('./demo/pages/settings/advertisings/advertisings.component').then((m) => m.AdvertisingsComponent)
+        path: 'trip-stars',
+        canActivate: [tripStarPermissionGuard],
+        data: { permission: Permissions.ADView },
+        loadComponent: () => import('./demo/pages/settings/trip-stars/trip-stars.component').then((m) => m.TripStarsComponent)
       },
       {
-        path: 'advertisings-form',
-        loadComponent: () =>
-          import('./demo/pages/settings/advertisings/advertisings-form/advertisings-form.component').then(
-            (m) => m.AdvertisingsFormComponent
-          )
+        path: 'trip-stars/new',
+        canActivate: [tripStarPermissionGuard],
+        data: { permission: Permissions.ADCreate },
+        loadComponent: () => import('./demo/pages/settings/trip-stars/trip-star-editor.component').then((m) => m.TripStarEditorComponent)
       },
       {
-        path: 'advertisings-form/:id',
-        loadComponent: () =>
-          import('./demo/pages/settings/advertisings/advertisings-form/advertisings-form.component').then(
-            (m) => m.AdvertisingsFormComponent
-          )
+        path: 'trip-stars/:id/edit',
+        canActivate: [tripStarPermissionGuard],
+        data: { permission: Permissions.ADEdit },
+        loadComponent: () => import('./demo/pages/settings/trip-stars/trip-star-editor.component').then((m) => m.TripStarEditorComponent)
       },
       {
-        path: 'advertising-details',
-        loadComponent: () =>
-          import('./demo/pages/settings/advertisings/advertisings-details/advertisings-details.component').then(
-            (m) => m.AdvertisingsDetailsComponent
-          )
+        path: 'trip-stars/:id',
+        canActivate: [tripStarPermissionGuard],
+        data: { permission: Permissions.ADView },
+        loadComponent: () => import('./demo/pages/settings/trip-stars/trip-star-details.component').then((m) => m.TripStarDetailsComponent)
       },
+      { path: 'advertisings', redirectTo: 'trip-stars', pathMatch: 'full' },
+      { path: 'advertisings-form', redirectTo: 'trip-stars/new', pathMatch: 'full' },
+      { path: 'advertisings-form/:id', redirectTo: 'trip-stars/:id/edit', pathMatch: 'full' },
+      { path: 'advertising-details', redirectTo: 'trip-stars', pathMatch: 'full' },
       {
         path: 'Sales-Agencies',
         loadComponent: () => import('./demo/pages/settings/sales-agencies/sales-agencies.component').then((m) => m.SalesAgenciesComponent)

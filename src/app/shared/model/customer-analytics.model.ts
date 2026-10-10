@@ -1,11 +1,14 @@
 // ─── Request/Response Models for Customer Analytics ──────────────
 
+import { BookingFinancialsDto } from './booking-financials.model';
+
 export interface CustomerAnalyticsRequest {
   from: string;
   to: string;
 }
 
 export interface CustomerAnalyticsData {
+  financials?: BookingFinancialsDto | null;
   registeredCount: number;
   loggedInCount: number;
   searchedCount: number;
@@ -18,14 +21,7 @@ export interface CustomerAnalyticsData {
   bookingsLast7DaysPaid: number;
 }
 
-export type AnalyticsType =
-  | 'registered'
-  | 'loggedIn'
-  | 'searched'
-  | 'booked'
-  | 'paid'
-  | 'bookings7days'
-  | 'paid7days';
+export type AnalyticsType = 'registered' | 'loggedIn' | 'searched' | 'booked' | 'paid' | 'bookings7days' | 'paid7days';
 
 export interface CustomersByTypeRequest {
   from: string;
@@ -67,6 +63,7 @@ export interface SearchHistoryItem {
 }
 
 export interface AnalyticsCustomer {
+  financials?: BookingFinancialsDto | null;
   id: string;
   userName: string;
   name: string;

@@ -1,0 +1,81 @@
+<section
+  class="financial-summary"
+  [class.financial-summary--compact]="compact"
+  [attr.aria-label]="'CustomerFinancials.title' | translate"
+  [attr.aria-busy]="loading"
+>
+  <header class="summary-header">
+    <div class="summary-heading">
+      <span class="summary-icon" aria-hidden="true"><i class="pi pi-wallet"></i></span>
+      <div>
+        <h2>{{ 'CustomerFinancials.title' | translate }}</h2>
+        <p>{{ (period ? 'CustomerFinancials.periodScope' : 'CustomerFinancials.customerScope') | translate }}</p>
+      </div>
+    </div>
+    <span class="period" *ngIf="period">
+      <i class="pi pi-calendar" aria-hidden="true"></i>
+      {{ period.from | date: 'dd MMM yyyy' : undefined : locale }}
+      <span aria-hidden="true">–</span>
+      {{ period.to | date: 'dd MMM yyyy' : undefined : locale }}
+    </span>
+  </header>
+  <div *ngIf="loading" class="summary-state" role="status">
+    <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+    {{ 'CustomerFinancials.loading' | translate }}
+  </div>
+  <div *ngIf="!loading && error" class="summary-state summary-state--error" role="alert">
+    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+    {{ error | translate }}
+  </div>
+  <div *ngIf="!loading && !error && !financials" class="summary-state" role="status">
+    <i class="pi pi-info-circle" aria-hidden="true"></i>
+    {{ 'CustomerFinancials.unavailable' | translate }}
+  </div>
+  <ng-container *ngIf="!loading && !error && financials">
+    <dl class="highlight-grid">
+      <div
+        *ngFor="let metric of highlights"
+        class="highlight"
+        [class.highlight--net]="metric.key === 'tripsCommissionNet'"
+        [class.highlight--negative]="metric.key === 'tripsCommissionNet' && isNegativeNet"
+      >
+        <dt>
+          <i [class]="metric.icon" aria-hidden="true"></i>
+          {{ 'CustomerFinancials.' + metric.key | translate }}
+        </dt>
+        <dd>
+          <bdi *ngIf="amount(metric.key) !== null; else missingAmount">
+            {{ amount(metric.key) | currency: 'EGP' : 'code' : '1.2-2' : locale }}
+          </bdi>
+        </dd>
+        <p>{{ 'CustomerFinancials.' + metric.key + 'Hint' | translate }}</p>
+        <span class="negative-note" *ngIf="metric.key === 'tripsCommissionNet' && isNegativeNet">
+          <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+          {{ 'CustomerFinancials.negativeNet' | translate }}
+        </span>
+      </div>
+    </dl>
+    <div class="breakdown-heading">{{ 'CustomerFinancials.breakdown' | translate }}</div>
+    <dl class="breakdown-grid">
+      <div *ngFor="let metric of breakdown" class="breakdown-item">
+        <dt>
+          <i [class]="metric.icon" aria-hidden="true"></i>
+          {{ 'CustomerFinancials.' + metric.key | translate }}
+        </dt>
+        <dd>
+          <bdi *ngIf="amount(metric.key) !== null; else missingAmount">
+            {{ amount(metric.key) | currency: 'EGP' : 'code' : '1.2-2' : locale }}
+          </bdi>
+        </dd>
+        <p>{{ 'CustomerFinancials.' + metric.key + 'Hint' | translate }}</p>
+      </div>
+    </dl>
+    <p class="formula">
+      <i class="pi pi-info-circle" aria-hidden="true"></i>
+      {{ 'CustomerFinancials.formula' | translate }}
+    </p>
+  </ng-container>
+  <ng-template #missingAmount>
+    <span class="missing-amount">{{ 'CustomerFinancials.notProvided' | translate }}</span>
+  </ng-template>
+</section>
