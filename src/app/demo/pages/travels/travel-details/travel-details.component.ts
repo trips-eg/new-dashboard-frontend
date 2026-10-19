@@ -1,6 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, takeUntil } from 'rxjs';
+import { ItemReviewsComponent } from 'src/app/shared/components/item-reviews/item-reviews.component';
 import { Router, ActivatedRoute } from '@angular/router';
-import { SubHeaderComponent } from '../../../../shared/components/sub-header/sub-header.component';
+import {
+  DetailPageHeaderComponent,
+  DetailHeaderAction
+} from '../../../../shared/components/detail-page-header/detail-page-header.component';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 import { TravelTripsService } from 'src/app/shared/services/travel-trips.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -10,11 +16,14 @@ import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-travel-details',
   standalone: true,
-  imports: [SubHeaderComponent, SharedModule],
+  imports: [DetailPageHeaderComponent, SharedModule, ItemReviewsComponent],
   templateUrl: './travel-details.component.html',
   styleUrl: './travel-details.component.scss'
 })
 export class TravelDetailsComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly routeChanged = new Subject<void>();
+  loadError = false;
   data: any = null;
   programs: any[] = [];
   travelId: number = null;
@@ -23,7 +32,7 @@ export class TravelDetailsComponent implements OnInit {
   paseurl = environment.imgUrl;
 
   imgs: string[] = [];
-  actionButtons: any[] = [];
+  actionButtons: DetailHeaderAction[] = [];
   timelineAlign: string = 'left';
 
   responsiveOptions = [
@@ -49,15 +58,22 @@ export class TravelDetailsComponent implements OnInit {
     private configureService: ConfigureService
   ) {
     this.timelineAlign = this.translateService.currentLang === 'ar' ? 'right' : 'left';
-    this.translateService.onLangChange.subscribe((event) => {
+    this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((event) => {
       this.currentLang = event.lang;
       this.timelineAlign = event.lang === 'ar' ? 'right' : 'left';
     });
   }
 
   ngOnInit(): void {
-    this.ActivatedRoute.params.subscribe((params) => {
-      this.travelId = params['id'];
+    this.destroyRef.onDestroy(() => {
+      this.routeChanged.next();
+      this.routeChanged.complete();
+    });
+    this.ActivatedRoute.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      this.routeChanged.next();
+      this.data = null;
+      this.programs = [];
+      this.travelId = Number(params['id']);
       this.initActionButtons();
       this.getTravelDetails();
       this.getPrograms();
@@ -70,10 +86,7 @@ export class TravelDetailsComponent implements OnInit {
   }
 
   initActionButtons() {
-    this.actionButtons = [
-      { label: 'Back', action: 'back', icon: 'pi pi-arrow-left', class: 'btn-outline-secondary' },
-      ...(this.canEdit() ? [{ label: 'Edit Trip', action: 'edit', icon: 'pi pi-pencil', class: 'btn-primary' }] : [])
-    ];
+    this.actionButtons = [...(this.canEdit() ? [{ label: 'Edit Trip', action: 'edit', icon: 'pi pi-pencil' }] : [])];
   }
 
   handleAction(event: any) {
@@ -104,37 +117,54 @@ export class TravelDetailsComponent implements OnInit {
 
   getTravelDetails() {
     this.isLoading = true;
-    this.TravelTripsService.getTravelById(this.travelId).subscribe({
-      next: (res: any) => {
-        this.data = res.data;
-        this.imgs = res.data?.images?.map((img: any) => this.paseurl + img.imageUrl) || [];
-        if (!this.programs || !this.programs.length) {
-          this.setPrograms(res.data?.segments || []);
+    this.loadError = false;
+    if (!Number.isInteger(this.travelId) || this.travelId <= 0) {
+      this.isLoading = false;
+      this.loadError = true;
+      return;
+    }
+    this.TravelTripsService.getTravelById(this.travelId)
+      .pipe(takeUntil(this.routeChanged), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res: any) => {
+          if (res?.success === false || !res?.data) {
+            this.isLoading = false;
+            this.loadError = true;
+            return;
+          }
+          this.data = res.data;
+          this.imgs = res.data?.images?.map((img: any) => this.paseurl + img.imageUrl) || [];
+          if (!this.programs || !this.programs.length) {
+            this.setPrograms(res.data?.segments || []);
+          }
+          this.isLoading = false;
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.loadError = true;
+          console.error('Error fetching trip details:', err);
         }
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.isLoading = false;
-        console.error('Error fetching trip details:', err);
-      }
-    });
+      });
   }
 
   getPrograms() {
-    this.TravelTripsService.getProgramStepsByTripId(this.travelId).subscribe({
-      next: (res: any) => {
-        if (res.data && res.data.length) {
-          this.setPrograms(res.data);
-        } else if (this.data?.segments) {
-          this.setPrograms(this.data.segments);
+    if (!Number.isInteger(this.travelId) || this.travelId <= 0) return;
+    this.TravelTripsService.getProgramStepsByTripId(this.travelId)
+      .pipe(takeUntil(this.routeChanged), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res: any) => {
+          if (res.data && res.data.length) {
+            this.setPrograms(res.data);
+          } else if (this.data?.segments) {
+            this.setPrograms(this.data.segments);
+          }
+        },
+        error: () => {
+          if (this.data?.segments) {
+            this.setPrograms(this.data.segments);
+          }
         }
-      },
-      error: () => {
-        if (this.data?.segments) {
-          this.setPrograms(this.data.segments);
-        }
-      }
-    });
+      });
   }
 
   getTripTypeBadge(type?: number): { label: string; severity: 'info' | 'warning' | 'success' | 'secondary'; icon: string } {

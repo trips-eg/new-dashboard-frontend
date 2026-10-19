@@ -1,4 +1,5 @@
 export class APIs {
+  public static reviews = { base: 'Reviews' };
   public static Account = {
     login: 'Authentication/Webtoken',
     forgetPassword: 'Authentication/ResendEMailOtp',

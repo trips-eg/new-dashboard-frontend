@@ -1,0 +1,364 @@
+// Shared admin/vendor layout. Wide data stays inside scrollable regions.
+body.dashboard-layout {
+  &.dashboard-menu-open {
+    overflow: hidden;
+  }
+  .pc-container,
+  .coded-wrapper,
+  .coded-content,
+  .coded-inner-content,
+  .main-body,
+  .page-wrapper {
+    min-width: 0;
+  }
+  .pc-container .main,
+  .pc-container .card,
+  .pc-container .p-card {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .pc-container .row > *,
+  .pc-container .grid > * {
+    min-width: 0;
+  }
+  p-table {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .p-datatable {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .p-datatable-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+  .dashboard-table-hint {
+    color: #526475;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    padding: 8px 12px;
+    margin: 0;
+    background: #f5f8fa;
+    border-block-end: 1px solid #dce5eb;
+    text-align: start;
+    text-transform: none;
+  }
+  .p-datatable-wrapper:focus-visible {
+    outline: 3px solid var(--main-color, #1c7ba0);
+    outline-offset: -3px;
+  }
+  .pc-header .header-wrapper {
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+  }
+  .pc-header app-nav-right {
+    min-width: 0;
+  }
+  .pc-header .pc-head-link {
+    border: 0;
+    width: auto;
+    min-width: 44px;
+    height: 44px;
+    gap: 8px;
+    padding: 8px;
+    margin-inline: 4px;
+    flex-shrink: 0;
+  }
+  .pc-header .header-user-profile .pc-head-link {
+    max-width: 260px;
+  }
+  .pc-header .header-username {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: inherit !important;
+  }
+  .pc-header .dropdown-user-profile {
+    min-width: 0;
+    width: min(330px, calc(100vw - 24px));
+    max-width: calc(100vw - 24px);
+  }
+  .pc-header .dropdown-user-profile :is(h4, p, span) {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+  .pc-header .dropdown-user-profile .dropdown-item {
+    min-height: 44px;
+  }
+  .pc-head-link:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+  }
+  .pc-sidebar .coded-inner-navbar a {
+    min-height: 44px;
+  }
+  .p-dialog {
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100dvh - 24px) !important;
+    min-width: 0 !important;
+  }
+  .p-dialog :is(.p-dialog-header, .p-dialog-content, .p-dialog-footer) {
+    min-width: 0;
+  }
+  .p-dialog-header {
+    gap: 12px;
+  }
+  .p-dialog-title {
+    overflow-wrap: anywhere;
+  }
+  .p-dialog-header-icons {
+    flex-shrink: 0;
+  }
+  .p-dialog-header-icon {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .p-dialog-content {
+    overscroll-behavior: contain;
+  }
+  .p-dialog-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: end;
+    gap: 8px;
+  }
+  .p-dialog-footer button {
+    min-height: 44px;
+    margin: 0;
+  }
+  .p-tabview-nav-content,
+  .p-steps > ul,
+  .p-stepper-nav {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+  .p-tabview-nav li,
+  .p-stepper-header {
+    flex-shrink: 0;
+  }
+  .p-tabview-nav-link,
+  .p-stepper-action {
+    min-height: 44px;
+  }
+  .p-dropdown-panel,
+  .p-multiselect-panel,
+  .p-datepicker {
+    max-width: calc(100vw - 24px);
+  }
+}
+@media (max-width: 1024px) {
+  body.dashboard-layout {
+    .pc-container {
+      margin-inline: 0;
+    }
+    .pc-header .header-wrapper {
+      padding-inline: 12px;
+    }
+    .pc-header app-nav-left {
+      flex: 0 0 auto;
+    }
+    .pc-header app-nav-right {
+      margin-inline-start: auto;
+    }
+    .pc-header .header-user-profile .pc-head-link {
+      max-width: 170px;
+    }
+    .pc-sidebar {
+      max-width: calc(100vw - 44px);
+    }
+  }
+}
+@media (max-width: 767px) {
+  body.dashboard-layout {
+    .pc-container .main {
+      padding: 16px 12px;
+    }
+    .pc-container .product-form.p-4 {
+      padding: 12px !important;
+    }
+    .pc-container .product-form .date-period-card {
+      padding: 12px;
+    }
+    // Rotate only the decorative icon so its wide container cannot cover fields.
+    .pc-container .product-form .connector-arrow {
+      transform: none !important;
+      height: 32px !important;
+      margin: 8px 0 !important;
+      pointer-events: none;
+    }
+    .pc-container .product-form .connector-arrow i {
+      transform: rotate(90deg);
+    }
+    .pc-container .p-toolbar {
+      gap: 12px;
+      padding: 12px;
+    }
+    .pc-container :is(.p-toolbar-group-start, .p-toolbar-group-end, .p-toolbar-group-left, .p-toolbar-group-right) {
+      flex-wrap: wrap;
+      gap: 8px;
+      min-width: 0;
+      max-width: 100%;
+    }
+    .pc-container :is(.p-toolbar-group-start, .p-toolbar-group-left) {
+      flex: 1 1 100%;
+    }
+    .pc-container .p-toolbar :is(.p-input-icon-left, .p-input-icon-right) {
+      min-width: 0;
+      max-width: 100%;
+      flex: 1 1 200px;
+    }
+    .pc-container .p-toolbar input {
+      max-width: 100%;
+      width: 100%;
+    }
+    .pc-container .p-toolbar :is(button, .p-button) {
+      min-height: 44px;
+    }
+    .dashboard-scroll-table .p-datatable-table {
+      min-width: var(--mobile-table-min-width, 40rem);
+    }
+    .dashboard-scroll-table .p-frozen-column {
+      position: static !important;
+      left: auto !important;
+      right: auto !important;
+    }
+    .p-paginator {
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 12px 8px;
+    }
+    .p-paginator-current {
+      flex-basis: 100%;
+      margin: 0;
+      text-align: center;
+      white-space: normal;
+      height: auto;
+      line-height: 1.5;
+    }
+    .p-paginator .p-paginator-pages {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .p-paginator :is(.p-paginator-page, .p-paginator-first, .p-paginator-prev, .p-paginator-next, .p-paginator-last) {
+      min-width: 44px;
+      min-height: 44px;
+      margin: 0;
+    }
+    .p-paginator .p-dropdown {
+      height: 44px;
+    }
+    .p-datatable :is(.p-button, button.btn, .custom-eye-button) {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    .p-toast {
+      width: calc(100vw - 24px);
+      max-width: calc(100vw - 24px);
+      inset-inline: 12px !important;
+    }
+    .p-stepper-header {
+      flex: 0 0 auto;
+    }
+    .p-stepper-panels {
+      padding-inline: 8px;
+    }
+    .pc-footer {
+      margin-inline: 0;
+    }
+  }
+}
+@media (max-width: 640px) {
+  body.dashboard-layout {
+    .pc-header .header-username {
+      max-width: 90px;
+      font-size: 0.8rem;
+    }
+    .pc-header .pc-head-link {
+      margin-inline: 0;
+    }
+    .pc-header .dropdown-user-profile {
+      margin-inline: 12px;
+      width: calc(100vw - 24px);
+    }
+    .pc-container :is(.formgrid, .form-field .grid) > [class*='col-'],
+    .p-dialog form .grid > [class*='col-'] {
+      width: 100%;
+    }
+    .pc-container form :is(.p-dropdown, .p-multiselect, .p-calendar, .p-inputnumber, .p-password, .p-autocomplete),
+    .p-dialog form :is(.p-dropdown, .p-multiselect, .p-calendar, .p-inputnumber, .p-password, .p-autocomplete) {
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+    }
+    .pc-container form :is(input:not([type='checkbox']):not([type='radio']), textarea, select),
+    .p-dialog form :is(input:not([type='checkbox']):not([type='radio']), textarea, select) {
+      min-width: 0;
+      max-width: 100%;
+      font-size: 16px;
+    }
+    .p-inputgroup {
+      min-width: 0;
+      width: 100%;
+    }
+    .p-inputgroup :is(input, p-inputnumber, p-dropdown, p-calendar) {
+      min-width: 0;
+      flex: 1;
+    }
+    .p-dialog:not(.update-cookie-banner) {
+      width: calc(100vw - 24px) !important;
+    }
+    .p-dialog-header,
+    .p-dialog-content,
+    .p-dialog-footer {
+      padding: 16px;
+    }
+    .p-dialog-footer button {
+      flex: 1 1 120px;
+    }
+    .p-datepicker {
+      min-width: 0 !important;
+      padding: 8px;
+    }
+    .p-datepicker table {
+      width: 100%;
+      table-layout: fixed;
+    }
+    .p-datepicker table td {
+      padding: 2px;
+    }
+    .p-datepicker table td > span {
+      width: 100%;
+      max-width: 2rem;
+      height: 2rem;
+    }
+    .p-dropdown-items .p-dropdown-item,
+    .p-multiselect-items .p-multiselect-item {
+      white-space: normal;
+      overflow-wrap: anywhere;
+      min-height: 44px;
+    }
+    .p-fileupload-buttonbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .p-fileupload-buttonbar .p-button {
+      margin: 0;
+      min-height: 44px;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.dashboard-layout .pc-sidebar,
+  body.dashboard-layout .pc-header {
+    transition: none;
+  }
+}

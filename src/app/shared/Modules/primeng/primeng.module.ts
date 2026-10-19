@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { TreeTableModule } from 'primeng/treetable';
 import { TreeModule } from 'primeng/tree';
 import { TableModule } from 'primeng/table';
+import { ResponsiveTableDirective } from '../../directives/responsive-table.directive';
 import { DataViewModule } from 'primeng/dataview';
 import { OrderListModule } from 'primeng/orderlist';
 import { OrganizationChartModule } from 'primeng/organizationchart';
@@ -71,6 +72,7 @@ import { StepperModule } from 'primeng/stepper';
 @NgModule({
   declarations: [],
   imports: [
+    ResponsiveTableDirective,
     CommonModule,
     TreeTableModule,
     TreeModule,
@@ -143,6 +145,7 @@ import { StepperModule } from 'primeng/stepper';
     ColorPickerModule
   ],
   exports: [
+    ResponsiveTableDirective,
     TreeTableModule,
     TreeModule,
     TableModule,

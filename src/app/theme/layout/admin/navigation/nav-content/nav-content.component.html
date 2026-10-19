@@ -1,6 +1,6 @@
-<ng-scrollbar style="height: calc(100vh - 70px); font-weight: 500;  overflow-y: auto" visibility="hover">
+<ng-scrollbar visibility="hover">
   <div class="navbar-content" [dir]="'dir' | translate">
-    <ul class="nav coded-inner-navbar" (clickOutside)="fireOutClick()" (mouseleave)="navMob()">
+    <ul class="nav coded-inner-navbar">
       @for (item of navigation; track item) {
         @if (item.type == 'group') {
           <app-nav-group [item]="item"></app-nav-group>

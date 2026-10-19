@@ -4,14 +4,14 @@
   object-fit: cover; /* Ensures the image scales and crops properly */
   border-radius: 10px; /* Optional: Adjust the border radius */
 }
-.store-banner{
-background: url('/assets/images/bg-login.jpg') no-repeat center center;
-background-size: cover;
-position: relative;
-z-index: 2;
-border-radius: 9px;
+.store-banner {
+  background: url('/assets/images/bg-login.jpg') no-repeat center center;
+  background-size: cover;
+  position: relative;
+  z-index: 2;
+  border-radius: 9px;
 }
-.store-banner::before{
+.store-banner::before {
   content: '';
   position: absolute;
   top: 0;
@@ -21,15 +21,65 @@ border-radius: 9px;
   border-radius: 9px;
   background-color: #0b3c58db; /* Adjust the opacity as needed */
 }
-.info{
-  background:#fff;
+.info {
+  background: #fff;
   padding: 4px;
   border-radius: 3px;
   color: var(--thm-blue);
 }
-.pi-link:hover{
+.pi-link:hover {
   cursor: pointer;
-
-
 }
-h4{font-weight: 700;}
+h4 {
+  font-weight: 700;
+}
+.store-identity,
+.store-copy {
+  min-width: 0;
+}
+.store-logo {
+  flex-shrink: 0;
+  margin-inline-end: 16px;
+}
+.store-copy :is(h2, p, bdi) {
+  overflow-wrap: anywhere;
+}
+.store-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+.store-contact > span {
+  display: inline-flex;
+  align-items: start;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+.store-contact i {
+  flex-shrink: 0;
+}
+@media (max-width: 767px) {
+  .store-overview {
+    padding: 16px 12px !important;
+  }
+  .store-banner {
+    padding: 20px 16px !important;
+  }
+}
+@media (max-width: 640px) {
+  .store-identity {
+    flex-direction: column;
+    align-items: start !important;
+    gap: 16px;
+  }
+  .store-logo {
+    width: 84px;
+    height: 64px;
+    margin-inline-end: 0;
+  }
+  .store-copy h2 {
+    font-size: 1.4rem;
+    line-height: 1.5;
+  }
+}

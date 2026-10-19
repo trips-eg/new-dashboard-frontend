@@ -23,8 +23,9 @@ export class NavRightComponent implements OnInit, OnDestroy {
   notificationsList: any;
   selectedNotification: any;
   unreadCount: number;
-  vendorId
+  vendorId;
   private userStateSubscription: Subscription;
+  private languageSubscription: Subscription;
 
   constructor(
     private translationService: TranslateService,
@@ -34,7 +35,8 @@ export class NavRightComponent implements OnInit, OnDestroy {
     private swUpdate: SwUpdate,
     private toastr: ToastrService
   ) {
-    this.currentLang = this.translationService.getDefaultLang();
+    this.currentLang = this.translationService.currentLang || this.translationService.getDefaultLang();
+    this.languageSubscription = this.translationService.onLangChange.subscribe(({ lang }) => (this.currentLang = lang));
     this.refreshUserData();
 
     // Subscribe to user state changes
@@ -49,6 +51,7 @@ export class NavRightComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.languageSubscription.unsubscribe();
     // Clean up subscription
     if (this.userStateSubscription) {
       this.userStateSubscription.unsubscribe();
@@ -73,47 +76,57 @@ export class NavRightComponent implements OnInit, OnDestroy {
     this.document.documentElement.lang = this.currentLang;
     this.document.documentElement.dir = dir;
   }
+  get initials(): string {
+    const parts = (this.username || '').trim().split(/\s+/).filter(Boolean);
+    return parts.length > 1 ? (parts[0][0] + parts[1][0]).toUpperCase() : (parts[0] || 'Trips').slice(0, 2).toUpperCase();
+  }
+  get roleLabels(): string {
+    return (this.userRole || [])
+      .map((role) => {
+        const key = 'NAV_UI.ROLE_' + role.replace(/\./g, '_').toUpperCase();
+        const label = this.translationService.instant(key);
+        return label === key ? role : label;
+      })
+      .join(' · ');
+  }
 
   logout() {
     // Use the ConfigureService logout method which handles notifications
     this._configSer.Logout();
   }
 
-//is vendor or admin //
- isVendor(): boolean {
+  //is vendor or admin //
+  isVendor(): boolean {
     const roles = this._configSer.userRoles();
     return roles.some((role) => role.startsWith('Vendor.'));
   }
 
   checkForUpdates() {
     if (this.swUpdate.isEnabled) {
-      this.toastr.info(
-        this.currentLang === 'ar' ? 'جاري التحقق من وجود تحديثات...' : 'Checking for updates...',
-        '',
-        { timeOut: 2000 }
-      );
-      this.swUpdate.checkForUpdate().then(hasUpdate => {
-        if (!hasUpdate) {
-          this.toastr.success(
-            this.currentLang === 'ar' ? 'لوحة التحكم محدثة بالفعل إلى أحدث إصدار.' : 'The dashboard is already up to date.',
-            '',
-            { timeOut: 3000 }
-          );
-        } else {
-          this.toastr.info(
-            this.currentLang === 'ar' ? 'تم العثور على تحديث! جاري تنزيل الملفات...' : 'Update found! Downloading assets in the background...',
-            '',
-            { timeOut: 4000 }
-          );
-        }
-      }).catch(err => {
-        console.error('Check for updates failed:', err);
-        this.toastr.error(
-          this.currentLang === 'ar' ? 'فشل التحقق من التحديثات.' : 'Failed to check for updates.',
-          '',
-          { timeOut: 3000 }
-        );
-      });
+      this.toastr.info(this.currentLang === 'ar' ? 'جاري التحقق من وجود تحديثات...' : 'Checking for updates...', '', { timeOut: 2000 });
+      this.swUpdate
+        .checkForUpdate()
+        .then((hasUpdate) => {
+          if (!hasUpdate) {
+            this.toastr.success(
+              this.currentLang === 'ar' ? 'لوحة التحكم محدثة بالفعل إلى أحدث إصدار.' : 'The dashboard is already up to date.',
+              '',
+              { timeOut: 3000 }
+            );
+          } else {
+            this.toastr.info(
+              this.currentLang === 'ar'
+                ? 'تم العثور على تحديث! جاري تنزيل الملفات...'
+                : 'Update found! Downloading assets in the background...',
+              '',
+              { timeOut: 4000 }
+            );
+          }
+        })
+        .catch((err) => {
+          console.error('Check for updates failed:', err);
+          this.toastr.error(this.currentLang === 'ar' ? 'فشل التحقق من التحديثات.' : 'Failed to check for updates.', '', { timeOut: 3000 });
+        });
     } else {
       this.toastr.warning(
         this.currentLang === 'ar' ? 'التحقق من التحديثات غير متاح في بيئة التطوير.' : 'Update check is not available in development mode.',
@@ -122,5 +135,4 @@ export class NavRightComponent implements OnInit, OnDestroy {
       );
     }
   }
-
 }

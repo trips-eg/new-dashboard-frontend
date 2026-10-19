@@ -1,0 +1,95 @@
+<main class="main reviews-page" [attr.dir]="rtl ? 'rtl' : 'ltr'">
+  <div class="reviews-workspace">
+    <header class="workspace-heading" aria-labelledby="reviews-page-title">
+      <span class="workspace-mark" aria-hidden="true"><i class="fas fa-star-half-stroke"></i></span>
+      <div class="workspace-heading-copy">
+        <nav class="workspace-breadcrumb" [attr.aria-label]="'REVIEWS.TITLE' | translate">
+          <a routerLink="/default">{{ 'Home' | translate }}</a>
+          <i class="fas fa-chevron-right" aria-hidden="true"></i>
+          <span aria-current="page">{{ 'REVIEWS.TITLE' | translate }}</span>
+        </nav>
+        <h1 id="reviews-page-title">{{ 'REVIEWS.TITLE' | translate }}</h1>
+        <p>{{ 'REVIEWS_CATALOG.INTRO' | translate }}</p>
+      </div>
+    </header>
+    <section class="catalog-panel" aria-labelledby="catalog-heading">
+      <div class="catalog-heading">
+        <h2 id="catalog-heading">{{ 'REVIEWS_CATALOG.CHOOSE' | translate }}</h2>
+      </div>
+      <form class="catalog-controls" (ngSubmit)="find()">
+        <div class="field">
+          <label for="review-item-type">{{ 'REVIEWS_CATALOG.TYPE' | translate }}</label>
+          <select id="review-item-type" [ngModel]="type" (ngModelChange)="changeType($event)" name="type">
+            <option *ngFor="let value of types" [value]="value">{{ 'REVIEWS_CATALOG.' + value | translate }}</option>
+          </select>
+        </div>
+        <div class="field search-field">
+          <label for="review-item-search">{{ 'REVIEWS_CATALOG.SEARCH_LABEL' | translate }}</label>
+          <div class="search-controls">
+            <input
+              id="review-item-search"
+              type="search"
+              name="search"
+              [(ngModel)]="search"
+              [placeholder]="'REVIEWS_CATALOG.SEARCH_HINT' | translate"
+            />
+            <button type="submit" class="search-button" [disabled]="loading">
+              <i class="fas fa-search" aria-hidden="true"></i>
+              {{ 'REVIEWS_CATALOG.SEARCH' | translate }}
+            </button>
+          </div>
+        </div>
+      </form>
+      <p *ngIf="loading" class="catalog-status" role="status">{{ 'REVIEWS_CATALOG.LOADING' | translate }}</p>
+      <div *ngIf="error" class="catalog-error" role="alert">
+        <p>{{ error | translate }}</p>
+        <button type="button" (click)="load()">{{ 'REVIEWS.RETRY' | translate }}</button>
+      </div>
+      <ng-container *ngIf="!loading && !error">
+        <p class="catalog-status" role="status">{{ 'REVIEWS_CATALOG.RESULTS' | translate: { count: total } }}</p>
+        <div class="catalog-grid">
+          <button
+            type="button"
+            class="catalog-item"
+            *ngFor="let item of items"
+            (click)="selectItem(item)"
+            [class.selected]="selected?.id === item.id"
+            [attr.aria-pressed]="selected?.id === item.id"
+          >
+            <span class="item-name">{{ name(item) }}</span>
+            <span class="item-meta">
+              <bdi dir="ltr">#{{ item.id }}</bdi>
+              <span>{{ (selected?.id === item.id ? 'REVIEWS_CATALOG.SELECTED' : 'REVIEWS_CATALOG.MANAGE') | translate }}</span>
+            </span>
+          </button>
+        </div>
+        <p *ngIf="!items.length" class="catalog-status">{{ 'REVIEWS_CATALOG.EMPTY' | translate }}</p>
+        <nav *ngIf="pageCount > 1" class="catalog-pagination" [attr.aria-label]="'REVIEWS_CATALOG.PAGINATION' | translate">
+          <button type="button" (click)="changePage(-1)" [disabled]="page === 1">{{ 'REVIEWS.PREVIOUS' | translate }}</button>
+          <span>{{ 'REVIEWS.PAGE' | translate: { page: page, total: pageCount } }}</span>
+          <button type="button" (click)="changePage(1)" [disabled]="page >= pageCount">{{ 'REVIEWS.NEXT' | translate }}</button>
+        </nav>
+      </ng-container>
+    </section>
+    <section *ngIf="selected; else chooseItem" class="selected-reviews" aria-labelledby="selected-heading">
+      <div class="selection-heading">
+        <div>
+          <span class="eyebrow">{{ 'REVIEWS_CATALOG.REVIEWING' | translate }}</span>
+          <h2 id="selected-heading" #selectedHeading tabindex="-1">{{ name(selected) }}</h2>
+        </div>
+        <a [routerLink]="[detailsRoute, selected.id]">
+          {{ 'REVIEWS_CATALOG.DETAILS' | translate }}
+          <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+        </a>
+      </div>
+      <app-item-reviews [itemType]="reviewType" [itemId]="selected.id" [itemName]="name(selected)" />
+    </section>
+    <ng-template #chooseItem>
+      <div class="selection-empty">
+        <i class="fas fa-star-half-stroke" aria-hidden="true"></i>
+        <h2>{{ 'REVIEWS_CATALOG.EMPTY_TITLE' | translate }}</h2>
+        <p>{{ 'REVIEWS_CATALOG.EMPTY_HINT' | translate }}</p>
+      </div>
+    </ng-template>
+  </div>
+</main>

@@ -1,5 +1,5 @@
 // Angular import
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-nav-left',
@@ -7,6 +7,7 @@ import { Component, Output, EventEmitter } from '@angular/core';
   styleUrls: ['./nav-left.component.scss']
 })
 export class NavLeftComponent {
+  @Input() mobileMenuOpen = false;
   // public props
   @Output() NavCollapsedMob = new EventEmitter();
 }

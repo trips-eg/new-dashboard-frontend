@@ -1,25 +1,36 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, takeUntil } from 'rxjs';
+import { ItemReviewsComponent } from 'src/app/shared/components/item-reviews/item-reviews.component';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { SubHeaderComponent } from 'src/app/shared/components/sub-header/sub-header.component';
+import { DetailPageHeaderComponent } from 'src/app/shared/components/detail-page-header/detail-page-header.component';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 import { OutingService } from 'src/app/shared/services/outing.service';
 import { environment } from 'src/environments/environment';
 
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+
 @Component({
   selector: 'app-outing-details',
   standalone: true,
-  imports: [SubHeaderComponent, SharedModule],
+  imports: [DetailPageHeaderComponent, SharedModule, ItemReviewsComponent],
   templateUrl: './outing-details.component.html',
   styleUrls: ['./outing-details.component.scss']
 })
 export class OutingDetailsComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly sanitizer = inject(DomSanitizer);
+  private readonly routeChanged = new Subject<void>();
+  loading = true;
+  loadError = false;
   outing: any = null;
   outingId: number | null = null;
   imgBaseUrl: string = environment.imgUrl || '';
   imgs: string[] = []; // used by Galleria (same name as travel example)
   currentLang: string;
   scheduledDates: Date[][] = []; // Store dates for each schedule
+  renderedDescription: SafeHtml = '';
 
   responsiveOptions = [
     { breakpoint: '1024px', numVisible: 4 },
@@ -33,34 +44,76 @@ export class OutingDetailsComponent implements OnInit {
     private translateService: TranslateService
   ) {
     this.currentLang = this.translateService.currentLang || 'en';
+    this.translateService.onLangChange.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((event) => (this.currentLang = event.lang));
     // Ensure no trailing slash
     this.imgBaseUrl = this.imgBaseUrl.replace(/\/$/, '');
   }
 
   ngOnInit(): void {
-    this.route.params.subscribe((params) => {
+    this.destroyRef.onDestroy(() => {
+      this.routeChanged.next();
+      this.routeChanged.complete();
+    });
+    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      this.routeChanged.next();
+      this.outing = null;
+      this.renderedDescription = '';
       this.outingId = +params['id'];
       this.getOutingDetails();
     });
   }
 
   getOutingDetails() {
-    if (!this.outingId) return;
+    this.loading = true;
+    this.loadError = false;
+    if (!Number.isInteger(this.outingId) || this.outingId <= 0) {
+      this.loading = false;
+      this.loadError = true;
+      return;
+    }
 
-    this.outingService.getOutingById(this.outingId).subscribe({
-      next: (res: any) => {
-        if (res?.success) {
-          this.outing = res.data;
-          this.buildImages();
-          this.processScheduleDates();
-        } else {
-          console.error('Failed to load outing or invalid response:', res);
+    this.outingService
+      .getOutingById(this.outingId)
+      .pipe(takeUntil(this.routeChanged), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res: any) => {
+          this.loading = false;
+          if (res?.success && res.data) {
+            this.outing = res.data;
+            this.buildImages();
+            this.processScheduleDates();
+            this.processDescription();
+          } else {
+            this.loadError = true;
+            console.error('Failed to load outing or invalid response:', res);
+          }
+        },
+        error: (err) => {
+          this.loading = false;
+          this.loadError = true;
+          console.error('Error loading outing details:', err);
         }
-      },
-      error: (err) => {
-        console.error('Error loading outing details:', err);
-      }
-    });
+      });
+  }
+
+  private processDescription() {
+    if (!this.outing?.description) {
+      this.renderedDescription = '';
+      return;
+    }
+
+    let html = this.outing.description;
+
+    // If plain text without any HTML tags, preserve newlines as line breaks
+    if (!/<[a-z][\s\S]*>/i.test(html)) {
+      html = html.replace(/\r\n|\r|\n/g, '<br/>');
+    }
+
+    // Convert markdown bold **text** to <strong>text</strong>
+    html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*\*([^*\n<]+)(?=(?:<\/p>|<br\s*\/?>|$))/g, '<strong>$1</strong>');
+
+    this.renderedDescription = this.sanitizer.bypassSecurityTrustHtml(html);
   }
 
   private buildImages() {
@@ -107,7 +160,7 @@ export class OutingDetailsComponent implements OnInit {
 
   getDayOfWeekName(dayNumber: number): string {
     // API uses 1-based index: 1=Saturday, 2=Sunday, 3=Monday, etc.
-    const days = [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday' ,'Saturday'];
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     return days[dayNumber] || 'N/A';
   }
 

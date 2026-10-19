@@ -1,17 +1,20 @@
 <div class="m-header">
-  <a [routerLink]="['/default/']" class="b-brand w-100 text-center">
-    <img src="assets/images/logo_color.png" alt="" class="logo logo-lg" />
+  <a routerLink="/default" class="brand-link" [attr.aria-label]="'NAV_UI.HOME' | translate">
+    <img src="assets/images/new logo.PNG" alt="" width="44" height="44" class="brand-mark" />
+    <span class="brand-copy">
+      <strong>Trips</strong>
+      <small>{{ 'NAV_UI.DASHBOARD' | translate }}</small>
+    </span>
   </a>
-  <div class="pc-h-item">
-    <a
-      href="javascript:"
-      class="pc-head-link head-link-secondary m-0 mobile-menu"
-      [ngClass]="{ on: navCollapsed }"
-      id="sidebar-hide mobile-collapse"
-      (click)="navCollapse()"
-    >
-      <i class="ti ti-menu-2"></i>
-    </a>
-  </div>
+  <button
+    type="button"
+    class="pc-head-link desktop-menu-toggle"
+    id="sidebar-hide"
+    (click)="navCollapse()"
+    [attr.aria-label]="(navCollapsed ? 'NAV_UI.EXPAND_SIDEBAR' : 'NAV_UI.COLLAPSE_SIDEBAR') | translate"
+    [attr.aria-expanded]="!navCollapsed"
+    aria-controls="dashboard-sidebar"
+  >
+    <i [class]="navCollapsed ? 'ti ti-layout-sidebar-left-expand' : 'ti ti-layout-sidebar-left-collapse'" aria-hidden="true"></i>
+  </button>
 </div>
-<!-- [ Header ] end -->

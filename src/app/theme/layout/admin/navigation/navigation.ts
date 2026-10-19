@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ConfigureService } from 'src/app/theme/shared/services/configure.service';
 import { BehaviorSubject } from 'rxjs';
+import { REVIEW_ADMIN_ROLES } from 'src/app/shared/model/review.model';
 
 export interface NavigationItem {
   id: string;
@@ -16,6 +17,7 @@ export interface NavigationItem {
   permissions?: string[]; // to manage permissions instead of roles
   adminOnly?: boolean;
   vendorOnly?: boolean;
+  roles?: readonly string[];
 }
 
 export interface Navigation extends NavigationItem {
@@ -503,6 +505,16 @@ const NavigationItems = [
   },
 
   {
+    id: 'reviews',
+    title: 'REVIEWS.TITLE',
+    type: 'item',
+    classes: 'nav-item',
+    url: '/reviews',
+    icon: 'fas fa-star-half-stroke',
+    breadcrumbs: false,
+    roles: REVIEW_ADMIN_ROLES
+  },
+  {
     id: 'transactions',
     title: 'transactions',
     type: 'collapse',
@@ -854,7 +866,7 @@ export class NavigationItem {
     const userRoles = this._configService.userRoles();
     const isVendor = userRoles.some((role: string) => role.startsWith('Vendor.'));
     console.log('User Permissions:....................', userPermissions);
-    if (!user || !userPermissions || userPermissions.length === 0) {
+    if (!user || !userPermissions) {
       return [];
     }
 
@@ -862,6 +874,8 @@ export class NavigationItem {
 
     const filterItems = (items) => {
       return items.filter((item) => {
+        if (userPermissions.length === 0 && !item.roles) return false;
+        if (item.roles && !userRoles.some((role: string) => item.roles.includes(role))) return false;
         if (item.vendorOnly && !isVendor) {
           return false;
         }

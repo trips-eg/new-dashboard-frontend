@@ -1,29 +1,48 @@
-<div class="main">
-  <!-- Sub-Header with Back & Edit Actions -->
-  <sub-header
-    [mainHeader]="'travel Details' | translate"
-    [mainSection]="'travel Management' | translate"
-    [subSection]="data?.name || ('Details' | translate)"
-    [actionButtons]="actionButtons"
+<div class="main details-page" [attr.dir]="currentLang === 'ar' ? 'rtl' : 'ltr'">
+  <app-detail-page-header
+    typeLabel="DETAIL_HEADER.TRIP_DETAILS"
+    parentLabel="DETAIL_HEADER.TRIPS"
+    parentLink="/travels"
+    icon="fas fa-plane-departure"
+    [itemName]="data?.name"
+    [itemId]="data?.id"
+    [active]="data?.isActive"
+    [rtl]="currentLang === 'ar'"
+    [loading]="isLoading || !data"
+    [actions]="actionButtons"
     (actionClicked)="handleAction($event)"
-  ></sub-header>
+  />
 
   <!-- Loading State -->
-  <div *ngIf="isLoading" class="card p-5 text-center shadow-1 border-round mb-4">
+  <div *ngIf="isLoading" class="detail-state" role="status">
     <i class="pi pi-spin pi-spinner text-primary text-4xl mb-3"></i>
     <p class="text-muted">{{ 'Loading details...' | translate }}</p>
   </div>
 
   <div *ngIf="!isLoading && data">
+    <nav class="detail-section-nav" [attr.aria-label]="'DETAIL_PAGE.NAV' | translate">
+      <a href="#detail-overview" (click)="$event.preventDefault(); detailOverview.scrollIntoView()">
+        <i class="pi pi-info-circle" aria-hidden="true"></i>
+        {{ 'DETAIL_PAGE.OVERVIEW' | translate }}
+      </a>
+      <a href="#detail-itinerary" (click)="$event.preventDefault(); detailItinerary.scrollIntoView()">
+        <i class="pi pi-map" aria-hidden="true"></i>
+        {{ 'DETAIL_PAGE.ITINERARY' | translate }}
+      </a>
+      <a href="#detail-reviews" (click)="$event.preventDefault(); detailReviews.scrollIntoView()">
+        <i class="pi pi-comments" aria-hidden="true"></i>
+        {{ 'DETAIL_PAGE.REVIEWS' | translate }}
+      </a>
+    </nav>
     <!-- ── 1. Hero Overview Card ── -->
-    <div class="card p-4 border-round shadow-2 mb-4 border-0 hero-trip-card">
+    <div #detailOverview id="detail-overview" class="card p-4 border-round shadow-2 mb-4 border-0 hero-trip-card detail-overview">
       <div class="row g-3 align-items-center">
         <!-- Gallery / Media (Left) -->
         <div class="col-12 col-lg-5">
           <div *ngIf="imgs && imgs.length > 0; else noImagesPlaceholder">
             <p-galleria
               [value]="imgs"
-              [autoPlay]="true"
+              [autoPlay]="false"
               [circular]="true"
               [showItemNavigators]="true"
               [thumbnailsPosition]="'bottom'"
@@ -32,11 +51,11 @@
               [numVisible]="4"
             >
               <ng-template pTemplate="item" let-item>
-                <img [src]="item" class="w-full h-18rem md:h-22rem border-round shadow-1 object-fit-cover" />
+                <img [src]="item" [alt]="data.name" class="w-full h-18rem md:h-22rem border-round shadow-1 object-fit-cover" />
               </ng-template>
               <ng-template pTemplate="thumbnail" let-item>
                 <div class="grid grid-nogutter justify-content-center">
-                  <img [src]="item" class="w-5rem h-4rem border-round object-fit-cover" />
+                  <img [src]="item" alt="" loading="lazy" class="w-5rem h-4rem border-round object-fit-cover" />
                 </div>
               </ng-template>
             </p-galleria>
@@ -57,7 +76,9 @@
         <div class="col-12 col-lg-7 ps-lg-4 mt-3 mt-lg-0">
           <!-- Meta Tags Row -->
           <div class="flex align-items-center gap-2 flex-wrap mb-2">
-            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-2 py-1 text-xs font-monospace">
+            <span
+              class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill px-2 py-1 text-xs font-monospace"
+            >
               #{{ data.id }}
             </span>
             <p-tag
@@ -71,11 +92,19 @@
               [severity]="data.isActive ? 'success' : 'danger'"
               styleClass="text-xs"
             ></p-tag>
-            <span *ngIf="data.isRecommended" class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-1 text-xs">
-              <i class="pi pi-star-fill mr-1"></i>{{ 'Featured' | translate }}
+            <span
+              *ngIf="data.isRecommended"
+              class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2 py-1 text-xs"
+            >
+              <i class="pi pi-star-fill mr-1"></i>
+              {{ 'Featured' | translate }}
             </span>
-            <span *ngIf="data.isExternallTrip" class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-1 text-xs">
-              <i class="pi pi-globe mr-1"></i>{{ 'External Trip' | translate }}
+            <span
+              *ngIf="data.isExternallTrip"
+              class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-1 text-xs"
+            >
+              <i class="pi pi-globe mr-1"></i>
+              {{ 'External Trip' | translate }}
             </span>
           </div>
 
@@ -86,7 +115,8 @@
           <div class="route-banner p-2 px-3 border-round my-2 flex align-items-center gap-2 flex-wrap">
             <span class="font-semibold text-primary flex align-items-center">
               <i class="pi pi-map-marker mr-1"></i>
-              {{ data.city?.name || '-' }}<span *ngIf="data.country?.name">, {{ data.country.name }}</span>
+              {{ data.city?.name || '-' }}
+              <span *ngIf="data.country?.name">, {{ data.country.name }}</span>
             </span>
             <span class="text-muted" *ngIf="data.fromLocation || data.toLocation">•</span>
             <span class="text-700 text-sm flex align-items-center" *ngIf="data.fromLocation || data.toLocation">
@@ -98,6 +128,7 @@
           </div>
 
           <!-- Rating -->
+          <p class="detail-rating-label">{{ 'DETAIL_PAGE.ITEM_RATING' | translate }}</p>
           <div class="flex align-items-center gap-2 my-2">
             <p-rating [(ngModel)]="data.rating" [readonly]="true" [cancel]="false"></p-rating>
             <span class="text-muted text-sm font-medium">({{ data.rating || 0 }} / 5)</span>
@@ -152,12 +183,13 @@
             <div>
               <span class="text-muted text-xs block mb-1">{{ 'Seats Remaining' | translate }}</span>
               <strong class="text-900 text-lg font-bold">
-                {{ data.remainingSeats }} <small class="text-muted text-xs font-normal">/ {{ data.capacity }}</small>
+                {{ data.remainingSeats }}
+                <small class="text-muted text-xs font-normal">/ {{ data.capacity }}</small>
               </strong>
             </div>
           </div>
           <!-- Mini Progress Bar -->
-          <div class="w-full bg-200 border-round mt-2" style="height: 6px; overflow: hidden; background: #e2e8f0;">
+          <div class="w-full bg-200 border-round mt-2" style="height: 6px; overflow: hidden; background: #e2e8f0">
             <div
               class="h-full border-round"
               [style.width.%]="getOccupancyRate()"
@@ -176,7 +208,7 @@
           <div>
             <span class="text-muted text-xs block mb-1">{{ 'Adult Price' | translate }}</span>
             <strong class="text-900 text-lg font-bold text-success">
-              {{ data.price | currency: 'EGP ':'symbol':'1.0-0' }}
+              {{ data.price | currency: 'EGP ' : 'symbol' : '1.0-0' }}
             </strong>
           </div>
         </div>
@@ -191,7 +223,7 @@
           <div>
             <span class="text-muted text-xs block mb-1">{{ 'Child Price' | translate }}</span>
             <strong class="text-900 text-lg font-bold">
-              {{ data.childPrice ? (data.childPrice | currency: 'EGP ':'symbol':'1.0-0') : ('Free / N/A' | translate) }}
+              {{ data.childPrice ? (data.childPrice | currency: 'EGP ' : 'symbol' : '1.0-0') : ('Free / N/A' | translate) }}
             </strong>
           </div>
         </div>
@@ -258,7 +290,10 @@
     </div>
 
     <!-- Legacy Single Date Display (if no tripDates) -->
-    <div class="card p-4 border-round shadow-2 mb-4 border-0" *ngIf="(!data.tripDates || !data.tripDates.length) && data.startDate && !data.startDate.startsWith('0001-01-01')">
+    <div
+      class="card p-4 border-round shadow-2 mb-4 border-0"
+      *ngIf="(!data.tripDates || !data.tripDates.length) && data.startDate && !data.startDate.startsWith('0001-01-01')"
+    >
       <h3 class="text-xl font-bold mb-3 flex align-items-center gap-2">
         <i class="pi pi-calendar text-primary"></i>
         {{ 'Departure Date' | translate }}
@@ -308,10 +343,7 @@
             </h4>
 
             <div *ngIf="data.accommodationTypes && data.accommodationTypes.length > 0; else noAccommodation">
-              <div
-                *ngFor="let acc of data.accommodationTypes"
-                class="accommodation-item-box p-3 border-round mb-2 border-1 surface-border"
-              >
+              <div *ngFor="let acc of data.accommodationTypes" class="accommodation-item-box p-3 border-round mb-2 border-1 surface-border">
                 <div class="flex align-items-center gap-2 mb-1">
                   <i class="pi pi-building text-primary"></i>
                   <strong class="text-900 text-sm font-semibold">{{ acc.name }}</strong>
@@ -359,15 +391,16 @@
               <!-- Deposit Rate -->
               <div class="col-12 col-sm-6 mb-2">
                 <small class="text-muted block text-xs mb-1">{{ 'Deposit Required' | translate }}</small>
-                <span class="font-semibold text-900 text-sm">
-                  {{ data.depositRate || 0 }}%
-                </span>
+                <span class="font-semibold text-900 text-sm">{{ data.depositRate || 0 }}%</span>
               </div>
 
               <!-- Payment on Arrival -->
               <div class="col-12 col-sm-6 mb-2">
                 <small class="text-muted block text-xs mb-1">{{ 'Payment Upon Arrival' | translate }}</small>
-                <span class="badge" [ngClass]="data.isAllowPaymentUponArrival ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'">
+                <span
+                  class="badge"
+                  [ngClass]="data.isAllowPaymentUponArrival ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'"
+                >
                   {{ (data.isAllowPaymentUponArrival ? 'Allowed' : 'Not Allowed') | translate }}
                 </span>
               </div>
@@ -392,8 +425,8 @@
     </div>
 
     <!-- ── 5. Program & Itinerary Timeline ── -->
-    <div class="card p-4 border-round shadow-2 border-0 mb-4 itinerary-card">
-      <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+    <div #detailItinerary id="detail-itinerary" class="card p-4 border-round shadow-2 border-0 mb-4 itinerary-card">
+      <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom detail-section-heading">
         <div>
           <h3 class="text-xl font-bold m-0 text-900 d-flex align-items-center gap-2">
             <i class="fa-solid fa-route text-primary"></i>
@@ -423,10 +456,12 @@
             <div class="itinerary-opposite-stamp">
               <span class="itinerary-step-number">{{ 'Step' | translate }} #{{ getStepIndex(program) }}</span>
               <span class="itinerary-date-text" *ngIf="program.time && !program.time.startsWith('0001-01-01')">
-                <i class="fa-regular fa-calendar me-1"></i>{{ program.time | date: 'dd/MM/yyyy' }}
+                <i class="fa-regular fa-calendar me-1"></i>
+                {{ program.time | date: 'dd/MM/yyyy' }}
               </span>
               <span class="itinerary-time-text" *ngIf="program.time && !program.time.startsWith('0001-01-01')">
-                <i class="fa-regular fa-clock me-1"></i>{{ program.time | date: 'shortTime' }}
+                <i class="fa-regular fa-clock me-1"></i>
+                {{ program.time | date: 'shortTime' }}
               </span>
             </div>
           </ng-template>
@@ -438,10 +473,18 @@
               <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                 <div class="d-flex align-items-center gap-2">
                   <span class="itinerary-type-badge">
-                    {{ currentLang === 'ar' ? (program.typeObj?.nameAr || program.typeObj?.nameEn) : (program.typeObj?.nameEn || program.typeObj?.nameAr) }}
+                    {{
+                      currentLang === 'ar'
+                        ? program.typeObj?.nameAr || program.typeObj?.nameEn
+                        : program.typeObj?.nameEn || program.typeObj?.nameAr
+                    }}
                   </span>
-                  <span class="badge bg-light text-secondary border rounded-pill px-2 py-1 text-xs" *ngIf="program.time && !program.time.startsWith('0001-01-01')">
-                    <i class="fa-regular fa-clock me-1 text-primary"></i>{{ program.time | date: 'shortTime' }}
+                  <span
+                    class="badge bg-light text-secondary border rounded-pill px-2 py-1 text-xs"
+                    *ngIf="program.time && !program.time.startsWith('0001-01-01')"
+                  >
+                    <i class="fa-regular fa-clock me-1 text-primary"></i>
+                    {{ program.time | date: 'dd/MM/yyyy, HH:mm' }}
                   </span>
                 </div>
                 <span class="text-muted text-xs font-monospace">ID: #{{ program.id }}</span>
@@ -451,7 +494,10 @@
               <h4 class="itinerary-step-title mb-2">{{ program.title }}</h4>
 
               <!-- Route Indicator (if fromLocation or toLocation) -->
-              <div class="itinerary-route-box p-2 px-3 border-round mb-2 d-flex align-items-center gap-2 text-xs" *ngIf="program.fromLocation || program.toLocation">
+              <div
+                class="itinerary-route-box p-2 px-3 border-round mb-2 d-flex align-items-center gap-2 text-xs"
+                *ngIf="program.fromLocation || program.toLocation"
+              >
                 <i class="fa-solid fa-map-location-dot text-primary"></i>
                 <span class="fw-semibold text-700">{{ program.fromLocation || '-' }}</span>
                 <i class="fa-solid fa-arrow-right-long text-primary mx-1"></i>
@@ -459,7 +505,10 @@
               </div>
 
               <!-- Time Range (fromTime - toTime) -->
-              <div class="itinerary-timerange-box text-xs text-muted mb-2 d-flex align-items-center gap-2" *ngIf="program.fromTime && program.toTime">
+              <div
+                class="itinerary-timerange-box text-xs text-muted mb-2 d-flex align-items-center gap-2"
+                *ngIf="program.fromTime && program.toTime"
+              >
                 <i class="fa-regular fa-hourglass-half text-primary"></i>
                 <span>{{ program.fromTime | date: 'shortTime' }} — {{ program.toTime | date: 'shortTime' }}</span>
               </div>
@@ -470,9 +519,13 @@
               </p>
 
               <!-- Sub-Steps / Checklist -->
-              <div *ngIf="program.stepDescriptions && program.stepDescriptions.length > 0" class="itinerary-substeps-wrapper mt-3 pt-2 border-top">
+              <div
+                *ngIf="program.stepDescriptions && program.stepDescriptions.length > 0"
+                class="itinerary-substeps-wrapper mt-3 pt-2 border-top"
+              >
                 <small class="text-muted fw-bold d-block mb-2 text-xs">
-                  <i class="fa-solid fa-list-check me-1 text-primary"></i>{{ 'Key Program Steps' | translate }}:
+                  <i class="fa-solid fa-list-check me-1 text-primary"></i>
+                  {{ 'Key Program Steps' | translate }}:
                 </small>
                 <div class="d-flex flex-column gap-2">
                   <div
@@ -499,5 +552,13 @@
         </div>
       </ng-template>
     </div>
+    <div #detailReviews id="detail-reviews" class="detail-reviews">
+      <app-item-reviews itemType="Trip" [itemId]="travelId" [itemName]="data.name"></app-item-reviews>
+    </div>
+  </div>
+  <div *ngIf="!isLoading && loadError" class="detail-state" role="alert">
+    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+    <p>{{ 'DETAIL_PAGE.ERROR' | translate }}</p>
+    <button type="button" (click)="getTravelDetails(); getPrograms()">{{ 'DETAIL_PAGE.RETRY' | translate }}</button>
   </div>
 </div>

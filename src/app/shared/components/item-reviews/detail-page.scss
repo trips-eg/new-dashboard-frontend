@@ -1,0 +1,299 @@
+.details-page {
+  --detail-ink: #172b3a;
+  --detail-muted: #526475;
+  --detail-border: #dce5eb;
+  --detail-surface: #f5f8fa;
+  padding: clamp(12px, 2vw, 28px);
+  background: var(--detail-surface);
+  color: var(--detail-ink);
+  min-width: 0;
+  h2,
+  h3,
+  h4,
+  p,
+  td,
+  th,
+  span {
+    overflow-wrap: anywhere;
+    text-transform: none;
+  }
+  .detail-section-nav {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 0 0 24px;
+  }
+  .detail-section-nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 16px;
+    border: 1px solid var(--detail-border);
+    border-radius: 100px;
+    text-decoration: none;
+    background: #fff;
+    color: var(--detail-ink);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .detail-section-nav a:hover {
+    background: #e9f3f6;
+    border-color: var(--main-color);
+  }
+  a:focus-visible,
+  button:focus-visible {
+    outline: 3px solid var(--main-color);
+    outline-offset: 3px;
+  }
+  .detail-overview,
+  .detail-card,
+  .itinerary-card {
+    border-radius: 16px !important;
+    border: 1px solid var(--detail-border) !important;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(23, 43, 58, 0.03) !important;
+  }
+  .detail-overview {
+    scroll-margin-top: 100px;
+  }
+  .detail-overview h2 {
+    font-size: clamp(1.5rem, 3vw, 2rem) !important;
+    line-height: 1.35;
+    letter-spacing: -0.025em;
+  }
+  .detail-overview-copy {
+    padding-inline-start: 24px;
+  }
+  .detail-overview-grid {
+    display: flex;
+    margin: 0;
+    gap: 0;
+  }
+  .detail-overview-grid > div {
+    min-width: 0;
+  }
+  .detail-reviews,
+  #detail-itinerary {
+    scroll-margin-top: 100px;
+    margin-block: 24px;
+  }
+  .detail-no-images {
+    display: grid;
+    place-content: center;
+    text-align: center;
+    gap: 16px;
+    min-height: 260px;
+    border-radius: 12px;
+    background: var(--detail-surface);
+    border: 1px dashed #a8b8c5;
+    color: var(--detail-muted);
+  }
+  .detail-no-images i {
+    font-size: 2rem;
+    color: var(--main-color);
+  }
+  .detail-no-images p {
+    margin: 0;
+  }
+  .detail-state {
+    border: 1px solid var(--detail-border);
+    border-radius: 14px;
+    padding: 32px 20px;
+    background: #fff;
+    text-align: center;
+  }
+  .detail-state p {
+    line-height: 1.6;
+    margin: 12px 0 20px;
+  }
+  .detail-state button,
+  .detail-back {
+    min-height: 44px;
+    border: 1px solid #a8b8c5;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--detail-ink);
+    padding: 10px 16px;
+  }
+  .detail-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-block: 16px;
+    text-decoration: none;
+  }
+  .detail-rating-label {
+    font-size: 0.8rem;
+    color: var(--detail-muted);
+    margin-block: 8px 4px;
+  }
+  .detail-section-heading {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .description-callout {
+    border-left: 0;
+    border-right: 0;
+    border-inline-start: 3px solid var(--main-color);
+  }
+}
+:host ::ng-deep .details-page {
+  .p-galleria {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+  .p-galleria-item img {
+    width: 100%;
+    height: clamp(220px, 28vw, 360px) !important;
+    object-fit: cover;
+  }
+  .p-galleria-thumbnail-item img {
+    width: 64px !important;
+    height: 48px !important;
+    object-fit: cover;
+  }
+  .p-galleria-thumbnail-container {
+    padding: 8px;
+    background: #f5f8fa;
+    gap: 4px;
+  }
+  .p-galleria-item-next,
+  .p-galleria-item-prev {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .p-datatable-wrapper {
+    max-width: 100%;
+  }
+  .p-datatable .p-column-title {
+    flex: 0 0 42%;
+    font-weight: 600;
+    padding-inline-end: 12px;
+  }
+  .p-datatable .p-column-title + span {
+    min-width: 0;
+  }
+  .p-datatable-table {
+    width: 100%;
+    table-layout: fixed;
+  }
+  .p-datatable-thead th,
+  .p-datatable-tbody td {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    font-size: 0.875rem;
+  }
+  .p-timeline-event-content {
+    min-width: 0;
+  }
+  .p-accordion-header-link {
+    min-height: 44px;
+    line-height: 1.5;
+  }
+  .p-datepicker {
+    max-width: 100%;
+    min-width: 0;
+  }
+  .p-datepicker-prev,
+  .p-datepicker-next {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .p-datepicker table {
+    width: 100%;
+    table-layout: fixed;
+  }
+  .p-datepicker table td > span {
+    width: 100%;
+    max-width: 2rem;
+  }
+}
+@media (max-width: 767px) {
+  .details-page {
+    .p-4 {
+      padding: 16px !important;
+    }
+    .detail-overview-grid > .col-md-6 {
+      width: 100%;
+    }
+    .detail-overview-copy {
+      padding-inline-start: 8px !important;
+      margin-block-start: 20px;
+    }
+    .detail-section-nav {
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .detail-section-nav a {
+      flex: 1;
+      justify-content: center;
+      padding-inline: 10px;
+      font-size: 0.8rem;
+    }
+    .detail-section-heading {
+      align-items: start !important;
+    }
+    .text-2xl,
+    .text-xl {
+      font-size: 1.2rem !important;
+    }
+    .itinerary-route-box {
+      flex-wrap: wrap;
+    }
+  }
+  :host ::ng-deep .details-page {
+    .p-timeline-event-opposite {
+      display: none;
+    }
+    .p-timeline-event-content {
+      padding: 0 0 20px 12px !important;
+    }
+    .p-timeline-right .p-timeline-event-content {
+      padding: 0 12px 20px 0 !important;
+    }
+    .p-timeline-event-separator {
+      flex: 0 0 32px;
+    }
+    .itinerary-marker-circle,
+    .p-timeline-event-marker,
+    .customized-timeline .w-3rem {
+      width: 32px !important;
+      height: 32px !important;
+    }
+    .p-datepicker {
+      padding: 4px;
+      max-width: 100%;
+      min-width: 0;
+    }
+    .p-datepicker table th,
+    .p-datepicker table td {
+      padding: 2px;
+    }
+    .p-datepicker table td > span {
+      width: 100%;
+      max-width: 1.75rem;
+      height: 1.75rem;
+    }
+    .p-datepicker table th > span {
+      font-size: 0.75rem;
+    }
+    .p-datatable .p-datatable-thead > tr > th,
+    .p-datatable .p-datatable-tbody > tr > td {
+      padding: 8px !important;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .details-page .metric-card,
+  .details-page .trip-date-card,
+  .details-page .itinerary-card-item,
+  .details-page .segment-card,
+  .details-page .itinerary-marker-circle {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
+}

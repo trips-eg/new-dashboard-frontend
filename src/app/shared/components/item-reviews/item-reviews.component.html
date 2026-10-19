@@ -1,0 +1,280 @@
+<section class="reviews-panel" [attr.dir]="rtl ? 'rtl' : 'ltr'" aria-labelledby="reviews-title" [attr.aria-busy]="loading">
+  <header class="reviews-heading">
+    <div class="reviews-heading-copy">
+      <span class="reviews-eyebrow">{{ 'REVIEWS.EYEBROW' | translate }}</span>
+      <h2 id="reviews-title">
+        {{ 'REVIEWS.TITLE' | translate }}
+        <span class="review-count">{{ reviews.length }}</span>
+      </h2>
+      <p>{{ 'REVIEWS.SUBTITLE' | translate }}</p>
+    </div>
+    <div class="review-header-actions">
+      <button
+        type="button"
+        class="review-button secondary"
+        (click)="loadReviews()"
+        [disabled]="loading || saving || deleting"
+        [attr.aria-label]="'REVIEWS.REFRESH' | translate"
+      >
+        <i class="pi pi-refresh" aria-hidden="true"></i>
+        <span>{{ 'REVIEWS.REFRESH' | translate }}</span>
+      </button>
+      <button
+        *ngIf="canManage"
+        type="button"
+        class="review-button primary"
+        (click)="openEditor()"
+        [disabled]="loading || saving || deleting"
+      >
+        <i class="pi pi-plus" aria-hidden="true"></i>
+        {{ 'REVIEWS.ADD' | translate }}
+      </button>
+    </div>
+  </header>
+
+  <p *ngIf="feedback" class="review-feedback" role="status">{{ feedback | translate }}</p>
+  <div *ngIf="loadError" class="review-error" role="alert">
+    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+    <span>{{ loadError | translate }}</span>
+    <button type="button" class="review-button secondary" (click)="loadReviews()" [disabled]="loading">
+      {{ 'REVIEWS.RETRY' | translate }}
+    </button>
+  </div>
+  <div *ngIf="loading" class="review-loading" role="status">
+    <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+    {{ 'REVIEWS.LOADING' | translate }}
+  </div>
+
+  <div *ngIf="!loading && reviews.length" class="reviews-layout">
+    <aside class="review-summary" [attr.aria-label]="'REVIEWS.SUMMARY' | translate">
+      <span class="review-summary-label">{{ 'REVIEWS.AVERAGE' | translate }}</span>
+      <div class="review-average">
+        <bdi dir="ltr">
+          {{ average | number: '1.1-1' }}
+          <span>/ 5</span>
+        </bdi>
+      </div>
+      <div class="review-stars" aria-hidden="true">
+        <i *ngFor="let star of stars" class="pi" [ngClass]="star <= average ? 'pi-star-fill' : 'pi-star'"></i>
+      </div>
+      <p>{{ 'REVIEWS.BASED_ON' | translate: { count: reviews.length } }}</p>
+      <div class="rating-distribution" *ngFor="let row of distribution">
+        <span>
+          {{ row.stars }}
+          <i class="pi pi-star-fill" aria-hidden="true"></i>
+        </span>
+        <div class="distribution-track" aria-hidden="true"><div [style.width.%]="row.percentage"></div></div>
+        <span>{{ row.count }}</span>
+      </div>
+      <small>{{ 'REVIEWS.SUMMARY_NOTE' | translate }}</small>
+    </aside>
+
+    <div class="review-list">
+      <div class="review-toolbar">
+        <div>
+          <label for="review-rating-filter">{{ 'REVIEWS.FILTER' | translate }}</label>
+          <select id="review-rating-filter" [value]="ratingFilter" (change)="setRatingFilter($any($event.target).value)">
+            <option value="0">{{ 'REVIEWS.ALL_RATINGS' | translate }}</option>
+            <option *ngFor="let star of stars" [value]="star">{{ 'REVIEWS.STAR_LABEL' | translate: { count: star } }}</option>
+          </select>
+        </div>
+        <div>
+          <label for="review-sort">{{ 'REVIEWS.SORT' | translate }}</label>
+          <select id="review-sort" [value]="sortOrder" (change)="setSortOrder($any($event.target).value)">
+            <option value="newest">{{ 'REVIEWS.NEWEST' | translate }}</option>
+            <option value="oldest">{{ 'REVIEWS.OLDEST' | translate }}</option>
+          </select>
+        </div>
+      </div>
+      <p class="review-results" role="status">{{ 'REVIEWS.RESULTS' | translate: { count: filteredReviews.length } }}</p>
+      <article *ngFor="let review of visibleReviews; trackBy: trackReview" class="review-card">
+        <div class="review-card-header">
+          <div class="review-person">
+            <div class="review-avatar" aria-hidden="true">{{ (review.customerName || '?').slice(0, 1) }}</div>
+            <div>
+              <h3>{{ review.customerName || ('REVIEWS.UNNAMED' | translate) }}</h3>
+              <time *ngIf="review.createdAt" dir="ltr" [attr.datetime]="review.createdAt">
+                {{ review.createdAt | date: 'dd/MM/yyyy, HH:mm' }}
+              </time>
+              <span *ngIf="!review.createdAt" class="review-date">{{ 'REVIEWS.DATE_UNAVAILABLE' | translate }}</span>
+            </div>
+          </div>
+          <span class="review-source">
+            <i class="pi" [ngClass]="review.userId == null ? 'pi-user-edit' : 'pi-user'" aria-hidden="true"></i>
+            {{ (review.userId == null ? 'REVIEWS.ADMIN_ADDED' : 'REVIEWS.CUSTOMER') | translate }}
+          </span>
+        </div>
+        <div class="review-rating">
+          <span class="review-stars" aria-hidden="true">
+            <i *ngFor="let star of stars" class="pi" [ngClass]="star <= review.stars ? 'pi-star-fill' : 'pi-star'"></i>
+          </span>
+          <span dir="ltr">{{ review.stars }} / 5</span>
+        </div>
+        <p class="review-comment" [class.no-comment]="!review.comment">{{ review.comment || ('REVIEWS.NO_COMMENT' | translate) }}</p>
+        <div *ngIf="canManage" class="review-card-actions">
+          <button
+            type="button"
+            class="review-button secondary"
+            (click)="openEditor(review)"
+            [disabled]="saving || deleting"
+            [attr.aria-label]="'REVIEWS.EDIT_NAMED' | translate: { name: review.customerName }"
+          >
+            <i class="pi pi-pencil" aria-hidden="true"></i>
+            {{ 'REVIEWS.EDIT' | translate }}
+          </button>
+          <button
+            type="button"
+            class="review-button danger-text"
+            (click)="askDelete(review)"
+            [disabled]="saving || deleting"
+            [attr.aria-label]="'REVIEWS.DELETE_NAMED' | translate: { name: review.customerName }"
+          >
+            <i class="pi pi-trash" aria-hidden="true"></i>
+            {{ 'REVIEWS.DELETE' | translate }}
+          </button>
+        </div>
+      </article>
+      <div *ngIf="!filteredReviews.length" class="review-empty compact">
+        <i class="pi pi-filter" aria-hidden="true"></i>
+        <p>{{ 'REVIEWS.NO_MATCHES' | translate }}</p>
+      </div>
+      <nav *ngIf="pageCount > 1" class="review-pagination" [attr.aria-label]="'REVIEWS.PAGINATION' | translate">
+        <button type="button" class="review-button secondary" (click)="page = page - 1" [disabled]="page === 0">
+          {{ 'REVIEWS.PREVIOUS' | translate }}
+        </button>
+        <span role="status">{{ 'REVIEWS.PAGE' | translate: { page: page + 1, total: pageCount } }}</span>
+        <button type="button" class="review-button secondary" (click)="page = page + 1" [disabled]="page + 1 >= pageCount">
+          {{ 'REVIEWS.NEXT' | translate }}
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !loadError && !reviews.length" class="review-empty">
+    <div class="review-empty-icon"><i class="pi pi-comments" aria-hidden="true"></i></div>
+    <h3>{{ 'REVIEWS.EMPTY_TITLE' | translate }}</h3>
+    <p>{{ (canManage ? 'REVIEWS.EMPTY_ADMIN' : 'REVIEWS.EMPTY_READER') | translate }}</p>
+    <button *ngIf="canManage" type="button" class="review-button primary" (click)="openEditor()">
+      <i class="pi pi-plus" aria-hidden="true"></i>
+      {{ 'REVIEWS.ADD_FIRST' | translate }}
+    </button>
+  </div>
+</section>
+
+<p-dialog
+  [(visible)]="editorVisible"
+  [header]="(editingReview ? 'REVIEWS.EDIT' : 'REVIEWS.ADD') | translate"
+  [modal]="true"
+  [baseZIndex]="3000"
+  [blockScroll]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [rtl]="rtl"
+  [closable]="!saving"
+  [closeOnEscape]="!saving"
+  [closeAriaLabel]="'REVIEWS.CLOSE' | translate"
+  [style]="{ width: '36rem', maxWidth: 'calc(100vw - 2rem)' }"
+  [breakpoints]="{ '640px': 'calc(100vw - 2rem)' }"
+  styleClass="review-dialog"
+>
+  <form [formGroup]="form" (ngSubmit)="save()" class="review-form" [attr.dir]="rtl ? 'rtl' : 'ltr'">
+    <p class="review-context">
+      {{ 'REVIEWS.FOR_ITEM' | translate }}
+      <strong>{{ itemName || '#' + itemId }}</strong>
+    </p>
+    <div *ngIf="formError" class="review-error" role="alert">{{ formError | translate }}</div>
+    <div class="review-field">
+      <label for="review-customer-name">
+        {{ 'REVIEWS.NAME' | translate }}
+        <span aria-hidden="true">*</span>
+      </label>
+      <input
+        id="review-customer-name"
+        type="text"
+        formControlName="customerName"
+        autocomplete="name"
+        required
+        [attr.aria-invalid]="form.controls.customerName.touched && form.controls.customerName.invalid"
+        [attr.aria-describedby]="form.controls.customerName.touched && form.controls.customerName.invalid ? 'review-name-error' : null"
+      />
+      <small id="review-name-error" class="field-error" *ngIf="form.controls.customerName.touched && form.controls.customerName.invalid">
+        {{ 'REVIEWS.NAME_REQUIRED' | translate }}
+      </small>
+    </div>
+    <fieldset
+      class="review-field"
+      [attr.aria-invalid]="form.controls.stars.touched && form.controls.stars.invalid"
+      [attr.aria-describedby]="form.controls.stars.touched && form.controls.stars.invalid ? 'review-stars-error' : 'review-stars-hint'"
+    >
+      <legend>
+        {{ 'REVIEWS.RATING' | translate }}
+        <span aria-hidden="true">*</span>
+      </legend>
+      <div class="review-rating-picker">
+        <label *ngFor="let star of stars" [class.selected]="form.controls.stars.value === star">
+          <input
+            type="radio"
+            formControlName="stars"
+            [value]="star"
+            [attr.aria-label]="'REVIEWS.STAR_LABEL' | translate: { count: star }"
+          />
+          <span>
+            <i class="pi pi-star-fill" aria-hidden="true"></i>
+            {{ star }}
+          </span>
+        </label>
+      </div>
+      <small id="review-stars-hint">{{ 'REVIEWS.RATING_HINT' | translate }}</small>
+      <small id="review-stars-error" class="field-error" *ngIf="form.controls.stars.touched && form.controls.stars.invalid">
+        {{ 'REVIEWS.RATING_REQUIRED' | translate }}
+      </small>
+    </fieldset>
+    <div class="review-field">
+      <label for="review-comment">
+        {{ 'REVIEWS.COMMENT' | translate }}
+        <span class="optional">{{ 'REVIEWS.OPTIONAL' | translate }}</span>
+      </label>
+      <textarea id="review-comment" formControlName="comment" rows="4" [placeholder]="'REVIEWS.COMMENT_HINT' | translate"></textarea>
+    </div>
+    <div class="review-dialog-actions">
+      <button type="button" class="review-button secondary" (click)="editorVisible = false" [disabled]="saving">
+        {{ 'REVIEWS.CANCEL' | translate }}
+      </button>
+      <button type="submit" class="review-button primary" [disabled]="saving || !canManage">
+        <i *ngIf="saving" class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+        {{ (saving ? 'REVIEWS.SAVING' : 'REVIEWS.SAVE') | translate }}
+      </button>
+    </div>
+  </form>
+</p-dialog>
+
+<p-dialog
+  [(visible)]="deleteVisible"
+  [header]="'REVIEWS.DELETE' | translate"
+  [modal]="true"
+  [baseZIndex]="3000"
+  [blockScroll]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [rtl]="rtl"
+  [closable]="!deleting"
+  [closeOnEscape]="!deleting"
+  [closeAriaLabel]="'REVIEWS.CLOSE' | translate"
+  [style]="{ width: '28rem', maxWidth: 'calc(100vw - 2rem)' }"
+  styleClass="review-dialog"
+>
+  <div class="review-delete-content" [attr.dir]="rtl ? 'rtl' : 'ltr'">
+    <p>{{ 'REVIEWS.DELETE_CONFIRM' | translate: { name: deletingReview?.customerName || ('REVIEWS.UNNAMED' | translate) } }}</p>
+    <p class="review-delete-note">{{ 'REVIEWS.DELETE_NOTE' | translate }}</p>
+    <div *ngIf="deleteError" class="review-error" role="alert">{{ deleteError | translate }}</div>
+    <div class="review-dialog-actions">
+      <button type="button" class="review-button secondary" (click)="deleteVisible = false" [disabled]="deleting">
+        {{ 'REVIEWS.CANCEL' | translate }}
+      </button>
+      <button type="button" class="review-button danger" (click)="confirmDelete()" [disabled]="deleting || !canManage">
+        <i *ngIf="deleting" class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+        {{ (deleting ? 'REVIEWS.DELETING' : 'REVIEWS.DELETE') | translate }}
+      </button>
+    </div>
+  </div>
+</p-dialog>

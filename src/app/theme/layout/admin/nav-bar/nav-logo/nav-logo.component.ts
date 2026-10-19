@@ -10,12 +10,10 @@ export class NavLogoComponent {
   // public props
   @Input() navCollapsed: boolean;
   @Output() NavCollapse = new EventEmitter();
-  windowWidth = window.innerWidth;
 
   // public import
   navCollapse() {
-    if (this.windowWidth >= 1025) {
-      this.navCollapsed = !this.navCollapsed;
+    if (window.innerWidth >= 1025) {
       this.NavCollapse.emit();
     }
   }

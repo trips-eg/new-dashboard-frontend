@@ -1,3 +1,7 @@
+@import '../../../../shared/components/item-reviews/detail-page';
+
+.detail-table-section { min-width: 0; }
+.detail-table-section h3 { padding-block: 8px; }
 :host ::ng-deep .readonly-calendar {
   .p-datepicker {
     table {
@@ -9,3 +13,44 @@
     }
   }
 }
+
+:host ::ng-deep .outing-description-content {
+  color: var(--detail-muted, #526475);
+  line-height: 1.7;
+  font-size: 0.95rem;
+
+  p {
+    margin-top: 0;
+    margin-bottom: 0.6rem;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  p:empty,
+  p > br:only-child {
+    min-height: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  strong, b {
+    font-weight: 700;
+    color: var(--detail-ink, #172b3a);
+  }
+
+  ul, ol {
+    margin-top: 0;
+    margin-bottom: 0.6rem;
+    padding-inline-start: 1.5rem;
+  }
+
+  li {
+    margin-bottom: 0.25rem;
+  }
+
+  a {
+    color: var(--main-color, #1890ff);
+    text-decoration: underline;
+  }
+}
+

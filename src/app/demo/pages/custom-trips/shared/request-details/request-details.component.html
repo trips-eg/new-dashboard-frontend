@@ -1,0 +1,263 @@
+<section class="request-details" [attr.aria-labelledby]="'request-detail-title-' + request.id" [attr.dir]="lang === 'ar' ? 'rtl' : 'ltr'">
+  <header class="detail-banner">
+    <div class="request-heading">
+      <div class="heading-line">
+        <span class="request-reference">{{ 'Trip Requests' | translate }} #{{ request.id }}</span>
+        <h2 [id]="'request-detail-title-' + request.id">{{ request.destination || '—' }}</h2>
+        <div class="request-tags">
+          <p-tag [value]="tripType" severity="info"></p-tag>
+          <p-tag [value]="status" [severity]="statusSeverity"></p-tag>
+        </div>
+      </div>
+      <p class="submitted">{{ 'Submitted On' | translate }}: {{ request.createdDate | date: 'medium' }}</p>
+    </div>
+    <div class="request-window">
+      <div class="window-summary">
+        <app-countdown-timer
+          [expiresAt]="request.offerWindowExpiresAt"
+          [remainingSeconds]="request.remainingSeconds"
+          [accepting]="accepting"
+        ></app-countdown-timer>
+        <div class="activity-counts">
+          <span>
+            <i class="pi pi-eye" aria-hidden="true"></i>
+            {{ request.viewsCount ?? 0 }} {{ 'Views' | translate }}
+          </span>
+          <span>
+            <i class="pi pi-briefcase" aria-hidden="true"></i>
+            {{ request.offers?.length || 0 }} {{ 'Offers' | translate }}
+          </span>
+        </div>
+        <span *ngIf="request.offerWindowExpiresAt && !request.offerWindowExpiresAt.startsWith('0001')">
+          {{ 'Expires' | translate }}: {{ request.offerWindowExpiresAt | date: 'medium' }}
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <div class="detail-layout">
+    <section class="traveler-details detail-section" [attr.aria-labelledby]="'traveler-title-' + request.id">
+      <div class="traveler-heading">
+        <div class="traveler-title-row">
+          <h3 [id]="'traveler-title-' + request.id">{{ 'Traveler' | translate }}</h3>
+          <div class="traveler-identity">
+            <span class="avatar" aria-hidden="true">{{ initials(request.customerName) }}</span>
+            <div>
+              <strong>{{ request.customerName || '—' }}</strong>
+              <span class="muted">ID #{{ request.customerId }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="contact-actions" *ngIf="request.customerPhone">
+          <a
+            [href]="'tel:' + request.customerPhone"
+            class="contact-link"
+            [attr.aria-label]="('Call Customer' | translate) + ': ' + request.customerPhone"
+          >
+            <i class="pi pi-phone" aria-hidden="true"></i>
+            <bdi>{{ request.customerPhone }}</bdi>
+          </a>
+          <a [href]="whatsappUrl" target="_blank" rel="noopener noreferrer" class="contact-link whatsapp">
+            <i class="pi pi-whatsapp" aria-hidden="true"></i>
+            {{ 'WhatsApp' | translate }}
+          </a>
+        </div>
+      </div>
+      <div class="traveler-body">
+        <dl class="trip-specs">
+          <div>
+            <dt>
+              <i class="pi pi-calendar" aria-hidden="true"></i>
+              {{ 'Trip Schedule' | translate }}
+            </dt>
+            <dd>
+              {{ request.travelDate | date: 'mediumDate' }}
+              <span class="muted">{{ request.numberOfDays }} {{ 'days' | translate }}</span>
+            </dd>
+          </div>
+          <div>
+            <dt>
+              <i class="pi pi-users" aria-hidden="true"></i>
+              {{ 'Party Composition' | translate }}
+            </dt>
+            <dd>
+              {{ request.numberOfAdults }} {{ 'Adults' | translate }}
+              <span class="muted">{{ request.numberOfChildren }} {{ 'Children' | translate }}</span>
+            </dd>
+          </div>
+          <div>
+            <dt>
+              <i class="pi pi-building" aria-hidden="true"></i>
+              {{ 'Accommodation' | translate }}
+            </dt>
+            <dd>{{ request.hotelName || ('No specific preference' | translate) }}</dd>
+          </div>
+          <div>
+            <dt>
+              <i class="pi pi-shield" aria-hidden="true"></i>
+              {{ 'Services' | translate }}
+            </dt>
+            <dd class="service-list">
+              <span>
+                {{ 'Flight' | translate }}:
+                <strong>{{ (request.needsFlight ? 'Included' : 'Not Needed') | translate }}</strong>
+              </span>
+              <span>
+                {{ 'Visa' | translate }}:
+                <strong>{{ (request.needsVisa ? 'Included' : 'Not Needed') | translate }}</strong>
+              </span>
+            </dd>
+          </div>
+          <div class="children-ages" *ngIf="request.numberOfChildren > 0 && request.childrenAges?.length">
+            <dt>{{ 'Children Ages' | translate }}</dt>
+            <dd class="age-list">
+              <span *ngFor="let age of request.childrenAges">{{ age }} {{ 'yrs' | translate }}</span>
+            </dd>
+          </div>
+        </dl>
+        <details class="note-disclosure customer-notes">
+          <summary>{{ 'Customer Notes' | translate }}</summary>
+          <p class="notes-content">{{ request.additionalNotes || ('No special requests noted by traveler' | translate) }}</p>
+        </details>
+      </div>
+    </section>
+
+    <section class="offers-section detail-section" [attr.aria-labelledby]="'offers-title-' + request.id">
+      <div class="section-heading">
+        <div>
+          <h3 [id]="'offers-title-' + request.id">
+            {{ 'Vendor Offers' | translate }}
+            <span class="offer-count">{{ request.offers?.length || 0 }}</span>
+          </h3>
+          <p class="muted">{{ 'Review proposals, pricing spread, and vendor inclusions' | translate }}</p>
+        </div>
+        <button *ngIf="accepting" type="button" class="add-offer" (click)="addOffer.emit($event)">
+          <i class="pi pi-plus" aria-hidden="true"></i>
+          {{ 'Add Offer On Behalf Of Vendor' | translate }}
+        </button>
+      </div>
+      <div class="offers-body">
+        <dl class="quote-summary" *ngIf="request.offers?.length">
+          <div class="lowest-quote">
+            <dt>{{ 'Lowest Quote' | translate }}</dt>
+            <dd>
+              {{ lowest === null ? '—' : (lowest | number: '1.0-2') }}
+              <span>EGP</span>
+            </dd>
+          </div>
+          <div>
+            <dt>{{ 'Average Quote' | translate }}</dt>
+            <dd>
+              {{ average === null ? '—' : (average | number: '1.0-2') }}
+              <span>EGP</span>
+            </dd>
+          </div>
+          <div>
+            <dt>{{ 'Highest Quote' | translate }}</dt>
+            <dd>
+              {{ highest === null ? '—' : (highest | number: '1.0-2') }}
+              <span>EGP</span>
+            </dd>
+          </div>
+        </dl>
+        <table class="offer-comparison" *ngIf="request.offers?.length; else noOffers" [attr.aria-labelledby]="'offers-title-' + request.id">
+          <thead>
+            <tr>
+              <th scope="col">{{ 'Vendor' | translate }}</th>
+              <th scope="col">{{ 'Price' | translate }}</th>
+              <th scope="col">{{ 'Payment Type' | translate }}</th>
+              <th scope="col">{{ 'Deposit' | translate }}</th>
+              <th scope="col">{{ 'Status' | translate }}</th>
+              <th scope="col">{{ 'Submitted At' | translate }}</th>
+              <th scope="col">{{ 'View Notes' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody *ngFor="let offer of request.offers; trackBy: trackOffer">
+            <tr class="offer-row" [class.best-rate]="isLowest(offer)">
+              <td class="vendor-cell">
+                <div class="vendor-identity">
+                  <img
+                    *ngIf="offer.vendorLogoUrl; else monogram"
+                    [src]="offer.vendorLogoUrl"
+                    alt=""
+                    class="avatar vendor-logo"
+                    width="28"
+                    height="28"
+                    loading="lazy"
+                  />
+                  <ng-template #monogram>
+                    <span class="avatar" aria-hidden="true">{{ initials(offer.vendorName) }}</span>
+                  </ng-template>
+                  <div>
+                    <h4>{{ offer.vendorName || ('Vendor' | translate) }}</h4>
+                    <span class="best-rate-label" *ngIf="isLowest(offer)">
+                      <i class="pi pi-star-fill" aria-hidden="true"></i>
+                      {{ 'Best Rate' | translate }}
+                    </span>
+                  </div>
+                </div>
+              </td>
+              <td class="offer-price">
+                <span class="mobile-label" aria-hidden="true">{{ 'Price' | translate }}</span>
+                {{ offer.price | number: '1.0-2' }}
+                <span class="currency">EGP</span>
+              </td>
+              <td>
+                <span class="mobile-label" aria-hidden="true">{{ 'Payment Type' | translate }}</span>
+                {{ paymentLabel(offer) }}
+              </td>
+              <td class="deposit-cell">
+                <span class="mobile-label" aria-hidden="true">{{ 'Deposit' | translate }}</span>
+                {{ offer.depositAmount == null ? '—' : (offer.depositAmount | number: '1.0-2') }}
+                <span class="currency" *ngIf="offer.depositAmount != null">EGP</span>
+              </td>
+              <td>
+                <span class="mobile-label" aria-hidden="true">{{ 'Status' | translate }}</span>
+                <p-tag class="offer-status" [value]="offerStatus(offer)" [severity]="offerSeverity(offer)"></p-tag>
+              </td>
+              <td class="submitted-cell">
+                <span class="mobile-label" aria-hidden="true">{{ 'Submitted At' | translate }}</span>
+                {{ offer.createdDate | date: 'mediumDate' }}
+                <span class="submitted-time">{{ offer.createdDate | date: 'shortTime' }}</span>
+              </td>
+              <td class="notes-cell">
+                <button
+                  type="button"
+                  class="notes-toggle"
+                  (click)="toggleNotes(offer)"
+                  [attr.aria-expanded]="expandedNotes.has(offer.id)"
+                  [attr.aria-controls]="'proposal-' + request.id + '-' + offer.id"
+                  [attr.aria-label]="
+                    ((expandedNotes.has(offer.id) ? 'Hide Notes' : 'View Notes') | translate) +
+                    ': ' +
+                    (offer.vendorName || ('Vendor' | translate))
+                  "
+                >
+                  {{ (expandedNotes.has(offer.id) ? 'Hide Notes' : 'View Notes') | translate }}
+                  <i [class]="expandedNotes.has(offer.id) ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" aria-hidden="true"></i>
+                </button>
+              </td>
+            </tr>
+            <tr class="proposal-row" [hidden]="!expandedNotes.has(offer.id)" [id]="'proposal-' + request.id + '-' + offer.id">
+              <td colspan="7">
+                <h4>{{ 'Vendor Proposal Inclusions & Terms' | translate }}</h4>
+                <p class="notes-content">
+                  {{ offer.vendorNotes || ('No specific proposal notes or exclusions provided with this quotation.' | translate) }}
+                </p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ng-template #noOffers>
+          <div class="empty-offers">
+            <i class="pi pi-inbox" aria-hidden="true"></i>
+            <div>
+              <h4>{{ 'No vendor proposals submitted yet' | translate }}</h4>
+              <p>{{ 'Vendors are reviewing this request. You can also submit a proposal on behalf of a partner vendor.' | translate }}</p>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </section>
+  </div>
+</section>

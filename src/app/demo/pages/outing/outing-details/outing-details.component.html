@@ -1,85 +1,131 @@
-<div class="main">
-  <sub-header
-    [mainHeader]="'outing details' | translate"
-    [mainSection]="'outing Management' | translate"
-    [subSection]="'Details' | translate"
-  ></sub-header>
+<div class="main details-page" [attr.dir]="currentLang === 'ar' ? 'rtl' : 'ltr'">
+  <app-detail-page-header
+    typeLabel="DETAIL_HEADER.OUTING_DETAILS"
+    parentLabel="DETAIL_HEADER.OUTINGS"
+    parentLink="/outing"
+    icon="pi pi-sun"
+    [itemName]="outing?.name"
+    [itemId]="outing?.id"
+    [active]="outing?.isActive"
+    [rtl]="currentLang === 'ar'"
+    [loading]="loading"
+  />
 
-  <div class="border-1 border-solid surface-border border-round mb-4 p-4 shadow-3" *ngIf="outing; else loading">
-    <div class="grid">
-      <div class="col-12 col-md-6">
-        <p-galleria
-          [value]="imgs"
-          [autoPlay]="false"
-          [circular]="true"
-          [showItemNavigators]="true"
-          [thumbnailsPosition]="'bottom'"
-          [responsiveOptions]="responsiveOptions"
-          [containerStyle]="{ 'max-width': '100%' }"
-          [numVisible]="4"
-        >
-          <ng-template pTemplate="item" let-item>
-            <img
-              [src]="item"
-              class="w-full h-20rem border-round"
-              style="object-fit: cover; margin-bottom: 10px"
-              (error)="onImageError($event)"
-              [alt]="outing?.name"
-            />
-          </ng-template>
-
-          <ng-template pTemplate="thumbnail" let-item>
-            <div class="grid grid-nogutter justify-content-center">
+  <div class="detail-body" *ngIf="outing; else pageState">
+    <nav class="detail-section-nav" [attr.aria-label]="'DETAIL_PAGE.NAV' | translate">
+      <a href="#detail-overview" (click)="$event.preventDefault(); detailOverview.scrollIntoView()">
+        <i class="pi pi-info-circle" aria-hidden="true"></i>
+        {{ 'DETAIL_PAGE.OVERVIEW' | translate }}
+      </a>
+      <a *ngIf="outing.programs?.length" href="#detail-itinerary" (click)="$event.preventDefault(); detailItinerary.scrollIntoView()">
+        <i class="pi pi-map" aria-hidden="true"></i>
+        {{ 'DETAIL_PAGE.ITINERARY' | translate }}
+      </a>
+      <a href="#detail-reviews" (click)="$event.preventDefault(); detailReviews.scrollIntoView()">
+        <i class="pi pi-comments" aria-hidden="true"></i>
+        {{ 'DETAIL_PAGE.REVIEWS' | translate }}
+      </a>
+    </nav>
+    <section #detailOverview id="detail-overview" class="detail-overview p-4 mb-4">
+      <div class="grid detail-overview-grid">
+        <div class="col-12 col-md-6">
+          <p-galleria
+            *ngIf="imgs.length; else noImages"
+            [value]="imgs"
+            [autoPlay]="false"
+            [circular]="true"
+            [showItemNavigators]="true"
+            [thumbnailsPosition]="'bottom'"
+            [responsiveOptions]="responsiveOptions"
+            [containerStyle]="{ 'max-width': '100%' }"
+            [numVisible]="4"
+          >
+            <ng-template pTemplate="item" let-item>
               <img
                 [src]="item"
-                class="w-7rem h-5rem border-round"
-                style="object-fit: cover"
+                class="w-full h-20rem border-round"
+                style="object-fit: cover; margin-bottom: 10px"
                 (error)="onImageError($event)"
                 [alt]="outing?.name"
               />
+            </ng-template>
+
+            <ng-template pTemplate="thumbnail" let-item>
+              <div class="grid grid-nogutter justify-content-center">
+                <img
+                  [src]="item"
+                  class="w-7rem h-5rem border-round"
+                  style="object-fit: cover"
+                  (error)="onImageError($event)"
+                  [alt]="outing?.name"
+                />
+              </div>
+            </ng-template>
+          </p-galleria>
+          <ng-template #noImages>
+            <div class="detail-no-images">
+              <i class="pi pi-images" aria-hidden="true"></i>
+              <p>{{ 'DETAIL_PAGE.NO_IMAGES' | translate }}</p>
             </div>
           </ng-template>
-        </p-galleria>
-      </div>
-
-      <div class="col-12 col-md-6 pl-4">
-        <h2 class="text-3xl mb-2">{{ outing.name }}</h2>
-
-        <div class="medium text-body-secondary mb-1">
-          <i class="fas fa-map-marker-alt me-1"></i>
-          {{ outing.location || 'N/A' }}
         </div>
 
-        <div class="flex align-items-center gap-3 mb-4" *ngIf="outing.rating !== undefined">
-          <p-rating [(ngModel)]="outing.rating" [readonly]="true" [cancel]="false"></p-rating>
-          <span class="text-muted text-lg">({{ outing.rating }} / 5)</span>
-        </div>
+        <div class="col-12 col-md-6 detail-overview-copy">
+          <h2 class="text-3xl mb-2">{{ outing.name }}</h2>
 
-        <p class="text-muted mb-2">
-          <i class="fas fa-tag mr-2"></i>
-          {{ 'Price Range' | translate }}: {{ outing.miniPrice || 0 }} - {{ outing.maxPrice || 0 }}
-        </p>
+          <div class="medium text-body-secondary mb-1">
+            <i class="fas fa-map-marker-alt me-1"></i>
+            {{ outing.location || 'N/A' }}
+          </div>
 
-        <p class="text-muted mb-2">
-          <i class="fas fa-calendar-alt mr-2"></i>
-          {{ outing.startDate | date }} - {{ outing.endDate | date }}
-        </p>
+          <p class="detail-rating-label" *ngIf="outing.rating !== undefined">{{ 'DETAIL_PAGE.ITEM_RATING' | translate }}</p>
+          <div class="flex align-items-center gap-3 mb-4" *ngIf="outing.rating !== undefined">
+            <p-rating [(ngModel)]="outing.rating" [readonly]="true" [cancel]="false"></p-rating>
+            <span class="text-muted text-lg">({{ outing.rating }} / 5)</span>
+          </div>
 
-        <!-- <p class="text-muted mb-2">
+          <p class="text-muted mb-2">
+            <i class="fas fa-tag mr-2"></i>
+            {{ 'Price Range' | translate }}: {{ outing.miniPrice || 0 }} - {{ outing.maxPrice || 0 }}
+          </p>
+
+          <p class="text-muted mb-2">
+            <i class="fas fa-calendar-alt mr-2"></i>
+            {{ outing.startDate | date }} - {{ outing.endDate | date }}
+          </p>
+
+          <!-- <p class="text-muted mb-2">
           <i class="fas fa-users mr-2"></i>
           {{ 'Capacity' | translate }}: {{ outing.capacity || 0 }} ({{ outing.remainingSeats || 0 }} remaining)
         </p> -->
 
-        <p class="text-muted mb-2">
-          <i class="fas fa-info-circle mr-2"></i>
-          {{ outing.description || '-' }}
-        </p>
+          <div class="mt-3 pt-3 border-top-1 surface-border" *ngIf="outing.description; else noDesc">
+            <div class="text-sm font-semibold text-secondary mb-2 flex align-items-center gap-2">
+              <i class="fas fa-align-left text-primary"></i>
+              <span>{{ 'Description' | translate }}</span>
+            </div>
+            <div
+              class="outing-description-content text-muted line-height-3"
+              [innerHTML]="renderedDescription"
+            ></div>
+          </div>
+          <ng-template #noDesc>
+            <p class="text-muted mb-2">
+              <i class="fas fa-info-circle mr-2"></i>-
+            </p>
+          </ng-template>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="shadow-3 bg-light p-3 border-round mt-4" *ngIf="outing.programs?.length">
+    <div #detailItinerary id="detail-itinerary" class="detail-card p-4" [hidden]="!outing.programs?.length">
       <h3 class="text-xl mb-3">{{ 'programs' | translate }}</h3>
-      <p-timeline [value]="outing.programs" layout="vertical" align="right" class="customized-timeline">
+      <p-timeline
+        [value]="outing.programs"
+        layout="vertical"
+        [align]="currentLang === 'ar' ? 'right' : 'left'"
+        styleClass="customized-timeline"
+      >
         <ng-template pTemplate="content" let-program>
           <div [attr.dir]="currentLang === 'ar' ? 'rtl' : 'ltr'" class="p-3 border-1 surface-border surface-card border-round shadow-1">
             <h4 class="text-primary mb-1">{{ program.title }}</h4>
@@ -107,9 +153,9 @@
     </div>
 
     <div class="grid mt-4">
-      <div class="col-12 md:col-6">
+      <div class="col-12 md:col-6 detail-table-section">
         <h3 class="text-xl mb-2">{{ 'Tickets' | translate }}</h3>
-        <p-table [value]="outing.tickets || []">
+        <p-table [value]="outing.tickets || []" responsiveLayout="stack" breakpoint="640px">
           <ng-template pTemplate="header">
             <tr>
               <th>{{ 'Type' | translate }}</th>
@@ -119,17 +165,26 @@
           </ng-template>
           <ng-template pTemplate="body" let-t>
             <tr>
-              <td>{{ t.ticketType }}</td>
-              <td>{{ t.price }}</td>
-              <td>{{ t.availableQuantity }}</td>
+              <td>
+                <span class="p-column-title">{{ 'Type' | translate }}</span>
+                <span>{{ t.ticketType }}</span>
+              </td>
+              <td>
+                <span class="p-column-title">{{ 'Price' | translate }}</span>
+                <span>{{ t.price }}</span>
+              </td>
+              <td>
+                <span class="p-column-title">{{ 'Available' | translate }}</span>
+                <span>{{ t.availableQuantity }}</span>
+              </td>
             </tr>
           </ng-template>
         </p-table>
       </div>
 
-      <div class="col-12 md:col-6">
+      <div class="col-12 md:col-6 detail-table-section">
         <h3 class="text-xl mb-2">{{ 'Add-ons' | translate }}</h3>
-        <p-table [value]="outing.addOns || []">
+        <p-table [value]="outing.addOns || []" responsiveLayout="stack" breakpoint="640px">
           <ng-template pTemplate="header">
             <tr>
               <th>{{ 'Name' | translate }}</th>
@@ -138,8 +193,14 @@
           </ng-template>
           <ng-template pTemplate="body" let-a>
             <tr>
-              <td>{{ a.name }}</td>
-              <td>{{ a.price }}</td>
+              <td>
+                <span class="p-column-title">{{ 'Name' | translate }}</span>
+                <span>{{ a.name }}</span>
+              </td>
+              <td>
+                <span class="p-column-title">{{ 'Price' | translate }}</span>
+                <span>{{ a.price }}</span>
+              </td>
             </tr>
           </ng-template>
         </p-table>
@@ -149,7 +210,7 @@
     <div class="grid mt-4" *ngIf="outing.branshes?.length">
       <div class="col-12">
         <h3 class="text-xl mb-2">{{ 'Branches' | translate }}</h3>
-        <p-table [value]="outing.branshes">
+        <p-table [value]="outing.branshes" responsiveLayout="stack" breakpoint="640px">
           <ng-template pTemplate="header">
             <tr>
               <th>{{ 'ID' | translate }}</th>
@@ -159,9 +220,18 @@
           </ng-template>
           <ng-template pTemplate="body" let-branch>
             <tr>
-              <td>{{ branch.id }}</td>
-              <td>{{ branch.name }}</td>
-              <td>{{ branch.description }}</td>
+              <td>
+                <span class="p-column-title">{{ 'ID' | translate }}</span>
+                <span>{{ branch.id }}</span>
+              </td>
+              <td>
+                <span class="p-column-title">{{ 'Name' | translate }}</span>
+                <span>{{ branch.name }}</span>
+              </td>
+              <td>
+                <span class="p-column-title">{{ 'Description' | translate }}</span>
+                <span>{{ branch.description }}</span>
+              </td>
             </tr>
           </ng-template>
         </p-table>
@@ -174,7 +244,7 @@
         <p-accordion [activeIndex]="0">
           <p-accordionTab
             *ngFor="let schedule of outing.outingSchedules; let i = index"
-            [header]="'Schedule ' + (i + 1) + ' - ' + getDayOfWeekName(schedule.dayOfWeek)"
+            [header]="('Schedule' | translate) + ' ' + (i + 1) + ' - ' + (getDayOfWeekName(schedule.dayOfWeek) | translate)"
           >
             <div class="grid">
               <div class="col-12 md:col-6">
@@ -254,7 +324,7 @@
     <div class="grid mt-4" *ngIf="outing.offers?.length">
       <div class="col-12">
         <h3 class="text-xl mb-3">{{ 'Offers' | translate }}</h3>
-        <p-table [value]="outing.offers">
+        <p-table [value]="outing.offers" responsiveLayout="stack" breakpoint="640px">
           <ng-template pTemplate="header">
             <tr>
               <th>{{ 'Title' | translate }}</th>
@@ -265,20 +335,36 @@
           </ng-template>
           <ng-template pTemplate="body" let-o>
             <tr>
-              <td>{{ o.title }}</td>
-              <td>{{ o.discountPercentage }}</td>
-              <td>{{ o.discountAmount }}</td>
-              <td>{{ o.validFrom | date: 'mediumDate' }} - {{ o.validTo | date: 'mediumDate' }}</td>
+              <td>
+                <span class="p-column-title">{{ 'Title' | translate }}</span>
+                <span>{{ o.title }}</span>
+              </td>
+              <td>
+                <span class="p-column-title">{{ 'Discount %' | translate }}</span>
+                <span>{{ o.discountPercentage }}</span>
+              </td>
+              <td>
+                <span class="p-column-title">{{ 'Discount Amount' | translate }}</span>
+                <span>{{ o.discountAmount }}</span>
+              </td>
+              <td>
+                <span class="p-column-title">{{ 'Valid' | translate }}</span>
+                <span>{{ o.validFrom | date: 'mediumDate' }} - {{ o.validTo | date: 'mediumDate' }}</span>
+              </td>
             </tr>
           </ng-template>
         </p-table>
       </div>
     </div>
+    <div #detailReviews id="detail-reviews" class="detail-reviews">
+      <app-item-reviews itemType="Outing" [itemId]="outingId" [itemName]="outing.name"></app-item-reviews>
+    </div>
   </div>
 
-  <ng-template #loading>
-    <div class="card p-4">
-      <p>{{ 'Loading...' | translate }}</p>
+  <ng-template #pageState>
+    <div class="detail-state" [attr.role]="loadError ? 'alert' : 'status'">
+      <p>{{ (loadError ? 'DETAIL_PAGE.ERROR' : 'Loading...') | translate }}</p>
+      <button *ngIf="loadError" type="button" (click)="getOutingDetails()">{{ 'DETAIL_PAGE.RETRY' | translate }}</button>
     </div>
   </ng-template>
 </div>

@@ -1,7 +1,9 @@
 .custom-trips-page {
   /* KPI Cards */
   .kpi-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
     background: #ffffff;
 
     &:hover {
@@ -205,7 +207,9 @@
     border-color: #25d366;
     color: #ffffff;
     font-weight: 600;
-    transition: background-color 0.15s ease, transform 0.1s ease;
+    transition:
+      background-color 0.15s ease,
+      transform 0.1s ease;
 
     &:hover {
       background-color: #1eb855;
@@ -219,207 +223,16 @@
     }
   }
 
-  /* Expansion Dossier */
-  .expansion-dossier-wrapper {
-    background-color: #f8fafc;
-    border-inline-start: 4px solid #0284c7;
-    box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.03);
-
-    .dossier-banner {
-      background-color: #ffffff;
-      border-bottom: 1px solid #e2e8f0;
-    }
-
-    .dossier-card {
-      border: 1px solid #e2e8f0;
-      transition: box-shadow 0.2s ease;
-
-      &:hover {
-        box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.06);
-      }
-    }
-
-    .customer-avatar-large {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-      color: #0369a1;
-      font-weight: 700;
-      font-size: 0.8rem;
-      border: 2px solid #ffffff;
-      flex-shrink: 0;
-    }
-
-    /* Bento Spec Grid */
-    .bento-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.5rem;
-
-      @media (max-width: 576px) {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .bento-tile {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      padding: 0.4rem 0.5rem;
-      transition: border-color 0.15s ease, background-color 0.15s ease;
-
-      &:hover {
-        border-color: #cbd5e1;
-        background-color: #fbfcfe;
-      }
-    }
-
-    .bento-icon-box {
-      width: 22px;
-      height: 22px;
-      border-radius: 5px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
-      flex-shrink: 0;
-    }
-
-    .customer-quote-callout {
-      background-color: #f1f5f9;
-      border-inline-start: 3px solid #0284c7;
-      line-height: 1.4;
-      font-style: italic;
-      color: #334155;
-      max-height: 55px;
-      overflow-y: auto;
-      scrollbar-width: thin;
-    }
-
-    .hub-icon-circle {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    /* Marketplace Financial Spread Bar */
-    .marketplace-spread-bar {
-      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-      border-color: #e2e8f0;
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
-
-      @media (min-width: 768px) {
-        .border-md-start {
-          border-inline-start: 1px solid #e2e8f0 !important;
-        }
-        .border-md-end {
-          border-inline-end: 1px solid #e2e8f0 !important;
-        }
-      }
-    }
-
-    .spread-icon-badge {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      flex-shrink: 0;
-    }
-
-    /* Nested Offers Scroll Container */
-    .nested-offers-scroll-wrapper {
-      max-height: 240px;
-      overflow-y: auto;
-      overflow-x: auto;
-      scrollbar-width: thin;
-      scrollbar-color: #cbd5e1 #f8fafc;
-
-      &::-webkit-scrollbar {
-        width: 5px;
-        height: 5px;
-      }
-      &::-webkit-scrollbar-track {
-        background: #f8fafc;
-      }
-      &::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 4px;
-      }
-    }
-
-    /* Nested Offers Table */
-    .nested-offers-table {
-      .p-datatable-thead > tr > th {
-        background: #f8fafc !important;
-        font-size: 0.7rem;
-        padding: 0.45rem 0.55rem;
-        color: #475569;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        border-bottom: 1px solid #e2e8f0;
-      }
-
-      td {
-        padding: 0.45rem 0.55rem;
-        border-bottom: 1px solid #f1f5f9;
-        vertical-align: middle;
-        font-size: 0.8rem;
-      }
-
-      tr.highlight-best-rate {
-        background-color: rgba(34, 197, 94, 0.03) !important;
-        border-inline-start: 3px solid #22c55e;
-      }
-
-      .vendor-avatar-img {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 1px solid #e2e8f0;
-        flex-shrink: 0;
-      }
-
-      .vendor-avatar-monogram {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: #f1f5f9;
-        color: #475569;
-        font-weight: 700;
-        font-size: 0.7rem;
-        border: 1px solid #e2e8f0;
-        flex-shrink: 0;
-      }
-
-      .vendor-proposal-notes-row {
-        background-color: #f8fafc;
-
-        .proposal-notes-content {
-          background-color: #f8fafc;
-          border: 1px solid #e2e8f0;
-          border-radius: 6px;
-          padding: 0.5rem 0.65rem;
-          line-height: 1.5;
-          white-space: pre-wrap;
-          font-size: 0.8rem;
-        }
-      }
-    }
-
-    .empty-offers-dossier {
-      background-color: #ffffff;
-      border: 1px dashed #cbd5e1;
-    }
+  // Keep expanded details readable while the request list scrolls horizontally.
+  .request-expansion-cell {
+    padding: 0 !important;
+  }
+  .request-expansion {
+    position: sticky;
+    inset-inline-start: 0;
+    width: var(--table-viewport-width, 100%);
+    max-width: 100%;
+    border-block: 1px solid #dce5eb;
   }
 
   /* Empty state */

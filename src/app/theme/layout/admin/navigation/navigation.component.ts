@@ -1,5 +1,5 @@
 // Angular import
-import { Component, EventEmitter, HostListener, Output } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-navigation',
@@ -12,15 +12,9 @@ export class NavigationComponent {
   navCollapsedMob = window.innerWidth;
   windowWidth: number;
 
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
-    this.windowWidth = event.target.innerWidth;
-    this.navCollapseMob();
-  }
-
   // public method
   navCollapseMob() {
-    if (this.windowWidth < 1025) {
+    if (window.innerWidth < 1025) {
       this.NavCollapsedMob.emit();
     }
   }

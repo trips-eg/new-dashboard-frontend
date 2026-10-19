@@ -1,6 +1,12 @@
 <li [ngClass]="item.classes!" *ngIf="isVisible && item.url && !item.external" [routerLinkActive]="['active']">
-  <a class="nav-link" [target]="item.target ? '_blank' : '_self'" [routerLink]="[item.url]" (click)="closeOtherMenu($event)">
-    <span *ngIf="item.icon" class="coded-micon"><i [ngClass]="item.icon"></i></span>
+  <a
+    class="nav-link"
+    [target]="item.target ? '_blank' : '_self'"
+    [routerLink]="[item.url]"
+    routerLinkActive="active"
+    ariaCurrentWhenActive="page"
+  >
+    <span *ngIf="item.icon" class="coded-micon"><i [ngClass]="item.icon" aria-hidden="true"></i></span>
     <span class="coded-mtext" *ngIf="item.icon; else directTitle">{{ item.title | translate }}</span>
     <ng-template #directTitle>
       {{ item.title | translate }}
@@ -8,8 +14,8 @@
   </a>
 </li>
 <li [ngClass]="item.classes!" *ngIf="isVisible && item.url && item.external">
-  <a [target]="item.target ? '_blank' : '_self'" [href]="item.url">
-    <span *ngIf="item.icon" class="coded-micon"><i [ngClass]="item.icon"></i></span>
+  <a class="nav-link" [target]="item.target ? '_blank' : '_self'" [href]="item.url">
+    <span *ngIf="item.icon" class="coded-micon"><i [ngClass]="item.icon" aria-hidden="true"></i></span>
     <span class="coded-mtext" *ngIf="item.icon; else directTitle">{{ item.title | translate }}</span>
     <ng-template #directTitle>
       {{ item.title | translate }}

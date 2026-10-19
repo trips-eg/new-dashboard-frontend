@@ -1,0 +1,41 @@
+<header class="detail-page-header" [attr.dir]="rtl ? 'rtl' : 'ltr'" [attr.aria-label]="typeLabel | translate">
+  <div class="header-main">
+    <span class="header-mark" aria-hidden="true"><i [class]="icon"></i></span>
+    <div class="header-copy">
+      <nav class="header-breadcrumb" [attr.aria-label]="'DETAIL_HEADER.BREADCRUMB' | translate">
+        <a routerLink="/default">{{ 'Home' | translate }}</a>
+        <i class="pi pi-angle-right" aria-hidden="true"></i>
+        <a [routerLink]="parentLink">{{ parentLabel | translate }}</a>
+        <i class="pi pi-angle-right" aria-hidden="true"></i>
+        <span aria-current="page">{{ 'Details' | translate }}</span>
+      </nav>
+      <span *ngIf="itemName" class="header-type">{{ typeLabel | translate }}</span>
+      <h1 class="header-title" dir="auto">{{ itemName || (typeLabel | translate) }}</h1>
+      <div *ngIf="itemId || active === true || active === false" class="header-meta">
+        <bdi *ngIf="itemId" class="header-id" dir="ltr">#{{ itemId }}</bdi>
+        <span *ngIf="active === true || active === false" class="header-status" [class.inactive]="active === false">
+          <span class="status-dot" aria-hidden="true"></span>
+          {{ (active ? 'Active' : 'Inactive') | translate }}
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <a class="header-button header-back" [routerLink]="parentLink">
+      <i class="pi pi-arrow-left" aria-hidden="true"></i>
+      <span>{{ 'DETAIL_PAGE.BACK' | translate }}</span>
+    </a>
+    <ng-container *ngFor="let action of actions">
+      <button
+        *ngIf="!action.hidden"
+        type="button"
+        class="header-button header-primary"
+        [disabled]="loading || action.disabled"
+        (click)="runAction(action)"
+      >
+        <i *ngIf="action.icon" [class]="action.icon" aria-hidden="true"></i>
+        <span>{{ action.label | translate }}</span>
+      </button>
+    </ng-container>
+  </div>
+</header>

@@ -14,25 +14,23 @@ import { ConfigureService } from 'src/app/theme/shared/services/configure.servic
 import { ToastrService } from 'ngx-toastr';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { VendorRequestDialogComponent } from '../vendor-request-dialog/vendor-request-dialog.component';
+import { RequestDetailsComponent } from '../shared/request-details/request-details.component';
 import { CountdownTimerComponent } from '../shared/countdown-timer/countdown-timer.component';
 import {
   CustomTripTypeLabels,
   CustomTripRequestStatus,
   CustomTripRequestStatusLabels,
   CustomTripRequestStatusSeverity,
-  VendorTripOfferStatusLabels,
-  VendorTripOfferStatusSeverity,
-  OfferPaymentTypeLabels,
   TagSeverity,
   enumDisplay,
   enumSeverity
 } from 'src/app/shared/Enums/custom-trip';
-import { IAdminCustomTripRequest, IAdminVendorOffer, IVendorTripRequestsQuery } from 'src/app/shared/model/icustom-trip';
+import { IAdminCustomTripRequest, IVendorTripRequestsQuery } from 'src/app/shared/model/icustom-trip';
 
 @Component({
   selector: 'app-admin-trip-requests',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedModule, SubHeaderComponent, TranslateModule, CountdownTimerComponent],
+  imports: [CommonModule, FormsModule, SharedModule, SubHeaderComponent, TranslateModule, CountdownTimerComponent, RequestDetailsComponent],
   providers: [ConfirmationService, DialogService, MessageService],
   templateUrl: './admin-trip-requests.component.html',
   styleUrl: './admin-trip-requests.component.scss'
@@ -68,7 +66,6 @@ export class AdminTripRequestsComponent implements OnInit, OnDestroy {
   needsFlightFilter = false;
   needsVisaFilter = false;
   expandedRows: { [key: string]: boolean } = {};
-  expandedOfferNotes: { [offerId: number]: boolean } = {};
   private searchSubscription?: Subscription;
 
   statusOptions = Object.entries(CustomTripRequestStatusLabels).map(([value, labels]) => ({
@@ -78,13 +75,8 @@ export class AdminTripRequestsComponent implements OnInit, OnDestroy {
 
   get metrics() {
     const total = this.totalRecords || this.requests.length;
-    const activeWindows = this.requests.filter(
-      (r) => r.status === CustomTripRequestStatus.ReceivingOffers || r.isAcceptingOffers
-    ).length;
-    const totalOffers = this.requests.reduce(
-      (sum, r) => sum + (r.offersCount || r.offers?.length || 0),
-      0
-    );
+    const activeWindows = this.requests.filter((r) => r.status === CustomTripRequestStatus.ReceivingOffers || r.isAcceptingOffers).length;
+    const totalOffers = this.requests.reduce((sum, r) => sum + (r.offersCount || r.offers?.length || 0), 0);
     const totalViews = this.requests.reduce((sum, r) => sum + (r.viewsCount || 0), 0);
     return { total, activeWindows, totalOffers, totalViews };
   }
@@ -98,55 +90,6 @@ export class AdminTripRequestsComponent implements OnInit, OnDestroy {
     return name.substring(0, 2).toUpperCase();
   }
 
-  getWhatsAppUrl(phone?: string): string {
-    if (!phone) return '';
-    let clean = phone.replace(/[^0-9]/g, '');
-    if (clean.startsWith('00')) {
-      clean = clean.substring(2);
-    }
-    if (clean.startsWith('0') && clean.length === 11) {
-      clean = '20' + clean.substring(1);
-    } else if (!clean.startsWith('20') && clean.length === 10) {
-      clean = '20' + clean;
-    }
-    return `https://wa.me/${clean}`;
-  }
-
-  getLowestOffer(offers?: IAdminVendorOffer[]): number | null {
-    if (!offers || offers.length === 0) return null;
-    const prices = offers.map((o) => o.price).filter((p) => typeof p === 'number' && !isNaN(p));
-    return prices.length > 0 ? Math.min(...prices) : null;
-  }
-
-  getHighestOffer(offers?: IAdminVendorOffer[]): number | null {
-    if (!offers || offers.length === 0) return null;
-    const prices = offers.map((o) => o.price).filter((p) => typeof p === 'number' && !isNaN(p));
-    return prices.length > 0 ? Math.max(...prices) : null;
-  }
-
-  getAverageOffer(offers?: IAdminVendorOffer[]): number | null {
-    if (!offers || offers.length === 0) return null;
-    const prices = offers.map((o) => o.price).filter((p) => typeof p === 'number' && !isNaN(p));
-    if (prices.length === 0) return null;
-    const total = prices.reduce((sum, p) => sum + p, 0);
-    return Math.round(total / prices.length);
-  }
-
-  isLowestOffer(offer: IAdminVendorOffer, offers?: IAdminVendorOffer[]): boolean {
-    if (!offers || offers.length < 2) return false;
-    const lowest = this.getLowestOffer(offers);
-    return offer.price === lowest;
-  }
-
-  toggleOfferNotes(offerId: number, event?: Event): void {
-    if (event) event.stopPropagation();
-    this.expandedOfferNotes[offerId] = !this.expandedOfferNotes[offerId];
-  }
-
-  isOfferNotesExpanded(offerId: number): boolean {
-    return !!this.expandedOfferNotes[offerId];
-  }
-
   toggleAllRows(): void {
     if (Object.keys(this.expandedRows).length > 0) {
       this.expandedRows = {};
@@ -157,6 +100,13 @@ export class AdminTripRequestsComponent implements OnInit, OnDestroy {
       });
       this.expandedRows = newExpanded;
     }
+  }
+
+  setRowExpanded(request: IAdminCustomTripRequest, expanded: boolean): void {
+    const rows = { ...this.expandedRows };
+    if (expanded) rows[request.id] = true;
+    else delete rows[request.id];
+    this.expandedRows = rows;
   }
 
   get hasExpandedRows(): boolean {
@@ -245,11 +195,9 @@ export class AdminTripRequestsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.searchSubscription = this.destinationSubject
-      .pipe(debounceTime(400), distinctUntilChanged())
-      .subscribe(() => {
-        this.dt?.reset();
-      });
+    this.searchSubscription = this.destinationSubject.pipe(debounceTime(400), distinctUntilChanged()).subscribe(() => {
+      this.dt?.reset();
+    });
 
     this.translate.onLangChange.subscribe(() => {
       this.lang = this.translate.currentLang;
@@ -356,19 +304,5 @@ export class AdminTripRequestsComponent implements OnInit, OnDestroy {
 
   statusSeverity(value: number): TagSeverity {
     return enumSeverity(CustomTripRequestStatusSeverity, value);
-  }
-
-  offerStatusLabel(status: number, statusName?: string): string {
-    if (statusName) return statusName;
-    return enumDisplay(VendorTripOfferStatusLabels, status, this.lang);
-  }
-
-  offerStatusSeverity(value: number): TagSeverity {
-    return enumSeverity(VendorTripOfferStatusSeverity, value);
-  }
-
-  paymentTypeLabel(paymentType: number, paymentTypeName?: string): string {
-    if (paymentTypeName) return paymentTypeName;
-    return enumDisplay(OfferPaymentTypeLabels, paymentType, this.lang);
   }
 }

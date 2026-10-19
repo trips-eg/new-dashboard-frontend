@@ -1,19 +1,20 @@
 <div class="div">
-  <div class="grid align-items-center">
-    <div class="col-6 text-start">
+  <div class="sub-header-layout">
+    <div class="sub-header-copy">
       <h1 class="flex flex-column">
         <span class="mainHeader" *ngIf="mainHeader">{{ mainHeader | translate }} &nbsp;</span>
         <span class="subHeader" *ngIf="subHeader">{{ subHeader | translate }}</span>
       </h1>
-      <h6>
-        <span class="main-sec" (click)="goBack()" *ngIf="mainSection">{{ mainSection | translate }} &nbsp; > &nbsp;</span>
+      <div class="sub-header-breadcrumb" *ngIf="mainSection || subSection">
+        <button type="button" class="main-sec" (click)="goBack()" *ngIf="mainSection">{{ mainSection | translate }}</button>
+        <span *ngIf="mainSection && subSection" aria-hidden="true">›</span>
         <span class="sub-sec" *ngIf="subSection">{{ subSection | translate }}</span>
-      </h6>
+      </div>
     </div>
-    <div class="col-6 text-end">
-      <ng-container *ngFor="let btn of actionButtons">
-        <button class="btn" [ngClass]="btn.class" *ngIf="!btn.hidden" [disabled]="btn.disabled" (click)="onButtonClick(btn.action)">
-          <i *ngIf="btn.icon" class="{{ btn.icon }} me-1"></i>
+    <div class="sub-header-actions" *ngIf="visibleActions.length">
+      <ng-container *ngFor="let btn of visibleActions">
+        <button type="button" class="btn" [ngClass]="btn.class" [disabled]="btn.disabled" (click)="onButtonClick(btn.action)">
+          <i *ngIf="btn.icon" class="{{ btn.icon }}" aria-hidden="true"></i>
           {{ btn.label | translate }}
         </button>
       </ng-container>

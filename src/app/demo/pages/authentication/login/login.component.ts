@@ -1,8 +1,8 @@
-import { CommonModule } from '@angular/common';
-import { Component, ViewChild } from '@angular/core';
+import { CommonModule, DOCUMENT } from '@angular/common';
+import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
 import { AccountService } from 'src/app/shared/services/account.service';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
@@ -33,6 +33,8 @@ import { ConfigureService } from 'src/app/theme/shared/services/configure.servic
 })
 export default class LoginComponent {
   @ViewChild('signInNgForm') signInNgForm: NgForm;
+  @ViewChild('usernameInput') usernameInput: ElementRef<HTMLInputElement>;
+  @ViewChild('passwordInput') passwordInput: ElementRef<HTMLInputElement>;
   signInForm: FormGroup;
   showErrorMsg: boolean = false;
   isLoading: boolean = false;
@@ -45,7 +47,9 @@ export default class LoginComponent {
     private _loginService: AccountService,
     private toast: ToastrService,
     private navService: NavigationItem,
-    private configService: ConfigureService
+    private configService: ConfigureService,
+    private translate: TranslateService,
+    @Inject(DOCUMENT) private document: Document
   ) {}
 
   ngOnInit(): void {
@@ -69,8 +73,16 @@ export default class LoginComponent {
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
-    const passwordField = document.getElementById('password') as HTMLInputElement;
-    passwordField.type = this.showPassword ? 'text' : 'password';
+  }
+  get currentLang(): string {
+    return this.translate.currentLang || 'en';
+  }
+  changeLanguage(): void {
+    const lang = this.currentLang === 'ar' ? 'en' : 'ar';
+    localStorage.setItem('Language', lang);
+    this.translate.use(lang);
+    this.document.documentElement.lang = lang;
+    this.document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   }
   private isExactScanner(permissions: string[]): boolean {
     const scannerPermissions = ['Permissions.Scanner.View', 'Permissions.Scanner.Edit'];
@@ -79,8 +91,11 @@ export default class LoginComponent {
   }
 
   onSubmit() {
+    if (this.isLoading) return;
     if (this.signInForm.invalid) {
       this.signInForm.markAllAsTouched();
+      const firstInvalidInput = this.signInForm.controls['username'].invalid ? this.usernameInput : this.passwordInput;
+      firstInvalidInput.nativeElement.focus();
       return;
     }
 
@@ -127,7 +142,7 @@ export default class LoginComponent {
       (error) => {
         this.showErrorMsg = true;
         this.isLoading = false;
-        this.toast.error('Login failed. Please try again.', 'Error');
+        this.toast.error(this.translate.instant('AUTH_UI.NETWORK_ERROR'), this.translate.instant('AUTH_UI.ERROR_TITLE'));
       }
     );
   }

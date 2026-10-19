@@ -1,4 +1,4 @@
-import { CommonModule,Location } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 
@@ -10,28 +10,28 @@ import { SharedModule } from 'src/app/theme/shared/shared.module';
   styleUrl: './sub-header.component.scss'
 })
 export class SubHeaderComponent {
-  @Input() mainHeader='';
-  @Input() subHeader='';
-  @Input() mainSection='';
-  @Input() subSection='';
+  @Input() mainHeader = '';
+  @Input() subHeader = '';
+  @Input() mainSection = '';
+  @Input() subSection = '';
   @Input() actionButtons: {
     label: string;
     action: string;
-    icon?: string;              // Optional icon
-    class?: string;             // Optional CSS class
+    icon?: string; // Optional icon
+    class?: string; // Optional CSS class
     disabled?: boolean;
     hidden?: boolean;
   }[] = [];
 
   @Output() actionClicked = new EventEmitter<{ action: string }>();
+  get visibleActions() {
+    return this.actionButtons.filter((button) => !button.hidden);
+  }
   constructor(private location: Location) {}
-
-
 
   goBack(): void {
     this.location.back();
   }
-
 
   onButtonClick(action: string): void {
     this.actionClicked.emit({ action });

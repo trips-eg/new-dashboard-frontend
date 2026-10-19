@@ -1,6 +1,9 @@
 // Angular import
-import { Component } from '@angular/core';
-import { Location, LocationStrategy } from '@angular/common';
+import { Component, DestroyRef, HostListener, Renderer2, inject } from '@angular/core';
+import { DOCUMENT, Location, LocationStrategy } from '@angular/common';
+import { NavigationEnd, NavigationSkipped, Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { PrimeNGConfig } from 'primeng/api';
 
 // Project import
 import { BerryConfig } from '../../../app-config';
@@ -11,6 +14,11 @@ import { BerryConfig } from '../../../app-config';
   styleUrls: ['./admin.component.scss']
 })
 export class AdminComponent {
+  private readonly document = inject(DOCUMENT);
+  private readonly renderer = inject(Renderer2);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
+  private readonly primeConfig = inject(PrimeNGConfig);
   // public props
   berryConfig;
   navCollapsed: boolean;
@@ -36,32 +44,60 @@ export class AdminComponent {
 
     this.windowWidth = window.innerWidth;
     this.navCollapsed = this.windowWidth >= 1025 ? BerryConfig.isCollapse_menu : false;
+    this.renderer.addClass(this.document.body, 'dashboard-layout');
+    const originalZIndex = this.primeConfig.zIndex;
+    this.primeConfig.zIndex = { modal: 4000, overlay: 5000, menu: 5000, tooltip: 6000 };
+    this.router.events.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((event) => {
+      if ((event instanceof NavigationEnd || event instanceof NavigationSkipped) && this.navCollapsedMob) this.closeMenu(false);
+    });
+    this.destroyRef.onDestroy(() => {
+      this.renderer.removeClass(this.document.body, 'dashboard-layout');
+      this.renderer.removeClass(this.document.body, 'dashboard-menu-open');
+      this.primeConfig.zIndex = originalZIndex;
+    });
   }
 
   // public method
   navMobClick() {
-    if (this.navCollapsedMob && !document.querySelector('app-navigation.coded-navbar')?.classList.contains('mob-open')) {
-      this.navCollapsedMob = !this.navCollapsedMob;
-      setTimeout(() => {
-        this.navCollapsedMob = !this.navCollapsedMob;
-      }, 100);
-    } else {
-      this.navCollapsedMob = !this.navCollapsedMob;
+    if (this.navCollapsedMob) {
+      this.closeMenu();
+      return;
     }
-    if (document.querySelector('app-navigation.pc-sidebar')?.classList.contains('navbar-collapsed')) {
-      document.querySelector('app-navigation.pc-sidebar')?.classList.remove('navbar-collapsed');
-    }
+    this.navCollapsedMob = true;
+    this.navCollapsed = false;
+    this.renderer.addClass(this.document.body, 'dashboard-menu-open');
+    requestAnimationFrame(() => {
+      if (this.navCollapsedMob) (this.document.querySelector('#dashboard-sidebar a[href]') as HTMLElement)?.focus();
+    });
   }
 
   handleKeyDown(event: KeyboardEvent): void {
-    if (event.key === 'Escape') {
+    if (['Escape', 'Enter', ' '].includes(event.key)) {
+      event.preventDefault();
       this.closeMenu();
     }
   }
 
-  closeMenu() {
-    if (document.querySelector('app-navigation.pc-sidebar')?.classList.contains('mob-open')) {
-      document.querySelector('app-navigation.pc-sidebar')?.classList.remove('mob-open');
+  closeMenu(restoreFocus = true) {
+    this.navCollapsedMob = false;
+    this.renderer.removeClass(this.document.body, 'dashboard-menu-open');
+    if (restoreFocus) {
+      requestAnimationFrame(() => {
+        if (!this.navCollapsedMob) (this.document.querySelector('.header-mobile-collapse .mobile-menu') as HTMLElement)?.focus();
+      });
     }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    if (this.navCollapsedMob) this.closeMenu();
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    const previousWidth = this.windowWidth;
+    this.windowWidth = window.innerWidth;
+    const crossedMobileBreakpoint = previousWidth <= 1024 !== this.windowWidth <= 1024;
+    if (crossedMobileBreakpoint) this.closeMenu(false);
   }
 }

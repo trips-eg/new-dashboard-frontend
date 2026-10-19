@@ -1,141 +1,47 @@
-<div class="ms-auto">
-  <ul class="list-unstyled">
-    <li>
-      <div class=" pc-h-item" >
-      <a
-      class="pc-head-link head-link-secondary   me-0"
-
-      href="javascript:"
-
-   (click)="changeLanguage('en')"  *ngIf="currentLang === 'ar'">
-
-        <i class="ti ti-world me-1"></i> EN
-
-      </a>
-      <a
-      class="pc-head-link head-link-secondary   me-0"
-
-      href="javascript:"
-  (click)="changeLanguage('ar')" *ngIf="currentLang === 'en'">
-           <i class="ti ti-world me-1"></i> AR
-
-      </a>
+<div class="nav-right-content">
+  <div class="pc-h-item">
+    <button
+      type="button"
+      class="pc-head-link language-control"
+      (click)="changeLanguage(currentLang === 'ar' ? 'en' : 'ar')"
+      [attr.aria-label]="('RESPONSIVE.LANGUAGE' | translate) + ': ' + (currentLang === 'ar' ? 'English' : 'العربية')"
+    >
+      <i class="ti ti-world" aria-hidden="true"></i>
+      <span>{{ currentLang === 'ar' ? 'EN' : 'AR' }}</span>
+    </button>
+  </div>
+  <div class="dropdown pc-h-item header-user-profile" ngbDropdown>
+    <button
+      type="button"
+      class="pc-head-link profile-control dropdown-toggle"
+      ngbDropdownToggle
+      [attr.aria-label]="('RESPONSIVE.PROFILE' | translate) + ': ' + username"
+    >
+      <span class="profile-avatar" aria-hidden="true">{{ initials }}</span>
+      <span class="header-username">{{ username }}</span>
+      <i class="ti ti-chevron-down profile-chevron" aria-hidden="true"></i>
+    </button>
+    <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown" ngbDropdownMenu>
+      <div class="profile-summary">
+        <span class="profile-welcome">{{ 'NAV_UI.WELCOME' | translate }}</span>
+        <strong>{{ username }}</strong>
+        <span class="profile-role" *ngIf="userRole?.length">{{ roleLabels }}</span>
+        <span class="profile-email" *ngIf="userEmail">{{ userEmail }}</span>
       </div>
-    </li>
-
-    <li>
-      <div class="dropdown pc-h-item header-user-profile" ngbDropdown>
-        <a
-          class="pc-head-link head-link-primary dropdown-toggle"
-          data-bs-toggle="dropdown"
-          href="javascript:"
-          ngbDropdownToggle
-        >
-
-          <span>
-            <i class="ti ti-user"></i>
-          </span>
-          <small class="text-main">
-            {{username}} <i class="pi pi-sort-down-fill" style="font-size: 10px;"></i>
-          </small>
-
+      <div class="profile-actions">
+        <a [routerLink]="['/vendor-details', vendorId]" class="dropdown-item" ngbDropdownItem *ngIf="isVendor()">
+          <i class="ti ti-user" aria-hidden="true"></i>
+          <span>{{ 'NAV_UI.PROFILE' | translate }}</span>
         </a>
-        <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown" ngbDropdownMenu>
-          <div class="dropdown-header">
-            <h4>
-              {{'Welcome,' | translate}}
-              <span class="small text-muted">{{username}}</span>
-            </h4>
-            <p class="text-muted" *ngIf="userRole">{{userRole}}</p>
-            <p class="text-info" *ngIf="userEmail">{{userEmail}}</p>
-
-
-            <hr />
-<!-- userID -->
-              <a [routerLink]="['/vendor-details',vendorId ]" class="dropdown-item" *ngIf="isVendor()">
-                <i class="ti ti-user ms-2"></i>
-                <span>{{"My Profile" | translate}}</span>
-              </a>
-
-              <a (click)="checkForUpdates()" class="dropdown-item" style="cursor: pointer;">
-                <i class="pi pi-refresh ms-2" style="font-size: 14px;"></i>
-                <span>{{"Check for Updates" | translate}}</span>
-              </a>
-
-              <a  (click)="logout()" class="dropdown-item">
-                <i class="ti ti-logout ms-2"></i>
-                <span>{{'Logout' | translate}}</span>
-              </a>
-
-          </div>
-        </div>
+        <button type="button" class="dropdown-item" ngbDropdownItem (click)="checkForUpdates()">
+          <i class="ti ti-refresh" aria-hidden="true"></i>
+          <span>{{ 'NAV_UI.CHECK_UPDATES' | translate }}</span>
+        </button>
+        <button type="button" class="dropdown-item logout-action" ngbDropdownItem (click)="logout()">
+          <i class="ti ti-logout" aria-hidden="true"></i>
+          <span>{{ 'NAV_UI.LOGOUT' | translate }}</span>
+        </button>
       </div>
-    </li>
-  </ul>
+    </div>
+  </div>
 </div>
-
-
-
-
-
-<!-- <a class="list-group-item list-group-item-action">
-  <div class="d-flex">
-    <div class="flex-shrink-0">
-      <div class="user-avtar bg-light-success"><i class="ti ti-building-store"></i></div>
-    </div>
-    <div class="flex-grow-1 ms-1">
-      <span class="float-end text-muted">3 min ago</span>
-      <h5>Store Verification Done</h5>
-      <p class="text-body fs-6">We have successfully received your request.</p>
-      <div class="badge rounded-pill bg-light-danger">Unread</div>
-    </div>
-  </div>
-</a>
-<a class="list-group-item list-group-item-action">
-  <div class="d-flex">
-    <div class="flex-shrink-0">
-      <div class="user-avtar bg-light-primary"><i class="ti ti-mailbox"></i></div>
-    </div>
-    <div class="flex-grow-1 ms-1">
-      <span class="float-end text-muted">5 min ago</span>
-      <h5>Check Your Mail.</h5>
-      <p class="text-body fs-6">All done! Now check your inbox as you're in for a sweet treat!</p>
-      <button class="btn btn-sm btn-primary">
-        Mail
-        <i class="ti ti-brand-telegram"></i>
-      </button>
-    </div>
-  </div>
-</a>
-<a class="list-group-item list-group-item-action">
-  <div class="d-flex">
-    <div class="flex-shrink-0">
-      <img src="assets/images/user/avatar-1.jpg" alt="user-image" class="user-avtar" />
-    </div>
-    <div class="flex-grow-1 ms-1">
-      <span class="float-end text-muted">8 min ago</span>
-      <h5>John Doe</h5>
-      <p class="text-body fs-6">
-        Uploaded two file on &nbsp;
-        <strong>21 Jan 2020</strong>
-      </p>
-      <div class="notification-file d-flex p-3 bg-light-secondary rounded">
-        <i class="ti ti-arrow-bar-to-down"></i>
-        <h5 class="m-0">demo.jpg</h5>
-      </div>
-    </div>
-  </div>
-</a>
-<a class="list-group-item list-group-item-action">
-  <div class="d-flex">
-    <div class="flex-shrink-0">
-      <img src="assets/images/user/avatar-3.jpg" alt="user-image" class="user-avtar" />
-    </div>
-    <div class="flex-grow-1 ms-1">
-      <span class="float-end text-muted">10 min ago</span>
-      <h5>Joseph William</h5>
-      <p class="text-body fs-6">It is a long established fact that a reader will be distracted</p>
-      <div class="badge rounded-pill bg-light-success">Confirmation of Account</div>
-    </div>
-  </div>
-</a> -->

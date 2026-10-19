@@ -1,14 +1,17 @@
-<!-- [ Sidebar Menu ] start -->
-<nav>
+<nav [attr.aria-label]="'RESPONSIVE.MENU' | translate">
   <div class="navbar-wrapper">
-    <div class="m-header">
-      <!-- [ Header Topbar ] start -->
-      <a [routerLink]="['/default/']" class="b-brand w-100 text-center">
-        <!-- ========   change your logo hear   ============ -->
-        <img src="../../../../../assets/images/logo_color.png" width="80px" class="logo logo-lg" />
+    <div class="m-header sidebar-brand-header">
+      <a routerLink="/default" class="brand-link" [attr.aria-label]="'NAV_UI.HOME' | translate">
+        <img src="assets/images/new logo.PNG" alt="" width="44" height="44" class="brand-mark" />
+        <span class="brand-copy">
+          <strong>Trips</strong>
+          <small>{{ 'NAV_UI.DASHBOARD' | translate }}</small>
+        </span>
       </a>
+      <button type="button" class="sidebar-close" (click)="navCollapseMob()" [attr.aria-label]="'RESPONSIVE.MENU_CLOSE' | translate">
+        <i class="ti ti-x" aria-hidden="true"></i>
+      </button>
     </div>
     <app-nav-content (NavCollapsedMob)="navCollapseMob()" class="scroll-div"></app-nav-content>
   </div>
 </nav>
-<!-- [ Sidebar Menu ] end -->

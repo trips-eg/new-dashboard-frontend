@@ -4,6 +4,7 @@ import { AdminComponent } from './theme/layout/admin/admin.component';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { DeletionComponent } from './shared/components/New folder/delation.component';
 import { tripStarPermissionGuard } from './shared/guards/trip-star-permission.guard';
+import { reviewsAdminGuard } from './shared/guards/reviews-admin.guard';
 import { Permissions } from './theme/layout/admin/navigation/navigation';
 
 const routes: Routes = [
@@ -28,6 +29,11 @@ const routes: Routes = [
     component: AdminComponent,
     // canActivate: [AuthGuard],
     children: [
+      {
+        path: 'reviews',
+        canActivate: [reviewsAdminGuard],
+        loadComponent: () => import('./demo/pages/reviews/reviews.component').then((c) => c.ReviewsComponent)
+      },
       {
         path: '',
         redirectTo: '/default',

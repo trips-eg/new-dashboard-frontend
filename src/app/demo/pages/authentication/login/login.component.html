@@ -1,101 +1,112 @@
-<div class="login-wrapper">
-  <section class="grid mx-0">
+<main class="login-wrapper">
+  <section class="login-layout" aria-labelledby="login-title">
     <div class="login-content">
-      <div class="login-content__inner">
+      <header class="login-toolbar">
         <div class="logo-box">
-          <img src="assets/images/logo_color.png" alt="App Logo" class="main-logo" />
+          <img src="assets/images/new logo.PNG" alt="Trips" class="main-logo" width="52" height="52" fetchpriority="high" />
+          <div>
+            <span class="brand-name">Trips</span>
+            <span class="brand-caption">{{ 'NAV_UI.DASHBOARD' | translate }}</span>
+          </div>
         </div>
-
-        <h2 class="login-title">{{ 'Welcome Back' | translate }}</h2>
-        <p class="login-subtitle">{{ 'Sign in to continue' | translate }}</p>
-
-        <form [formGroup]="signInForm" (ngSubmit)="onSubmit()">
-          <div class="input-group">
-            <label for="username">{{ 'user name' | translate }}</label>
+        <button type="button" class="language-switch" (click)="changeLanguage()" [attr.aria-label]="'RESPONSIVE.LANGUAGE' | translate">
+          <i class="ti ti-world" aria-hidden="true"></i>
+          {{ currentLang === 'ar' ? 'English' : 'العربية' }}
+        </button>
+      </header>
+      <div class="login-content__inner">
+        <div class="login-heading">
+          <h1 id="login-title" class="login-title">{{ 'AUTH_UI.WELCOME' | translate }}</h1>
+          <p class="login-subtitle">{{ 'AUTH_UI.INTRO' | translate }}</p>
+        </div>
+        <form [formGroup]="signInForm" (ngSubmit)="onSubmit()" [attr.aria-busy]="isLoading">
+          <div class="login-field">
+            <label for="username">{{ 'AUTH_UI.USERNAME' | translate }}</label>
             <input
+              #usernameInput
               type="text"
               id="username"
               formControlName="username"
-              placeholder="your username"
-              [ngClass]="{
-                'p-invalid': (signInForm.controls['username'].invalid && signInForm.controls['username'].touched) || showErrorMsg
-              }"
+              autocomplete="username"
+              autocapitalize="none"
+              spellcheck="false"
+              [placeholder]="'AUTH_UI.USERNAME_PLACEHOLDER' | translate"
+              (input)="showErrorMsg = false"
+              [class.p-invalid]="(signInForm.controls['username'].invalid && signInForm.controls['username'].touched) || showErrorMsg"
+              [attr.aria-invalid]="(signInForm.controls['username'].invalid && signInForm.controls['username'].touched) || showErrorMsg"
+              [attr.aria-describedby]="
+                signInForm.controls['username'].invalid && signInForm.controls['username'].touched ? 'username-error' : null
+              "
               pInputText
             />
-            <small *ngIf="signInForm.controls['username'].invalid && signInForm.controls['username'].touched" class="p-error">
-              {{ 'username is required' | translate }}
+            <small
+              id="username-error"
+              *ngIf="signInForm.controls['username'].invalid && signInForm.controls['username'].touched"
+              class="field-error"
+            >
+              {{ 'AUTH_UI.USERNAME_REQUIRED' | translate }}
             </small>
           </div>
-
-          <div class="input-group">
-            <label for="password">{{ 'Password' | translate }}</label>
-            <div class="p-password">
+          <div class="login-field">
+            <div class="field-heading">
+              <label for="password">{{ 'Password' | translate }}</label>
+              <a routerLink="/forgot-password">{{ 'AUTH_UI.FORGOT_PASSWORD' | translate }}</a>
+            </div>
+            <div class="password-field">
               <input
-                type="password"
+                #passwordInput
+                [type]="showPassword ? 'text' : 'password'"
                 id="password"
                 formControlName="password"
-                placeholder="••••••••"
-                [ngClass]="{
-                  'p-invalid': (signInForm.controls['password'].invalid && signInForm.controls['password'].touched) || showErrorMsg
-                }"
+                autocomplete="current-password"
+                [placeholder]="'AUTH_UI.PASSWORD_PLACEHOLDER' | translate"
+                (input)="showErrorMsg = false"
+                [class.p-invalid]="(signInForm.controls['password'].invalid && signInForm.controls['password'].touched) || showErrorMsg"
+                [attr.aria-invalid]="(signInForm.controls['password'].invalid && signInForm.controls['password'].touched) || showErrorMsg"
+                [attr.aria-describedby]="
+                  signInForm.controls['password'].invalid && signInForm.controls['password'].touched ? 'password-error' : null
+                "
                 pInputText
               />
-              <i class="pi pi-eye password-toggle" (click)="togglePasswordVisibility()"></i>
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="togglePasswordVisibility()"
+                [attr.aria-label]="(showPassword ? 'AUTH_UI.HIDE_PASSWORD' : 'AUTH_UI.SHOW_PASSWORD') | translate"
+                [attr.aria-pressed]="showPassword"
+              >
+                <i [class]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" aria-hidden="true"></i>
+              </button>
             </div>
-            <small *ngIf="signInForm.controls['password'].invalid && signInForm.controls['password'].touched" class="p-error">
-              {{ 'Password is required' | translate }}
+            <small
+              id="password-error"
+              *ngIf="signInForm.controls['password'].invalid && signInForm.controls['password'].touched"
+              class="field-error"
+            >
+              {{ 'AUTH_UI.PASSWORD_REQUIRED' | translate }}
             </small>
           </div>
-
-          <div class="remember-forgot">
-            <!-- <div class="remember-me">
-              <p-checkbox [binary]="true" formControlName="rememberMe"></p-checkbox>
-              <label>{{ 'Remember me' | translate }}</label>
-            </div> -->
-            <a class="forgot-password" routerLink="/forgot-password">
-              {{ 'Forgot Password?' | translate }}
-            </a>
-          </div>
-
-          <strong class="p-error text-center d-block" *ngIf="showErrorMsg">
-            {{ 'Invalid Username or Password' | translate }}
-          </strong>
-
-          <button type="submit" class="theme-btn" [disabled]="signInForm.invalid || isLoading">
-            <i class="btn-curve"></i>
-            <span class="btn-title">
-              <i *ngIf="isLoading" class="pi pi-spin pi-spinner"></i>
-              {{ 'Sign In' | translate }}
-            </span>
+          <p class="login-error" role="alert" *ngIf="showErrorMsg">
+            <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+            <span>{{ 'AUTH_UI.INVALID_CREDENTIALS' | translate }}</span>
+          </p>
+          <button type="submit" class="sign-in-button" [disabled]="isLoading">
+            <i *ngIf="isLoading" class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+            {{ (isLoading ? 'AUTH_UI.SIGNING_IN' : 'AUTH_UI.SIGN_IN') | translate }}
+            <i *ngIf="!isLoading" class="pi pi-arrow-right sign-in-arrow" aria-hidden="true"></i>
           </button>
-
-          <!-- <div class="social-login">
-            <p>{{ 'Or sign in with' | translate }}</p>
-            <div class="social-icons">
-              <button type="button" class="social-btn google">
-                <i class="pi pi-google"></i>
-              </button>
-              <button type="button" class="social-btn facebook">
-                <i class="pi pi-facebook"></i>
-              </button>
-              <button type="button" class="social-btn twitter">
-                <i class="pi pi-twitter"></i>
-              </button>
-            </div>
-          </div> -->
         </form>
-
         <p class="signup-link">
-          {{ "Don't have an account?" | translate }}
-          <a routerLink="/register">{{ 'Sign Up' | translate }}</a>
+          {{ 'AUTH_UI.NO_ACCOUNT' | translate }}
+          <a routerLink="/register">{{ 'AUTH_UI.SIGN_UP' | translate }}</a>
         </p>
-
-        <p class="copyright-text">© {{ currentYear }} {{ 'impact bussines sloutions All rights reserved' | translate }}</p>
       </div>
+      <footer class="login-footer">
+        <p class="copyright-text">© {{ currentYear }} {{ 'AUTH_UI.COPYRIGHT' | translate }}</p>
+      </footer>
     </div>
-
-    <div class="login-bg image-bg">
-      <img src="assets/images/tripsCover.jpg" alt="Login Background" />
-    </div>
+    <aside class="login-artwork">
+      <img src="assets/images/inspiration2.jpeg" [alt]="'AUTH_UI.ARTWORK_DESCRIPTION' | translate" width="1024" height="1536" />
+    </aside>
   </section>
-</div>
+</main>

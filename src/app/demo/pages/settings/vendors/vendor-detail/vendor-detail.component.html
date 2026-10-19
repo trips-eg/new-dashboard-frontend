@@ -2,19 +2,17 @@
   <!-- Store Header -->
   <div class="p-card store-banner p-5 mb-4" *ngIf="CompanyId || vendorId">
     <div class="grid align-items-center">
-      <div class="col-8" style="z-index: 3">
-        <div class="flex align-items-center">
-          <img [src]="imgUrl ?? 'https://placehold.co/600x400?text=No+Image'" alt="Store Banner" class="store-logo border-round mr-3" />
-          <div>
+      <div class="col-12" style="z-index: 3">
+        <div class="store-identity flex align-items-center">
+          <img [src]="imgUrl ?? 'assets/images/logo_color.png'" [alt]="VendorData.name || ('vendors' | translate)" class="store-logo border-round" />
+          <div class="store-copy">
             <h2 class="mb-1 text-white">{{ VendorData.name }}</h2>
             <p class="mb-2 text-white">
               {{ VendorData.description }}
             </p>
-            <div class="flex align-items-center text-white">
-              <i class="pi pi-envelope mr-2 info"></i>
-              {{ VendorData.email }}
-              <i class="pi pi-phone ml-4 mr-2 info"></i>
-              {{ VendorData.phone }}
+            <div class="store-contact text-white">
+              <span><i class="pi pi-envelope info" aria-hidden="true"></i><bdi>{{ VendorData.email }}</bdi></span>
+              <span><i class="pi pi-phone info" aria-hidden="true"></i><bdi>{{ VendorData.phone }}</bdi></span>
             </div>
           </div>
         </div>

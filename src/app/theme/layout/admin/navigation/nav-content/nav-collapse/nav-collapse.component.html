@@ -1,22 +1,25 @@
-<li data-username="Berry dashboard" class="nav-item coded-hasmenu" [routerLinkActive]="['active']">
-  <a [routerLinkActive]="['active']" href="javascript:" class="nav-link" (click)="navCollapse($event)">
-    @if (item.icon) {
-      <span class="coded-micon">
-        <i class="{{ item.icon }}"></i>
-      </span>
-    }
-    <span class="coded-mtext">{{ item.title |translate }}</span>
-  </a>
-  <ul class="coded-submenu" [routerLinkActive]="['active']">
-    @for (item of item.children; track item) {
-      @if (item.type == 'group') {
-        <app-nav-group [item]="item"></app-nav-group>
+<li class="nav-item coded-hasmenu" [class.active]="active" [class.coded-trigger]="expanded">
+  <button
+    type="button"
+    class="nav-link nav-section-toggle"
+    (click)="navCollapse()"
+    [attr.aria-expanded]="expanded"
+    [attr.aria-controls]="submenuId"
+  >
+    <span class="coded-micon" *ngIf="item.icon"><i [class]="item.icon" aria-hidden="true"></i></span>
+    <span class="coded-mtext">{{ item.title | translate }}</span>
+    <i class="ti ti-chevron-down section-chevron" aria-hidden="true"></i>
+  </button>
+  <ul class="coded-submenu" [id]="submenuId" [hidden]="!expanded">
+    @for (child of item.children; track child) {
+      @if (child.type == 'group') {
+        <app-nav-group [item]="child"></app-nav-group>
       }
-      @if (item.type == 'collapse') {
-        <app-nav-collapse [item]="item"></app-nav-collapse>
+      @if (child.type == 'collapse') {
+        <app-nav-collapse [item]="child"></app-nav-collapse>
       }
-      @if (item.type == 'item') {
-        <app-nav-item [item]="item"></app-nav-item>
+      @if (child.type == 'item') {
+        <app-nav-item [item]="child"></app-nav-item>
       }
     }
   </ul>

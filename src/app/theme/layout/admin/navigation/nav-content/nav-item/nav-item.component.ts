@@ -55,7 +55,12 @@ checkItemVisibility() {
   const user = this.configService.User();
 
   // تأمين على اليوزر والبيرميشنز والآيتيم نفسه
-  if (!user || !userPermissions || userPermissions.length === 0 || !this.item) {
+  if (!user || !userPermissions || !this.item || (userPermissions.length === 0 && !this.item.roles)) {
+    this.isVisible = false;
+    return;
+  }
+
+  if (this.item.roles && !this.configService.userRoles().some((role: string) => this.item.roles!.includes(role))) {
     this.isVisible = false;
     return;
   }
@@ -99,9 +104,6 @@ checkItemVisibility() {
       } else if (last_parent.classList.contains('coded-hasmenu')) {
         last_parent.classList.add('active');
       }
-    }
-    if ((document.querySelector('app-navigation.coded-navbar') as HTMLDivElement).classList.contains('mob-open')) {
-      (document.querySelector('app-navigation.coded-navbar') as HTMLDivElement).classList.remove('mob-open');
     }
   }
 }
