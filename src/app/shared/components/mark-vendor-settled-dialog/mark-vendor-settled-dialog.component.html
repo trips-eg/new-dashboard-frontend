@@ -81,16 +81,16 @@
         {{ newProgressPercent }}%
       </span>
     </div>
-    <div class="progress-track" style="height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; position: relative;">
+    <div class="progress-track" style="height: 8px; background: var(--ts-line); border-radius: 999px; overflow: hidden; position: relative;">
       <div
         class="progress-fill-current"
         [style.width.%]="currentProgressPercent"
-        style="height: 100%; background: #10b981; position: absolute; left: 0; top: 0; transition: width 0.3s ease;"
+        style="height: 100%; background: var(--ts-ok-fg); position: absolute; left: 0; top: 0; transition: width 0.3s ease;"
       ></div>
       <div
         class="progress-fill-new"
         [style.width.%]="newProgressPercent"
-        style="height: 100%; background: #3b82f6; opacity: 0.6; position: absolute; left: 0; top: 0; transition: width 0.3s ease;"
+        style="height: 100%; background: var(--ts-blue); opacity: 0.6; position: absolute; left: 0; top: 0; transition: width 0.3s ease;"
       ></div>
     </div>
   </div>

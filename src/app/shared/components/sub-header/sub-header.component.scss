@@ -5,7 +5,7 @@
 .div {
   padding: 20px;
   margin: 0 0 24px;
-  border: 1px solid #dce5eb;
+  border: 1px solid var(--ts-line);
   border-radius: 12px;
   background: #fff;
 }
@@ -29,11 +29,11 @@ h1 {
   overflow-wrap: anywhere;
 }
 .mainHeader {
-  color: var(--font-color, #172b3a);
+  color: var(--font-color, var(--ts-ink));
   text-transform: none;
 }
 .subHeader {
-  color: #526475;
+  color: var(--ts-ink-muted);
   font-weight: 400;
   font-size: 1rem;
   line-height: 1.5;
@@ -46,7 +46,7 @@ h1 {
   flex-wrap: wrap;
   gap: 8px;
   margin-block-start: 8px;
-  color: #526475;
+  color: var(--ts-ink-muted);
   font-size: 0.875rem;
   line-height: 1.5;
 }
@@ -58,7 +58,7 @@ h1 {
   padding: 0;
   background: transparent;
   border: 0;
-  color: #526475;
+  color: var(--ts-ink-muted);
   font: inherit;
   text-align: start;
   cursor: pointer;
@@ -68,7 +68,7 @@ h1 {
   text-decoration: underline;
 }
 .sub-sec {
-  color: var(--main-color, #1c7ba0);
+  color: var(--main-color, var(--ts-navy));
   overflow-wrap: anywhere;
 }
 .sub-header-actions {
@@ -90,7 +90,7 @@ h1 {
   overflow-wrap: anywhere;
 }
 button:focus-visible {
-  outline: 3px solid var(--main-color, #1c7ba0);
+  outline: 3px solid var(--main-color, var(--ts-navy));
   outline-offset: 3px;
 }
 @media (max-width: 640px) {

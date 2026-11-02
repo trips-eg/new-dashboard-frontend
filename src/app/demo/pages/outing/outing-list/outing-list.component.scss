@@ -11,7 +11,7 @@
 // Compact filter row styling
 :host ::ng-deep .p-datatable .p-datatable-thead > tr:nth-child(2) > th {
   padding: 0.25rem 0.5rem !important;
-  background: #f8f9fa;
+  background: var(--ts-subtle);
 }
 
 :host ::ng-deep .p-datatable .p-column-filter-row {

@@ -5,11 +5,11 @@
 }
 
 .dropzone {
-  border: 2px dashed #cccccc;
+  border: 2px dashed var(--ts-line-control);
   border-radius: 8px;
   padding: 20px;
   transition: all 0.3s ease;
-  background-color: #f8f9fa;
+  background-color: var(--ts-subtle);
   height: 300px;
   overflow-y: auto;
 }
@@ -19,7 +19,7 @@
 }
 
 .dropzone::-webkit-scrollbar-thumb {
-  background-color: #ccc;
+  background-color: var(--ts-line-control);
   border-radius: 3px;
 }
 
@@ -28,8 +28,8 @@
 }
 
 .dropzone.dragging {
-  border-color: #2196F3;
-  background-color: #e3f2fd;
+  border-color: var(--ts-blue);
+  background-color: var(--ts-selected);
 }
 
 .content-wrapper {
@@ -46,7 +46,7 @@
 
 .upload-content {
   text-align: center;
-  color: #666;
+  color: var(--ts-ink-faint);
   padding: 2rem;
 }
 
@@ -57,14 +57,14 @@
 }
 
 .upload-content .browse-link {
-  color: #2196F3;
+  color: var(--ts-blue);
   cursor: pointer;
   text-decoration: underline;
 }
 
 .upload-content .requirements {
   font-size: 0.9rem;
-  color: #999;
+  color: var(--ts-ink-faint);
   margin-top: 0.5rem;
 }
 
@@ -106,30 +106,30 @@
 .plus-card {
   width: 150px;
   height: 150px;
-  border: 2px dashed #cccccc;
+  border: 2px dashed var(--ts-line-control);
   border-radius: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #f8f9fa;
+  background: var(--ts-subtle);
   transition: all 0.2s ease;
 }
 
 .plus-card:hover {
-  border-color: #2196F3;
-  background-color: #e3f2fd;
+  border-color: var(--ts-blue);
+  background-color: var(--ts-selected);
   cursor: pointer;
 }
 
 .plus-card .plus-icon {
   font-size: 2rem;
-  color: #666;
+  color: var(--ts-ink-faint);
 }
 
 .plus-card .space-info {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--ts-ink-faint);
   margin-top: 5px;
 }
 
@@ -148,7 +148,7 @@
   position: absolute;
   bottom: 5px;
   font-size: 0.8rem;
-  color: #666;
+  color: var(--ts-ink-faint);
 }
 
 /* ❌ Delete button */
@@ -156,7 +156,7 @@
   position: absolute;
   top: 5px;
   right: 5px;
-  background: #dc3545;
+  background: var(--ts-danger);
   color: white;
   border: none;
   border-radius: 50%;
@@ -175,7 +175,7 @@
 }
 
 .error-message {
-  color: #dc3545;
+  color: var(--ts-danger);
   padding: 0.5rem;
   margin-top: 1rem;
   border-radius: 4px;

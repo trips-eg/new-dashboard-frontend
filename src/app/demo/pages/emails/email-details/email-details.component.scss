@@ -22,7 +22,7 @@
   background: #ffffff;
   border-radius: 8px;
   padding: 1rem 1.25rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--ts-line);
   margin-bottom: 0.5rem;
 }
 
@@ -33,12 +33,12 @@
     margin: 0 0 0.5rem 0;
     font-size: 1.25rem;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--ts-ink);
   }
 
   .email-address {
     font-size: 0.9375rem;
-    color: #6b7280;
+    color: var(--ts-ink-faint);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -57,7 +57,7 @@
 .info-label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--ts-ink-faint);
 }
 
 // Tabs
@@ -65,7 +65,7 @@
   ::ng-deep {
     .p-tabview-nav {
       background: #ffffff;
-      border-bottom: 2px solid #e5e7eb;
+      border-bottom: 2px solid var(--ts-line);
     }
 
     .p-tabview-panels {
@@ -85,7 +85,7 @@
   width: 100%;
   min-height: 1200px;
   height: calc(75vh - 200px);
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--ts-line);
   border-radius: 8px;
   background-color: #ffffff;
 }
@@ -93,7 +93,7 @@
 .no-content {
   text-align: center;
   padding: 3rem;
-  color: #9ca3af;
+  color: var(--ts-ink-faint);
   font-style: italic;
 }
 
@@ -104,7 +104,7 @@
   align-items: center;
   justify-content: center;
   padding: 3rem;
-  color: #6b7280;
+  color: var(--ts-ink-faint);
   gap: 1rem;
 }
 
@@ -131,18 +131,18 @@
   font-size: 1.25rem;
 
   &.status-success {
-    background-color: #d1fae5;
-    color: #047857;
+    background-color: var(--ts-ok-bg);
+    color: var(--ts-ok-fg);
   }
 
   &.status-warning {
-    background-color: #fef3c7;
-    color: #d97706;
+    background-color: var(--ts-pend-bg);
+    color: var(--ts-pend-ink);
   }
 
   &.status-danger {
-    background-color: #fee2e2;
-    color: #dc2626;
+    background-color: var(--ts-danger-soft);
+    color: var(--ts-danger);
   }
 }
 
@@ -167,7 +167,7 @@
     margin: 0;
     font-size: 1rem;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--ts-ink);
   }
 }
 
@@ -176,7 +176,7 @@
   flex-wrap: wrap;
   gap: 1rem;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--ts-ink-faint);
 
   span {
     display: flex;
@@ -185,7 +185,7 @@
 
     i {
       font-size: 0.875rem;
-      color: #9ca3af;
+      color: var(--ts-ink-faint);
     }
   }
 }

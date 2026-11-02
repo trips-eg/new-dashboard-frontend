@@ -18,5 +18,5 @@
 
 .colored-parent,
 .colored > div {
-  background-color: #333;
+  background-color: var(--ts-ink);
 }

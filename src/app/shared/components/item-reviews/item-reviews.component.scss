@@ -1,11 +1,11 @@
 :host {
   display: block;
   min-width: 0;
-  --review-ink: #172b3a;
-  --review-muted: #526475;
-  --review-border: #dce5eb;
-  --review-surface: #f5f8fa;
-  --review-accent: var(--main-color, #1c7ba0);
+  --review-ink: var(--ts-ink);
+  --review-muted: var(--ts-ink-muted);
+  --review-border: var(--ts-line);
+  --review-surface: var(--ts-subtle);
+  --review-accent: var(--main-color, var(--ts-navy));
   --review-danger: #b42318;
 }
 :host * {
@@ -46,7 +46,7 @@ h2 {
 }
 .review-count {
   font-size: 0.8rem;
-  background: #e9f3f6;
+  background: var(--ts-subtle);
   color: var(--review-accent);
   border-radius: 100px;
   padding: 4px 10px;
@@ -85,11 +85,11 @@ h2 {
   line-height: 1.5;
 }
 .review-button.primary {
-  background: var(--review-accent);
-  color: #fff;
+  background: var(--ts-accent);
+  color: var(--ts-on-accent);
 }
 .review-button.primary:hover {
-  background: #155f7d;
+  background: var(--ts-accent-hover);
 }
 .review-button.secondary {
   background: #fff;
@@ -185,7 +185,7 @@ textarea:focus-visible {
 .distribution-track {
   height: 7px;
   border-radius: 10px;
-  background: #dce5eb;
+  background: var(--ts-line);
   overflow: hidden;
 }
 .distribution-track div {
@@ -215,7 +215,7 @@ select,
 textarea {
   width: 100%;
   min-height: 44px;
-  border: 1px solid #a8b8c5;
+  border: 1px solid var(--ts-line-control);
   border-radius: 8px;
   background: #fff;
   padding: 10px 12px;
@@ -258,7 +258,7 @@ textarea {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #e9f3f6;
+  background: var(--ts-subtle);
   color: var(--review-accent);
   display: grid;
   place-items: center;
@@ -337,7 +337,7 @@ textarea {
   place-items: center;
   width: 60px;
   height: 60px;
-  background: #e9f3f6;
+  background: var(--ts-subtle);
   color: var(--review-accent);
   border-radius: 16px;
   font-size: 1.6rem;
@@ -456,12 +456,12 @@ textarea {
   justify-content: center;
   padding: 12px 4px;
   min-height: 48px;
-  border: 1px solid #a8b8c5;
+  border: 1px solid var(--ts-line-control);
   border-radius: 8px;
   background: #fff;
 }
 .review-rating-picker .selected span {
-  background: #e9f3f6;
+  background: var(--ts-subtle);
   color: var(--review-accent);
   border: 2px solid var(--review-accent);
   padding: 11px 3px;

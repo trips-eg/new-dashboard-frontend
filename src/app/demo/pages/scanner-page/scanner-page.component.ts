@@ -9,7 +9,6 @@ import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { SubHeaderComponent } from 'src/app/shared/components/sub-header/sub-header.component';
 import { OutingService } from 'src/app/shared/services/outing.service';
 
 @Component({
@@ -24,8 +23,7 @@ import { OutingService } from 'src/app/shared/services/outing.service';
     ButtonModule,
     ToastModule,
     TooltipModule,
-    ConfirmDialogModule,
-    SubHeaderComponent
+    ConfirmDialogModule
   ],
   templateUrl: './scanner-page.component.html',
   styleUrl: './scanner-page.component.scss',

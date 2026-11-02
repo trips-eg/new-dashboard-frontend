@@ -10,7 +10,7 @@
 
   // ─── Coupon Card (Top Hero) ────────────────────────────────
   .coupon-card {
-    background: linear-gradient(135deg, #43a047, #66bb6a);
+    background: var(--ts-ok-fg);
     border-radius: 16px;
     color: white;
     box-shadow: 0 8px 32px rgba(67, 160, 71, 0.25);
@@ -23,7 +23,7 @@
     }
 
     &--bogo {
-      background: linear-gradient(135deg, #7b1fa2, #ba68c8);
+      background: var(--ts-marketing);
       box-shadow: 0 8px 32px rgba(123, 31, 162, 0.25);
 
       &:hover {
@@ -31,7 +31,7 @@
       }
 
       .copy-btn {
-        color: #7b1fa2 !important;
+        color: var(--ts-marketing) !important;
       }
 
       .dotted-line::before,
@@ -41,7 +41,7 @@
     }
 
     &--recovery {
-      background: linear-gradient(135deg, #e65100, #ff9800);
+      background: var(--ts-pend-ink);
       box-shadow: 0 8px 32px rgba(230, 81, 0, 0.25);
 
       &:hover {
@@ -49,7 +49,7 @@
       }
 
       .copy-btn {
-        color: #e65100 !important;
+        color: var(--ts-pend-ink) !important;
       }
     }
 
@@ -87,13 +87,13 @@
 
         &--recovery {
           background: rgba(255, 193, 7, 0.3);
-          color: #fff8e1;
+          color: var(--ts-pend-bg);
           border: 1px solid rgba(255, 193, 7, 0.5);
         }
 
         &--targeted {
           background: rgba(33, 150, 243, 0.3);
-          color: #e3f2fd;
+          color: var(--ts-selected);
           border: 1px solid rgba(33, 150, 243, 0.5);
         }
       }
@@ -195,7 +195,7 @@
 
       .copy-btn {
         background: white;
-        color: #43a047;
+        color: var(--ts-ok-fg);
         border: none;
         padding: 0.5rem 1.25rem;
         border-radius: 24px;
@@ -266,23 +266,23 @@
         margin: 0 0 0.4rem;
         font-size: 0.95rem;
         font-weight: 700;
-        color: #333;
+        color: var(--ts-ink);
       }
     }
 
     &__desc {
       margin: 0 0 0.6rem;
       font-size: 0.8rem;
-      color: #888;
+      color: var(--ts-ink-faint);
       line-height: 1.4;
     }
 
     // ── BOGO Card ──
     &--bogo {
-      border-left-color: #9c27b0;
+      border-left-color: var(--ts-marketing);
 
       .feature-card__icon {
-        background: linear-gradient(135deg, #9c27b0, #ce93d8);
+        background: var(--ts-marketing);
       }
 
       .feature-card__stats {
@@ -298,14 +298,14 @@
             display: block;
             font-size: 1.4rem;
             font-weight: 800;
-            color: #7b1fa2;
+            color: var(--ts-marketing);
             line-height: 1;
           }
 
           .stat-label {
             display: block;
             font-size: 0.65rem;
-            color: #999;
+            color: var(--ts-ink-faint);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-top: 2px;
@@ -321,10 +321,10 @@
 
     // ── Recovery Card ──
     &--recovery {
-      border-left-color: #ff9800;
+      border-left-color: var(--ts-pend-ink);
 
       .feature-card__icon {
-        background: linear-gradient(135deg, #e65100, #ffb74d);
+        background: var(--ts-pend-ink);
       }
 
       .recovery-percentage {
@@ -335,23 +335,23 @@
         .recovery-value {
           font-size: 1.6rem;
           font-weight: 800;
-          color: #e65100;
+          color: var(--ts-pend-ink);
           line-height: 1;
         }
 
         .recovery-label {
           font-size: 0.75rem;
-          color: #999;
+          color: var(--ts-ink-faint);
         }
       }
     }
 
     // ── Targeted Customer Card ──
     &--targeted {
-      border-left-color: #2196f3;
+      border-left-color: var(--ts-blue);
 
       .feature-card__icon {
-        background: linear-gradient(135deg, #1565c0, #64b5f6);
+        background: var(--ts-blue);
       }
 
       .customer-info-grid {
@@ -376,7 +376,7 @@
 
         i {
           font-size: 0.85rem;
-          color: #1976d2;
+          color: var(--ts-navy);
           width: 18px;
           text-align: center;
         }
@@ -384,7 +384,7 @@
         .info-label {
           display: block;
           font-size: 0.65rem;
-          color: #999;
+          color: var(--ts-ink-faint);
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
@@ -392,7 +392,7 @@
         .info-value {
           display: block;
           font-size: 0.85rem;
-          color: #333;
+          color: var(--ts-ink);
           font-weight: 600;
         }
       }
@@ -403,7 +403,7 @@
         gap: 6px;
         margin-top: 0.75rem;
         padding: 0.5rem 1.25rem;
-        background: linear-gradient(135deg, #1565c0, #42a5f5);
+        background: var(--ts-blue);
         color: white;
         border: none;
         border-radius: 8px;
@@ -441,7 +441,7 @@
         font-size: 1.05rem;
         font-weight: bold;
         margin-bottom: 1rem;
-        color: #333;
+        color: var(--ts-ink);
         display: flex;
         align-items: center;
         gap: 0.5rem;
@@ -449,18 +449,18 @@
 
       .date-row {
         margin-bottom: 0.5rem;
-        color: #555;
+        color: var(--ts-ink-muted);
         font-size: 0.95rem;
       }
 
       .status-row {
         margin-top: 0.5rem;
         font-size: 0.9rem;
-        color: #777;
+        color: var(--ts-ink-faint);
 
         .status-badge {
           &.expired {
-            color: #e53935;
+            color: var(--ts-danger);
             font-weight: bold;
           }
         }
@@ -471,12 +471,12 @@
         align-items: flex-start;
         gap: 0.8rem;
         margin-bottom: 0.8rem;
-        color: #555;
+        color: var(--ts-ink-muted);
         font-size: 0.95rem;
 
         i {
           margin-top: 0.2rem;
-          color: #43a047;
+          color: var(--ts-ok-fg);
         }
       }
 
@@ -487,10 +487,10 @@
         .category-title {
           font-size: 1rem;
           font-weight: 600;
-          color: #555;
+          color: var(--ts-ink-muted);
           margin-bottom: 0.8rem;
           padding-left: 0.5rem;
-          border-left: 3px solid #43a047;
+          border-left: 3px solid var(--ts-ok-fg);
         }
 
         .item-grid {
@@ -499,21 +499,21 @@
           gap: 0.8rem;
 
           .clickable-item {
-            background: #f9f9f9;
+            background: var(--ts-subtle);
             padding: 0.5rem 1rem;
             border-radius: 8px;
-            color: #333;
+            color: var(--ts-ink);
             font-size: 0.95rem;
             cursor: pointer;
             transition: all 0.2s ease;
-            border: 1px solid #eee;
+            border: 1px solid var(--ts-line);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
             display: flex;
             align-items: center;
 
             &:hover {
-              background: #e8f5e9;
-              color: #2e7d32;
+              background: var(--ts-ok-bg);
+              color: var(--ts-ok-fg);
               border-color: #a5d6a7;
               transform: translateY(-2px);
               box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
@@ -524,7 +524,7 @@
               font-family: 'primeicons';
               margin-right: 0.5rem;
               font-size: 0.8rem;
-              color: #43a047;
+              color: var(--ts-ok-fg);
             }
           }
         }
@@ -533,7 +533,7 @@
 
     .divider {
       height: 1px;
-      background: #eee;
+      background: var(--ts-line);
       margin: 1.5rem 0;
     }
   }
@@ -542,7 +542,7 @@
   .loading-state {
     text-align: center;
     padding: 3rem;
-    color: #777;
+    color: var(--ts-ink-faint);
 
     i {
       font-size: 2rem;

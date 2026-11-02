@@ -1,11 +1,11 @@
 :host {
   --analytics-ink: var(--bs-body-color, #223047);
-  --analytics-muted: #526078;
-  --analytics-line: #dfe5ed;
-  --analytics-surface: var(--bs-body-bg, #fff);
-  --analytics-soft: #f6f8fb;
-  --analytics-accent: #245ca6;
-  --analytics-accent-soft: #edf3fb;
+  --analytics-muted: var(--ts-ink-muted);
+  --analytics-line: var(--ts-line);
+  --analytics-surface: var(--ts-surface);
+  --analytics-soft: var(--ts-subtle);
+  --analytics-accent: var(--ts-navy);
+  --analytics-accent-soft: var(--ts-selected);
   --analytics-danger: #b42318;
   display: block;
 }

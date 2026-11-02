@@ -13,7 +13,7 @@
   overflow: hidden;
 
   .profile-header {
-    background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+    background: linear-gradient(to bottom, var(--ts-subtle), #ffffff);
 
     .profile-image-wrapper {
       position: relative;
@@ -33,7 +33,7 @@
 
     h3 {
       font-weight: 700;
-      color: #2c3e50;
+      color: var(--ts-ink);
     }
 
     .badge {
@@ -83,7 +83,7 @@
       transition: background-color 0.2s;
 
       &:hover {
-        background-color: #f8f9fa;
+        background-color: var(--ts-subtle);
 
         .icon-box {
           transform: scale(1.05);

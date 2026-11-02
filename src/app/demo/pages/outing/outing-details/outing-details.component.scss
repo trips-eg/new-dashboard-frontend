@@ -15,7 +15,7 @@
 }
 
 :host ::ng-deep .outing-description-content {
-  color: var(--detail-muted, #526475);
+  color: var(--detail-muted, var(--ts-ink-muted));
   line-height: 1.7;
   font-size: 0.95rem;
 
@@ -35,7 +35,7 @@
 
   strong, b {
     font-weight: 700;
-    color: var(--detail-ink, #172b3a);
+    color: var(--detail-ink, var(--ts-ink));
   }
 
   ul, ol {

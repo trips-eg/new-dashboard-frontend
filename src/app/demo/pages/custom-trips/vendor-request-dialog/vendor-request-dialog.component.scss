@@ -11,32 +11,32 @@
 
   .dossier-card {
     background: #ffffff;
-    border: 1px solid #e2e8f0 !important;
+    border: 1px solid var(--ts-line) !important;
 
     .dossier-header {
-      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      background: var(--ts-subtle);
     }
 
     .pin-icon-box {
       width: 44px;
       height: 44px;
-      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+      background: var(--ts-navy);
+      box-shadow: 0 4px 12px rgba(18, 32, 58, 0.25);
     }
 
     .spec-tile {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
+      background: var(--ts-subtle);
+      border: 1px solid var(--ts-line);
       transition: all 0.2s ease;
 
       &:hover {
-        background: #f1f5f9;
-        border-color: #cbd5e1;
+        background: var(--ts-subtle);
+        border-color: var(--ts-line-control);
       }
     }
 
     .hotel-spec-box {
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--ts-line);
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 
       .hotel-icon-circle {
@@ -46,53 +46,53 @@
     }
 
     .service-chip {
-      background: #f8fafc;
-      color: #94a3b8;
-      border: 1px solid #e2e8f0;
+      background: var(--ts-subtle);
+      color: var(--ts-ink-faint);
+      border: 1px solid var(--ts-line);
       transition: all 0.2s ease;
 
       &.active {
-        background: #ecfdf5;
-        color: #059669;
-        border-color: #a7f3d0;
+        background: var(--ts-ok-bg);
+        color: var(--ts-ok-fg);
+        border-color: var(--ts-ok-line);
         box-shadow: 0 2px 6px rgba(5, 150, 105, 0.1);
 
         i {
-          color: #059669;
+          color: var(--ts-ok-fg);
         }
       }
     }
 
     .customer-notes-card {
-      background: #f8fafc;
-      border-inline-start: 3px solid #0284c7 !important;
-      border: 1px solid #e2e8f0;
+      background: var(--ts-subtle);
+      border-inline-start: 3px solid var(--ts-navy) !important;
+      border: 1px solid var(--ts-line);
     }
   }
 
   .quotation-card {
     background: #ffffff;
-    border: 1px solid #e2e8f0 !important;
+    border: 1px solid var(--ts-line) !important;
 
     .payment-option-card {
-      background: #f8fafc;
-      border: 1.5px solid #e2e8f0 !important;
+      background: var(--ts-subtle);
+      border: 1.5px solid var(--ts-line) !important;
       min-height: 90px;
       transition: all 0.2s ease;
 
       &:hover {
-        border-color: #cbd5e1 !important;
-        background: #f1f5f9;
+        border-color: var(--ts-line-control) !important;
+        background: var(--ts-subtle);
       }
 
       &.selected {
-        background: #f0f9ff;
-        border-color: #0284c7 !important;
-        box-shadow: 0 0 0 1px #0284c7, 0 4px 12px rgba(2, 132, 199, 0.12);
+        background: var(--ts-selected);
+        border-color: var(--ts-navy) !important;
+        box-shadow: 0 0 0 1px var(--ts-navy), 0 4px 12px rgba(18, 32, 58, 0.12);
 
         .radio-dot {
-          border-color: #0284c7;
-          background: #0284c7;
+          border-color: var(--ts-navy);
+          background: var(--ts-navy);
           box-shadow: inset 0 0 0 3px #ffffff;
         }
       }
@@ -101,20 +101,20 @@
         width: 16px;
         height: 16px;
         border-radius: 50%;
-        border: 2px solid #cbd5e1;
+        border: 2px solid var(--ts-line-control);
         display: inline-block;
         transition: all 0.2s ease;
       }
     }
 
     .deposit-section {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
+      background: var(--ts-subtle);
+      border: 1px solid var(--ts-line);
     }
 
     .financial-breakdown-card {
-      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-      border: 1px solid #bae6fd;
+      background: var(--ts-selected);
+      border: 1px solid var(--ts-done-line);
     }
   }
 

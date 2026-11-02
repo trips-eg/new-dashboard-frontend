@@ -1,20 +1,20 @@
 @import '../../components/item-reviews/detail-page';
 
 .accommodation-card {
-  background: #f5f8fa !important;
-  border: 1px solid #dce5eb;
+  background: var(--ts-subtle) !important;
+  border: 1px solid var(--ts-line);
   box-shadow: none !important;
   min-width: 0;
   .text-white,
   .text-white-alpha-90 {
-    color: #172b3a !important;
+    color: var(--ts-ink) !important;
   }
   .accommodation-icon-wrapper {
     width: 44px;
     height: 44px;
     min-width: 44px;
     margin-inline-end: 12px;
-    background: #e9f3f6 !important;
+    background: var(--ts-subtle) !important;
   }
   .accommodation-icon-wrapper i {
     color: var(--main-color) !important;
@@ -35,27 +35,27 @@
 }
 .segment-card {
   background: #fff;
-  border: 1px solid #dce5eb;
+  border: 1px solid var(--ts-line);
   border-inline-start: 3px solid var(--main-color);
   box-shadow: none !important;
   margin-bottom: 16px;
   overflow-wrap: anywhere;
 }
 .segment-title {
-  color: #172b3a;
+  color: var(--ts-ink);
 }
 .segment-subtitle,
 .segment-info-text,
 .segment-meta {
-  color: #526475;
+  color: var(--ts-ink-muted);
 }
 .segment-info-box,
 .segment-step-item {
-  background: #f5f8fa;
+  background: var(--ts-subtle);
 }
 .segment-info-title,
 .segment-steps-title {
-  color: #172b3a;
+  color: var(--ts-ink);
 }
 .segment-step-number {
   background: var(--main-color);
@@ -67,7 +67,7 @@
 }
 .segment-divider {
   height: 1px;
-  background: #dce5eb;
+  background: var(--ts-line);
 }
 .segment-marker-flight,
 .segment-marker-hotel,
@@ -86,7 +86,7 @@
     flex: 1;
   }
   .p-timeline-event-connector {
-    background: #dce5eb;
+    background: var(--ts-line);
     width: 2px;
   }
 }

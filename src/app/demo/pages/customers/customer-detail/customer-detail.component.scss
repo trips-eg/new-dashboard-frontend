@@ -1,8 +1,8 @@
 // Hero Card Styling
 // Hero Card Styling
 .hero-card {
-  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-  color: #495057;
+  background: var(--ts-pend-bg);
+  color: var(--ts-ink-nav);
   border: none;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 
@@ -29,13 +29,13 @@
   font-size: 2rem;
   font-weight: 600;
   margin: 0;
-  color: #2c3e50;
+  color: var(--ts-ink);
 }
 
 .customer-username {
   font-size: 1.1rem;
   opacity: 0.8;
-  color: #6c757d;
+  color: var(--ts-ink-faint);
 
   .pi {
     opacity: 0.8;
@@ -59,7 +59,7 @@
   width: 50px;
   height: 50px;
   background: rgba(255, 152, 0, 0.15);
-  color: #f57c00;
+  color: var(--ts-pend-ink);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -71,14 +71,14 @@
   font-size: 0.875rem;
   opacity: 0.8;
   margin: 0;
-  color: #6c757d;
+  color: var(--ts-ink-faint);
 }
 
 .wallet-amount {
   font-size: 1.75rem;
   font-weight: 700;
   margin: 0;
-  color: #2c3e50;
+  color: var(--ts-ink);
 }
 
 // Information Cards
@@ -93,8 +93,8 @@
   }
 
   .card-header {
-    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-    color: #495057;
+    background: var(--ts-pend-bg);
+    color: var(--ts-ink-nav);
     border-bottom: none;
     padding: 1rem 1.5rem;
 
@@ -115,7 +115,7 @@
   align-items: flex-start;
   gap: 1rem;
   padding: 1rem 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--ts-subtle);
 
   &:last-child {
     border-bottom: none;
@@ -130,7 +130,7 @@
 .info-icon {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #ffb74d 0%, #ff9800 100%);
+  background: var(--ts-accent);
   color: white;
   border-radius: 8px;
   display: flex;
@@ -146,7 +146,7 @@
   label {
     display: block;
     font-size: 0.875rem;
-    color: #6c757d;
+    color: var(--ts-ink-faint);
     margin-bottom: 0.25rem;
     font-weight: 500;
   }
@@ -154,7 +154,7 @@
   p {
     margin: 0;
     font-size: 1rem;
-    color: #212529;
+    color: var(--ts-ink);
     font-weight: 500;
   }
 }
@@ -189,7 +189,7 @@
 ::ng-deep {
   .p-datatable {
     .p-datatable-header {
-      background: #f8f9fa;
+      background: var(--ts-subtle);
       border: none;
     }
 
@@ -199,7 +199,7 @@
       transition: background-color 0.2s;
 
       &:hover {
-        background-color: #f8f9fa;
+        background-color: var(--ts-subtle);
       }
     }
   }

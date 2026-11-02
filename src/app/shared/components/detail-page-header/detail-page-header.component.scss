@@ -2,10 +2,10 @@
   display: block;
   min-width: 0;
   margin-block-end: 24px;
-  --header-accent: var(--main-color, #1c7ba0);
-  --header-ink: #172b3a;
-  --header-muted: #526475;
-  --header-border: #dce5eb;
+  --header-accent: var(--main-color, var(--ts-navy));
+  --header-ink: var(--ts-ink);
+  --header-muted: var(--ts-ink-muted);
+  --header-border: var(--ts-line);
 }
 :host * {
   box-sizing: border-box;
@@ -36,7 +36,7 @@
   width: 48px;
   height: 48px;
   flex-shrink: 0;
-  background: #e9f3f6;
+  background: var(--ts-subtle);
   color: var(--header-accent);
   border-radius: 12px;
   font-size: 22px;
@@ -105,7 +105,7 @@
   padding: 4px 8px;
   border-radius: 6px;
   border: 1px solid var(--header-border);
-  background: #f5f8fa;
+  background: var(--ts-subtle);
   color: var(--header-muted);
 }
 .header-status {
@@ -118,7 +118,7 @@
   background: #e5f6ec;
 }
 .header-status.inactive {
-  color: #526475;
+  color: var(--ts-ink-muted);
   background: #f0f3f6;
 }
 .status-dot {
@@ -144,7 +144,7 @@
   gap: 8px;
   min-height: 44px;
   padding: 10px 16px;
-  border: 1px solid #a8b8c5;
+  border: 1px solid var(--ts-line-control);
   border-radius: 9px;
   background: #fff;
   color: var(--header-ink);
@@ -162,7 +162,7 @@
   flex-shrink: 0;
 }
 .header-button:hover:not(:disabled) {
-  background: #f5f8fa;
+  background: var(--ts-subtle);
   border-color: var(--header-accent);
 }
 .header-primary {

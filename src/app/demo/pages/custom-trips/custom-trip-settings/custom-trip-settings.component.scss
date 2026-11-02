@@ -3,15 +3,15 @@
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
-    border: 1px solid #bae6fd;
+    background: var(--ts-selected);
+    border: 1px solid var(--ts-done-line);
     flex-shrink: 0;
   }
 
   .unsaved-badge {
-    background-color: #fef3c7;
+    background-color: var(--ts-pend-bg);
     color: #92400e;
-    border: 1px solid #fde68a;
+    border: 1px solid var(--ts-pend-line);
     display: inline-flex;
     align-items: center;
     animation: bounceSlow 2s infinite ease-in-out;
@@ -32,7 +32,7 @@
     transition: all 0.2s ease;
 
     &:hover {
-      border-color: #0284c7 !important;
+      border-color: var(--ts-navy) !important;
     }
   }
 
@@ -40,8 +40,8 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: #f1f5f9;
-    color: #475569;
+    background: var(--ts-subtle);
+    color: var(--ts-ink-muted);
     font-size: 0.75rem;
     font-weight: 700;
     display: flex;
@@ -65,47 +65,47 @@
     width: 40px;
     height: 40px;
     border-radius: 10px;
-    background-color: #f1f5f9;
-    border: 1px solid #e2e8f0;
+    background-color: var(--ts-subtle);
+    border: 1px solid var(--ts-line);
     flex-shrink: 0;
   }
 
   .duration-highlight {
     padding: 0.35rem 0.85rem;
     border-radius: 9999px;
-    background-color: #f0fdf4;
-    color: #16a34a !important;
-    border: 1px solid #bbf7d0;
+    background-color: var(--ts-ok-bg);
+    color: var(--ts-ok-fg) !important;
+    border: 1px solid var(--ts-ok-line);
   }
 
   /* Tactile Duration Stepper */
   .duration-stepper-box {
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--ts-line-control);
     background: #ffffff;
     border-radius: 10px;
     overflow: hidden;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
     &:focus-within {
-      border-color: #0284c7;
-      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.18);
+      border-color: var(--ts-navy);
+      box-shadow: 0 0 0 3px rgba(18, 32, 58, 0.18);
     }
 
     .stepper-action-btn {
       width: 44px;
       height: 44px;
-      background: #f8fafc;
-      color: #475569;
+      background: var(--ts-subtle);
+      color: var(--ts-ink-muted);
       cursor: pointer;
       transition: background-color 0.15s ease, color 0.15s ease;
 
       &:hover:not(:disabled) {
-        background-color: #e2e8f0;
-        color: #0f172a;
+        background-color: var(--ts-line);
+        color: var(--ts-ink);
       }
 
       &:active:not(:disabled) {
-        background-color: #cbd5e1;
+        background-color: var(--ts-line-control);
       }
 
       &:disabled {
@@ -120,11 +120,11 @@
     }
 
     .stepper-btn-dec {
-      border-inline-end: 1px solid #e2e8f0 !important;
+      border-inline-end: 1px solid var(--ts-line) !important;
     }
 
     .stepper-btn-inc {
-      border-inline-start: 1px solid #e2e8f0 !important;
+      border-inline-start: 1px solid var(--ts-line) !important;
     }
 
     .stepper-input-core {
@@ -135,7 +135,7 @@
         font-weight: 700;
         outline: none;
         background: transparent;
-        color: #0f172a;
+        color: var(--ts-ink);
         -moz-appearance: textfield;
 
         &::-webkit-inner-spin-button,
@@ -151,20 +151,20 @@
     height: 44px;
     display: inline-flex;
     align-items: center;
-    border-color: #e2e8f0 !important;
+    border-color: var(--ts-line) !important;
   }
 
   /* Quick Preset Pills */
   .preset-pill {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    color: #475569;
+    background: var(--ts-subtle);
+    border: 1px solid var(--ts-line);
+    color: var(--ts-ink-muted);
     cursor: pointer;
 
     &:hover {
-      background: #e2e8f0;
-      color: #0f172a;
-      border-color: #cbd5e1;
+      background: var(--ts-line);
+      color: var(--ts-ink);
+      border-color: var(--ts-line-control);
       transform: translateY(-1px);
     }
 
@@ -173,10 +173,10 @@
     }
 
     &.active {
-      background: #0284c7;
-      border-color: #0284c7;
+      background: var(--ts-navy);
+      border-color: var(--ts-navy);
       color: #ffffff;
-      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+      box-shadow: 0 2px 6px rgba(18, 32, 58, 0.25);
     }
   }
 
@@ -188,7 +188,7 @@
     width: 72px;
     height: 72px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
-    border: 1px solid #bae6fd;
+    background: var(--ts-selected);
+    border: 1px solid var(--ts-done-line);
   }
 }

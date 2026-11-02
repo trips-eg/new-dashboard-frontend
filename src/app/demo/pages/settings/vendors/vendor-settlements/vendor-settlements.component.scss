@@ -7,7 +7,7 @@
   .kpi-card {
     background: #ffffff;
     border-radius: 1rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--ts-line);
     position: relative;
     overflow: hidden;
     transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
@@ -25,50 +25,50 @@
     &:hover {
       transform: translateY(-3px);
       box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.09);
-      border-color: #cbd5e1;
+      border-color: var(--ts-line-control);
     }
 
     &.kpi-blue {
       &::before {
-        background: linear-gradient(90deg, #3b82f6, #60a5fa);
+        background: var(--ts-blue);
       }
       .kpi-icon-wrapper {
-        background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-        color: #2563eb;
-        border: 1px solid #bfdbfe;
+        background: var(--ts-selected);
+        color: var(--ts-blue);
+        border: 1px solid var(--ts-done-line);
       }
     }
 
     &.kpi-green {
       &::before {
-        background: linear-gradient(90deg, #10b981, #34d399);
+        background: var(--ts-ok-fg);
       }
       .kpi-icon-wrapper {
-        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-        color: #059669;
-        border: 1px solid #a7f3d0;
+        background: var(--ts-ok-bg);
+        color: var(--ts-ok-fg);
+        border: 1px solid var(--ts-ok-line);
       }
     }
 
     &.kpi-orange {
       &::before {
-        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        background: var(--ts-pend-ink);
       }
       .kpi-icon-wrapper {
-        background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-        color: #d97706;
-        border: 1px solid #fde68a;
+        background: var(--ts-pend-bg);
+        color: var(--ts-pend-ink);
+        border: 1px solid var(--ts-pend-line);
       }
     }
 
     &.kpi-red {
       &::before {
-        background: linear-gradient(90deg, #ef4444, #f87171);
+        background: var(--ts-danger);
       }
       .kpi-icon-wrapper {
-        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-        color: #dc2626;
-        border: 1px solid #fecaca;
+        background: var(--ts-danger-soft);
+        color: var(--ts-danger);
+        border: 1px solid var(--ts-danger-line);
       }
     }
 
@@ -94,7 +94,7 @@
   .filter-hub-card {
     background: #ffffff;
     border-radius: 1rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--ts-line);
     box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05);
 
     .filter-label {
@@ -102,7 +102,7 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.04em;
-      color: #64748b;
+      color: var(--ts-ink-faint);
       margin-bottom: 0.25rem;
       display: block;
     }
@@ -127,7 +127,7 @@
      3. STICKY SELECTION & BADGES
      ============================================================ */
   .sticky-selection-bar {
-    background: linear-gradient(135deg, rgba(239, 246, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    background: var(--ts-subtle);
     border: 1px solid #93c5fd;
     backdrop-filter: blur(8px);
     animation: slideDown 0.3s ease-out;
@@ -144,13 +144,13 @@
     white-space: nowrap;
 
     &.sector-travel {
-      background-color: #e0f2fe;
-      color: #0284c7;
-      border: 1px solid #bae6fd;
+      background-color: var(--ts-selected);
+      color: var(--ts-navy);
+      border: 1px solid var(--ts-done-line);
     }
     &.sector-room {
-      background-color: #f3e8ff;
-      color: #9333ea;
+      background-color: var(--ts-marketing-bg);
+      color: var(--ts-marketing);
       border: 1px solid #e9d5ff;
     }
     &.sector-outing {
@@ -159,9 +159,9 @@
       border: 1px solid #99f6e4;
     }
     &.sector-manasik {
-      background-color: #fef3c7;
-      color: #d97706;
-      border: 1px solid #fde68a;
+      background-color: var(--ts-pend-bg);
+      color: var(--ts-pend-ink);
+      border: 1px solid var(--ts-pend-line);
     }
   }
 

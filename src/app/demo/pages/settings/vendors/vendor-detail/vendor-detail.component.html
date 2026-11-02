@@ -32,89 +32,89 @@
 
   <!-- vendor Statistics -->
   <div class="grid mb-4">
-    <div class="col-12 col-md-4">
-      <p-card class="stat">
-        <div class="flex align-items-center justify-content-between">
+    <div class="col-6 col-md-4">
+      <p-card class="stat" styleClass="ts-tile ts-tone-trip">
+        <div class="flex align-items-start justify-content-between gap-3">
           <div>
-            <h4>{{ 'Total Trip Reservation' | translate }}</h4>
+            <h4 class="ts-tile-label">{{ 'Total Trip Reservation' | translate }}</h4>
 
-            <h4 class="text-success">
-              {{ VendorStatistics?.totalTripReservation }}
+            <h4 class="ts-tile-value">
+              {{ VendorStatistics?.totalTripReservation | number: '1.0-2' }}
             </h4>
           </div>
-          <i class="pi pi-wallet text-orange-500 text-4xl"></i>
+          <i class="pi pi-map ts-tile-icon" aria-hidden="true"></i>
         </div>
       </p-card>
     </div>
-    <div class="col-12 col-md-4">
-      <p-card class="stat">
-        <div class="flex align-items-center justify-content-between">
+    <div class="col-6 col-md-4">
+      <p-card class="stat" styleClass="ts-tile ts-tone-hotel">
+        <div class="flex align-items-start justify-content-between gap-3">
           <div>
-            <h4>{{ 'Total Room Reservation' | translate }}</h4>
+            <h4 class="ts-tile-label">{{ 'Total Room Reservation' | translate }}</h4>
 
-            <h4 class="text-success">
-              {{ VendorStatistics?.totalRoomReservation }}
+            <h4 class="ts-tile-value">
+              {{ VendorStatistics?.totalRoomReservation | number: '1.0-2' }}
             </h4>
           </div>
-          <i class="pi pi-dollar text-green-500 text-4xl"></i>
+          <i class="pi pi-building ts-tile-icon" aria-hidden="true"></i>
         </div>
       </p-card>
     </div>
-    <div class="col-12 col-md-4">
-      <p-card class="stat">
-        <div class="flex align-items-center justify-content-between">
+    <div class="col-6 col-md-4">
+      <p-card class="stat" styleClass="ts-tile ts-tone-revenue">
+        <div class="flex align-items-start justify-content-between gap-3">
           <div>
-            <h4>{{ 'Total Vendor Income' | translate }}</h4>
+            <h4 class="ts-tile-label">{{ 'Total Vendor Income' | translate }}</h4>
 
-            <h4 class="text-success">
-              {{ VendorStatistics?.totalVendorIncome }}
+            <h4 class="ts-tile-value">
+              {{ VendorStatistics?.totalVendorIncome | number: '1.0-2' }}
             </h4>
           </div>
-          <i class="pi pi-users text-purple-500 text-4xl"></i>
+          <i class="pi pi-wallet ts-tile-icon" aria-hidden="true"></i>
         </div>
       </p-card>
     </div>
     <!-- Outing Reservation (TODO: backend) -->
-    <div class="col-12 col-md-4" *ngIf="isOutingVendor">
-      <p-card class="stat">
-        <div class="flex align-items-center justify-content-between">
+    <div class="col-6 col-md-4" *ngIf="isOutingVendor">
+      <p-card class="stat" styleClass="ts-tile ts-tone-outing">
+        <div class="flex align-items-start justify-content-between gap-3">
           <div>
-            <h4>
+            <h4 class="ts-tile-label">
               {{ 'Total Outing Reservation' | translate }}
             
             </h4>
 
-            <h4 class="text-success">
-              {{ VendorStatistics?.totalOutingReservation }}
+            <h4 class="ts-tile-value">
+              {{ VendorStatistics?.totalOutingReservation | number: '1.0-2' }}
             </h4>
           </div>
-          <i class="pi pi-compass text-cyan-500 text-4xl"></i>
+          <i class="pi pi-compass ts-tile-icon" aria-hidden="true"></i>
         </div>
       </p-card>
     </div>
     <!-- Hajj Reservation (TODO: backend) -->
-    <div class="col-12 col-md-4" *ngIf="isManasikVendor">
-      <p-card class="stat">
-        <div class="flex align-items-center justify-content-between">
+    <div class="col-6 col-md-4" *ngIf="isManasikVendor">
+      <p-card class="stat" styleClass="ts-tile ts-tone-hajj">
+        <div class="flex align-items-start justify-content-between gap-3">
           <div>
-            <h4>
+            <h4 class="ts-tile-label">
               {{ 'Total Hajj Reservation' | translate }}
               
             </h4>
 
-            <h4 class="text-success">
-              {{ VendorStatistics?.totalHajjReservation }}
+            <h4 class="ts-tile-value">
+              {{ VendorStatistics?.totalHajjReservation | number: '1.0-2' }}
             </h4>
           </div>
-          <i class="pi pi-moon text-indigo-500 text-4xl"></i>
+          <i class="pi pi-moon ts-tile-icon" aria-hidden="true"></i>
         </div>
       </p-card>
     </div>
-    <div class="col-12 col-md-4" *ngIf="VendorData.id">
-      <p-card class="stat">
-        <div class="flex align-items-center justify-content-between">
+    <div class="col-6 col-md-4" *ngIf="VendorData.id">
+      <p-card class="stat" styleClass="ts-tile ts-tone-neutral">
+        <div class="flex align-items-start justify-content-between gap-3">
           <div>
-            <h4>{{ 'Commission' | translate }}</h4>
+            <h4 class="ts-tile-label">{{ 'Commission' | translate }}</h4>
             <h4>
               <small class="text-success text-sm">{{ 'Hotel' | translate }} :</small>
               {{ VendorData?.hotelCommissionRate }} %
@@ -144,69 +144,69 @@
               ></i>
             </h4>
           </div>
-          <i class="pi pi-chart-line text-blue-500 text-4xl"></i>
+          <i class="pi pi-percentage ts-tile-icon" aria-hidden="true"></i>
         </div>
       </p-card>
     </div>
 
-    <!-- <div class="col-12 col-md-4">
-      <p-card class="stat">
-        <div class="flex align-items-center justify-content-between">
+    <!-- <div class="col-6 col-md-4">
+      <p-card class="stat" styleClass="ts-tile ts-tone-revenue">
+        <div class="flex align-items-start justify-content-between gap-3">
           <div>
-            <h4>{{ 'Total payed' | translate }}</h4>
+            <h4 class="ts-tile-label">{{ 'Total payed' | translate }}</h4>
 
-            <p class="text-success">
-              {{ VendorStatistics?.totalPayed }}
+            <p class="ts-tile-value">
+              {{ VendorStatistics?.totalPayed | number: '1.0-2' }}
             </p>
           </div>
-          <i class="pi pi-users text-purple-500 text-4xl"></i>
+          <i class="pi pi-wallet ts-tile-icon" aria-hidden="true"></i>
         </div>
       </p-card>
     </div> -->
 <!-- Total Customers -->
-<div class="col-12 col-md-4" *ngIf="!isVendor()">
-  <p-card class="stat">
-    <div class="flex align-items-center justify-content-between">
+<div class="col-6 col-md-4" *ngIf="!isVendor()">
+  <p-card class="stat" styleClass="ts-tile ts-tone-info">
+    <div class="flex align-items-start justify-content-between gap-3">
       <div>
-        <h4>{{ 'Total Customers' | translate }}</h4>
-        <p class="text-success">
-          {{ VendorStatistics?.customerCount }}
+        <h4 class="ts-tile-label">{{ 'Total Customers' | translate }}</h4>
+        <p class="ts-tile-value">
+          {{ VendorStatistics?.customerCount | number: '1.0-2' }}
         </p>
       </div>
-      <i class="pi pi-users text-purple-500 text-4xl"></i>
+      <i class="pi pi-users ts-tile-icon" aria-hidden="true"></i>
     </div>
   </p-card>
 </div>
 
 <!-- Total Vendors — جديد -->
-<div class="col-12 col-md-4" *ngIf="!isVendor()">
-  <p-card class="stat">
-    <div class="flex align-items-center justify-content-between">
+<div class="col-6 col-md-4" *ngIf="!isVendor()">
+  <p-card class="stat" styleClass="ts-tile ts-tone-neutral">
+    <div class="flex align-items-start justify-content-between gap-3">
       <div>
-        <h4>{{ 'Total Vendors' | translate }}</h4>
-        <p class="text-success">
-          {{ VendorStatistics?.vendorCount }}
+        <h4 class="ts-tile-label">{{ 'Total Vendors' | translate }}</h4>
+        <p class="ts-tile-value">
+          {{ VendorStatistics?.vendorCount | number: '1.0-2' }}
         </p>
       </div>
-      <i class="pi pi-building text-blue-500 text-4xl"></i>
+      <i class="pi pi-briefcase ts-tile-icon" aria-hidden="true"></i>
     </div>
   </p-card>
 </div>
 
 <!-- Total Completed Reservations — جديد -->
-<div class="col-12 col-md-4" *ngIf="!isVendor()">
-  <p-card class="stat">
-    <div class="flex align-items-center justify-content-between">
+<div class="col-6 col-md-4" *ngIf="!isVendor()">
+  <p-card class="stat" styleClass="ts-tile ts-tone-brand">
+    <div class="flex align-items-start justify-content-between gap-3">
       <div>
-        <h4>{{ 'Total Reservations' | translate }}</h4>
-        <p class="text-success">
-          {{ VendorStatistics?.totalCompletedReservations }}
+        <h4 class="ts-tile-label">{{ 'Total Reservations' | translate }}</h4>
+        <p class="ts-tile-value">
+          {{ VendorStatistics?.totalCompletedReservations | number: '1.0-2' }}
         </p>
         <small class="text-500">
           {{ 'Today' | translate }}: {{ VendorStatistics?.totalReservationsToday }}
         </small>
       </div>
-      <i class="pi pi-calendar-check text-green-500 text-4xl"></i>
+      <i class="pi pi-calendar ts-tile-icon" aria-hidden="true"></i>
     </div>
   </p-card>
 </div>
@@ -378,102 +378,102 @@
         <p-tabPanel [header]="'Travel' | translate" *ngIf="isTravelVendor">
           <ng-template pTemplate="content">
             <div class="grid mb-4" *ngIf="!showNoDataMessage && VendorTravelStatistics; else noData">
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-info">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Reservations' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Reservations' | translate }}</h4>
 
-                      <h4 class="text-success">
-                        {{ VendorTravelStatistics?.totalReservations }}
+                      <h4 class="ts-tile-value">
+                        {{ VendorTravelStatistics?.totalReservations | number: '1.0-2' }}
                       </h4>
                     </div>
-                    <i class="pi pi-wallet text-orange-500 text-4xl"></i>
+                    <i class="pi pi-calendar ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-revenue">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'totalRevenue' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'totalRevenue' | translate }}</h4>
 
-                      <h4 class="text-success">
-                        {{ VendorTravelStatistics?.totalRevenue }}
+                      <h4 class="ts-tile-value">
+                        {{ VendorTravelStatistics?.totalRevenue | number: '1.0-2' }}
                       </h4>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-wallet ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-success">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Vendor Profit' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Vendor Profit' | translate }}</h4>
 
-                      <h4 class="text-success">
-                        {{ VendorTravelStatistics?.totalVendorProfit }}
+                      <h4 class="ts-tile-value">
+                        {{ VendorTravelStatistics?.totalVendorProfit | number: '1.0-2' }}
                       </h4>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-chart-line ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
 
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-success">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Profit' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Profit' | translate }}</h4>
 
-                      <p class="text-success">
-                        {{ VendorTravelStatistics?.totalProfit }}
+                      <p class="ts-tile-value">
+                        {{ VendorTravelStatistics?.totalProfit | number: '1.0-2' }}
                       </p>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-chart-line ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-inactive">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Sales Tax' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Sales Tax' | translate }}</h4>
 
-                      <p class="text-success">
-                        {{ VendorTravelStatistics?.totalSalesTax }}
+                      <p class="ts-tile-value">
+                        {{ VendorTravelStatistics?.totalSalesTax | number: '1.0-2' }}
                       </p>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-file ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-pending">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Coupons Value' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Coupons Value' | translate }}</h4>
 
-                      <p class="text-success">
-                        {{ VendorTravelStatistics?.totalCouponsValue }}
+                      <p class="ts-tile-value">
+                        {{ VendorTravelStatistics?.totalCouponsValue | number: '1.0-2' }}
                       </p>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-ticket ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-inactive">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total CommissionVat' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total CommissionVat' | translate }}</h4>
 
-                      <p class="text-success">
-                        {{ VendorTravelStatistics?.totalCommissionVat }}
+                      <p class="ts-tile-value">
+                        {{ VendorTravelStatistics?.totalCommissionVat | number: '1.0-2' }}
                       </p>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-percentage ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
@@ -491,102 +491,102 @@
         <p-tabPanel [header]="'Room' | translate" *ngIf="isRoomlVendor">
           <ng-template pTemplate="content">
             <div class="grid mb-4" *ngIf="!showNoDataMessage && VendorTravelStatistics; else noData">
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-info">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Reservations' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Reservations' | translate }}</h4>
 
-                      <h4 class="text-success">
-                        {{ VendorRoomStatistics?.totalReservations }}
+                      <h4 class="ts-tile-value">
+                        {{ VendorRoomStatistics?.totalReservations | number: '1.0-2' }}
                       </h4>
                     </div>
-                    <i class="pi pi-wallet text-orange-500 text-4xl"></i>
+                    <i class="pi pi-calendar ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-revenue">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'totalRevenue' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'totalRevenue' | translate }}</h4>
 
-                      <h4 class="text-success">
-                        {{ VendorRoomStatistics?.totalRevenue }}
+                      <h4 class="ts-tile-value">
+                        {{ VendorRoomStatistics?.totalRevenue | number: '1.0-2' }}
                       </h4>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-wallet ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-success">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Vendor Profit' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Vendor Profit' | translate }}</h4>
 
-                      <h4 class="text-success">
-                        {{ VendorRoomStatistics?.totalVendorProfit }}
+                      <h4 class="ts-tile-value">
+                        {{ VendorRoomStatistics?.totalVendorProfit | number: '1.0-2' }}
                       </h4>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-chart-line ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
 
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-success">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Profit' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Profit' | translate }}</h4>
 
-                      <p class="text-success">
-                        {{ VendorRoomStatistics?.totalProfit }}
+                      <p class="ts-tile-value">
+                        {{ VendorRoomStatistics?.totalProfit | number: '1.0-2' }}
                       </p>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-chart-line ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-inactive">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Sales Tax' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Sales Tax' | translate }}</h4>
 
-                      <p class="text-success">
-                        {{ VendorRoomStatistics?.totalSalesTax }}
+                      <p class="ts-tile-value">
+                        {{ VendorRoomStatistics?.totalSalesTax | number: '1.0-2' }}
                       </p>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-file ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-pending">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Coupons Value' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Coupons Value' | translate }}</h4>
 
-                      <p class="text-success">
-                        {{ VendorRoomStatistics?.totalCouponsValue }}
+                      <p class="ts-tile-value">
+                        {{ VendorRoomStatistics?.totalCouponsValue | number: '1.0-2' }}
                       </p>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-ticket ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-inactive">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total CommissionVat' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total CommissionVat' | translate }}</h4>
 
-                      <p class="text-success">
-                        {{ VendorRoomStatistics?.totalCommissionVat }}
+                      <p class="ts-tile-value">
+                        {{ VendorRoomStatistics?.totalCommissionVat | number: '1.0-2' }}
                       </p>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-percentage ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
@@ -604,102 +604,102 @@
         <p-tabPanel [header]="'outing' | translate" *ngIf="isOutingVendor">
           <ng-template pTemplate="content">
             <div class="grid mb-4" *ngIf="!showNoDataMessage && VendorOutingStatistics; else noDataOuting">
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-info">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Reservations' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Reservations' | translate }}</h4>
 
-                      <h4 class="text-success">
-                        {{ VendorOutingStatistics?.totalReservations }}
+                      <h4 class="ts-tile-value">
+                        {{ VendorOutingStatistics?.totalReservations | number: '1.0-2' }}
                       </h4>
                     </div>
-                    <i class="pi pi-wallet text-orange-500 text-4xl"></i>
+                    <i class="pi pi-calendar ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-revenue">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'totalRevenue' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'totalRevenue' | translate }}</h4>
 
-                      <h4 class="text-success">
-                        {{ VendorOutingStatistics?.totalRevenue }}
+                      <h4 class="ts-tile-value">
+                        {{ VendorOutingStatistics?.totalRevenue | number: '1.0-2' }}
                       </h4>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-wallet ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-success">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Vendor Profit' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Vendor Profit' | translate }}</h4>
 
-                      <h4 class="text-success">
-                        {{ VendorOutingStatistics?.totalVendorProfit }}
+                      <h4 class="ts-tile-value">
+                        {{ VendorOutingStatistics?.totalVendorProfit | number: '1.0-2' }}
                       </h4>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-chart-line ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
 
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-success">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Profit' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Profit' | translate }}</h4>
 
-                      <p class="text-success">
-                        {{ VendorOutingStatistics?.totalProfit }}
+                      <p class="ts-tile-value">
+                        {{ VendorOutingStatistics?.totalProfit | number: '1.0-2' }}
                       </p>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-chart-line ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-inactive">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Sales Tax' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Sales Tax' | translate }}</h4>
 
-                      <p class="text-success">
-                        {{ VendorOutingStatistics?.totalSalesTax }}
+                      <p class="ts-tile-value">
+                        {{ VendorOutingStatistics?.totalSalesTax | number: '1.0-2' }}
                       </p>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-file ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-pending">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Coupons Value' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Coupons Value' | translate }}</h4>
 
-                      <p class="text-success">
-                        {{ VendorOutingStatistics?.totalCouponsValue }}
+                      <p class="ts-tile-value">
+                        {{ VendorOutingStatistics?.totalCouponsValue | number: '1.0-2' }}
                       </p>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-ticket ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-inactive">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total CommissionVat' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total CommissionVat' | translate }}</h4>
 
-                      <p class="text-success">
-                        {{ VendorOutingStatistics?.totalCommissionVat }}
+                      <p class="ts-tile-value">
+                        {{ VendorOutingStatistics?.totalCommissionVat | number: '1.0-2' }}
                       </p>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-percentage ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
@@ -717,102 +717,102 @@
         <p-tabPanel [header]="'manasik' | translate" *ngIf="isManasikVendor">
           <ng-template pTemplate="content">
             <div class="grid mb-4" *ngIf="!showNoDataMessage && VendorHajjStatistics; else noDataHajj">
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-info">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Reservations' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Reservations' | translate }}</h4>
 
-                      <h4 class="text-success">
-                        {{ VendorHajjStatistics?.totalReservations }}
+                      <h4 class="ts-tile-value">
+                        {{ VendorHajjStatistics?.totalReservations | number: '1.0-2' }}
                       </h4>
                     </div>
-                    <i class="pi pi-wallet text-orange-500 text-4xl"></i>
+                    <i class="pi pi-calendar ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-revenue">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'totalRevenue' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'totalRevenue' | translate }}</h4>
 
-                      <h4 class="text-success">
-                        {{ VendorHajjStatistics?.totalRevenue }}
+                      <h4 class="ts-tile-value">
+                        {{ VendorHajjStatistics?.totalRevenue | number: '1.0-2' }}
                       </h4>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-wallet ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-success">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Vendor Profit' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Vendor Profit' | translate }}</h4>
 
-                      <h4 class="text-success">
-                        {{ VendorHajjStatistics?.totalVendorProfit }}
+                      <h4 class="ts-tile-value">
+                        {{ VendorHajjStatistics?.totalVendorProfit | number: '1.0-2' }}
                       </h4>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-chart-line ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
 
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-success">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Profit' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Profit' | translate }}</h4>
 
-                      <p class="text-success">
-                        {{ VendorHajjStatistics?.totalProfit }}
+                      <p class="ts-tile-value">
+                        {{ VendorHajjStatistics?.totalProfit | number: '1.0-2' }}
                       </p>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-chart-line ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-inactive">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Sales Tax' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Sales Tax' | translate }}</h4>
 
-                      <p class="text-success">
-                        {{ VendorHajjStatistics?.totalSalesTax }}
+                      <p class="ts-tile-value">
+                        {{ VendorHajjStatistics?.totalSalesTax | number: '1.0-2' }}
                       </p>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-file ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-pending">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total Coupons Value' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total Coupons Value' | translate }}</h4>
 
-                      <p class="text-success">
-                        {{ VendorHajjStatistics?.totalCouponsValue }}
+                      <p class="ts-tile-value">
+                        {{ VendorHajjStatistics?.totalCouponsValue | number: '1.0-2' }}
                       </p>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-ticket ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>
-              <div class="col-12 col-md-4">
-                <p-card class="stat">
-                  <div class="flex align-items-center justify-content-between">
+              <div class="col-6 col-md-4">
+                <p-card class="stat" styleClass="ts-tile ts-tone-inactive">
+                  <div class="flex align-items-start justify-content-between gap-3">
                     <div>
-                      <h4>{{ 'total CommissionVat' | translate }}</h4>
+                      <h4 class="ts-tile-label">{{ 'total CommissionVat' | translate }}</h4>
 
-                      <p class="text-success">
-                        {{ VendorHajjStatistics?.totalCommissionVat }}
+                      <p class="ts-tile-value">
+                        {{ VendorHajjStatistics?.totalCommissionVat | number: '1.0-2' }}
                       </p>
                     </div>
-                    <i class="pi pi-dollar text-green-500 text-4xl"></i>
+                    <i class="pi pi-percentage ts-tile-icon" aria-hidden="true"></i>
                   </div>
                 </p-card>
               </div>

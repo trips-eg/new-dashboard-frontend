@@ -2,13 +2,13 @@
   display: block;
   min-width: 0;
   container-type: inline-size;
-  --detail-border: #dce5eb;
-  --detail-muted: #526475;
-  --detail-accent: #175b7a;
+  --detail-border: var(--ts-line);
+  --detail-muted: var(--ts-ink-muted);
+  --detail-accent: var(--ts-navy);
 }
 .request-details {
-  color: #172b3a;
-  background: #f5f8fa;
+  color: var(--ts-ink);
+  background: var(--ts-subtle);
   font-size: 0.875rem;
   line-height: 1.5;
   overflow-wrap: anywhere;
@@ -69,7 +69,7 @@ dt,
 }
 .request-reference {
   background: #edf3f7;
-  color: #23465c;
+  color: var(--ts-navy);
   border: 1px solid var(--detail-border);
   padding: 4px 8px;
   border-radius: 6px;
@@ -161,7 +161,7 @@ dt,
   height: 36px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: #eaf3f8;
+  background: var(--ts-selected);
   color: var(--detail-accent);
   font-weight: 700;
 }
@@ -192,7 +192,7 @@ dt,
 }
 .contact-link {
   flex: 1 1 180px;
-  color: #23465c;
+  color: var(--ts-navy);
   background: #fff;
 }
 .contact-link bdi {
@@ -210,8 +210,8 @@ dt,
   background: #edf7f1;
 }
 .add-offer {
-  background: var(--main-color, #1c7ba0);
-  color: #fff;
+  background: var(--ts-accent);
+  color: var(--ts-on-accent);
   border-color: transparent;
   cursor: pointer;
   max-width: 250px;
@@ -289,7 +289,7 @@ dd > .muted {
 }
 .age-list > span {
   background: #edf5f8;
-  color: #23465c;
+  color: var(--ts-navy);
   border-radius: 4px;
   padding: 2px 6px;
   font-size: 0.75rem;
@@ -322,7 +322,7 @@ dd > .muted {
   min-width: 24px;
   padding: 1px 7px;
   border-radius: 12px;
-  background: #eaf3f8;
+  background: var(--ts-selected);
   color: var(--detail-accent);
   font-size: 0.75rem;
   text-align: center;
@@ -335,7 +335,7 @@ dd > .muted {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   padding: 10px 12px;
   margin-block-end: 12px;
-  background: #f5f8fa;
+  background: var(--ts-subtle);
   border: 1px solid var(--detail-border);
   border-radius: 6px;
 }
@@ -379,7 +379,7 @@ dd > .muted {
   overflow-wrap: anywhere;
 }
 .offer-comparison th {
-  background: #f5f8fa;
+  background: var(--ts-subtle);
   font-weight: 600;
   color: var(--detail-muted);
 }
@@ -471,7 +471,7 @@ dd > .muted {
 }
 .proposal-row td {
   padding: 12px;
-  background: #f8fafc;
+  background: var(--ts-subtle);
 }
 .proposal-row[hidden] {
   display: none !important;
@@ -504,7 +504,7 @@ dd > .muted {
   align-items: start;
   padding: 20px 16px;
   margin-block: 4px;
-  background: #f8fafc;
+  background: var(--ts-subtle);
   border: 1px dashed var(--detail-border);
   border-radius: 6px;
 }
@@ -520,7 +520,7 @@ dd > .muted {
   max-width: 60ch;
 }
 :is(a, button, summary):focus-visible {
-  outline: 3px solid var(--main-color, #1c7ba0);
+  outline: 3px solid var(--main-color, var(--ts-navy));
   outline-offset: 3px;
 }
 :host ::ng-deep .request-details .p-tag {

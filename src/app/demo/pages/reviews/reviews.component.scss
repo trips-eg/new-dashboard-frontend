@@ -1,12 +1,12 @@
 :host {
   display: block;
   min-width: 0;
-  --review-accent: var(--main-color, #1c7ba0);
-  --review-ink: #172b3a;
-  --review-muted: #526475;
-  --review-border: #dce5eb;
-  --review-surface: #f5f8fa;
-  --review-accent-soft: #e9f3f6;
+  --review-accent: var(--main-color, var(--ts-navy));
+  --review-ink: var(--ts-ink);
+  --review-muted: var(--ts-ink-muted);
+  --review-border: var(--ts-line);
+  --review-surface: var(--ts-subtle);
+  --review-accent-soft: var(--ts-subtle);
 }
 .reviews-page {
   padding-block: 24px 32px;
@@ -176,9 +176,9 @@ button:disabled {
   justify-content: center;
   gap: 0.5rem;
   flex: 0 0 auto;
-  background: var(--review-accent);
-  color: #fff;
-  border-color: var(--review-accent);
+  background: var(--ts-accent);
+  color: var(--ts-on-accent);
+  border-color: var(--ts-accent);
 }
 :is(button, input, select, a):focus-visible {
   outline: 3px solid var(--review-accent);

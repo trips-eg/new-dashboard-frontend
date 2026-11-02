@@ -86,7 +86,7 @@
 
 
 .custom-eye-button {
-  color: #1e40af; /* Matches Tailwind text-blue-800 */
+  color: var(--ts-navy); /* Matches Tailwind text-blue-800 */
   font-size: 24px; /* Matches Tailwind icon-size-6 */
   background: none; /* Transparent background */
   border: none; /* No border */
@@ -96,7 +96,7 @@
 }
 
 .custom-eye-button:hover {
-  color: #3b82f6; /* Lighter blue on hover */
+  color: var(--ts-blue); /* Lighter blue on hover */
 }
 .product-badge {
   border-radius: 2px;
@@ -107,11 +107,11 @@
   letter-spacing: .3px;
 }
 .product-badge.status-instock {
-  background: #C8E6C9;
+  background: var(--ts-ok-line);
   color: #256029;
 }
 .product-badge.status-outofstock {
-  background: #FFCDD2;
+  background: var(--ts-danger-line);
   color: #c63737;
 }
 .product-badge.status-lowstock {
@@ -127,8 +127,8 @@
     cursor: not-allowed;
   }
   .disabled-btn {
-    background-color: #e0e0e0 !important; /* Light gray */
-    color: #6c757d !important;           /* Optional: muted text */
+    background-color: var(--ts-line) !important; /* Light gray */
+    color: var(--ts-ink-faint) !important;           /* Optional: muted text */
     border-color: #d6d6d6 !important;
     cursor: not-allowed;
     pointer-events: none;

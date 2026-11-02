@@ -1,5 +1,15 @@
 <main class="login-wrapper">
   <section class="login-layout" aria-labelledby="login-title">
+    <aside class="login-brand">
+      <img src="assets/images/new logo.PNG" alt="Trips" class="brand-logo" width="96" height="96" fetchpriority="high" />
+      <p class="brand-title">TRIPS</p>
+      <p class="brand-tagline">{{ 'AUTH_UI.BRAND_TAGLINE' | translate }}</p>
+      <ul class="brand-roles" [attr.aria-label]="'AUTH_UI.BRAND_ROLES' | translate">
+        <li><i class="ti ti-layout-dashboard" aria-hidden="true"></i>{{ 'AUTH_UI.ROLE_ADMIN' | translate }}</li>
+        <li><i class="ti ti-building-store" aria-hidden="true"></i>{{ 'AUTH_UI.ROLE_VENDOR' | translate }}</li>
+        <li><i class="ti ti-scan" aria-hidden="true"></i>{{ 'AUTH_UI.ROLE_SCANNER' | translate }}</li>
+      </ul>
+    </aside>
     <div class="login-content">
       <header class="login-toolbar">
         <div class="logo-box">
@@ -105,8 +115,5 @@
         <p class="copyright-text">© {{ currentYear }} {{ 'AUTH_UI.COPYRIGHT' | translate }}</p>
       </footer>
     </div>
-    <aside class="login-artwork">
-      <img src="assets/images/inspiration2.jpeg" [alt]="'AUTH_UI.ARTWORK_DESCRIPTION' | translate" width="1024" height="1536" />
-    </aside>
   </section>
 </main>

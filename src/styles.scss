@@ -35,47 +35,12 @@
 @import 'scss/fonts/tabler-icons.min.css';
 @import 'scss/fonts/phosphor/duotone/style.css';
 
-/* Arabic Font (cairo-Arabic) */
-@font-face {
-  font-family: 'Cairo', sans-serif;
-  src: url('assets/fonts/Cairo/Cairo-VariableFont_slnt\,wght.ttf') format('ttf');
-  font-weight: normal;
-  font-style: normal;
-}
-
-/* English Font (Inter) */
-@font-face {
-  font-family: 'Inter', serif;
-  src: url('assets/fonts/Inter/Inter-VariableFont_opsz\,wght.ttf') format('ttf');
-  font-weight: normal;
-  font-style: normal;
-}
-
-/* English (LTR) */
-html[dir='ltr'],
-[dir='ltr'] {
-  font-family: 'Inter', serif !important;
-}
-
-/* Arabic (RTL) */
-html[dir='rtl'],
-[dir='rtl'] {
-  font-family: 'Cairo', sans-serif !important;
-}
+/* Fonts: IBM Plex Sans Arabic + Inter, loaded in index.html; the family is set in scss/trips-staff/_theme.scss */
+@import 'scss/trips-staff/tokens';
 * {
   text-transform: capitalize;
 }
-:root {
-  --main-color: #1c7ba0; //#2E70BE; // #21345C;
-  --font-color: #232323;
-  --grey-color: #939393;
-  --thm-base: #f0ab00;
-  --thm-light-blue: #2db9be;
-  --thm-blue: #0978bd;
-  --thm-font: 'Cairo', sans-serif;
-  --thm-light-grey: #f9f9f9;
-  --thm-third-color: #1e6ea0;
-}
+/* The legacy --main-color / --thm-* variables now point at the TRIPS Staff tokens (_theme.scss). */
 /* إعادة الشكل الدائري لأزرار PrimeNG بدون ما يأثر على أزرار الزيادة/النقصان */
 .p-button:not(.p-inputnumber-button) {
   border-radius: var(--border-radius) !important; // من ثيم Lara
@@ -580,17 +545,6 @@ navbar-content[dir='rtl'] {
     left: 0 !important;
     text-align: start;
   }
-}
-/* English (LTR) */
-html[dir='ltr'],
-[dir='ltr'] {
-  font-family: 'Inter', serif !important;
-}
-
-/* Arabic (RTL) */
-html[dir='rtl'],
-[dir='rtl'] {
-  font-family: 'Cairo', sans-serif !important;
 }
 
 // .p-fileupload .p-fileupload-buttonbar {
@@ -1148,3 +1102,6 @@ strong {
 }
 @import './scss/dashboard-responsive';
 @import './scss/dashboard-navigation';
+
+// TRIPS Staff theme: last, so it settles every page on the same look
+@import './scss/trips-staff/theme';

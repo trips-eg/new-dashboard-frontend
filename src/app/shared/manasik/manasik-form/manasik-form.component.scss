@@ -1,7 +1,7 @@
 // Custom premium panels and inputs overrides for Manasik
 :host ::ng-deep {
   .custom-panel.p-panel {
-    border: 1px solid #e2e8f0 !important;
+    border: 1px solid var(--ts-line) !important;
     border-radius: 12px !important;
     overflow: hidden;
     margin-bottom: 2rem;
@@ -10,9 +10,9 @@
     .p-panel-header {
       background: #ffffff !important;
       border: none !important;
-      border-bottom: 1px solid #f1f5f9 !important;
+      border-bottom: 1px solid var(--ts-subtle) !important;
       padding: 1rem 1.25rem !important;
-      color: var(--secondary, #21345c) !important;
+      color: var(--secondary, var(--ts-navy)) !important;
       font-weight: 700 !important;
       font-size: 1rem;
     }
@@ -31,13 +31,13 @@
   .p-inputnumber,
   textarea {
     border-radius: 8px !important;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--ts-line-control);
     transition: all 0.2s ease-in-out;
 
     &:focus,
     &.p-focus {
-      border-color: var(--main-color, #2db9be) !important;
-      box-shadow: 0 0 0 3px rgba(45, 185, 190, 0.15) !important;
+      border-color: var(--main-color, var(--ts-navy)) !important;
+      box-shadow: 0 0 0 3px rgba(18, 32, 58, 0.15) !important;
       outline: none;
     }
   }
@@ -48,14 +48,14 @@
       margin-bottom: 1rem !important;
       border-radius: 12px !important;
       overflow: hidden;
-      border: 1px solid #e2e8f0 !important;
+      border: 1px solid var(--ts-line) !important;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.01) !important;
 
       .p-accordion-header {
         .p-accordion-header-link {
           background: #ffffff !important;
           border: none !important;
-          color: var(--secondary, #21345c) !important;
+          color: var(--secondary, var(--ts-navy)) !important;
           font-weight: 700 !important;
           padding: 1.25rem 1.5rem !important;
           transition: background-color 0.2s;
@@ -64,8 +64,8 @@
           gap: 0.5rem;
 
           &:hover {
-            background: #f8fafc !important;
-            color: var(--main-color, #2db9be) !important;
+            background: var(--ts-subtle) !important;
+            color: var(--main-color, var(--ts-navy)) !important;
           }
         }
       }
@@ -73,7 +73,7 @@
       .p-accordion-content {
         background: #ffffff !important;
         border: none !important;
-        border-top: 1px solid #f1f5f9 !important;
+        border-top: 1px solid var(--ts-subtle) !important;
         padding: 1.5rem !important;
       }
     }
@@ -81,16 +81,16 @@
 
   // PrimeNG Table Custom Override
   .p-datatable.p-datatable-gridlines {
-    border: 1px solid #e2e8f0 !important;
+    border: 1px solid var(--ts-line) !important;
     border-radius: 12px !important;
     overflow: hidden !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01) !important;
 
     .p-datatable-thead > tr > th {
-      background-color: #f8fafc !important;
-      color: var(--secondary, #21345c) !important;
+      background-color: var(--ts-subtle) !important;
+      color: var(--secondary, var(--ts-navy)) !important;
       font-weight: 700 !important;
-      border: 1px solid #e2e8f0 !important;
+      border: 1px solid var(--ts-line) !important;
       padding: 1rem 1.25rem !important;
       font-size: 0.875rem;
     }
@@ -100,13 +100,13 @@
       transition: background-color 0.15s ease-in-out;
 
       &:hover {
-        background-color: #f1f5f9 !important;
+        background-color: var(--ts-subtle) !important;
       }
 
       > td {
-        border: 1px solid #e2e8f0 !important;
+        border: 1px solid var(--ts-line) !important;
         padding: 0.85rem 1.25rem !important;
-        color: #334155;
+        color: var(--ts-ink-nav);
         font-size: 0.875rem;
         vertical-align: middle;
       }
@@ -118,7 +118,7 @@
 .ux-card {
   background: #ffffff;
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--ts-line);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
   padding: 2rem;
   margin-bottom: 2rem;
@@ -132,7 +132,7 @@
   }
 
   .ux-card-header {
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--ts-subtle);
     padding-bottom: 1rem;
     margin-bottom: 1.5rem;
     display: flex;
@@ -148,8 +148,8 @@
 
     i {
       font-size: 1.25rem;
-      color: var(--main-color, #2db9be);
-      background: rgba(45, 185, 190, 0.08);
+      color: var(--main-color, var(--ts-navy));
+      background: rgba(18, 32, 58, 0.08);
       padding: 0.6rem;
       border-radius: 10px;
       display: flex;
@@ -162,7 +162,7 @@
       margin: 0;
       font-size: 1.15rem;
       font-weight: 700;
-      color: var(--secondary, #21345c);
+      color: var(--secondary, var(--ts-navy));
     }
   }
 }
@@ -175,7 +175,7 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
-    color: #475569;
+    color: var(--ts-ink-muted);
     font-size: 0.9rem;
   }
 }
@@ -186,19 +186,19 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.25rem;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--ts-subtle);
+  border: 1px solid var(--ts-line);
   border-radius: 12px;
   transition: all 0.25s ease;
   height: 100%;
 
   &.active {
-    background: rgba(45, 185, 190, 0.03);
-    border-color: var(--main-color, #2db9be);
-    box-shadow: 0 2px 8px rgba(45, 185, 190, 0.05);
+    background: rgba(18, 32, 58, 0.03);
+    border-color: var(--main-color, var(--ts-navy));
+    box-shadow: 0 2px 8px rgba(18, 32, 58, 0.05);
 
     label {
-      color: var(--secondary, #21345c);
+      color: var(--secondary, var(--ts-navy));
       font-weight: 700;
     }
   }
@@ -206,7 +206,7 @@
   label {
     margin: 0;
     font-weight: 600;
-    color: #475569;
+    color: var(--ts-ink-muted);
     cursor: pointer;
     font-size: 0.9rem;
   }
@@ -230,35 +230,35 @@
   font-weight: 600;
   cursor: pointer;
   background-color: #ffffff;
-  border: 1.5px solid #cbd5e1;
-  color: #475569;
+  border: 1.5px solid var(--ts-line-control);
+  color: var(--ts-ink-muted);
   transition: all 0.2s ease-in-out;
   user-select: none;
   height: 38px;
 
   &:hover {
-    border-color: var(--main-color, #2db9be);
-    color: var(--main-color, #2db9be);
-    background-color: rgba(45, 185, 190, 0.04);
+    border-color: var(--main-color, var(--ts-navy));
+    color: var(--main-color, var(--ts-navy));
+    background-color: rgba(18, 32, 58, 0.04);
   }
 
   &.active {
-    background-color: var(--main-color, #2db9be);
-    border-color: var(--main-color, #2db9be);
+    background-color: var(--main-color, var(--ts-navy));
+    border-color: var(--main-color, var(--ts-navy));
     color: #ffffff;
     font-weight: 700;
-    box-shadow: 0 4px 10px rgba(45, 185, 190, 0.25);
+    box-shadow: 0 4px 10px rgba(18, 32, 58, 0.25);
   }
 }
 
 .add-new-pill {
   background-color: transparent;
-  border: 1.5px dashed var(--main-color, #2db9be);
-  color: var(--main-color, #2db9be);
+  border: 1.5px dashed var(--main-color, var(--ts-navy));
+  color: var(--main-color, var(--ts-navy));
   font-weight: 700;
 
   &:hover {
-    background-color: var(--main-color, #2db9be);
+    background-color: var(--main-color, var(--ts-navy));
     color: #ffffff;
     border-style: solid;
   }
@@ -269,8 +269,8 @@
   display: flex;
   align-items: flex-start; // Align elements to the top for multi-row textareas
   gap: 0.75rem;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--ts-subtle);
+  border: 1px solid var(--ts-line);
   border-radius: 12px;
   padding: 0.85rem 1rem;
   margin-bottom: 0.75rem;
@@ -278,14 +278,14 @@
   width: 100%;
 
   &:focus-within {
-    border-color: var(--main-color, #2db9be);
+    border-color: var(--main-color, var(--ts-navy));
     background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(45, 185, 190, 0.1);
+    box-shadow: 0 0 0 3px rgba(18, 32, 58, 0.1);
   }
 
   .instruction-number {
-    background: #e2e8f0;
-    color: #475569;
+    background: var(--ts-line);
+    color: var(--ts-ink-muted);
     font-size: 0.775rem;
     font-weight: 700;
     width: 1.5rem;
@@ -306,7 +306,7 @@
     box-shadow: none !important;
     padding: 0.25rem 0.4rem !important;
     font-size: 0.9rem;
-    color: var(--secondary, #21345c);
+    color: var(--secondary, var(--ts-navy));
     font-family: inherit;
     line-height: 1.5;
     resize: vertical; // Allow vertical resizing if needed
@@ -327,7 +327,7 @@
     margin-top: -0.1rem; // Center delete button vertically with first line of text
 
     &:hover {
-      background: #fee2e2 !important;
+      background: var(--ts-danger-soft) !important;
     }
   }
 }
@@ -335,7 +335,7 @@
 // Child Pricing Policies Card Styles
 .child-policy-row {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--ts-line);
   border-radius: 12px;
   padding: 1.25rem 1.5rem;
   margin-bottom: 1rem;
@@ -343,9 +343,9 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 
   &:hover {
-    border-color: var(--main-color, #2db9be);
-    background-color: #f8fafc;
-    box-shadow: 0 4px 12px rgba(45, 185, 190, 0.03);
+    border-color: var(--main-color, var(--ts-navy));
+    background-color: var(--ts-subtle);
+    box-shadow: 0 4px 12px rgba(18, 32, 58, 0.03);
   }
 
   .field-col {
@@ -357,7 +357,7 @@
     label {
       font-size: 0.8rem;
       font-weight: 700;
-      color: #64748b;
+      color: var(--ts-ink-faint);
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin: 0;
@@ -370,15 +370,15 @@
     align-items: center;
     justify-content: center;
     border-radius: 8px;
-    border-color: #fee2e2 !important;
-    color: #ef4444 !important;
+    border-color: var(--ts-danger-soft) !important;
+    color: var(--ts-danger) !important;
     background-color: #ffffff !important;
     transition: all 0.2s ease-in-out;
 
     &:hover {
-      background-color: #ef4444 !important;
+      background-color: var(--ts-danger) !important;
       color: #ffffff !important;
-      border-color: #ef4444 !important;
+      border-color: var(--ts-danger) !important;
     }
   }
 }
@@ -397,18 +397,18 @@
     gap: 0.75rem;
 
     .day-badge {
-      background: var(--main-color, #2db9be);
+      background: var(--main-color, var(--ts-navy));
       color: #ffffff;
       padding: 0.3rem 0.8rem;
       border-radius: 20px;
       font-size: 0.75rem;
       font-weight: 700;
-      box-shadow: 0 2px 6px rgba(45, 185, 190, 0.25);
+      box-shadow: 0 2px 6px rgba(18, 32, 58, 0.25);
     }
 
     .step-title {
       font-weight: 700;
-      color: var(--secondary, #21345c);
+      color: var(--secondary, var(--ts-navy));
       font-size: 0.95rem;
     }
   }
@@ -428,11 +428,11 @@
 
   &.p-badge-success {
     background-color: rgba(34, 197, 94, 0.12);
-    color: #22c55e;
+    color: var(--ts-ok-fg);
   }
   &.p-badge-danger {
     background-color: rgba(239, 68, 68, 0.12);
-    color: #ef4444;
+    color: var(--ts-danger);
   }
 }
 

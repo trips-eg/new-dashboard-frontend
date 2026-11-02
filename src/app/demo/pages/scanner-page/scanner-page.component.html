@@ -1,39 +1,38 @@
-<div class="main">
-  <sub-header
-    [mainHeader]="'QR Code Scanner'"
-    [actionButtons]="[{ label: 'Scan New Code', action: 'add', icon: 'pi pi-camera', class: 'btn-primary' }]"
-    (actionClicked)="showDialog()"
-  />
+<div class="main scanner-page">
   <p-toast></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
-  <!-- Manual Entry Section -->
-  <div class="card mb-3 p-3">
-    <div class="row">
-      <div class="col-md-6 offset-md-3">
-        <div class="p-inputgroup">
-          <input
-            #bookingInput
-            type="text"
-            pInputText
-            placeholder="Enter Booking ID manually..."
-            [(ngModel)]="manualBookingId"
-            (keydown.enter)="onManualSubmit()"
-            autofocus
-          />
-          <button
-            type="button"
-            pButton
-            label="Validate"
-            icon="pi pi-check"
-            [raised]="true"
-            severity="primary"
-            (click)="onManualSubmit()"
-          ></button>
-        </div>
+  <!-- Scan station: the camera scan and the manual entry, in the TRIPS Staff look -->
+  <section class="scan-station" aria-labelledby="scan-station-title">
+    <div class="scan-station__intro">
+      <span class="scan-station__icon" aria-hidden="true"><i class="pi pi-qrcode"></i></span>
+      <div>
+        <h1 id="scan-station-title">{{ 'SCANNER_UI.TITLE' | translate }}</h1>
+        <p>{{ 'SCANNER_UI.HINT' | translate }}</p>
       </div>
     </div>
-  </div>
+    <button type="button" class="scan-station__scan" (click)="showDialog()">
+      <i class="pi pi-camera" aria-hidden="true"></i>
+      {{ 'SCANNER_UI.SCAN' | translate }}
+    </button>
+    <div class="scan-station__manual">
+      <label for="manual-booking-id">{{ 'SCANNER_UI.MANUAL' | translate }}</label>
+      <div class="p-inputgroup">
+        <input
+          #bookingInput
+          id="manual-booking-id"
+          type="text"
+          inputmode="numeric"
+          pInputText
+          [placeholder]="'SCANNER_UI.MANUAL_PLACEHOLDER' | translate"
+          [(ngModel)]="manualBookingId"
+          (keydown.enter)="onManualSubmit()"
+          autofocus
+        />
+        <button type="button" pButton [label]="'SCANNER_UI.VALIDATE' | translate" icon="pi pi-check" class="validate-button" (click)="onManualSubmit()"></button>
+      </div>
+    </div>
+  </section>
 
   <!-- Loading Overlay -->
   <div *ngIf="isLoading" class="loading-overlay">
@@ -42,7 +41,12 @@
   </div>
 
   <!-- History Table -->
-  <div class="history-table">
+  <div class="history-table card">
+    <div class="history-table__head">
+      <i class="pi pi-history" aria-hidden="true"></i>
+      <span>{{ 'SCANNER_UI.HISTORY' | translate }}</span>
+      <span class="history-count">{{ scannedCodes?.length || 0 }}</span>
+    </div>
     <p-table [value]="scannedCodes" [tableStyle]="{ 'min-width': '50rem' }" styleClass="p-datatable-striped">
       <ng-template pTemplate="header">
         <tr>

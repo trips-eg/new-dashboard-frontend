@@ -5,19 +5,19 @@
   --tsp-ink: #2e211e;
   container: tripstar-preview / inline-size;
   overflow: hidden;
-  border: 1px solid #e2eaf0;
+  border: 1px solid var(--ts-line);
   border-radius: 17px;
   background: #fff;
   box-shadow: 0 10px 30px rgba(24, 55, 75, .035);
 }
 .tsp-preview * { text-transform: none; }
 .tsp-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 19px 24px; }
-.tsp-kicker { display: inline-flex; align-items: center; gap: 9px; color: #17324a; font-size: 17px; font-weight: 800; }
+.tsp-kicker { display: inline-flex; align-items: center; gap: 9px; color: var(--ts-ink); font-size: 17px; font-weight: 800; }
 .tsp-kicker i { color: var(--tsp-orange); }
-.tsp-toolbar p { margin: 3px 0 0; color: #60758a; font-size: 13px; line-height: 1.5; }
+.tsp-toolbar p { margin: 3px 0 0; color: var(--ts-ink-muted); font-size: 13px; line-height: 1.5; }
 .tsp-language-switch { display: inline-flex; flex: none; gap: 3px; padding: 3px; border: 1px solid #dbe6ec; border-radius: 10px; background: #f4f8fa; }
 .tsp-language-switch button { min-width: 44px; min-height: 40px; border: 0; border-radius: 7px; background: transparent; color: #526b7d; font-size: 12px; font-weight: 800; cursor: pointer; }
-.tsp-language-switch button.is-active { color: #fff; background: #126f94; box-shadow: 0 2px 6px #17324a20; }
+.tsp-language-switch button.is-active { color: #fff; background: var(--ts-navy); box-shadow: 0 2px 6px #17324a20; }
 .tsp-parent-card { width: calc(100% - 48px); max-width: 1088px; margin: 0 auto 22px; }
 .tsp-parent-card.has-items { overflow: hidden; border: 1px solid #eedccf; border-radius: 22px; background: #fffdf9; }
 .tsp-parent-header { display: flex; align-items: flex-start; gap: 20px; padding: 24px; border-bottom: 1px solid #f0e3d8; background: #fff8ef; }
@@ -105,8 +105,8 @@
 .tsp-dots button::after { content: ''; width: 10px; height: 10px; border-radius: 50%; background: #e7c5ae; transition: background .15s ease; }
 .tsp-dots button.is-active::after { width: 13px; height: 13px; background: var(--tsp-orange); }
 .tsp-dots button:hover::after { background: #a94007; }
-.tsp-empty { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0; padding: 18px 0; color: #60758a; font-size: 12px; }
-:host button:focus-visible { outline: 3px solid #126f94; outline-offset: 3px; }
+.tsp-empty { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0; padding: 18px 0; color: var(--ts-ink-muted); font-size: 12px; }
+:host button:focus-visible { outline: 3px solid var(--ts-navy); outline-offset: 3px; }
 @container tripstar-preview (max-width: 740px) {
   .tsp-stage { padding: 24px 34px; border-radius: 25px; }
   .tsp-card { gap: 20px; min-height: 270px; padding: 24px; border-radius: 20px; }

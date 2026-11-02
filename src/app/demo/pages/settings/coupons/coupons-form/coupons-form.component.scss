@@ -1,6 +1,6 @@
 .form-section-card {
   background-color: var(--surface-card, #ffffff);
-  border: 1px solid var(--surface-border, #e9ecef);
+  border: 1px solid var(--surface-border, var(--ts-line));
   border-radius: 12px;
   padding: 2rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
@@ -15,62 +15,62 @@
 .section-title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--primary-color, #2196f3);
+  color: var(--primary-color, var(--ts-blue));
   display: flex;
   align-items: center;
-  border-bottom: 2px solid var(--surface-border, #e9ecef);
+  border-bottom: 2px solid var(--surface-border, var(--ts-line));
   padding-bottom: 0.75rem;
   margin-bottom: 1.75rem;
   
   i {
     font-size: 1.4rem;
     margin-right: 0.5rem;
-    color: var(--primary-color, #2196f3);
+    color: var(--primary-color, var(--ts-blue));
   }
 }
 
 .audience-filters-container {
   .card {
     background-color: var(--surface-card, #ffffff);
-    border: 1px solid var(--surface-border, #e9ecef);
+    border: 1px solid var(--surface-border, var(--ts-line));
     transition: all 0.25s ease-in-out;
     border-radius: 8px;
     
     &:hover {
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      border-color: var(--primary-color, #2196f3);
+      border-color: var(--primary-color, var(--ts-blue));
       transform: translateY(-2px);
     }
   }
 }
 
 .custom-segmented-control {
-  background-color: var(--surface-200, #e9ecef);
+  background-color: var(--surface-200, var(--ts-line));
   display: inline-flex;
   gap: 4px;
   
   .segmented-btn {
     background-color: transparent;
-    color: var(--text-color, #495057);
+    color: var(--text-color, var(--ts-ink-nav));
     border: none;
     border-radius: 6px;
     font-size: 14px;
     outline: none;
     
     &.active {
-      background-color: var(--primary-color, #2196f3);
+      background-color: var(--primary-color, var(--ts-blue));
       color: var(--primary-color-text, #ffffff);
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     }
     
     &:hover:not(.active) {
-      background-color: var(--surface-300, #dee2e6);
+      background-color: var(--surface-300, var(--ts-line));
     }
   }
 }
 
 .bg-light {
-  background-color: var(--surface-hover, #f8f9fa);
+  background-color: var(--surface-hover, var(--ts-subtle));
 }
 
 .transition-all {

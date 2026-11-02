@@ -1,16 +1,16 @@
 // Premium Design Tokens
-$primary-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+$primary-gradient: var(--ts-navy);
 $emerald-gradient: linear-gradient(135deg, #34d399 0%, #059669 100%);
 $indigo-gradient: linear-gradient(135deg, #818cf8 0%, #4f46e5 100%);
 $amber-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
 $slate-light: #f8fafc;
 $slate-border: #e2e8f0;
-$shadow-elegant: 0 10px 30px -10px rgba(79, 70, 229, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
-$shadow-hover: 0 20px 40px -15px rgba(79, 70, 229, 0.15), 0 4px 6px rgba(0, 0, 0, 0.05);
+$shadow-elegant: 0 10px 30px -10px rgba(18, 32, 58, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+$shadow-hover: 0 20px 40px -15px rgba(18, 32, 58, 0.12), 0 4px 6px rgba(0, 0, 0, 0.05);
 $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 .main {
-  background-color: #f8fafc;
+  background-color: var(--ts-subtle);
   min-height: 100vh;
   font-family: 'Outfit', 'Inter', sans-serif;
 }
@@ -28,7 +28,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       border-radius: 10px;
       border: 1px solid transparent;
       background: transparent;
-      color: #64748b;
+      color: var(--ts-ink-faint);
       transition: $transition-smooth;
 
       i {
@@ -37,8 +37,8 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       &:hover {
-        background: #f1f5f9;
-        color: #1e293b;
+        background: var(--ts-subtle);
+        color: var(--ts-ink);
         
         i {
           transform: scale(1.1);
@@ -48,7 +48,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       &.active-tab {
         background: $primary-gradient !important;
         color: #ffffff !important;
-        box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+        box-shadow: none;
         border-color: transparent;
 
         i {
@@ -69,7 +69,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       left: 1rem;
       top: 50%;
       transform: translateY(-50%);
-      color: #94a3b8;
+      color: var(--ts-ink-faint);
       font-size: 0.95rem;
       pointer-events: none;
     }
@@ -77,16 +77,16 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     .search-input {
       padding: 0.7rem 2.5rem 0.7rem 2.5rem;
       border-radius: 10px;
-      border: 1px solid #cbd5e1;
+      border: 1px solid var(--ts-line-control);
       font-size: 0.9rem;
       transition: $transition-smooth;
-      background-color: #f8fafc;
+      background-color: var(--ts-subtle);
       width: 100%;
 
       &:focus {
-        border-color: #6366f1;
+        border-color: var(--ts-navy);
         background-color: #ffffff;
-        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+        box-shadow: 0 0 0 4px rgba(18, 32, 58, 0.12);
         outline: none;
       }
     }
@@ -98,7 +98,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       transform: translateY(-50%);
       background: none;
       border: none;
-      color: #94a3b8;
+      color: var(--ts-ink-faint);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -108,8 +108,8 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       transition: $transition-smooth;
 
       &:hover {
-        background-color: #e2e8f0;
-        color: #475569;
+        background-color: var(--ts-line);
+        color: var(--ts-ink-muted);
       }
     }
   }
@@ -123,13 +123,13 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   ::ng-deep {
     .p-datatable {
       .p-datatable-thead > tr > th {
-        background-color: #f8fafc;
-        color: #475569;
+        background-color: var(--ts-subtle);
+        color: var(--ts-ink-muted);
         font-weight: 700;
         font-size: 0.78rem;
         text-transform: uppercase;
         letter-spacing: 0.06em;
-        border-bottom: 2px solid #e2e8f0;
+        border-bottom: 2px solid var(--ts-line);
         padding: 1.25rem 1.5rem;
 
         &.p-sortable-column {
@@ -137,26 +137,26 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           
           .p-sortable-column-icon {
             font-size: 0.75rem !important;
-            color: #94a3b8 !important;
+            color: var(--ts-ink-faint) !important;
             margin-left: 0.25rem !important;
             transition: color 0.15s ease;
           }
 
           &:hover {
-            background-color: #f1f5f9 !important;
-            color: #4f46e5 !important;
+            background-color: var(--ts-subtle) !important;
+            color: var(--ts-navy) !important;
             
             .p-sortable-column-icon {
-              color: #6366f1 !important;
+              color: var(--ts-navy) !important;
             }
           }
 
           &.p-highlight {
-            color: #4f46e5 !important;
-            background-color: rgba(99, 102, 241, 0.04) !important;
+            color: var(--ts-navy) !important;
+            background-color: rgba(18, 32, 58, 0.04) !important;
             
             .p-sortable-column-icon {
-              color: #4f46e5 !important;
+              color: var(--ts-navy) !important;
             }
           }
         }
@@ -172,9 +172,9 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
         & > td {
           padding: 1.25rem 1.5rem;
-          border-bottom: 1px solid #f1f5f9;
+          border-bottom: 1px solid var(--ts-subtle);
           vertical-align: middle;
-          color: #334155;
+          color: var(--ts-ink-nav);
           font-size: 0.9rem;
         }
       }
@@ -182,7 +182,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       // Paginator custom
       .p-paginator {
         background-color: #ffffff;
-        border-top: 1px solid #f1f5f9;
+        border-top: 1px solid var(--ts-subtle);
         padding: 0.75rem 1rem;
 
         .p-paginator-pages .p-paginator-page {
@@ -194,8 +194,8 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           font-weight: 600;
 
           &.p-highlight {
-            background: rgba(99, 102, 241, 0.08);
-            color: #4f46e5;
+            background: rgba(18, 32, 58, 0.08);
+            color: var(--ts-navy);
           }
         }
       }
@@ -216,32 +216,32 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   letter-spacing: 0.02em;
 
   &.trip-bg {
-    background-color: rgba(99, 102, 241, 0.08) !important;
-    color: #4f46e5 !important;
-    border: 1px solid rgba(99, 102, 241, 0.12);
+    background-color: rgba(18, 32, 58, 0.08) !important;
+    color: var(--ts-navy) !important;
+    border: 1px solid rgba(18, 32, 58, 0.12);
   }
 
   &.outing-bg {
     background-color: rgba(14, 165, 233, 0.08) !important;
-    color: #0ea5e9 !important;
+    color: var(--ts-navy-soft) !important;
     border: 1px solid rgba(14, 165, 233, 0.12);
   }
 
   &.hajj-bg {
     background-color: rgba(245, 158, 11, 0.08) !important;
-    color: #d97706 !important;
+    color: var(--ts-pend-ink) !important;
     border: 1px solid rgba(245, 158, 11, 0.12);
   }
 }
 
 .product-name {
   font-size: 0.95rem;
-  color: #1e293b;
+  color: var(--ts-ink);
 }
 
 // Price column
 .price-value {
-  color: #1e293b;
+  color: var(--ts-ink);
   font-size: 0.95rem;
 }
 
@@ -261,14 +261,14 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .model-value {
-    color: #0f172a;
+    color: var(--ts-ink);
     font-weight: 700;
     margin-right: 0.2rem;
   }
 
   .model-currency {
     font-size: 0.72rem;
-    color: #475569;
+    color: var(--ts-ink-muted);
     font-weight: 600;
     margin-right: 0.3rem;
   }
@@ -282,11 +282,11 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   // Percentage Badging
   &.badge-percentage {
     background-color: rgba(52, 211, 153, 0.1);
-    color: #047857;
+    color: var(--ts-ok-fg);
     border: 1px solid rgba(52, 211, 153, 0.2);
 
     .model-badge-icon {
-      color: #059669;
+      color: var(--ts-ok-fg);
     }
     
     .model-type {
@@ -296,12 +296,12 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   // Fixed Amount Badging
   &.badge-fixed {
-    background-color: rgba(99, 102, 241, 0.08);
-    color: #4338ca;
-    border: 1px solid rgba(99, 102, 241, 0.18);
+    background-color: rgba(18, 32, 58, 0.08);
+    color: var(--ts-navy);
+    border: 1px solid rgba(18, 32, 58, 0.18);
 
     .model-badge-icon {
-      color: #4f46e5;
+      color: var(--ts-navy);
     }
 
     .model-type {
@@ -312,11 +312,11 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   // Committed Net Badging
   &.badge-committed {
     background-color: rgba(251, 191, 36, 0.08);
-    color: #b45309;
+    color: var(--ts-pend-ink);
     border: 1px solid rgba(251, 191, 36, 0.18);
 
     .model-badge-icon {
-      color: #d97706;
+      color: var(--ts-pend-ink);
     }
 
     .model-type {
@@ -326,16 +326,16 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   // Not Configured Badging
   &.badge-none {
-    background-color: #f1f5f9;
-    color: #64748b;
-    border: 1px solid #e2e8f0;
+    background-color: var(--ts-subtle);
+    color: var(--ts-ink-faint);
+    border: 1px solid var(--ts-line);
 
     .model-badge-icon {
-      color: #94a3b8;
+      color: var(--ts-ink-faint);
     }
 
     .model-type {
-      color: #475569;
+      color: var(--ts-ink-muted);
     }
   }
 }
@@ -348,13 +348,13 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   align-items: center;
   justify-content: center;
   border-radius: 50% !important;
-  color: #64748b !important;
+  color: var(--ts-ink-faint) !important;
   transition: $transition-smooth !important;
 
   &:hover {
-    background-color: rgba(99, 102, 241, 0.08) !important;
-    color: #4f46e5 !important;
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+    background-color: rgba(18, 32, 58, 0.08) !important;
+    color: var(--ts-navy) !important;
+    box-shadow: 0 0 0 4px rgba(18, 32, 58, 0.12);
 
     ::ng-deep .p-button-icon {
       transform: rotate(45deg);
@@ -376,10 +376,10 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(10px);
 
   .p-dialog-header {
-    background-color: #f8fafc;
-    border-bottom: 1px solid #e2e8f0;
+    background-color: var(--ts-subtle);
+    border-bottom: 1px solid var(--ts-line);
     padding: 1.25rem 1.5rem;
-    color: #1e293b;
+    color: var(--ts-ink);
 
     .p-dialog-title {
       font-weight: 700;
@@ -395,8 +395,8 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       transition: $transition-smooth;
 
       &:hover {
-        background-color: #cbd5e1;
-        color: #0f172a;
+        background-color: var(--ts-line-control);
+        color: var(--ts-ink);
       }
     }
   }
@@ -430,20 +430,20 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     
     .p-dropdown-label {
       padding: 0.4rem 0.5rem 0.4rem 2rem !important;
-      color: #1e293b;
+      color: var(--ts-ink);
       font-weight: 500;
       text-align: left;
     }
 
     .p-dropdown-trigger {
-      color: #94a3b8;
+      color: var(--ts-ink-faint);
       width: 2rem;
     }
 
     .p-dropdown-clear-icon {
       right: 2.2rem;
       font-size: 0.8rem;
-      color: #94a3b8;
+      color: var(--ts-ink-faint);
     }
   }
 
@@ -465,20 +465,20 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   .active-filters-label {
     letter-spacing: 0.05em;
     font-size: 0.75rem;
-    color: #64748b;
+    color: var(--ts-ink-faint);
   }
 
   .filter-chip {
     transition: all 0.2s ease;
-    box-shadow: 0 1px 2px rgba(99, 102, 241, 0.03);
-    background-color: #f1f5f9;
-    border-color: #e2e8f0 !important;
-    color: #334155;
+    box-shadow: 0 1px 2px rgba(18, 32, 58, 0.03);
+    background-color: var(--ts-subtle);
+    border-color: var(--ts-line) !important;
+    color: var(--ts-ink-nav);
     
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.08);
-      background-color: #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(18, 32, 58, 0.08);
+      background-color: var(--ts-line);
     }
 
     .btn-close-chip {
@@ -501,7 +501,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
     
     &:hover {
-      color: #dc2626 !important;
+      color: var(--ts-danger) !important;
       text-decoration: underline !important;
     }
   }
@@ -528,8 +528,8 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 30px -4px rgba(79, 70, 229, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04) !important;
-    border-color: rgba(99, 102, 241, 0.2) !important;
+    box-shadow: 0 12px 30px -4px rgba(18, 32, 58, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+    border-color: rgba(18, 32, 58, 0.2) !important;
   }
 
   .stat-icon-wrapper {
@@ -549,29 +549,29 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .trip-theme {
-    background-color: rgba(99, 102, 241, 0.1) !important;
-    color: #4f46e5 !important;
+    background-color: rgba(18, 32, 58, 0.1) !important;
+    color: var(--ts-navy) !important;
   }
 
   .outing-theme {
     background-color: rgba(16, 185, 129, 0.1) !important;
-    color: #059669 !important;
+    color: var(--ts-ok-fg) !important;
   }
 
   .hajj-theme {
     background-color: rgba(245, 158, 11, 0.1) !important;
-    color: #d97706 !important;
+    color: var(--ts-pend-ink) !important;
   }
 
   .stat-title {
-    color: #64748b;
+    color: var(--ts-ink-faint);
     font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.05em;
   }
 
   .stat-value {
-    color: #1e293b;
+    color: var(--ts-ink);
     font-weight: 800;
   }
 
@@ -584,7 +584,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   .progress-bar-wrapper {
     .progress {
-      background-color: #f1f5f9;
+      background-color: var(--ts-subtle);
       overflow: hidden;
       border-radius: 10px;
     }
@@ -608,15 +608,15 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .trip-blob {
-    background-color: #4f46e5;
+    background-color: var(--ts-navy);
   }
 
   .outing-blob {
-    background-color: #059669;
+    background-color: var(--ts-ok-fg);
   }
 
   .hajj-blob {
-    background-color: #d97706;
+    background-color: var(--ts-pend-ink);
   }
 }
 

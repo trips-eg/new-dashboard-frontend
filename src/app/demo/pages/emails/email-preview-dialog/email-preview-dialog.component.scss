@@ -5,18 +5,18 @@
 .email-header {
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--ts-line);
 
   h3 {
     margin: 0 0 0.5rem 0;
-    color: #333;
+    color: var(--ts-ink);
   }
 
   .email-meta {
     display: flex;
     gap: 1.5rem;
     font-size: 0.9rem;
-    color: #666;
+    color: var(--ts-ink-faint);
 
     span {
       strong {
@@ -31,7 +31,7 @@
 
   h4 {
     margin: 0 0 0.75rem 0;
-    color: #555;
+    color: var(--ts-ink-muted);
     font-size: 1rem;
   }
 }
@@ -40,7 +40,7 @@
   width: 100%;
   min-height: 500px;
   height: calc(85vh - 200px);
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--ts-line);
   border-radius: 4px;
   background-color: #ffffff;
 }
@@ -49,5 +49,5 @@
   display: flex;
   justify-content: flex-end;
   padding-top: 1rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--ts-line);
 }

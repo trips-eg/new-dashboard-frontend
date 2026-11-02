@@ -67,11 +67,11 @@
 }
 
 ::ng-deep .p-menuitem:hover {
-  background-color: #e0e0e0 !important; // لون أغمق شوية عند hover
+  background-color: var(--ts-line) !important; // لون أغمق شوية عند hover
 }
 
 ::ng-deep .p-menuitem-link:hover {
-  background-color: #d0d0d0 !important; // لو عايز التأثير يظهر على اللينك كله
+  background-color: var(--ts-line-control) !important; // لو عايز التأثير يظهر على اللينك كله
 }
 /* إخفاء الزر الافتراضي في SplitButton */
 ::ng-deep .no-default-button .p-splitbutton-defaultbutton {
@@ -103,7 +103,7 @@
 // Compact filter row styling
 :host ::ng-deep .p-datatable .p-datatable-thead > tr:nth-child(2) > th {
   padding: 0.25rem 0.5rem !important;
-  background: #f8f9fa;
+  background: var(--ts-subtle);
 }
 
 :host ::ng-deep .p-datatable .p-column-filter-row {

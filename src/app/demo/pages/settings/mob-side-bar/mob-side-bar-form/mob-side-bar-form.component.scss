@@ -20,19 +20,19 @@
 
   // Accent colors per type
   &--room {
-    border-left-color: #3b82f6; // blue
+    border-left-color: var(--ts-blue); // blue
   }
   &--outing {
-    border-left-color: #22c55e; // green
+    border-left-color: var(--ts-ok-fg); // green
   }
   &--hajj {
-    border-left-color: #f59e0b; // amber
+    border-left-color: var(--ts-pend-ink); // amber
   }
   &--trip {
-    border-left-color: #ef4444; // red
+    border-left-color: var(--ts-danger); // red
   }
   &--company {
-    border-left-color: #64748b; // slate
+    border-left-color: var(--ts-ink-faint); // slate
   }
 
   // Card Name
@@ -57,9 +57,9 @@
   &__price {
     font-size: 0.9rem;
     font-weight: 700;
-    color: #16a34a;
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
+    color: var(--ts-ok-fg);
+    background: var(--ts-ok-bg);
+    border: 1px solid var(--ts-ok-line);
     border-radius: 20px;
     padding: 0.2rem 0.75rem;
     white-space: nowrap;
@@ -141,7 +141,7 @@
     }
 
     i {
-      color: #64748b;
+      color: var(--ts-ink-faint);
       font-size: 0.75rem;
     }
   }
@@ -158,7 +158,7 @@
     align-items: center;
     border-radius: 999px;
     padding: 0.2rem 0.55rem;
-    background: #eef2ff;
+    background: var(--ts-selected);
     color: #3730a3;
     font-size: 0.75rem;
     font-weight: 600;
@@ -186,7 +186,7 @@
     transition: color 0.15s ease;
 
     &:hover {
-      color: var(--primary-600, #4338ca);
+      color: var(--primary-600, var(--ts-navy));
     }
 
     i {
@@ -206,14 +206,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--surface-50, #f8fafc);
-    border: 1px solid var(--surface-200, #e2e8f0);
+    background: var(--surface-50, var(--ts-subtle));
+    border: 1px solid var(--surface-200, var(--ts-line));
     border-radius: 6px;
     padding: 0.5rem 0.75rem;
     transition: background 0.15s ease;
 
     &:hover {
-      background: var(--surface-100, #f1f5f9);
+      background: var(--surface-100, var(--ts-subtle));
     }
 
     &--inactive {
@@ -248,7 +248,7 @@
   &__ticket-price {
     font-size: 0.85rem;
     font-weight: 700;
-    color: #16a34a;
+    color: var(--ts-ok-fg);
   }
 
   &__ticket-qty {
@@ -282,19 +282,19 @@
 
   // Accent colors per type
   &--room {
-    border-left-color: #3b82f6;
+    border-left-color: var(--ts-blue);
   }
   &--outing {
-    border-left-color: #22c55e;
+    border-left-color: var(--ts-ok-fg);
   }
   &--hajj {
-    border-left-color: #f59e0b;
+    border-left-color: var(--ts-pend-ink);
   }
   &--trip {
-    border-left-color: #ef4444;
+    border-left-color: var(--ts-danger);
   }
   &--company {
-    border-left-color: #64748b;
+    border-left-color: var(--ts-ink-faint);
   }
 
   &__order {
@@ -389,7 +389,7 @@
   }
 
   &__price {
-    color: #16a34a;
+    color: var(--ts-ok-fg);
     font-weight: 600;
   }
 

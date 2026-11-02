@@ -24,23 +24,23 @@
 }
 
 .text-success {
-  color: #22c55e;
+  color: var(--ts-ok-fg);
 }
 
 .text-danger {
-  color: #ef4444;
+  color: var(--ts-danger);
 }
 
 ::ng-deep {
   .p-datatable {
     .p-datatable-thead > tr > th {
-      background-color: #f8f9fa;
+      background-color: var(--ts-subtle);
       font-weight: 600;
     }
 
     .p-datatable-tbody > tr {
       &:hover {
-        background-color: #f1f5f9;
+        background-color: var(--ts-subtle);
       }
     }
   }

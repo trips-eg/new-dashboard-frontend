@@ -1,4 +1,13 @@
 {
+  "SCANNER_UI": {
+    "TITLE": "Ticket scanner",
+    "HINT": "Scan the customer's QR code, or type the booking number.",
+    "SCAN": "Scan QR code",
+    "MANUAL": "Booking number",
+    "MANUAL_PLACEHOLDER": "Enter booking ID manually…",
+    "VALIDATE": "Validate",
+    "HISTORY": "Scanned this session"
+  },
   "Customer Analytics": "Customer Analytics",
   "Customer Journey Funnel": "Customer Journey Funnel",
   "Date Range": "Date Range",
@@ -1410,6 +1419,11 @@
     "LANGUAGE": "Switch language"
   },
   "AUTH_UI": {
+    "BRAND_TAGLINE": "One workspace for the Trips team, vendors and gate scanners.",
+    "BRAND_ROLES": "Who signs in here",
+    "ROLE_ADMIN": "Admin",
+    "ROLE_VENDOR": "Vendors",
+    "ROLE_SCANNER": "Ticket scanner",
     "USERNAME_PLACEHOLDER": "Enter your username",
     "SHOW_PASSWORD": "Show password",
     "HIDE_PASSWORD": "Hide password",

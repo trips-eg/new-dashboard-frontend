@@ -22,26 +22,26 @@ $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.0
 // 2. Model Selection Card
 .model-select-card {
   background-color: #ffffff;
-  border: 1px solid #e2e8f0 !important;
+  border: 1px solid var(--ts-line) !important;
   border-radius: 12px !important;
   transition: $transition-swift;
   position: relative;
   min-height: 125px;
 
   &:hover {
-    border-color: #cbd5e1 !important;
-    background-color: #f8fafc;
+    border-color: var(--ts-line-control) !important;
+    background-color: var(--ts-subtle);
     transform: translateY(-2px);
     box-shadow: $shadow-sm;
   }
 
   &.selected {
-    border-color: #6366f1 !important;
-    background-color: rgba(99, 102, 241, 0.02);
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.08);
+    border-color: var(--ts-navy) !important;
+    background-color: rgba(18, 32, 58, 0.02);
+    box-shadow: 0 0 0 4px rgba(18, 32, 58, 0.08);
 
     .model-card-radio-dot {
-      border-color: #4f46e5;
+      border-color: var(--ts-navy);
       background-color: #ffffff;
 
       &::after {
@@ -68,7 +68,7 @@ $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.0
     }
 
     &.fixed-bg {
-      background-color: rgba(99, 102, 241, 0.08);
+      background-color: rgba(18, 32, 58, 0.08);
     }
 
     &.committed-bg {
@@ -79,7 +79,7 @@ $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.0
   .model-card-title {
     font-size: 0.88rem;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--ts-ink);
   }
 
   // Radio button simulation dot
@@ -87,7 +87,7 @@ $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.0
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    border: 2px solid #cbd5e1;
+    border: 2px solid var(--ts-line-control);
     position: relative;
     transition: $transition-swift;
 
@@ -100,7 +100,7 @@ $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.0
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background-color: #4f46e5;
+      background-color: var(--ts-navy);
       opacity: 0;
       transition: $transition-swift;
     }
@@ -109,8 +109,8 @@ $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.0
 
 // 3. Dynamic Helper Alert Box
 .model-helper-alert {
-  background-color: rgba(99, 102, 241, 0.02) !important;
-  border: 1px dashed rgba(99, 102, 241, 0.25) !important;
+  background-color: rgba(18, 32, 58, 0.02) !important;
+  border: 1px dashed rgba(18, 32, 58, 0.25) !important;
   
   i {
     font-size: 1.1rem;
@@ -119,23 +119,23 @@ $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.0
 
 // 4. Custom Input Groups
 .form-group-custom {
-  background-color: #f8fafc;
-  border-color: #e2e8f0 !important;
+  background-color: var(--ts-subtle);
+  border-color: var(--ts-line) !important;
   border-radius: 10px !important;
   
   ::ng-deep .custom-input-number {
     .p-inputtext {
       border-radius: 8px;
       padding: 0.65rem 0.85rem;
-      border: 1px solid #cbd5e1;
+      border: 1px solid var(--ts-line-control);
       font-size: 0.95rem;
       font-weight: 600;
-      color: #1e293b;
+      color: var(--ts-ink);
       transition: $transition-swift;
 
       &:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+        border-color: var(--ts-navy);
+        box-shadow: 0 0 0 3px rgba(18, 32, 58, 0.12);
       }
     }
   }
@@ -144,11 +144,11 @@ $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.0
 // 5. Calculator Widget
 .projection-widget {
   background-color: #ffffff;
-  border-color: #e2e8f0 !important;
+  border-color: var(--ts-line) !important;
   box-shadow: $shadow-sm;
 
   .projection-box {
-    border-color: #cbd5e1 !important;
+    border-color: var(--ts-line-control) !important;
     min-width: 100px;
     flex: 1;
 
@@ -163,7 +163,7 @@ $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.0
     }
 
     &.final-box-bg {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      background: var(--ts-ok-fg);
       border: none !important;
       
       .box-value {
@@ -176,7 +176,7 @@ $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.0
     width: 28px;
     height: 28px;
     background-color: #ffffff;
-    border-color: #e2e8f0 !important;
+    border-color: var(--ts-line) !important;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -190,8 +190,8 @@ $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.0
 
 // 6. Action Buttons custom styles
 .custom-btn-cancel {
-  border-color: #cbd5e1 !important;
-  color: #475569 !important;
+  border-color: var(--ts-line-control) !important;
+  color: var(--ts-ink-muted) !important;
   border-radius: 8px !important;
   font-weight: 600 !important;
   padding: 0.55rem 1.1rem !important;
@@ -199,26 +199,26 @@ $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.0
   transition: $transition-swift !important;
 
   &:hover {
-    background-color: #f1f5f9 !important;
-    color: #1e293b !important;
-    border-color: #cbd5e1 !important;
+    background-color: var(--ts-subtle) !important;
+    color: var(--ts-ink) !important;
+    border-color: var(--ts-line-control) !important;
   }
 }
 
 .custom-btn-save {
-  background-color: #4f46e5 !important;
-  border-color: #4f46e5 !important;
+  background-color: var(--ts-navy) !important;
+  border-color: var(--ts-navy) !important;
   border-radius: 8px !important;
   font-weight: 600 !important;
   padding: 0.55rem 1.25rem !important;
   font-size: 0.88rem !important;
-  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2) !important;
+  box-shadow: 0 4px 10px rgba(18, 32, 58, 0.2) !important;
   transition: $transition-swift !important;
 
   &:hover {
-    background-color: #4338ca !important;
-    border-color: #4338ca !important;
-    box-shadow: 0 6px 14px rgba(79, 70, 229, 0.3) !important;
+    background-color: var(--ts-navy) !important;
+    border-color: var(--ts-navy) !important;
+    box-shadow: 0 6px 14px rgba(18, 32, 58, 0.3) !important;
     transform: translateY(-1px);
   }
   
