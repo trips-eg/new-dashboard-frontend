@@ -263,6 +263,59 @@ const NavigationItems = [
     permissions: [Permissions.UsersView] // Everyone can access home
   },
   {
+    id: 'staff-analytics',
+    title: 'STAFF_UI.ANALYTICS',
+    type: 'collapse',
+    classes: 'nav-item',
+    icon: 'fas fa-chart-pie',
+    breadcrumbs: false,
+    permissions: [Permissions.BookingView],
+    children: [
+      {
+        id: 'staff-analytics-growth',
+        title: 'STAFF_UI.OVERVIEW',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/analytics/overview',
+        icon: 'fas fa-chart-line',
+        breadcrumbs: false,
+        permissions: [Permissions.BookingView]
+      },
+      {
+        id: 'staff-analytics-sales',
+        title: 'STAFF_UI.SEARCH_AND_SALES',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/analytics/sales',
+        icon: 'fas fa-magnifying-glass-chart',
+        breadcrumbs: false,
+        permissions: [Permissions.BookingView],
+        adminOnly: true
+      },
+      {
+        id: 'staff-analytics-custom',
+        title: 'STAFF_UI.CUSTOM_TRIPS',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/analytics/custom-trips',
+        icon: 'fas fa-compass',
+        breadcrumbs: false,
+        permissions: [Permissions.BookingView],
+        adminOnly: true
+      },
+      {
+        id: 'staff-analytics-reports',
+        title: 'STAFF_UI.REPORTS',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/analytics/reports',
+        icon: 'fas fa-file-arrow-down',
+        breadcrumbs: false,
+        permissions: [Permissions.BookingView]
+      }
+    ]
+  },
+  {
     id: 'customers',
     title: 'Customers',
     type: 'item',

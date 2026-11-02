@@ -43,6 +43,27 @@ const routes: Routes = [
         path: 'default',
         loadComponent: () => import('./demo/default/default.component').then((c) => c.DefaultComponent)
       },
+      { path: 'analytics', redirectTo: 'analytics/overview', pathMatch: 'full' },
+      {
+        path: 'analytics/overview',
+        loadComponent: () => import('./demo/pages/staff-analytics/analytics/staff-analytics.component').then((c) => c.StaffAnalyticsComponent),
+        data: { view: 'growth' }
+      },
+      {
+        path: 'analytics/sales',
+        loadComponent: () => import('./demo/pages/staff-analytics/analytics/staff-analytics.component').then((c) => c.StaffAnalyticsComponent),
+        data: { view: 'sales' }
+      },
+      {
+        path: 'analytics/custom-trips',
+        loadComponent: () => import('./demo/pages/staff-analytics/analytics/staff-analytics.component').then((c) => c.StaffAnalyticsComponent),
+        data: { view: 'custom' }
+      },
+      {
+        path: 'analytics/reports',
+        loadComponent: () => import('./demo/pages/staff-analytics/analytics/staff-analytics.component').then((c) => c.StaffAnalyticsComponent),
+        data: { view: 'reports' }
+      },
       {
         path: 'customer-analytics',
         loadComponent: () =>

@@ -1,0 +1,356 @@
+<div class="ts-page">
+  <header class="ts-titlebar">
+    <div>
+      <h1>
+        {{
+          (view === 'sales'
+            ? 'STAFF_UI.SEARCH_AND_SALES'
+            : view === 'custom'
+              ? 'STAFF_UI.CUSTOM_TRIPS_ANALYTICS'
+              : view === 'reports'
+                ? 'STAFF_UI.REPORTS'
+                : isVendor
+                  ? 'STAFF_UI.MY_REPORTS'
+                  : 'STAFF_UI.ANALYTICS'
+          ) | translate
+        }}
+      </h1>
+      <p>{{ 'STAFF_UI.ANALYTICS_HINT' | translate }}</p>
+    </div>
+    <nav class="ts-titlebar__actions" [attr.aria-label]="'STAFF_UI.ANALYTICS' | translate">
+      <a routerLink="/analytics/overview" [class.is-active]="view === 'growth'"><i class="ti ti-chart-line" aria-hidden="true"></i>{{ 'STAFF_UI.ANALYTICS' | translate }}</a>
+      <ng-container *ngIf="!isVendor">
+        <a routerLink="/analytics/sales" [class.is-active]="view === 'sales'"><i class="ti ti-search" aria-hidden="true"></i>{{ 'STAFF_UI.SEARCH_AND_SALES' | translate }}</a>
+        <a routerLink="/analytics/custom-trips" [class.is-active]="view === 'custom'"><i class="ti ti-compass" aria-hidden="true"></i>{{ 'STAFF_UI.CUSTOM_TRIPS' | translate }}</a>
+      </ng-container>
+      <a routerLink="/analytics/reports" [class.is-active]="view === 'reports'"><i class="ti ti-download" aria-hidden="true"></i>{{ 'STAFF_UI.REPORTS' | translate }}</a>
+    </nav>
+  </header>
+
+  <ts-range-bar [selected]="range.key" (selectedChange)="setRange($event)"></ts-range-bar>
+
+  <div class="ts-error" *ngIf="adminOnly" role="alert">
+    <i class="ti ti-lock" aria-hidden="true"></i>
+    <span>{{ 'STAFF_UI.ADMIN_ONLY' | translate }}</span>
+  </div>
+
+  <div class="ts-kpi-grid" *ngIf="loading" aria-busy="true">
+    <div class="ts-skeleton"></div>
+    <div class="ts-skeleton"></div>
+    <div class="ts-skeleton"></div>
+    <div class="ts-skeleton"></div>
+  </div>
+
+  <div class="ts-error" *ngIf="failed" role="alert">
+    <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+    <span>{{ 'STAFF_UI.LOAD_FAILED' | translate }}</span>
+    <button type="button" class="btn btn-secondary" (click)="load()"><i class="ti ti-refresh" aria-hidden="true"></i>{{ 'STAFF_UI.RETRY' | translate }}</button>
+  </div>
+
+  <!-- ================= Growth (admin) / my numbers (vendor) ================= -->
+  <ng-container *ngIf="view === 'growth' && data && !loading">
+    <div class="ts-kpi-grid">
+      <ts-kpi
+        *ngFor="let k of kpis()"
+        [label]="kpiLabel(k) | translate"
+        [icon]="kpiIcon(k)"
+        [tone]="kpiTone(k)"
+        [value]="kpiValue(k)"
+        [delta]="k.changePct"
+        [deltaUp]="k.key !== 'cancelRatePct'"
+        [link]="kpiLink(k)"
+      ></ts-kpi>
+    </div>
+
+    <!-- Admin -->
+    <ng-container *ngIf="!isVendor">
+      <section class="ts-section">
+        <div class="ts-section__head">
+          <span class="ts-section__chip" aria-hidden="true"><i class="ti ti-chart-line"></i></span>
+          <div class="ts-section__title"><h2>{{ 'STAFF_UI.BOOKINGS_PER_DAY' | translate }}</h2></div>
+        </div>
+        <ts-trend-chart [values]="values(data.series, 'bookings')" [labels]="labels(data.series, 'label')" [ariaLabel]="'STAFF_UI.BOOKINGS_PER_DAY' | translate"></ts-trend-chart>
+      </section>
+
+      <div class="ts-grid-2">
+        <section class="ts-section">
+          <div class="ts-section__head">
+            <span class="ts-section__chip" aria-hidden="true"><i class="ti ti-rocket"></i></span>
+            <div class="ts-section__title">
+              <h2>{{ 'STAFF_UI.APP_GROWTH' | translate }}</h2>
+              <p>
+                {{
+                  data.engagement?.trackingSince
+                    ? ('STAFF_UI.TRACKING_SINCE' | translate: { n: data.engagement.trackingSince })
+                    : ('STAFF_UI.TRACKING_NOT_STARTED' | translate)
+                }}
+              </p>
+            </div>
+          </div>
+          <a class="ts-row" routerLink="/customers">
+            <span class="ts-row__label">{{ 'STAFF_UI.TOTAL_USERS' | translate }}</span>
+            <span class="ts-row__value">{{ fmtNum(data.engagement?.totalUsers) }}</span>
+          </a>
+          <div class="ts-row">
+            <span class="ts-row__label">{{ 'STAFF_UI.DAU' | translate }}</span><span class="ts-row__value">{{ fmtNum(data.engagement?.dau) }}</span>
+          </div>
+          <div class="ts-row">
+            <span class="ts-row__label">{{ 'STAFF_UI.MAU' | translate }}</span><span class="ts-row__value">{{ fmtNum(data.engagement?.mau) }}</span>
+          </div>
+          <div class="ts-row">
+            <span class="ts-row__label">{{ 'STAFF_UI.STICKINESS' | translate }}</span>
+            <span class="ts-row__value">{{ fmtPct(data.engagement?.stickinessPct) }}</span>
+          </div>
+          <ts-bars [values]="values(data.engagement?.registrations, 'count')" [labels]="labels(data.engagement?.registrations, 'month', true)"></ts-bars>
+        </section>
+
+        <section class="ts-section">
+          <div class="ts-section__head">
+            <span class="ts-section__chip" aria-hidden="true"><i class="ti ti-route"></i></span>
+            <div class="ts-section__title"><h2>{{ 'STAFF_UI.CUSTOMER_JOURNEY' | translate }}</h2></div>
+          </div>
+          <div class="ts-step" *ngFor="let s of data.funnel?.steps">
+            <div class="ts-step__row">
+              <span>{{ stepLabel(s.key) | translate }}</span><strong>{{ fmtNum(s.count) }}</strong>
+            </div>
+            <ts-progress [value]="s.count / firstStep()"></ts-progress>
+          </div>
+        </section>
+      </div>
+
+      <section class="ts-section">
+        <div class="ts-section__head">
+          <span class="ts-section__chip" aria-hidden="true"><i class="ti ti-calendar-time"></i></span>
+          <div class="ts-section__title"><h2>{{ 'STAFF_UI.LEAD_TIME' | translate }}</h2></div>
+        </div>
+        <div class="ts-lead" *ngFor="let b of data.patterns?.leadTime">
+          <span>{{ b.label }}</span>
+          <ts-progress [value]="b.pct / 100" color="var(--ts-teal)"></ts-progress>
+          <strong>{{ fmtPct(b.pct) }}</strong>
+        </div>
+      </section>
+    </ng-container>
+
+    <!-- Vendor -->
+    <ng-container *ngIf="isVendor">
+      <section class="ts-section">
+        <div class="ts-section__head">
+          <span class="ts-section__chip" aria-hidden="true"><i class="ti ti-chart-bar"></i></span>
+          <div class="ts-section__title"><h2>{{ 'STAFF_UI.BOOKINGS_PER_WEEK' | translate }}</h2></div>
+        </div>
+        <ts-bars [values]="values(data.series, 'bookings')" [labels]="labels(data.series, 'label')"></ts-bars>
+      </section>
+
+      <div class="ts-grid-2">
+        <section class="ts-section" *ngIf="data.performance">
+          <div class="ts-section__head">
+            <div class="ts-section__title"><h2>{{ 'STAFF_UI.VS_AVERAGE' | translate }}</h2></div>
+          </div>
+          <div class="ts-row" *ngFor="let v of data.performance.vsAverage">
+            <span class="ts-row__label">{{ v.label }}</span>
+            <span class="ts-row__value">{{ v.value == null ? '—' : fmtNum(v.value) }} / {{ v.average == null ? '—' : fmtNum(v.average) }}</span>
+          </div>
+        </section>
+
+        <section class="ts-section">
+          <div class="ts-section__head">
+            <div class="ts-section__title"><h2>{{ 'STAFF_UI.TOP_SELLERS' | translate }}</h2></div>
+          </div>
+          <p class="ts-empty-note" *ngIf="!data.top?.length">{{ 'STAFF_UI.NOTHING_YET' | translate }}</p>
+          <div class="ts-row" *ngFor="let r of data.top">
+            <span class="ts-row__label">{{ r.name }}</span><span class="ts-row__value">{{ fmtNum(r.bookings) }}</span>
+          </div>
+        </section>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <!-- ================= Search and sales ================= -->
+  <ng-container *ngIf="view === 'sales' && data && !loading">
+    <section class="ts-section">
+      <div class="ts-section__head">
+        <span class="ts-section__chip" aria-hidden="true"><i class="ti ti-cash"></i></span>
+        <div class="ts-section__title"><h2>{{ 'STAFF_UI.REVENUE_BY_MODULE' | translate }}</h2></div>
+      </div>
+      <ts-share-bar [parts]="shareParts()"></ts-share-bar>
+      <div class="ts-row" *ngFor="let m of data.modules" style="margin-top: 6px">
+        <span class="ts-row__label">{{ moduleOf(m.module).key | translate }}</span>
+        <span class="ts-row__value">
+          {{ fmtNum(m.bookings) }} · {{ fmtCompact(m.revenue) }} {{ 'STAFF_UI.EGP' | translate }} · {{ fmtPct(m.cancelRatePct) }}
+          {{ 'STAFF_UI.CANCEL_RATE' | translate }}
+        </span>
+      </div>
+    </section>
+
+    <div class="ts-grid-2">
+      <section class="ts-section">
+        <div class="ts-section__head">
+          <span class="ts-section__chip" aria-hidden="true"><i class="ti ti-search"></i></span>
+          <div class="ts-section__title">
+            <h2>{{ 'STAFF_UI.MOST_SEARCHED' | translate }}</h2>
+            <p *ngIf="data.search?.source === 'history'">{{ 'STAFF_UI.SEARCH_HISTORY_NOTE' | translate }}</p>
+          </div>
+        </div>
+        <p class="ts-empty-note" *ngIf="!data.search?.rows?.data?.length">{{ 'STAFF_UI.NOTHING_YET' | translate }}</p>
+        <div class="ts-rank" *ngFor="let r of (data.search?.rows?.data ?? []).slice(0, 10)">
+          <div class="ts-rank__top">
+            <span class="ts-rank__name">{{ r.query }}</span>
+            <span class="ts-rank__num">{{ fmtNum(r.count) }}</span>
+          </div>
+          <ts-progress [value]="r.count / maxCount(data.search?.rows?.data, 'count')" color="var(--ts-navy)"></ts-progress>
+        </div>
+      </section>
+
+      <section class="ts-section">
+        <div class="ts-section__head">
+          <span class="ts-section__chip" aria-hidden="true" style="background: var(--ts-pend-bg); color: var(--ts-pend-ink)"><i class="ti ti-sparkles"></i></span>
+          <div class="ts-section__title">
+            <h2>{{ 'STAFF_UI.DEMAND_GAPS' | translate }}</h2>
+            <p>{{ 'STAFF_UI.DEMAND_GAPS_HINT' | translate }}</p>
+          </div>
+        </div>
+        <p class="ts-empty-note" *ngIf="!data.gaps?.length">{{ 'STAFF_UI.NOTHING_YET' | translate }}</p>
+        <div class="ts-row" *ngFor="let g of data.gaps">
+          <span class="ts-row__label">
+            <strong style="color: var(--ts-ink)">{{ g.query }}</strong> · {{ 'STAFF_UI.SEARCHES_N' | translate: { n: fmtNum(g.searches) } }}
+          </span>
+          <span class="ts-row__value" style="font-weight: 400; font-family: inherit">{{ g.suggestion }}</span>
+        </div>
+      </section>
+    </div>
+
+    <div class="ts-grid-2">
+      <section class="ts-section">
+        <div class="ts-section__head">
+          <span class="ts-section__chip" aria-hidden="true" style="background: var(--ts-ok-bg); color: var(--ts-ok-fg)"><i class="ti ti-trending-up"></i></span>
+          <div class="ts-section__title"><h2>{{ 'STAFF_UI.TOP_SELLERS' | translate }}</h2></div>
+        </div>
+        <p class="ts-empty-note" *ngIf="!data.top?.length">{{ 'STAFF_UI.NOTHING_YET' | translate }}</p>
+        <div class="ts-rank" *ngFor="let r of data.top">
+          <div class="ts-rank__top">
+            <span class="ts-rank__dot" [style.background]="moduleOf(r.itemType).color"></span>
+            <span class="ts-rank__name">{{ r.name }} <span class="ts-rank__vendor" *ngIf="r.vendorName">· {{ r.vendorName }}</span></span>
+            <span class="ts-rank__num">{{ fmtNum(r.bookings) }}</span>
+          </div>
+          <ts-progress [value]="r.bookings / maxCount(data.top, 'bookings')" [color]="moduleOf(r.itemType).color"></ts-progress>
+        </div>
+      </section>
+
+      <section class="ts-section">
+        <div class="ts-section__head">
+          <span class="ts-section__chip" aria-hidden="true" style="background: var(--ts-danger-soft); color: var(--ts-danger)"><i class="ti ti-trending-down"></i></span>
+          <div class="ts-section__title"><h2>{{ 'STAFF_UI.WEAKEST' | translate }}</h2></div>
+        </div>
+        <p class="ts-empty-note" *ngIf="!data.bottom?.length">{{ 'STAFF_UI.NOTHING_YET' | translate }}</p>
+        <div class="ts-row" *ngFor="let r of data.bottom">
+          <span class="ts-row__label">{{ r.name }} <small *ngIf="r.alert" class="status-badge status-pending">{{ r.alert }}</small></span>
+          <span class="ts-row__value">{{ fmtNum(r.bookings) }}</span>
+        </div>
+      </section>
+    </div>
+  </ng-container>
+
+  <!-- ================= Custom trips ================= -->
+  <ng-container *ngIf="view === 'custom' && data && !loading">
+    <div class="ts-kpi-grid">
+      <ts-kpi [label]="'STAFF_UI.REQUESTS' | translate" icon="ti ti-compass" tone="info" [value]="fmtNum(data.funnel?.requests)" link="/admin-custom-trip-requests"></ts-kpi>
+      <ts-kpi [label]="'STAFF_UI.GOT_OFFER' | translate" icon="ti ti-mail" tone="pending" [value]="fmtNum(data.funnel?.gotOffer)" link="/admin-custom-trip-requests"></ts-kpi>
+      <ts-kpi [label]="'STAFF_UI.PAID' | translate" icon="ti ti-check" tone="success" [value]="fmtNum(data.funnel?.paid)" link="/all-reservations"></ts-kpi>
+      <ts-kpi [label]="'STAFF_UI.BOOKINGS_VALUE' | translate" icon="ti ti-cash" tone="revenue" [value]="fmtCompact(data.funnel?.bookingsValue)"></ts-kpi>
+      <ts-kpi [label]="'STAFF_UI.AVG_OFFERS' | translate" icon="ti ti-calculator" [value]="(data.avgOffersPerRequest ?? 0).toFixed(1)"></ts-kpi>
+      <ts-kpi
+        [label]="'STAFF_UI.FIRST_OFFER_HOURS' | translate"
+        icon="ti ti-clock"
+        [value]="data.avgFirstOfferHours == null ? '—' : data.avgFirstOfferHours.toFixed(1)"
+      ></ts-kpi>
+    </div>
+
+    <section class="ts-section">
+      <div class="ts-section__head">
+        <span class="ts-section__chip" aria-hidden="true" style="background: var(--ts-marketing-bg); color: var(--ts-marketing)"><i class="ti ti-chart-bar"></i></span>
+        <div class="ts-section__title"><h2>{{ 'STAFF_UI.REQUESTS_PER_WEEK' | translate }}</h2></div>
+      </div>
+      <ts-bars [values]="values(data.weekly, 'requests')" [labels]="labels(data.weekly, 'weekStart', true)" color="var(--ts-marketing)"></ts-bars>
+    </section>
+
+    <div class="ts-grid-2">
+      <section class="ts-section">
+        <div class="ts-section__head">
+          <div class="ts-section__title"><h2>{{ 'STAFF_UI.TOP_DESTINATIONS' | translate }}</h2></div>
+        </div>
+        <p class="ts-empty-note" *ngIf="!data.destinations?.length">{{ 'STAFF_UI.NOTHING_YET' | translate }}</p>
+        <div class="ts-row" *ngFor="let x of data.destinations">
+          <span class="ts-row__label">{{ x.destination }}</span>
+          <span class="ts-row__value">{{ 'STAFF_UI.REQUESTS_COUNT' | translate: { n: fmtNum(x.requests) } }}</span>
+        </div>
+      </section>
+
+      <section class="ts-section">
+        <div class="ts-section__head">
+          <div class="ts-section__title"><h2>{{ 'STAFF_UI.VENDORS_RANKING' | translate }}</h2></div>
+        </div>
+        <p class="ts-empty-note" *ngIf="!data.vendors?.length">{{ 'STAFF_UI.NOTHING_YET' | translate }}</p>
+        <div class="ts-row" *ngFor="let v of data.vendors">
+          <span class="ts-row__label">{{ v.name }}</span>
+          <span class="ts-row__value">{{ 'STAFF_UI.OFFERS_N' | translate: { n: fmtNum(v.offers) } }} · {{ fmtPct(v.winRatePct) }}</span>
+        </div>
+      </section>
+    </div>
+  </ng-container>
+
+  <!-- ================= Reports ================= -->
+  <ng-container *ngIf="view === 'reports' && !loading && !failed">
+    <section class="ts-section">
+      <div class="ts-section__head">
+        <span class="ts-section__chip" aria-hidden="true"><i class="ti ti-file-description"></i></span>
+        <div class="ts-section__title">
+          <h2>{{ 'STAFF_UI.REPORTS' | translate }}</h2>
+          <p>{{ 'STAFF_UI.REPORTS_HINT' | translate }}</p>
+        </div>
+      </div>
+      <div class="ts-row ts-report" *ngFor="let r of reports">
+        <span class="ts-report__name">{{ r.label | translate }}</span>
+        <button
+          *ngFor="let f of ['xlsx', 'pdf']"
+          type="button"
+          class="btn btn-secondary"
+          [disabled]="busyExport !== null"
+          (click)="export(r.key, $any(f))"
+        >
+          <i [class]="busyExport === r.key + '.' + f ? 'pi pi-spin pi-spinner' : f === 'pdf' ? 'ti ti-file-type-pdf' : 'ti ti-file-spreadsheet'" aria-hidden="true"></i>
+          {{ f === 'pdf' ? 'PDF' : 'Excel' }}
+        </button>
+      </div>
+    </section>
+
+    <section class="ts-section" *ngIf="subscription as s">
+      <div class="ts-switch-row">
+        <div>
+          <strong>{{ 'STAFF_UI.WEEKLY_EMAIL' | translate }}</strong>
+          <small>{{ 'STAFF_UI.WEEKLY_EMAIL_HINT' | translate }}</small>
+        </div>
+        <p-inputSwitch
+          [ngModel]="s.isActive"
+          (ngModelChange)="saveSubscription({ isActive: $event })"
+          [ariaLabel]="'STAFF_UI.WEEKLY_EMAIL' | translate"
+        ></p-inputSwitch>
+      </div>
+      <ng-container *ngIf="s.isActive">
+        <div class="ts-pills" style="margin-top: 14px" role="group">
+          <button type="button" [class.is-selected]="s.format === 'pdf'" (click)="saveSubscription({ format: 'pdf' })">PDF</button>
+          <button type="button" [class.is-selected]="s.format === 'xlsx'" (click)="saveSubscription({ format: 'xlsx' })">Excel</button>
+        </div>
+        <div class="ts-chips" style="margin-top: 12px">
+          <button type="button" class="ts-chip" *ngFor="let d of days; let i = index" [class.is-selected]="s.day === i" (click)="saveSubscription({ day: i })">
+            {{ d | translate }}
+          </button>
+        </div>
+        <div class="ts-chips" style="margin-top: 10px">
+          <button type="button" class="ts-chip" *ngFor="let h of hours" [class.is-selected]="s.hour === h" (click)="saveSubscription({ hour: h })">
+            {{ h }}:00
+          </button>
+        </div>
+      </ng-container>
+    </section>
+  </ng-container>
+</div>

@@ -1,0 +1,252 @@
+<div class="ts-page">
+  <!-- ================= Admin (a-home) ================= -->
+  <ng-container *ngIf="!isVendor">
+    <section class="ts-hero" aria-labelledby="home-hero-title">
+      <div class="ts-hero__top">
+        <p class="ts-hero__hello">{{ 'STAFF_UI.GOOD_MORNING' | translate: { n: username } }} · {{ today }}</p>
+        <a class="ts-hero__icon-link" routerLink="/all-reservations" [attr.aria-label]="'STAFF_UI.BOOKINGS' | translate"><i class="ti ti-search" aria-hidden="true"></i></a>
+        <a class="ts-hero__icon-link" routerLink="/notifications" [attr.aria-label]="'notifications' | translate"><i class="ti ti-bell" aria-hidden="true"></i></a>
+      </div>
+      <h1 id="home-hero-title" class="ts-hero__title">
+        {{
+          (admin?.overview?.today?.instaPayPending ?? 0) > 0
+            ? ('STAFF_UI.INSTAPAY_WAITING' | translate: { n: fmtNum(admin?.overview?.today?.instaPayPending) })
+            : ('STAFF_UI.ALL_CAUGHT_UP' | translate)
+        }}
+      </h1>
+      <div class="ts-hero__actions">
+        <div class="ts-pills ts-pills--dark" role="group" [attr.aria-label]="'STAFF_UI.PERIOD' | translate">
+          <button type="button" [class.is-selected]="period === 'today'" [attr.aria-pressed]="period === 'today'" (click)="setPeriod('today')">
+            {{ 'STAFF_UI.TODAY' | translate }}
+          </button>
+          <button type="button" [class.is-selected]="period === 'week'" [attr.aria-pressed]="period === 'week'" (click)="setPeriod('week')">
+            {{ 'STAFF_UI.WEEK' | translate }}
+          </button>
+          <button type="button" [class.is-selected]="period === 'month'" [attr.aria-pressed]="period === 'month'" (click)="setPeriod('month')">
+            {{ 'STAFF_UI.MONTH' | translate }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <ng-container *ngTemplateOutlet="state"></ng-container>
+
+    <ng-container *ngIf="admin && !loading">
+      <div class="ts-kpi-grid">
+        <ts-kpi
+          [label]="'STAFF_UI.BOOKINGS_TODAY' | translate"
+          icon="ti ti-ticket"
+          tone="info"
+          [value]="fmtNum(admin.overview.today.bookings)"
+          [delta]="admin.overview.today.bookingsChangePct"
+          [spark]="spark(admin.daily, 'bookings')"
+          link="/all-reservations"
+        ></ts-kpi>
+        <ts-kpi
+          [label]="'STAFF_UI.REVENUE_PERIOD' | translate"
+          icon="ti ti-cash"
+          tone="revenue"
+          [value]="fmtCompact(kpi(admin.overview, 'revenue')?.value)"
+          [delta]="kpi(admin.overview, 'revenue')?.changePct ?? null"
+          [spark]="spark(admin.daily, 'revenue')"
+          link="/walletTransactions"
+        ></ts-kpi>
+        <ts-kpi
+          [label]="'STAFF_UI.ACTIVE_USERS' | translate"
+          icon="ti ti-users"
+          tone="neutral"
+          [value]="fmtNum(admin.overview.today.activeUsersToday)"
+          link="/customers"
+        ></ts-kpi>
+        <ts-kpi
+          [label]="'STAFF_UI.DUE_TO_VENDORS' | translate"
+          icon="ti ti-wallet"
+          tone="pending"
+          [value]="fmtCompact(admin.overview.today.settlementsDueAmount)"
+          [footnote]="
+            (admin.overview.today.settlementsOverdue60 ?? 0) > 0
+              ? ('STAFF_UI.OVERDUE_COUNT' | translate: { n: fmtNum(admin.overview.today.settlementsOverdue60) })
+              : null
+          "
+          link="/vendor-settlements"
+        ></ts-kpi>
+      </div>
+
+      <div class="ts-grid-2">
+        <section class="ts-section ts-section--flush">
+          <div class="ts-section__head">
+            <div class="ts-section__title"><h2>{{ 'STAFF_UI.NEEDS_ACTION' | translate }}</h2></div>
+          </div>
+          <a class="ts-action-row" routerLink="/all-reservations">
+            <span class="ts-action-row__icon" style="background: var(--ts-pend-bg); color: var(--ts-pend-ink)"><i class="ti ti-clock" aria-hidden="true"></i></span>
+            <span class="ts-action-row__text"><strong>{{ 'STAFF_UI.INSTAPAY_TO_REVIEW' | translate }}</strong></span>
+            <span class="ts-action-row__count" style="color: var(--ts-pend-ink)">{{ fmtNum(admin.overview.today.instaPayPending) }}</span>
+            <i class="ti ti-chevron-right ts-action-row__chev" aria-hidden="true"></i>
+          </a>
+          <div class="ts-action-row">
+            <span class="ts-action-row__icon" style="background: var(--ts-outing-bg); color: var(--ts-teal)"><i class="ti ti-check" aria-hidden="true"></i></span>
+            <span class="ts-action-row__text"><strong>{{ 'STAFF_UI.PRODUCTS_TO_REVIEW' | translate }}</strong></span>
+            <span class="ts-action-row__count" style="color: var(--ts-teal)">{{ fmtNum(admin.overview.today.productsPendingReview) }}</span>
+          </div>
+          <a class="ts-action-row" routerLink="/admin-custom-trip-requests">
+            <span class="ts-action-row__icon" style="background: var(--ts-marketing-bg); color: var(--ts-marketing)"><i class="ti ti-compass" aria-hidden="true"></i></span>
+            <span class="ts-action-row__text">
+              <strong>{{ 'STAFF_UI.CUSTOM_NO_OFFERS' | translate }}</strong>
+              <small>{{ 'STAFF_UI.OVER_12_HOURS' | translate }}</small>
+            </span>
+            <span class="ts-action-row__count" style="color: var(--ts-marketing)">{{ fmtNum(admin.overview.today.customRequestsNoOffers) }}</span>
+            <i class="ti ti-chevron-right ts-action-row__chev" aria-hidden="true"></i>
+          </a>
+          <a class="ts-action-row" routerLink="/reviews">
+            <span class="ts-action-row__icon" style="background: var(--ts-hajj-bg); color: var(--ts-hajj)"><i class="ti ti-star" aria-hidden="true"></i></span>
+            <span class="ts-action-row__text"><strong>{{ 'STAFF_UI.REVIEWS_TO_REPLY' | translate }}</strong></span>
+            <span class="ts-action-row__count" style="color: var(--ts-hajj)">{{ fmtNum(admin.overview.today.reviewsToReply) }}</span>
+            <i class="ti ti-chevron-right ts-action-row__chev" aria-hidden="true"></i>
+          </a>
+          <a class="ts-action-row" routerLink="/vendor-settlements">
+            <span class="ts-action-row__icon" style="background: var(--ts-trip-bg); color: var(--ts-trip)"><i class="ti ti-wallet" aria-hidden="true"></i></span>
+            <span class="ts-action-row__text">
+              <strong>{{ 'STAFF_UI.SETTLEMENTS_OVERDUE' | translate }}</strong>
+              <small *ngIf="admin.overview.today.settlementsOverdue60Amount != null">
+                {{ fmtNum(admin.overview.today.settlementsOverdue60Amount) }} {{ 'STAFF_UI.EGP' | translate }}
+              </small>
+            </span>
+            <span class="ts-action-row__count" style="color: var(--ts-trip)">{{ fmtNum(admin.overview.today.settlementsOverdue60) }}</span>
+            <i class="ti ti-chevron-right ts-action-row__chev" aria-hidden="true"></i>
+          </a>
+        </section>
+
+        <section class="ts-section">
+          <div class="ts-section__head">
+            <div class="ts-section__title">
+              <h2>{{ 'STAFF_UI.BOOKING_PERFORMANCE' | translate }}</h2>
+              <p>{{ 'STAFF_UI.BOOKINGS_PER_MONTH' | translate }}</p>
+            </div>
+            <a class="ts-section__action" routerLink="/analytics/overview">{{ 'STAFF_UI.DETAILS' | translate }}</a>
+          </div>
+          <ts-trend-chart
+            [values]="spark(admin.monthly, 'bookings')"
+            [labels]="labels(admin.monthly)"
+            [ariaLabel]="'STAFF_UI.BOOKINGS_PER_MONTH' | translate"
+          ></ts-trend-chart>
+        </section>
+      </div>
+
+      <div class="ts-grid-2">
+        <section class="ts-section">
+          <div class="ts-section__head">
+            <div class="ts-section__title">
+              <h2>{{ 'STAFF_UI.REVENUE_BY_MODULE' | translate }}</h2>
+              <p>{{ fmtCompact(kpi(admin.overview, 'revenue')?.value) }} {{ 'STAFF_UI.EGP' | translate }}</p>
+            </div>
+          </div>
+          <ts-share-bar [parts]="shareParts"></ts-share-bar>
+        </section>
+
+        <section class="ts-section">
+          <div class="ts-section__head">
+            <div class="ts-section__title"><h2>{{ 'STAFF_UI.TOP_SELLERS' | translate }}</h2></div>
+            <a class="ts-section__action" routerLink="/analytics/sales">{{ 'STAFF_UI.SEE_ALL' | translate }}</a>
+          </div>
+          <p class="ts-empty-note" *ngIf="!admin.top.length">{{ 'STAFF_UI.NOTHING_YET' | translate }}</p>
+          <div class="ts-rank" *ngFor="let r of admin.top">
+            <div class="ts-rank__top">
+              <span class="ts-rank__dot" [style.background]="moduleOf(r.itemType).color"></span>
+              <span class="ts-rank__name">
+                {{ r.name }} <span class="ts-rank__vendor" *ngIf="r.vendorName">· {{ r.vendorName }}</span>
+              </span>
+              <span class="ts-rank__num">{{ fmtNum(r.bookings) }}</span>
+            </div>
+            <ts-progress [value]="admin.top[0].bookings ? r.bookings / admin.top[0].bookings : 0" [color]="moduleOf(r.itemType).color"></ts-progress>
+          </div>
+        </section>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <!-- ================= Vendor (MobileVendorHome) ================= -->
+  <ng-container *ngIf="isVendor">
+    <section class="ts-hero" aria-labelledby="vendor-hero-title">
+      <div class="ts-hero__top">
+        <p class="ts-hero__hello">{{ 'STAFF_UI.VENDOR_PORTAL' | translate }} · {{ 'STAFF_UI.HELLO' | translate: { n: username } }} · {{ today }}</p>
+      </div>
+      <h1 id="vendor-hero-title" class="ts-hero__title">{{ 'STAFF_UI.LEAVING_TODAY' | translate: { n: fmtNum(travellers) } }}</h1>
+      <div class="ts-hero__actions" *ngIf="canScan">
+        <a class="ts-hero__scan" routerLink="/scanner"><i class="ti ti-scan" aria-hidden="true"></i>{{ 'STAFF_UI.SCAN_TICKET' | translate }}</a>
+      </div>
+    </section>
+
+    <ng-container *ngTemplateOutlet="state"></ng-container>
+
+    <ng-container *ngIf="vendor && !loading">
+      <div class="ts-kpi-grid">
+        <ts-kpi
+          [label]="'STAFF_UI.BOOKINGS_TODAY' | translate"
+          icon="ti ti-ticket"
+          tone="info"
+          [value]="fmtNum(vendor.today.today.bookings)"
+          [footnote]="
+            vendor.today.today.departingToday == null ? null : ('STAFF_UI.DEPARTING_COUNT' | translate: { n: fmtNum(vendor.today.today.departingToday) })
+          "
+        ></ts-kpi>
+        <ts-kpi
+          [label]="'STAFF_UI.BOOKINGS_MONTH' | translate"
+          icon="ti ti-calendar-event"
+          tone="success"
+          [value]="fmtNum(kpi(vendor.month, 'bookings')?.value)"
+          [delta]="kpi(vendor.month, 'bookings')?.changePct ?? null"
+        ></ts-kpi>
+        <ts-kpi
+          [label]="'STAFF_UI.REMAINING_FOR_ME' | translate"
+          icon="ti ti-wallet"
+          tone="revenue"
+          [value]="fmtNum(vendor.today.today.remainingDue)"
+          [link]="companyId ? ['/vendor-details', companyId] : null"
+        ></ts-kpi>
+        <ts-kpi
+          [label]="'STAFF_UI.MY_RATING' | translate"
+          icon="ti ti-star"
+          tone="pending"
+          [value]="vendor.today.today.rating == null ? '—' : vendor.today.today.rating.toFixed(1)"
+          [footnote]="vendor.today.today.ratingsCount == null ? null : ('STAFF_UI.OF_RATINGS' | translate: { n: fmtNum(vendor.today.today.ratingsCount) })"
+        ></ts-kpi>
+      </div>
+
+      <section class="ts-section ts-section--flush">
+        <div class="ts-section__head">
+          <div class="ts-section__title"><h2>{{ 'STAFF_UI.LEAVING_TODAY_TITLE' | translate }}</h2></div>
+          <a class="ts-section__action" routerLink="/all-reservations">{{ 'STAFF_UI.SEE_ALL' | translate }}</a>
+        </div>
+        <div class="ts-empty" *ngIf="!vendor.departures.length">
+          <i class="ti ti-calendar-event" aria-hidden="true"></i>
+          <span>{{ 'STAFF_UI.NO_DEPARTURES_TODAY' | translate }}</span>
+        </div>
+        <div class="ts-departure" *ngFor="let d of vendor.departures">
+          <span class="ts-departure__time" [style.background]="moduleOf(d.itemType).bg" [style.color]="moduleOf(d.itemType).color">{{ d.startTime || '—' }}</span>
+          <span class="ts-departure__text">
+            <strong>{{ d.name }}</strong>
+            <small *ngIf="d.gatheringPoint">{{ d.gatheringPoint }}</small>
+          </span>
+          <span class="ts-departure__count">
+            <strong>{{ d.checkedIn == null ? fmtNum(d.travellers) : fmtNum(d.checkedIn) + ' / ' + fmtNum(d.travellers) }}</strong>
+            <small>{{ (d.checkedIn == null ? 'STAFF_UI.TRAVELLERS' : 'STAFF_UI.CHECKED_IN') | translate }}</small>
+          </span>
+        </div>
+      </section>
+    </ng-container>
+  </ng-container>
+
+  <ng-template #state>
+    <div class="ts-kpi-grid" *ngIf="loading" aria-busy="true">
+      <div class="ts-skeleton"></div>
+      <div class="ts-skeleton"></div>
+      <div class="ts-skeleton"></div>
+      <div class="ts-skeleton"></div>
+    </div>
+    <div class="ts-error" *ngIf="failed" role="alert">
+      <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+      <span>{{ 'STAFF_UI.LOAD_FAILED' | translate }}</span>
+      <button type="button" class="btn btn-secondary" (click)="load()"><i class="ti ti-refresh" aria-hidden="true"></i>{{ 'STAFF_UI.RETRY' | translate }}</button>
+    </div>
+  </ng-template>
+</div>

@@ -12,13 +12,14 @@ import { TranslateModule } from '@ngx-translate/core';
 import { SubHeaderComponent } from 'src/app/shared/components/sub-header/sub-header.component';
 import { ConfigureService } from 'src/app/theme/shared/services/configure.service';
 import { VendorDetailComponent } from './../pages/settings/vendors/vendor-detail/vendor-detail.component';
+import { StaffHomeComponent } from '../pages/staff-analytics/staff-home/staff-home.component';
 
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-default',
   standalone: true,
-  imports: [CommonModule, SharedModule, SubHeaderComponent, SearchFieldComponent, TranslateModule, VendorDetailComponent],
+  imports: [CommonModule, SharedModule, SubHeaderComponent, SearchFieldComponent, TranslateModule, VendorDetailComponent, StaffHomeComponent],
   templateUrl: './default.component.html',
   styleUrls: ['./default.component.scss']
 })
