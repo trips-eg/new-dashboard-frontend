@@ -71,3 +71,26 @@
 - **فترة الإحصائيات:** الفترة اللي تختارها (آخر 28 يوم، آخر 7 أيام، الشهر ده، آخر 3 شهور) بتفضل هي هي وانت بتتنقل بين شاشات التحليلات.
 - **المكونات** (`staff-ui.ts`): `ts-kpi` و`ts-range-bar` و`ts-trend-chart` و`ts-bars` و`ts-share-bar` و`ts-sparkline` و`ts-progress`، والـ Pipe اسمه `tsNum`. ستايلها في `src/scss/trips-staff/_staff-widgets.scss`.
 - **النصوص:** تحت `STAFF_UI` في `ar.json` و`en.json`، ومنقولة من ملفات الـ ARB بتاعة التطبيق.
+
+## كل شاشات التطبيق
+
+باقي شاشات TRIPS Staff اتنقلت هي كمان، وبتاخد بياناتها من نفس الـ Endpoints، وعلى نفس المسارات اللي في التطبيق: `/a/...` للأدمن، و`/v/...` للمورد، و`/form/...` للفورمز. الكود في `src/app/staff/`، والمسارات كلها في `staff.routes.ts`.
+
+| الجزء | المسارات | الملف |
+|---|---|---|
+| الحجوزات | `/a/bookings`، `/a/bookings/new`، `/a/bookings/:id`، `/v/bookings` | `bookings/` |
+| المنتجات | `/a/services`، `/a/products/...`، `/v/products`، `/hotel/:id` | `products/` |
+| الفورمز | `/form/trip`، `/form/outing`، `/form/hajj`، `/form/hajj/rooms`، `/form/room`، `/form/tripstar`، `/form/sidebar` | `forms/` |
+| العملاء والمحافظ | `/a/more/customers`، `/a/more/wallet-transactions` | `customers/` |
+| الموردين | `/a/more/vendors` | `vendors/` |
+| الفلوس | `/a/more/transactions`، `/a/more/settlements`، `/a/more/payment-accounts`، `/v/more/settlements` | `money/` |
+| التسويق | `/a/more/reviews`، `/a/more/search`، `/a/more/coupons` | `marketing/` |
+| الرسائل | `/a/more/emails`، `/a/more/notifications`، `/a/more/notify` | `messaging/` |
+| الطلبات الخاصة | `/a/more/custom-requests`، `/v/more/requests`، `/v/more/offers` | `requests/` |
+| الإعدادات | `/a/more/finance-settings`، `/a/more/lookups`، `/a/more/users`، `/a/more/tripstars`، `/a/more/commission`، … | `settings/` |
+| المزيد والسكانر | `/a/more`، `/v/more`، `/v/scanner`، `/v/notifications` | `more/` |
+
+- **القايمة الجانبية:** فيها تابات التطبيق بس. الشاشات القديمة كلها لسه موجودة، ومتجمعة في صفحة "المزيد" تحت "الشاشات القديمة"، ومتفلترة بنفس صلاحيات القايمة.
+- **المكونات** (`staff/ui/`): `kit.ts` فيه الكروت والـ Pills والحالات. `lists.ts` فيه البحث والـ Chips والقوايم بالصفحات ودرج الفلاتر. `dialogs.ts` فيه الـ Sheets والتأكيد. `controls.ts` فيه الـ Switches والـ Steppers. وأدوات الفورمز في `forms/form-kit.ts`. ستايلها كلها في `src/scss/trips-staff/_staff-app.scss`.
+- **النصوص:** تحت `APP` في `ar.json` و`en.json`، ومنسوخة من ملفات الـ ARB بتاعة التطبيق بـ `node tools/sync-staff-strings.mjs`. النصوص اللي في الويب بس موجودة تحت `WEB`.
+- **الطلبات:** طلبات `/api/staff` ما بتظهرش الـ Spinner اللي بيغطي الشاشة كلها (كل شاشة ليها حالة تحميل خاصة بيها)، وبتبعت لغة الشاشة. أما الفورمز فبتبعت `en-US` عشان الأرقام العشرية تتقري صح.
