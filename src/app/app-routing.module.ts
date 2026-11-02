@@ -6,6 +6,7 @@ import { DeletionComponent } from './shared/components/New folder/delation.compo
 import { tripStarPermissionGuard } from './shared/guards/trip-star-permission.guard';
 import { reviewsAdminGuard } from './shared/guards/reviews-admin.guard';
 import { Permissions } from './theme/layout/admin/navigation/navigation';
+import { STAFF_ROUTES } from './staff/staff.routes';
 
 const routes: Routes = [
   {
@@ -43,6 +44,8 @@ const routes: Routes = [
         path: 'default',
         loadComponent: () => import('./demo/default/default.component').then((c) => c.DefaultComponent)
       },
+      // The TRIPS Staff app screens (/a/..., /v/...)
+      ...STAFF_ROUTES,
       { path: 'analytics', redirectTo: 'analytics/overview', pathMatch: 'full' },
       {
         path: 'analytics/overview',

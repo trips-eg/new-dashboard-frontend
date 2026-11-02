@@ -251,18 +251,8 @@ export const Permissions = {
   ReportsView: 'Permissions.Reports.View'
 };
 
-const NavigationItems = [
-  {
-    id: 'default',
-    title: 'Home',
-    type: 'item',
-    classes: 'nav-item',
-    url: '/default',
-    icon: 'fas fa-house',
-    breadcrumbs: false,
-    permissions: [Permissions.UsersView] // Everyone can access home
-  },
-  {
+/** The analytics screens of the TRIPS Staff app. */
+const STAFF_ANALYTICS = {
     id: 'staff-analytics',
     title: 'STAFF_UI.ANALYTICS',
     type: 'collapse',
@@ -270,6 +260,8 @@ const NavigationItems = [
     icon: 'fas fa-chart-pie',
     breadcrumbs: false,
     permissions: [Permissions.BookingView],
+    // Vendors open their numbers from More ("My reports"), as in the app
+    adminOnly: true,
     children: [
       {
         id: 'staff-analytics-growth',
@@ -314,7 +306,21 @@ const NavigationItems = [
         permissions: [Permissions.BookingView]
       }
     ]
+  };
+
+/** The dashboard menu before the TRIPS Staff tabs; shown under "Old screens" so no screen is lost. */
+const LegacyItems = [
+  {
+    id: 'default',
+    title: 'Home',
+    type: 'item',
+    classes: 'nav-item',
+    url: '/default',
+    icon: 'fas fa-house',
+    breadcrumbs: false,
+    permissions: [Permissions.UsersView] // Everyone can access home
   },
+
   {
     id: 'customers',
     title: 'Customers',
@@ -893,6 +899,101 @@ const NavigationItems = [
   }
 ];
 
+/**
+ * The menu of the TRIPS Staff app (its bottom tabs): admins get Home, Bookings, Analytics, Services and More;
+ * vendors get Home, My bookings, Scanner, My products and More. The older dashboard screens are listed under
+ * "Old screens" on the More page (legacyScreens below).
+ */
+const NavigationItems = [
+  {
+    id: 'default',
+    title: 'APP.tabHome',
+    type: 'item',
+    classes: 'nav-item',
+    url: '/default',
+    icon: 'fas fa-house',
+    breadcrumbs: false,
+    permissions: [Permissions.UsersView]
+  },
+  {
+    id: 'a-bookings',
+    title: 'APP.tabBookings',
+    type: 'item',
+    classes: 'nav-item',
+    url: '/a/bookings',
+    icon: 'fas fa-ticket',
+    breadcrumbs: false,
+    permissions: [Permissions.BookingView],
+    adminOnly: true
+  },
+  {
+    id: 'v-bookings',
+    title: 'APP.tabMyBookings',
+    type: 'item',
+    classes: 'nav-item',
+    url: '/v/bookings',
+    icon: 'fas fa-ticket',
+    breadcrumbs: false,
+    permissions: [Permissions.BookingView],
+    vendorOnly: true
+  },
+  {
+    id: 'v-scanner',
+    title: 'APP.tabScanner',
+    type: 'item',
+    classes: 'nav-item',
+    url: '/v/scanner',
+    icon: 'fas fa-qrcode',
+    breadcrumbs: false,
+    permissions: [Permissions.ScannerView]
+  },
+  STAFF_ANALYTICS,
+  {
+    id: 'a-services',
+    title: 'APP.tabProducts',
+    type: 'item',
+    classes: 'nav-item',
+    url: '/a/services',
+    icon: 'fas fa-layer-group',
+    breadcrumbs: false,
+    permissions: [Permissions.TravelCreate, Permissions.OutingsCreate, Permissions.HajjCreate, Permissions.HotelCreate, Permissions.BookingView],
+    adminOnly: true
+  },
+  {
+    id: 'v-products',
+    title: 'APP.tabMyProducts',
+    type: 'item',
+    classes: 'nav-item',
+    url: '/v/products',
+    icon: 'fas fa-layer-group',
+    breadcrumbs: false,
+    permissions: [Permissions.BookingView],
+    vendorOnly: true
+  },
+  {
+    id: 'a-more',
+    title: 'APP.tabMore',
+    type: 'item',
+    classes: 'nav-item',
+    url: '/a/more',
+    icon: 'fas fa-grip',
+    breadcrumbs: false,
+    permissions: [Permissions.UsersView],
+    adminOnly: true
+  },
+  {
+    id: 'v-more',
+    title: 'APP.tabMore',
+    type: 'item',
+    classes: 'nav-item',
+    url: '/v/more',
+    icon: 'fas fa-grip',
+    breadcrumbs: false,
+    permissions: [Permissions.BookingView],
+    vendorOnly: true
+  }
+];
+
 @Injectable()
 export class NavigationItem {
   private navigationSubject = new BehaviorSubject<any>([]);
@@ -913,7 +1014,12 @@ export class NavigationItem {
     const navigation = this.getFilteredNavigation();
     this.navigationSubject.next(navigation);
   }
-  private getFilteredNavigation() {
+  /** The dashboard's screens from before the TRIPS Staff layout, filtered like the menu, for More → Old screens. */
+  legacyScreens(): any[] {
+    return this.getFilteredNavigation(LegacyItems.filter((i: any) => i.id !== 'default'));
+  }
+
+  private getFilteredNavigation(source: any[] = NavigationItems) {
     const userPermissions = this._configService.userPermissions();
     const user = this._configService.User();
     const userRoles = this._configService.userRoles();
@@ -923,7 +1029,7 @@ export class NavigationItem {
       return [];
     }
 
-    let navigation = JSON.parse(JSON.stringify(NavigationItems));
+    let navigation = JSON.parse(JSON.stringify(source));
 
     const filterItems = (items) => {
       return items.filter((item) => {

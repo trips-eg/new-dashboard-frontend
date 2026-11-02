@@ -29,6 +29,7 @@ import { MessageService } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { UpdateBannerComponent } from './shared/components/update-banner/update-banner.component';
+import { DialogHostComponent } from './staff/ui/dialogs';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -49,7 +50,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     ConfigurationComponent,
     UpdateBannerComponent
   ],
-  imports: [BrowserModule,  NgxSpinnerModule,AppRoutingModule, ToastrModule.forRoot({
+  imports: [BrowserModule,  NgxSpinnerModule,AppRoutingModule, DialogHostComponent, ToastrModule.forRoot({
     timeOut: 4000,
     positionClass: 'toast-top-right',
 

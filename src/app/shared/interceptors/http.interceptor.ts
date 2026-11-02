@@ -8,6 +8,9 @@ import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner'; // Import NgxSpinnerService
 import { Router } from '@angular/router';
 
+/** Header a request sets to skip the full-screen spinner; removed before the request leaves. */
+export const SKIP_SPINNER = 'X-Skip-Spinner';
+
 @Injectable()
 export class HttpInterceptorInterceptor implements HttpInterceptor {
   constructor(
@@ -19,14 +22,19 @@ export class HttpInterceptorInterceptor implements HttpInterceptor {
   ) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // Requests that show their own loading state (the TRIPS Staff screens) skip the full-screen spinner
+    const quiet = req.headers.has(SKIP_SPINNER);
+    if (quiet) req = req.clone({ headers: req.headers.delete(SKIP_SPINNER) });
     // Show spinner when request starts
-    this.spinner.show();
+    if (!quiet) this.spinner.show();
 
     let authReq = req;
     const token = this._configService.UserToken();
     let Lang = this._translation.currentLang;
     Lang = Lang === 'ar' ? 'ar' : 'en';
-    const languageHeader = /\/TripStar\//i.test(req.url) ? (Lang === 'ar' ? 'ar-EG' : 'en-US') : Lang;
+    // A request that chose its language keeps it (forms send en-US so the server reads decimal numbers)
+    const languageHeader =
+      req.headers.get('Accept-Language') ?? (/\/TripStar\//i.test(req.url) ? (Lang === 'ar' ? 'ar-EG' : 'en-US') : Lang);
 
     if (token !== null && token !== undefined && token !== '') {
       authReq = req.clone({
@@ -46,7 +54,9 @@ export class HttpInterceptorInterceptor implements HttpInterceptor {
         return throwError(() => err);
       }),
       // Hide spinner when request finishes (success or error)
-      finalize(() => this.spinner.hide())
+      finalize(() => {
+        if (!quiet) this.spinner.hide();
+      })
     );
   }
 }
