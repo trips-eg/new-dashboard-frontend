@@ -53,3 +53,21 @@
 ## الموبايل
 
 اتشال الـ `viewport` التاني اللي كان بيصغّر الصفحة لـ 0.9، فالصفحة دلوقتي بتتعرض بعرض الجهاز الحقيقي. اتجرب على 375 و768 و1440، بالعربي (RTL) والإنجليزي.
+
+## الرئيسية والتحليلات زي التطبيق
+
+الشاشات دي نسخة من شاشات تطبيق TRIPS Staff، وبتاخد بياناتها من نفس الـ Endpoints (`/api/staff/analytics/*`)، وكلها موجودة على `web-api.trips.eg`. الكود في `src/app/demo/pages/staff-analytics/`.
+
+| الشاشة | المسار | في التطبيق |
+|---|---|---|
+| الرئيسية (أدمن) | `/default`، فوق الإحصائيات القديمة | `admin_home_screen.dart` |
+| الرئيسية (مورد) | `/default` | `vendor_home_screen.dart` |
+| التحليلات | `/analytics/overview` | `AnalyticsScreen`، وللمورد `VendorAnalyticsScreen` |
+| البحث والمبيعات (أدمن بس) | `/analytics/sales` | `SearchSalesScreen` |
+| الطلبات الخاصة (أدمن بس) | `/analytics/custom-trips` | `CustomTripsAnalyticsScreen` |
+| التقارير | `/analytics/reports` | `ReportsScreen` |
+
+- **الأذونات:** القايمة بتظهر لأي حد عنده `Permissions.Booking.View`، وده نفس الإذن اللي السيرفر بيطلبه. السيرفر بيقصر بيانات المورد على شركته بس.
+- **فترة الإحصائيات:** الفترة اللي تختارها (آخر 28 يوم، آخر 7 أيام، الشهر ده، آخر 3 شهور) بتفضل هي هي وانت بتتنقل بين شاشات التحليلات.
+- **المكونات** (`staff-ui.ts`): `ts-kpi` و`ts-range-bar` و`ts-trend-chart` و`ts-bars` و`ts-share-bar` و`ts-sparkline` و`ts-progress`، والـ Pipe اسمه `tsNum`. ستايلها في `src/scss/trips-staff/_staff-widgets.scss`.
+- **النصوص:** تحت `STAFF_UI` في `ar.json` و`en.json`، ومنقولة من ملفات الـ ARB بتاعة التطبيق.
