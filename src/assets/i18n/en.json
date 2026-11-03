@@ -2536,6 +2536,8 @@
     "loadMore": "Load more",
     "oldScreens": "Old screens",
     "call": "Call",
-    "copied": "Copied"
+    "copied": "Copied",
+    "paymentReceipt": "Payment receipt",
+    "receiptStaysNote": "The receipt stays with the booking after it is confirmed or cancelled"
   }
 }

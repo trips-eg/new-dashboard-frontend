@@ -383,9 +383,11 @@ export class FilterDrawerComponent implements OnInit, OnDestroy {
     return optionLabel(o, this.text.arabic);
   }
 
-  /** A choice field with no options and no remote source can't be picked from (e.g. "items"). */
+  /** A choice field with no options and no remote source can't be picked from (e.g. "items"), so it isn't shown. */
   fields(): FilterField[] {
-    return (this.schema?.fields ?? []).filter((f) => !(['chips', 'select', 'multiSelect'].includes(f.control) && !f.options.length && !f.optionsSource));
+    return (this.schema?.fields ?? []).filter(
+      (f) => !(['chips', 'select', 'multiSelect', 'remoteSelect'].includes(f.control) && !f.options.length && !f.optionsSource)
+    );
   }
 
   chipItems(f: FilterField) {

@@ -10,7 +10,7 @@ import { StaffHttp } from '../core/staff-http';
 import { FilterCondition, FilterSchema, FiltersApi, ListResult, PagedList, asPage, emptyQuery, queryJson, StaffQuery } from '../core/query';
 import { P, StaffSession } from '../core/session';
 import { AdjustReason, itemType } from '../core/enums';
-import { fmtCompact, fmtNum, fmtShortDate, fmtTime, parseAmount, parseDate } from '../core/format';
+import { fmtCompact, fmtNum, fmtShortDate, fmtTime, parseAmount, parseDate, uuid } from '../core/format';
 import { FORM_KIT } from '../forms/form-kit';
 import { bookingsLink } from '../bookings/bookings-api';
 import { BarsComponent, KpiTileComponent, ShareBarComponent } from 'src/app/demo/pages/staff-analytics/staff-ui';
@@ -33,12 +33,9 @@ export class CustomersApi {
     return this.http.post<any[]>('/api/staff/customers/booking-counts', { userIds: [id] }).pipe(map((d) => d?.[0] ?? null));
   }
 
-  /** wallets/search takes a search text only, so the wallet is found by the customer's email or phone and matched on userId. */
-  wallet(userId: number, term: string): Observable<any | null> {
-    if (term.trim().length < 2) return of(null);
-    return this.http
-      .post<any>('/api/staff/wallets/search', queryJson(emptyQuery({ search: term, pageSize: 10 })))
-      .pipe(map((d) => asPage<any>(d).data.find((w) => w.userId === userId) ?? null));
+  /** The customer's wallet by their id (null when they have none yet). */
+  wallet(userId: number): Observable<any | null> {
+    return this.http.get<any>(`/api/staff/customers/${userId}/wallet`).pipe(map((w) => w ?? null));
   }
 
   adjustments(userId: number): Observable<any[]> {
@@ -46,8 +43,12 @@ export class CustomersApi {
   }
 
   /** POST /api/staff/wallet/adjust: positive adds, negative deducts. The backend refuses a deduction above the balance. */
-  adjust(o: { userId: number; amount: number; reason: number; note: string | null; notify: boolean }): Observable<any> {
-    return this.http.post('/api/staff/wallet/adjust', { userId: o.userId, amount: o.amount, reason: o.reason, note: o.note, notifyCustomer: o.notify });
+  adjust(o: { userId: number; amount: number; reason: number; note: string | null; notify: boolean }, key: string): Observable<any> {
+    return this.http.postIdempotent(
+      '/api/staff/wallet/adjust',
+      { userId: o.userId, amount: o.amount, reason: o.reason, note: o.note, notifyCustomer: o.notify },
+      key
+    );
   }
 
   /** { summary, page } (StaffWalletTransactionPageDto). */
@@ -65,7 +66,7 @@ export class CustomersApi {
       switchMap((user) =>
         forkJoin({
           counts: this.counts(id).pipe(catchError(() => of(null))),
-          wallet: this.wallet(id, user?.email || user?.phoneNumber || '').pipe(catchError(() => of(null))),
+          wallet: this.wallet(id).pipe(catchError(() => of(null))),
           adjustments: this.adjustments(id).pipe(catchError(() => of([])))
         }).pipe(map((rest) => ({ user, ...rest })))
       )
@@ -373,6 +374,8 @@ export class WalletAdjustComponent implements OnInit {
   busy = false;
   error: string | null = null;
   reasons = AdjustReason.all.map((r) => ({ key: String(r), label: this.text.tr(AdjustReason.label(r)) }));
+  /** One key per filled form: pressing again (or a retry) after a slow answer can't add the amount twice. */
+  private key = uuid();
 
   ngOnInit(): void {
     this.userId = +this.route.snapshot.paramMap.get('id')!;
@@ -394,7 +397,7 @@ export class WalletAdjustComponent implements OnInit {
     this.error = null;
     try {
       const r = await firstValueFrom(
-        this.api.adjust({ userId: this.userId, amount: this.deduct ? -a : a, reason: this.reason, note: this.note.trim() || null, notify: this.notify })
+        this.api.adjust({ userId: this.userId, amount: this.deduct ? -a : a, reason: this.reason, note: this.note.trim() || null, notify: this.notify }, this.key)
       );
       this.text.showDone(this.text.tr('APP.newBalance', { n: fmtNum(r?.balanceAfter) }));
       this.location.back();

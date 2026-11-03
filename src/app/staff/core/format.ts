@@ -109,3 +109,13 @@ export function initials(name: string | null | undefined): string {
   const t = (name ?? '').trim();
   return t ? Array.from(t)[0] : '?';
 }
+
+/** A random key for Idempotency-Key headers (crypto.randomUUID needs https; this works on plain http too). */
+export function uuid(): string {
+  return typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = (Math.random() * 16) | 0;
+        return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+      });
+}

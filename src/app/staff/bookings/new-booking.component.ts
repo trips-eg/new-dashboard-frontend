@@ -10,18 +10,9 @@ import { CONTROLS } from '../ui/controls';
 import { SheetComponent } from '../ui/dialogs';
 import { StaffHttp, ApiError } from '../core/staff-http';
 import { ITEM_TYPES, ItemTypeInfo, PayMethod, itemTypeByKey } from '../core/enums';
-import { apiDate, fmtNum, fmtShortDate, parseDate } from '../core/format';
+import { apiDate, fmtNum, fmtShortDate, parseDate, uuid } from '../core/format';
 import { emptyQuery, queryJson } from '../core/query';
 import { BookingsApi, checkoutType } from './bookings-api';
-
-function uuid(): string {
-  return typeof crypto !== 'undefined' && 'randomUUID' in crypto
-    ? crypto.randomUUID()
-    : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-        const r = (Math.random() * 16) | 0;
-        return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
-      });
-}
 
 /**
  * a-booking-new: an employee books for a customer. The screen only collects choices; every amount (price, coupon,

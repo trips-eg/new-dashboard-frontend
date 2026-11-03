@@ -92,7 +92,7 @@
           <td>
             <ng-container *ngIf="isInstaPay(booking.paymentMethod) && booking.paymentProofImageUrl; else noImage">
               <a
-                [href]="booking.paymentProofImageUrl"
+                [href]="proofUrl(booking.paymentProofImageUrl)"
                 target="_blank"
                 class="btn btn-sm btn-outline-primary"
                 [title]="'View Payment Proof' | translate"

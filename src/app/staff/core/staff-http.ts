@@ -109,6 +109,11 @@ export class StaffHttp {
     return this.unwrap<T>(this.http.delete(this.url(path), { params: this.params(query), headers: this.headers() }));
   }
 
+  /** A JSON POST with an Idempotency-Key: the backend answers a repeated key with the first result, so a double tap counts once. */
+  postIdempotent<T>(path: string, body: unknown, key: string): Observable<T> {
+    return this.unwrap<T>(this.http.post(this.url(path), body, { headers: this.headers().set('Idempotency-Key', key) }));
+  }
+
   /** JSON bodies of the product forms, also sent with en-US so decimal numbers bind. */
   postEn<T>(path: string, body: unknown = {}, query?: Query): Observable<T> {
     return this.unwrap<T>(this.http.post(this.url(path), body, { params: this.params(query), headers: this.headers(true) }));

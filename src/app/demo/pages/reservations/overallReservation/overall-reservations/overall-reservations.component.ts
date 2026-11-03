@@ -1,3 +1,4 @@
+import { environment } from 'src/environments/environment';
 import { Component, OnInit } from '@angular/core';
 import { SubHeaderComponent } from 'src/app/shared/components/sub-header/sub-header.component';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
@@ -147,6 +148,11 @@ export class OverallReservationsComponent implements OnInit {
       8: 'InstaPay'
     };
     return map[method] ?? '-';
+  }
+
+  /** The proof is stored as a path on the API host ("/images/InstaPayPayments/…"); a bare path opened on the dashboard's own host. */
+  proofUrl(path: string): string {
+    return /^https?:\/\//i.test(path) ? path : environment.imgUrl.replace(/\/$/, '') + (path.startsWith('/') ? path : '/' + path);
   }
 
   isInstaPay(method: number): boolean {

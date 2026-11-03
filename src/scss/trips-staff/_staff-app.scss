@@ -2394,3 +2394,7 @@ span.ts-cover__end {
   border-radius: 50%;
   background: var(--ts-amber, #f59f00);
 }
+
+.ts-receipt--small {
+  max-width: 360px;
+}

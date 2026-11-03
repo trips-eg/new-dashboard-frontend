@@ -39,6 +39,12 @@ import { BOOKING_PARTS } from './booking-parts';
         <ts-customer-card [customer]="b.customer"></ts-customer-card>
         <ts-item-card *ngFor="let item of b.items" [item]="item"></ts-item-card>
         <ts-money-card [b]="b"></ts-money-card>
+        <!-- The receipt stays on the booking after it's confirmed or cancelled; it used to show only while under review -->
+        <ts-card *ngIf="proof && !vendor" [title]="'WEB.paymentReceipt' | translate" [subtitle]="'WEB.receiptStaysNote' | translate" icon="ti ti-receipt">
+          <a [href]="proof" target="_blank" rel="noopener" class="ts-receipt ts-receipt--small">
+            <img [src]="proof" [alt]="'WEB.paymentReceipt' | translate" />
+          </a>
+        </ts-card>
         <ts-card *ngIf="b.emails?.length" [title]="'APP.emails' | translate">
           <div class="ts-row" *ngFor="let e of b.emails">
             <span class="ts-row__label">{{ e.to || '—' }}</span>
@@ -71,7 +77,13 @@ export class BookingDetailsComponent implements OnInit {
   }
 
   get note(): string | null {
-    return this.b?.payChannel === 'easykash' ? 'APP.easyKashAutoNote' : this.b?.payChannel === 'instapay' ? 'APP.instaPayNote' : null;
+    if (this.b?.payChannel === 'easykash') return 'APP.easyKashAutoNote';
+    // "Needs a team member to check the receipt" only while it waits for that check
+    return this.b?.payChannel === 'instapay' && this.b.status === BookingStatus.instaPending ? 'APP.instaPayNote' : null;
+  }
+
+  get proof(): string | null {
+    return mediaUrl(this.b?.paymentProofImageUrl);
   }
 
   ngOnInit(): void {
