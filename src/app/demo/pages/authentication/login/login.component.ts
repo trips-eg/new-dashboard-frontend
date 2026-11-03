@@ -55,20 +55,11 @@ export default class LoginComponent {
   ngOnInit(): void {
     this.signInForm = this.fb.group({
       username: ['', [Validators.required]],
-      password: ['', Validators.required]
-      // rememberMe: [false]
+      password: ['', Validators.required],
+      // Ticked: stay signed in on this browser. Not ticked: the session ends when the browser closes.
+      // The password itself is never saved.
+      rememberMe: [true]
     });
-
-    // Check for saved credentials
-    const savedCredentials = localStorage.getItem('savedCredentials');
-    if (savedCredentials) {
-      const credentials = JSON.parse(savedCredentials);
-      this.signInForm.patchValue({
-        username: credentials.username,
-        password: credentials.password,
-        rememberMe: true
-      });
-    }
   }
 
   togglePasswordVisibility() {
@@ -102,23 +93,12 @@ export default class LoginComponent {
     this.isLoading = true;
     this.showErrorMsg = false;
 
-    if (this.signInForm.value.rememberMe) {
-      localStorage.setItem(
-        'savedCredentials',
-        JSON.stringify({
-          username: this.signInForm.value.username,
-          password: this.signInForm.value.password
-        })
-      );
-    } else {
-      localStorage.removeItem('savedCredentials');
-    }
-
-    this._loginService.login(this.signInForm.value).subscribe(
+    const { username, password, rememberMe } = this.signInForm.value;
+    this._loginService.login({ username, password }).subscribe(
       (response: any) => {
         if (response.success) {
           // حفظ بيانات اليوزر في ConfigureService
-          this.configService.setUser(response.data);
+          this.configService.setUser(response.data, !!rememberMe);
 
           const permissions = response.data.permissions || [];
           const roles = response.data.roles || [];

@@ -12,7 +12,7 @@ export class ApiCallerService {
 
    }
    private  setRequiredHeaders() {
-       const token = localStorage.getItem('token');
+       const token = sessionStorage.getItem('token') ?? localStorage.getItem('token');
         let headers = {};
        if (token) {
            headers = { token: token };

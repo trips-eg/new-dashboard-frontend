@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
+import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, switchMap } from 'rxjs/operators';
 import { ConfigureService } from '../../theme/shared/services/configure.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
@@ -51,6 +51,19 @@ export class HttpInterceptorInterceptor implements HttpInterceptor {
 
     return next.handle(authReq).pipe(
       catchError((err) => {
+        // An expired access token: renew it with the saved refresh token and send the request once more.
+        // When the session can't be renewed, sign in again.
+        if (err instanceof HttpErrorResponse && err.status === 401 && token) {
+          return this._configService.refreshSession().pipe(
+            switchMap((fresh) => {
+              if (!fresh) {
+                this._configService.Logout();
+                return throwError(() => err);
+              }
+              return next.handle(authReq.clone({ setHeaders: { Authorization: `Bearer ${fresh}`, token: `Bearer ${fresh}` } }));
+            })
+          );
+        }
         return throwError(() => err);
       }),
       // Hide spinner when request finishes (success or error)

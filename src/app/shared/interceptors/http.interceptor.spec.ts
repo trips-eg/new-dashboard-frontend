@@ -61,4 +61,29 @@ describe('HttpInterceptorInterceptor', () => {
     interceptor.intercept(new HttpRequest('GET', '/api/Room/GetAllRooms'), handler).subscribe();
     expect(languages).toEqual(['ar-EG', 'ar']);
   });
+  it('renews an expired session once and sends the request again with the new token', () => {
+    const config = { UserToken: () => 'old-jwt', refreshSession: jasmine.createSpy('refresh').and.returnValue(of('new-jwt')), Logout: jasmine.createSpy('logout') } as any;
+    const interceptor = new HttpInterceptorInterceptor(config, { currentLang: 'en' } as any, {} as any, { show: () => {}, hide: () => {} } as any, {} as any);
+    const sent: (string | null)[] = [];
+    const handler: HttpHandler = {
+      handle: (request) => {
+        sent.push(request.headers.get('Authorization'));
+        return sent.length === 1 ? throwError(() => new HttpErrorResponse({ status: 401 })) : of(new HttpResponse({ status: 200 }));
+      }
+    };
+    let status = 0;
+    interceptor.intercept(new HttpRequest('GET', '/api/staff/bookings'), handler).subscribe((e: any) => (status = e.status));
+    expect(sent).toEqual(['Bearer old-jwt', 'Bearer new-jwt']);
+    expect(status).toBe(200);
+    expect(config.Logout).not.toHaveBeenCalled();
+  });
+  it('signs out when the session cannot be renewed', () => {
+    const config = { UserToken: () => 'old-jwt', refreshSession: () => of(null), Logout: jasmine.createSpy('logout') } as any;
+    const interceptor = new HttpInterceptorInterceptor(config, { currentLang: 'en' } as any, {} as any, { show: () => {}, hide: () => {} } as any, {} as any);
+    const handler: HttpHandler = { handle: () => throwError(() => new HttpErrorResponse({ status: 401 })) };
+    let failed = 0;
+    interceptor.intercept(new HttpRequest('GET', '/api/staff/bookings'), handler).subscribe({ error: (e: HttpErrorResponse) => (failed = e.status) });
+    expect(failed).toBe(401);
+    expect(config.Logout).toHaveBeenCalled();
+  });
 });

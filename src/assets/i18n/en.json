@@ -1561,6 +1561,8 @@
     "USERNAME_REQUIRED": "Enter your username.",
     "PASSWORD_REQUIRED": "Enter your password.",
     "INVALID_CREDENTIALS": "We couldn’t sign you in. Check your username and password.",
+    "REMEMBER_ME": "Remember me",
+    "REMEMBER_ME_HINT": "Stay signed in on this browser. Without it, the session ends when you close the browser or tab. Your password is never saved.",
     "COPYRIGHT": "Impact Business Solutions. All rights reserved.",
     "ERROR_TITLE": "Sign-in failed",
     "NETWORK_ERROR": "We couldn’t sign you in. Please try again."

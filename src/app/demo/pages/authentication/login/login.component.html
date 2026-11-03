@@ -96,6 +96,11 @@
               {{ 'AUTH_UI.PASSWORD_REQUIRED' | translate }}
             </small>
           </div>
+          <label class="remember-me" for="rememberMe">
+            <input type="checkbox" id="rememberMe" formControlName="rememberMe" aria-describedby="remember-me-hint" />
+            <span>{{ 'AUTH_UI.REMEMBER_ME' | translate }}</span>
+          </label>
+          <small id="remember-me-hint" class="remember-me-hint">{{ 'AUTH_UI.REMEMBER_ME_HINT' | translate }}</small>
           <p class="login-error" role="alert" *ngIf="showErrorMsg">
             <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
             <span>{{ 'AUTH_UI.INVALID_CREDENTIALS' | translate }}</span>
