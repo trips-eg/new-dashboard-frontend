@@ -1,0 +1,56 @@
+name: E2E on staging (Playwright + ZAP)
+
+# Runs the Playwright suite in e2e/ against the STAGING admin URL, then a ZAP baseline scan.
+# Variables (environment "staging"): STAGING_ADMIN_URL   e.g. https://test-admin.trips.eg
+# Secrets   (environment "staging"): E2E_USER, E2E_PASSWORD  (a staging-only admin account)
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [develop]
+
+jobs:
+  playwright:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    environment: staging
+    defaults:
+      run:
+        working-directory: e2e
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Run Playwright
+        env:
+          BASE_URL: ${{ vars.STAGING_ADMIN_URL }}
+          E2E_USER: ${{ secrets.E2E_USER }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+        run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: e2e/playwright-report
+
+  zap-baseline:
+    needs: playwright
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: zaproxy/action-baseline@v0.14.0
+        with:
+          target: ${{ vars.STAGING_ADMIN_URL }}
+          allow_issue_writing: false
+          fail_action: false
+          cmd_options: "-a"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-baseline-report
+          path: report_html.html

@@ -1,0 +1,62 @@
+name: CI
+
+# Admin dashboard (Angular 18). Build + unit tests + optional SonarQube on every push/PR.
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build & unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        # The existing lock file has Angular peer-version mismatches; --legacy-peer-deps matches how it was produced.
+        run: npm ci --no-audit --no-fund --legacy-peer-deps
+
+      - name: Production build
+        run: npm run build-prod
+
+      - name: Unit tests (Karma, headless)
+        if: hashFiles('src/**/*.spec.ts') != ''
+        run: npx ng test --watch=false --browsers=ChromeHeadless --code-coverage
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist
+          retention-days: 14
+
+  sonarqube:
+    name: SonarQube quality gate
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: SonarQube scan
+        if: ${{ vars.SONAR_HOST_URL != '' }}
+        uses: sonarsource/sonarqube-scan-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+      - name: Quality gate
+        if: ${{ vars.SONAR_HOST_URL != '' }}
+        uses: sonarsource/sonarqube-quality-gate-action@v1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
