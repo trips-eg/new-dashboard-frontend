@@ -2586,6 +2586,12 @@
     "usedOn": "Used {{n}}"
   },
   "WEB": {
+    "manualModeNote": "Save each vendor's WhatsApp group link here. With every confirmed booking the message is ready in the Send log: press \"Open WhatsApp\" (the message is copied and the group opens), paste and send it, then \"Sent by hand\".",
+    "linkSaved": "Group link saved",
+    "noLinkYet": "No group link",
+    "waitingToSendN": "{{n}} waiting to send",
+    "waitingToSend": "Waiting to send",
+    "openGroup": "Open the group",
     "loadMore": "Load more",
     "oldScreens": "Old screens",
     "call": "Call",

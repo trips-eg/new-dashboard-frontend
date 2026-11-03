@@ -29,6 +29,10 @@ export interface VendorGroupRow {
   lastTestAt?: string | null;
   lastError?: string | null;
   failedMessages: number;
+  /** WhatsApp messages waiting for an admin to send from the vendor's group by hand. */
+  pendingMessages?: number;
+  /** Without the Cloud API every group is linked and messaged by hand. */
+  cloudConfigured?: boolean;
 }
 
 export interface VendorMessageRow {
@@ -124,7 +128,7 @@ export function messageTone(status: number): Tone {
 
       <!-- Groups -->
       <ng-container *ngIf="tab === 'groups'">
-        <div class="ts-note ts-note--pending"><i class="ti ti-info-circle"></i>{{ 'WEB.notConfiguredNote' | translate }}</div>
+        <div class="ts-note" [class.ts-note--pending]="cloud"><i class="ti ti-info-circle"></i>{{ (cloud ? 'WEB.notConfiguredNote' : 'WEB.manualModeNote') | translate }}</div>
         <label class="ts-search">
           <i class="ti ti-search"></i>
           <input type="search" [placeholder]="'APP.search' | translate" (input)="search$.next($any($event.target).value)" />
@@ -139,11 +143,15 @@ export function messageTone(status: number): Tone {
                 <p class="ts-card-title">{{ v.vendorName }}</p>
                 <p class="ts-muted ts-num" *ngIf="v.vendorPhone">{{ v.vendorPhone }}</p>
               </div>
-              <ts-pill [tone]="groupTone(v.status)">{{ v.statusName }}</ts-pill>
+              <ts-pill *ngIf="cloud" [tone]="groupTone(v.status)">{{ v.statusName }}</ts-pill>
+              <ts-pill *ngIf="!cloud" [tone]="v.manualGroupLink ? 'ok' : 'pending'">{{ (v.manualGroupLink ? 'WEB.linkSaved' : 'WEB.noLinkYet') | translate }}</ts-pill>
             </div>
             <div class="ts-wrap" style="margin-top: 8px">
               <ts-tag *ngIf="v.participantsCount" tone="info" icon="ti ti-users">{{ 'WEB.members' | translate: { n: num(v.participantsCount) } }}</ts-tag>
               <ts-tag *ngIf="v.failedMessages" tone="danger" icon="ti ti-alert-triangle">{{ 'WEB.failedN' | translate: { n: num(v.failedMessages) } }}</ts-tag>
+              <button *ngIf="v.pendingMessages" type="button" class="ts-tag ts-tone-pending" style="border: 0; cursor: pointer" (click)="showPending(v)">
+                <i class="ti ti-send"></i><span>{{ 'WEB.waitingToSendN' | translate: { n: num(v.pendingMessages) } }}</span>
+              </button>
             </div>
             <p class="ts-danger-ink ts-clamp2" *ngIf="v.lastError" style="margin: 6px 0 0; font-size: 12px">{{ v.lastError }}</p>
 
@@ -168,11 +176,12 @@ export function messageTone(status: number): Tone {
               <ts-switch-row [title]="'WEB.messagesOn' | translate" [value]="edits[v.companyId]?.on ?? v.isEnabled" (valueChange)="editOf(v).on = $event"></ts-switch-row>
               <div class="ts-wrap" style="margin-top: 8px">
                 <button *ngIf="edits[v.companyId]" type="button" class="btn btn-primary btn-sm" [disabled]="busy === v.companyId" (click)="save(v)">{{ 'APP.save' | translate }}</button>
-                <button *ngIf="!v.groupId" type="button" class="btn btn-secondary btn-sm" [disabled]="busy === v.companyId" (click)="createGroup(v)">
+                <a *ngIf="!cloud && v.manualGroupLink" class="btn btn-sm ts-btn-wa" [href]="v.manualGroupLink" target="_blank" rel="noopener"><i class="ti ti-brand-whatsapp"></i>{{ 'WEB.openGroup' | translate }}</a>
+                <button *ngIf="cloud && !v.groupId" type="button" class="btn btn-secondary btn-sm" [disabled]="busy === v.companyId" (click)="createGroup(v)">
                   <i class="ti ti-brand-whatsapp"></i>{{ 'WEB.createGroup' | translate }}
                 </button>
-                <button *ngIf="v.groupId" type="button" class="btn btn-secondary btn-sm" [disabled]="busy === v.companyId" (click)="refresh(v)"><i class="ti ti-refresh"></i>{{ 'WEB.refreshGroup' | translate }}</button>
-                <button *ngIf="v.groupId" type="button" class="btn btn-secondary btn-sm" [disabled]="busy === v.companyId" (click)="test(v)"><i class="ti ti-send"></i>{{ 'WEB.sendTest' | translate }}</button>
+                <button *ngIf="cloud && v.groupId" type="button" class="btn btn-secondary btn-sm" [disabled]="busy === v.companyId" (click)="refresh(v)"><i class="ti ti-refresh"></i>{{ 'WEB.refreshGroup' | translate }}</button>
+                <button *ngIf="cloud && v.groupId" type="button" class="btn btn-secondary btn-sm" [disabled]="busy === v.companyId" (click)="test(v)"><i class="ti ti-send"></i>{{ 'WEB.sendTest' | translate }}</button>
               </div>
             </ng-container>
           </ts-card>
@@ -208,7 +217,7 @@ export function messageTone(status: number): Tone {
             <p class="ts-danger-ink" *ngIf="m.lastError && m.status !== 1" style="font-size: 12px; margin: 0 0 6px">{{ m.lastError }}</p>
             <pre class="ts-message">{{ m.message }}</pre>
             <div class="ts-wrap" *ngIf="canEdit && m.status !== 1 && m.channel !== 2">
-              <button type="button" class="btn btn-secondary btn-sm" [disabled]="busyLog === m.id" (click)="resend(m)"><i class="ti ti-refresh"></i>{{ 'WEB.resend' | translate }}</button>
+              <button *ngIf="cloud" type="button" class="btn btn-secondary btn-sm" [disabled]="busyLog === m.id" (click)="resend(m)"><i class="ti ti-refresh"></i>{{ 'WEB.resend' | translate }}</button>
               <button type="button" class="btn btn-success btn-sm" (click)="openWhatsApp(m)"><i class="ti ti-brand-whatsapp"></i>{{ 'WEB.openWhatsApp' | translate }}</button>
               <button type="button" class="btn btn-link btn-sm" [disabled]="busyLog === m.id" (click)="sentByHand(m)"><i class="ti ti-check"></i>{{ 'WEB.markSentByHand' | translate }}</button>
             </div>
@@ -264,7 +273,7 @@ export class VendorCommsComponent implements OnInit, OnDestroy {
     { key: '1', label: this.text.tr('APP.sent') },
     { key: '2', label: this.text.tr('APP.failed') },
     { key: '3', label: this.text.tr('WEB.skipped') },
-    { key: '0', label: this.text.tr('APP.pending') }
+    { key: '0', label: this.text.tr('WEB.waitingToSend') }
   ];
   channelChips = [
     { key: '', label: this.text.tr('WEB.channel') },
@@ -275,6 +284,20 @@ export class VendorCommsComponent implements OnInit, OnDestroy {
 
   get canEdit(): boolean {
     return this.session.can(P.companyEdit);
+  }
+
+  /** Whether the server has the WhatsApp Cloud API; without it (the setup decided 2026-11-03) groups are linked by hand. */
+  get cloud(): boolean {
+    return !!this.vendors?.[0]?.cloudConfigured;
+  }
+
+  /** The vendor's messages waiting to be sent by hand, in the send log. */
+  showPending(v: VendorGroupRow): void {
+    this.vendor = { id: String(v.companyId), name: v.vendorName } as Picked;
+    this.status = '0';
+    this.channel = '';
+    this.tab = 'log';
+    this.reloadLog();
   }
 
   ngOnInit(): void {
