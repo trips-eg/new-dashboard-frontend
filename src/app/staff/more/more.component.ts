@@ -16,6 +16,7 @@ import { ProductsApi } from '../products/products-api';
 import { ConfigureService } from 'src/app/theme/shared/services/configure.service';
 import { NavigationItem } from 'src/app/theme/layout/admin/navigation/navigation';
 import { StaffAnalyticsService, presetRange } from 'src/app/demo/pages/staff-analytics/staff-analytics.service';
+import { VendorCommsApi, VendorMessageRow } from '../vendor-comms/vendor-comms.component';
 
 interface Entry {
   icon: string;
@@ -167,7 +168,8 @@ export class AdminMoreComponent implements OnInit {
           title: 'APP.groupPeople',
           entries: [
             { icon: 'ti ti-users', label: 'APP.customers', ...main, route: '/a/more/customers', perm: P.customersView },
-            { icon: 'ti ti-building-store', label: 'APP.vendors', ...trip, route: '/a/more/vendors', perm: P.companyView }
+            { icon: 'ti ti-building-store', label: 'APP.vendors', ...trip, route: '/a/more/vendors', perm: P.companyView },
+            { icon: 'ti ti-brand-whatsapp', label: 'WEB.vendorComms', color: '#1E8E5A', bg: 'var(--ts-ok-bg)', route: '/a/more/vendor-comms', perm: P.companyView }
           ]
         },
         {
@@ -486,12 +488,14 @@ export class ScanHistoryComponent implements OnDestroy {
 // ---------------------------------------------------------------- vendor notifications
 
 interface VendorEvent {
-  kind: 'booking' | 'approved' | 'returned';
+  kind: 'booking' | 'approved' | 'returned' | 'confirmed';
   at: Date;
   title: string;
   detail?: string | null;
   route?: string | null;
   query?: Record<string, string>;
+  /** Server notifications carry their own read time. */
+  readAt?: string | null;
 }
 
 const SEEN_KEY = 'vendor_notifications_seen';
@@ -533,6 +537,7 @@ const SEEN_KEY = 'vendor_notifications_seen';
 export class VendorNotificationsComponent implements OnInit {
   private readonly bookings = inject(BookingsApi);
   private readonly products = inject(ProductsApi);
+  private readonly comms = inject(VendorCommsApi);
   private readonly text = inject(StaffText);
   num = fmtNum;
   events: VendorEvent[] | null = null;
@@ -554,15 +559,29 @@ export class VendorNotificationsComponent implements OnInit {
     forkJoin({
       b: this.bookings.list(emptyQuery({ pageSize: 20 })).pipe(map((r) => r.page.data)),
       approved: this.products.approvals(2).pipe(map((p) => p.data), catchError(() => of([]))),
-      returned: this.products.approvals(3).pipe(map((p) => p.data), catchError(() => of([])))
+      returned: this.products.approvals(3).pipe(map((p) => p.data), catchError(() => of([]))),
+      // The server's "new confirmed booking" notifications (sent with the vendor's WhatsApp message)
+      confirmed: this.comms.myNotifications().pipe(map((p) => p.data), catchError(() => of([] as VendorMessageRow[])))
     }).subscribe({
-      next: ({ b, approved, returned }) => (this.events = this.build(b, approved, returned)),
+      next: ({ b, approved, returned, confirmed }) => (this.events = this.build(b, approved, returned, confirmed)),
       error: (e) => (this.error = e)
     });
   }
 
-  private build(bookings: BookingRow[], approved: any[], returned: any[]): VendorEvent[] {
-    const out: VendorEvent[] = bookings
+  private build(bookings: BookingRow[], approved: any[], returned: any[], confirmed: VendorMessageRow[] = []): VendorEvent[] {
+    const announced = new Set(confirmed.map((c) => c.bookingId));
+    const out: VendorEvent[] = confirmed.map((c) => ({
+      kind: 'confirmed' as const,
+      at: new Date(c.createDate),
+      title: c.bookingReference ? `#${c.bookingReference}` : '',
+      detail: [c.bookingReference ? `#${c.bookingReference}` : '', ...c.message.split('\n').filter((l) => /👤|📍|🗓️|👥|👶/.test(l))]
+        .filter(Boolean)
+        .join(' · '),
+      route: c.bookingId ? `/v/bookings/${c.bookingId}` : null,
+      readAt: c.readAt
+    }));
+    out.push(...bookings
+      .filter((b) => !announced.has(b.id))
       .filter((b) => b.createDate)
       .map((b) => ({
         kind: 'booking' as const,
@@ -570,7 +589,7 @@ export class VendorNotificationsComponent implements OnInit {
         title: b.items[0]?.name ?? b.reference,
         detail: `${b.customer?.name ?? ''} · ${b.items.reduce((n, i) => n + (i.adults ?? 0) + (i.childs ?? 0), 0)}`,
         route: `/v/bookings/${b.id}`
-      }));
+      })));
     for (const [kind, rows] of [
       ['approved', approved],
       ['returned', returned]
@@ -592,6 +611,7 @@ export class VendorNotificationsComponent implements OnInit {
   }
 
   isUnread(e: VendorEvent): boolean {
+    if (e.readAt) return false;
     return this.seen == null || e.at.getTime() > this.seen;
   }
 
@@ -600,6 +620,7 @@ export class VendorNotificationsComponent implements OnInit {
   }
 
   markAllRead(): void {
+    this.comms.markRead().subscribe({ error: () => {} });
     this.seen = Date.now();
     try {
       localStorage.setItem(SEEN_KEY, String(this.seen));
@@ -622,6 +643,7 @@ export class VendorNotificationsComponent implements OnInit {
   }
 
   look(e: VendorEvent): { icon: string; color: string; headline: string } {
+    if (e.kind === 'confirmed') return { icon: 'ti ti-circle-check', color: 'var(--ts-ok-fg)', headline: 'WEB.newConfirmedBooking' };
     return e.kind === 'booking'
       ? { icon: 'ti ti-calendar-event', color: 'var(--ts-amber, #f59f00)', headline: 'APP.eventNewBooking' }
       : e.kind === 'approved'

@@ -2398,3 +2398,42 @@ span.ts-cover__end {
 .ts-receipt--small {
   max-width: 360px;
 }
+
+// ---------- vendor communication ----------
+.ts-copy-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px 4px 10px;
+  border: 1px solid var(--ts-line);
+  border-radius: 10px;
+  background: var(--ts-subtle);
+}
+
+.ts-copy-row code {
+  flex: 1;
+  min-width: 0;
+  color: var(--ts-ink);
+  font-size: 12px;
+  direction: ltr;
+}
+
+.ts-message {
+  max-height: 220px;
+  margin: 0 0 8px;
+  padding: 10px;
+  overflow: auto;
+  border-radius: 10px;
+  background: var(--ts-subtle);
+  color: var(--ts-ink);
+  font-family: inherit;
+  font-size: 12.5px;
+  white-space: pre-wrap;
+}
+
+.ts-log-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin-bottom: 8px;
+}
