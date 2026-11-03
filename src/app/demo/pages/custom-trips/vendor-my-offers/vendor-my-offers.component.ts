@@ -202,6 +202,9 @@ export class VendorMyOffersComponent implements OnInit, OnDestroy {
   }
 
   loadOffers(event: TableLazyLoadEvent): void {
+    // Admins are sent to their own page in ngOnInit; the table still asks for its first page before that, and the
+    // server answers a non-vendor with 401, which the interceptor takes for an expired session
+    if (!this.configService.userRoles().some((role: string) => role.startsWith('Vendor.'))) return;
     this.isLoading = true;
     const pageSize = event.rows || 10;
     const pageIndex = Math.floor((event.first || 0) / pageSize) + 1;

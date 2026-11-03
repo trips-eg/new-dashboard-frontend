@@ -2643,6 +2643,13 @@ span.ts-cover__end {
   background: var(--ts-surface);
   min-width: 0;
 }
+/* On a phone the status drops under the vendor's name instead of squeezing it into a narrow column */
+.ts-rq-offer > .ts-person {
+  flex-wrap: wrap;
+}
+.ts-rq-offer > .ts-person > .ts-grow {
+  min-width: 140px;
+}
 .ts-rq-offer.is-best {
   border-color: var(--ts-ok-line);
   box-shadow: 0 0 0 3px var(--ts-ok-bg);
