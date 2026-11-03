@@ -1,0 +1,11 @@
+{
+  "name": "trips-dashboard-e2e",
+  "private": true,
+  "description": "Browser checks of the dashboard (Playwright). See README.md.",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1"
+  }
+}
