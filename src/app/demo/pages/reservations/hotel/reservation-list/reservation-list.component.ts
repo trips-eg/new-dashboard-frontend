@@ -1,3 +1,4 @@
+import { childAgesText } from 'src/app/shared/utils/child-ages';
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
@@ -45,6 +46,7 @@ enum PayMethod {
   styleUrl: './reservation-list.component.scss'
 })
 export class ReservationListComponent implements OnInit, OnDestroy {
+  childAges = childAgesText;
   imgUrl = environment.imgUrl;
   @ViewChild('dt') dt!: Table;
 

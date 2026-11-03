@@ -344,6 +344,7 @@
                       <div class="d-flex gap-2 justify-content-center">
                         <span class="badge bg-primary text-white px-2 py-1 rounded">Adults: {{ trip.countDetails?.adults || 0 }}</span>
                         <span class="badge bg-info text-white px-2 py-1 rounded">Childs: {{ trip.countDetails?.childs || 0 }}</span>
+                        <span *ngIf="childAges(trip)" class="badge bg-warning text-dark px-2 py-1 rounded">{{ 'Children Ages' | translate }}: {{ childAges(trip) }}</span>
                         <span class="badge bg-success text-white px-2 py-1 rounded font-bold">
                           Total: {{ trip.countDetails?.total || 0 }}
                         </span>
@@ -415,6 +416,7 @@
                       <div class="d-flex gap-2 justify-content-center">
                         <span class="badge bg-primary text-white px-2 py-1 rounded">Adults: {{ outing.countDetails?.adults || 0 }}</span>
                         <span class="badge bg-info text-white px-2 py-1 rounded">Childs: {{ outing.countDetails?.childs || 0 }}</span>
+                        <span *ngIf="childAges(outing)" class="badge bg-warning text-dark px-2 py-1 rounded">{{ 'Children Ages' | translate }}: {{ childAges(outing) }}</span>
                         <span class="badge bg-success text-white px-2 py-1 rounded font-bold">
                           Total: {{ outing.countDetails?.total || outing.numberOfSeats || outing.quantity || 0 }}
                         </span>
@@ -457,6 +459,7 @@
                       <div class="d-flex gap-2 justify-content-center">
                         <span class="badge bg-primary text-white px-2 py-1 rounded">Adults: {{ room.adults || 0 }}</span>
                         <span class="badge bg-info text-white px-2 py-1 rounded">Childs: {{ room.childs || 0 }}</span>
+                        <span *ngIf="childAges(room)" class="badge bg-warning text-dark px-2 py-1 rounded">{{ 'Children Ages' | translate }}: {{ childAges(room) }}</span>
                         <span class="badge bg-success text-white px-2 py-1 rounded font-bold">
                           Total: {{ (room.adults || 0) + (room.childs || 0) }}
                         </span>
@@ -499,6 +502,7 @@
                       <div class="d-flex gap-2 justify-content-center">
                         <span class="badge bg-primary text-white px-2 py-1 rounded">Adults: {{ hajj.countDetails?.adults || 0 }}</span>
                         <span class="badge bg-info text-white px-2 py-1 rounded">Childs: {{ hajj.countDetails?.childs || 0 }}</span>
+                        <span *ngIf="childAges(hajj)" class="badge bg-warning text-dark px-2 py-1 rounded">{{ 'Children Ages' | translate }}: {{ childAges(hajj) }}</span>
                         <span class="badge bg-success text-white px-2 py-1 rounded font-bold">
                           Total: {{ hajj.countDetails?.total || 0 }}
                         </span>

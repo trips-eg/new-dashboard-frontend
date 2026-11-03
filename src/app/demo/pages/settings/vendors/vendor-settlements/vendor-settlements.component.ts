@@ -1,3 +1,4 @@
+import { childAgesText } from 'src/app/shared/utils/child-ages';
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -53,6 +54,7 @@ export interface SettlementLedgerItem {
   styleUrl: './vendor-settlements.component.scss'
 })
 export class VendorSettlementsComponent implements OnInit {
+  childAges = childAgesText;
   @Input() companyId?: number;
 
   // View Navigation: 'dues' (Active Booking Settlements) vs 'history' (Wallet Payout Logs)

@@ -427,6 +427,9 @@
                   <span class="badge bg-info text-white px-2 py-1" *ngIf="item.countDetails.childs">
                     {{ 'Childs' | translate }}: {{ item.countDetails.childs }}
                   </span>
+                  <span class="badge bg-warning text-dark px-2 py-1" *ngIf="childAges(item)">
+                    {{ 'Children Ages' | translate }}: {{ childAges(item) }}
+                  </span>
                   <span class="badge bg-success text-white px-2 py-1 font-bold" *ngIf="item.countDetails.total">
                     {{ 'Total' | translate }}: {{ item.countDetails.total }}
                   </span>
