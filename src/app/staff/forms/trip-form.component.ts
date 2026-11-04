@@ -7,6 +7,7 @@ import { KIT, StaffText } from '../ui/kit';
 import { ChipBarComponent } from '../ui/lists';
 import { SwitchRowComponent } from '../ui/controls';
 import { StaffSession } from '../core/session';
+import { FilterOption } from '../core/query';
 import { fmtNum, parseDate } from '../core/format';
 import {
   ChildPolicy,
@@ -23,7 +24,8 @@ import {
   intOf,
   programStepFrom,
   programStepJson,
-  runFollowUps
+  runFollowUps,
+  jsonEach
 } from './form-kit';
 
 interface TripDateRow {
@@ -36,8 +38,8 @@ interface TripDateRow {
  * f-trip-1 … f-trip-4. Everything is kept in this screen and sent in one request at the end: POST AddTravel (or PUT
  * UpdateTravel with Id), multipart TripRequest. Periodic and daily trips create one trip per date, so the answer is a
  * list of ids, and the program, gathering points, booking rule and foreign price are saved for each of them.
- * UpdateTravel replaces accommodation types, features and pricing periods and maps Rating, PriceBefore, IsRecommended
- * and IsFake from the request; the form doesn't edit those, so on edit it sends back what it loaded.
+ * UpdateTravel replaces accommodation types, features and pricing periods, which the form edits with the price before
+ * discount; Rating, IsRecommended and IsFake are mapped from the request too, so on edit it sends back what it loaded.
  */
 @Component({
   selector: 'ts-trip-form',
@@ -85,6 +87,7 @@ interface TripDateRow {
             <ts-field [label]="'APP.adultPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [required]="true" [(value)]="f.price"></ts-field>
             <ts-field [label]="'APP.childPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [(value)]="f.childPrice"></ts-field>
           </div>
+          <ts-field [label]="'APP.priceBefore' | translate" [number]="true" [suffix]="'APP.egp' | translate" [hint]="'APP.priceBeforeHint' | translate" [(value)]="f.priceBefore"></ts-field>
           <div class="ts-two">
             <ts-field [label]="'APP.capacity' | translate" [number]="true" [required]="true" [(value)]="f.capacity"></ts-field>
             <ts-field [label]="'APP.numberOfDays' | translate" [number]="true" [required]="f.tripType === 2" [(value)]="f.days"></ts-field>
@@ -99,6 +102,17 @@ interface TripDateRow {
             </div>
           </div>
           <button type="button" class="btn btn-secondary" (click)="dates.push({ id: 0, start: null, end: null })"><i class="ti ti-plus"></i>{{ 'APP.addDate' | translate }}</button>
+        </ts-form-section>
+        <ts-form-section [title]="'APP.pricingPeriods' | translate" [subtitle]="'APP.pricingPeriodsHint' | translate" icon="ti ti-calendar-dollar" kind="money">
+          <div class="ts-row-box" *ngFor="let p of periods; let i = index">
+            <button type="button" class="ts-row-box__remove" (click)="periods.splice(i, 1)"><i class="ti ti-trash"></i></button>
+            <div class="ts-two">
+              <ts-date-field [label]="'APP.start' | translate" [required]="true" [(value)]="p.from"></ts-date-field>
+              <ts-date-field [label]="'APP.end' | translate" [required]="true" [(value)]="p.to"></ts-date-field>
+            </div>
+            <ts-field [label]="'APP.pricePerPerson' | translate" [number]="true" [suffix]="'APP.egp' | translate" [required]="true" [(value)]="p.price"></ts-field>
+          </div>
+          <button type="button" class="btn btn-secondary" (click)="periods.push({ id: 0, from: null, to: null, price: '' })"><i class="ti ti-plus"></i>{{ 'APP.addPeriod' | translate }}</button>
         </ts-form-section>
         <ts-form-section [title]="'APP.childPricing' | translate" [subtitle]="'APP.childPricingHint' | translate" icon="ti ti-mood-kid" kind="money">
           <ts-child-policies [(rows)]="children"></ts-child-policies>
@@ -121,6 +135,11 @@ interface TripDateRow {
             <ts-field [label]="'APP.paragraph' | translate" [lines]="3" [value]="d" (valueChange)="descriptions[i] = $event"></ts-field>
           </div>
           <button type="button" class="btn btn-secondary" (click)="descriptions.push('')"><i class="ti ti-plus"></i>{{ 'APP.addParagraph' | translate }}</button>
+        </ts-form-section>
+        <ts-form-section [title]="'APP.tripFeatures' | translate" [subtitle]="'APP.tripFeaturesHint' | translate" icon="ti ti-checklist" kind="general">
+          <ts-chipbar *ngIf="features" [wrap]="true" [items]="chips(features)" [selected]="featureKeys()" (tap)="toggleFeature(+$event)"></ts-chipbar>
+          <span class="ts-label">{{ 'APP.accommodationType' | translate }}</span>
+          <ts-chipbar *ngIf="accommodations" [wrap]="true" [items]="chips(accommodations)" [selected]="accId ? [accId] : []" (tap)="accId = accId === $event ? null : $event"></ts-chipbar>
         </ts-form-section>
         <ts-form-section [title]="'APP.images' | translate" [subtitle]="'APP.imagesHint' | translate" icon="ti ti-photo" kind="media">
           <ts-images-field [(files)]="images" [existing]="existingImages" (removeExisting)="removeImage($event)"></ts-images-field>
@@ -170,6 +189,7 @@ export class TripFormComponent implements OnInit {
     address: '',
     price: '',
     childPrice: '',
+    priceBefore: '',
     capacity: '',
     days: '',
     deposit: '',
@@ -193,6 +213,12 @@ export class TripFormComponent implements OnInit {
   private existingImageIds: number[] = [];
   private removedImageIds: number[] = [];
   program: ProgramStep[] = [];
+  /** What the trip includes (TravelFeature) and its accommodation type, as the old dashboard sent them. */
+  features: FilterOption[] | null = null;
+  featureIds = new Set<number>();
+  accommodations: FilterOption[] | null = null;
+  accId: string | null = null;
+  periods: { id: number; from: Date | null; to: Date | null; price: string }[] = [];
   private originalStepIds = new Set<number>();
   /** Loaded on edit and sent back unchanged (see the class comment). */
   private kept: Record<string, unknown> = {};
@@ -214,7 +240,22 @@ export class TripFormComponent implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.queryParams['id'];
     this.id = id ? +id : null;
+    this.api.lookupGet('/api/TravelFeature/GetAll').subscribe({ next: (r) => (this.features = r), error: () => (this.features = []) });
+    this.api.lookupGet('/api/AccommodationType/GetAllAccommodationTypes').subscribe({ next: (r) => (this.accommodations = r), error: () => (this.accommodations = []) });
     if (this.id) this.load();
+  }
+
+  chips(options: FilterOption[]) {
+    return options.map((o) => ({ key: o.value, label: o.labelAr }));
+  }
+
+  featureKeys(): string[] {
+    return [...this.featureIds].map(String);
+  }
+
+  toggleFeature(id: number): void {
+    this.featureIds.has(id) ? this.featureIds.delete(id) : this.featureIds.add(id);
+    this.featureIds = new Set(this.featureIds);
   }
 
   load(): void {
@@ -257,20 +298,17 @@ export class TripFormComponent implements OnInit {
         f.active = d.isActive ?? true;
         this.program = (d.segments ?? []).map(programStepFrom);
         this.originalStepIds = new Set(this.program.map((s) => s.id));
-        this.kept = {
-          Rating: d.rating ?? null,
-          PriceBefore: d.priceBefore ?? null,
-          IsRecommended: !!d.isRecommended,
-          IsFake: !!d.isFake,
-          AccommodationTypeIds: (d.accommodationTypes ?? []).map((x: any) => x.id),
-          Features: (d.features ?? []).map((x: any) => x.id),
-          TripPricingPeriods: (d.tripPricingPeriods ?? []).map((x: any) => ({
-            Id: x.id,
-            FromDate: parseDate(x.fromDate),
-            ToDate: parseDate(x.toDate),
-            PricePerPerson: x.pricePerPerson
-          }))
-        };
+        f.priceBefore = d.priceBefore == null ? '' : fmtNum(d.priceBefore);
+        this.featureIds = new Set((d.features ?? []).map((x: any) => x.id));
+        const acc = (d.accommodationTypes ?? [])[0]?.id ?? d.accommodationTypeId;
+        this.accId = acc == null ? null : String(acc);
+        this.periods = (d.tripPricingPeriods ?? []).map((x: any) => ({
+          id: x.id ?? 0,
+          from: parseDate(x.fromDate),
+          to: parseDate(x.toDate),
+          price: x.pricePerPerson == null ? '' : fmtNum(x.pricePerPerson)
+        }));
+        this.kept = { Rating: d.rating ?? null, IsRecommended: !!d.isRecommended, IsFake: !!d.isFake };
         this.loading = false;
       },
       error: (e) => {
@@ -299,6 +337,7 @@ export class TripFormComponent implements OnInit {
         if (!this.dates.length || this.dates.some((d) => !d.start)) return 'APP.datesRequired';
         if (f.tripType !== 3 && this.dates.some((d) => !d.end || d.end < d.start!)) return 'APP.endDateRequired';
         if (f.tripType === 2 && (intOf(f.days) ?? 0) <= 0) return 'APP.daysRequired';
+        if (this.periods.some((p) => !p.from || !p.to || p.to < p.from || amountOf(p.price) == null)) return 'APP.periodInvalid';
         return childPolicyError(this.children);
       case 2:
         if (this.descriptions.every((d) => !d.trim())) return 'APP.descriptionRequired';
@@ -338,16 +377,23 @@ export class TripFormComponent implements OnInit {
       ...(!this.vendor ? { VendorId: f.vendor?.id } : {}),
       Price: amountOf(f.price),
       ChildPrice: amountOf(f.childPrice),
+      PriceBefore: amountOf(f.priceBefore),
+      Features: [...this.featureIds],
+      // TripRequest reads this list under the singular name ([FromForm(Name = "AccommodationTypeId")])
+      AccommodationTypeId: this.accId ? [+this.accId] : [],
+      TripPricingPeriods: jsonEach(
+        this.periods.map((p) => ({ Id: p.id ?? 0, FromDate: p.from, ToDate: p.to, PricePerPerson: amountOf(p.price) }))
+      ),
       Capacity: intOf(f.capacity),
       NumberOfDays: days,
-      TripDates: this.dates.map((d) => ({ Id: d.id, StartDate: d.start, EndDate: f.tripType === 3 ? null : d.end })),
+      TripDates: jsonEach(this.dates.map((d) => ({ Id: d.id ?? 0, StartDate: d.start, EndDate: f.tripType === 3 ? null : d.end }))),
       depositRate: amountOf(f.deposit),
       IsAllowPaymentUponArrival: f.payOnArrival,
       IsRefundable: f.refundable,
       MinimumDaysToRefund: f.refundable ? intOf(f.refundDays) : null,
       CancellationPolicy: f.policy.trim(),
-      ChildPricingPolicies: this.children.map(childPolicyJson),
-      Descriptions: this.descriptions.filter((d) => d.trim()).map((d) => ({ Description: d.trim() })),
+      ChildPricingPolicies: jsonEach(this.children.map(childPolicyJson)),
+      Descriptions: jsonEach(this.descriptions.filter((d) => d.trim()).map((d) => ({ Description: d.trim() }))),
       ImagesFiles: this.images,
       IsIncludeVate: f.vat,
       ExternalLink: f.link.trim(),

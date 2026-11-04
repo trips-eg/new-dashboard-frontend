@@ -475,7 +475,7 @@ export class LookupListComponent implements OnInit, OnDestroy {
   }
 
   img(x: any): string | null {
-    return mediaUrl(x.imageUrl ?? x.image ?? x.logoUrl);
+    return mediaUrl(x.imageUrl || x.image || x.logoUrl);
   }
 
   titleOf(x: any): string {

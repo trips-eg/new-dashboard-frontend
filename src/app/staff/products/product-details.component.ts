@@ -211,7 +211,8 @@ export class ProductDetailsComponent implements OnInit {
   get image(): string | null {
     const d = this.d;
     const images = d?.images ?? [];
-    return mediaUrl(d?.imageUrl ?? images[0]?.imageUrl ?? images[0]?.url ?? null);
+    // || not ??: outings keep imageUrl as "" and their pictures in images[], so ?? stopped at the empty string
+    return mediaUrl(d?.imageUrl || images[0]?.imageUrl || images[0]?.url || null);
   }
 
   get vendorName(): string | null {

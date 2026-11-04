@@ -2583,7 +2583,16 @@
     "travelCommission": "Travel commission",
     "travelCommissionRate": "Travel commission rate",
     "usedCoupons": "Used coupons",
-    "usedOn": "Used {{n}}"
+    "usedOn": "Used {{n}}",
+    "priceBefore": "Price before discount",
+    "priceBeforeHint": "Optional: shown struck through next to the price",
+    "tripFeatures": "The trip includes",
+    "tripFeaturesHint": "Transport, a tour guide, the stay and so on",
+    "accommodationType": "Accommodation type",
+    "pricingPeriods": "Pricing periods",
+    "pricingPeriodsHint": "A different price per person in certain periods of the year",
+    "addPeriod": "Pricing period",
+    "periodInvalid": "Each pricing period needs a start, an end after it and a price."
   },
   "WEB": {
     "svNewThisMonth": "New visitors this month",

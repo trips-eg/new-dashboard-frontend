@@ -2619,7 +2619,16 @@
     "travelCommission": "عمولة الرحلات",
     "travelCommissionRate": "نسبة عمولة الرحلات",
     "usedCoupons": "الكوبونات المستخدمة",
-    "usedOn": "استُخدم {{n}}"
+    "usedOn": "استُخدم {{n}}",
+    "priceBefore": "السعر قبل الخصم",
+    "priceBeforeHint": "اختياري: بيظهر للعميل مشطوب جنب السعر",
+    "tripFeatures": "الرحلة تشمل",
+    "tripFeaturesHint": "زي التنقلات والمرشد السياحي والإقامة",
+    "accommodationType": "نوع الإقامة",
+    "pricingPeriods": "فترات التسعير",
+    "pricingPeriodsHint": "سعر مختلف للفرد في فترات معينة من السنة",
+    "addPeriod": "فترة تسعير",
+    "periodInvalid": "كل فترة تسعير محتاجة تاريخ بداية ونهاية وسعر، والنهاية بعد البداية."
   },
   "WEB": {
     "svNewThisMonth": "زوار جداد الشهر ده",

@@ -6,6 +6,8 @@ import { catchError, firstValueFrom, of } from 'rxjs';
 import { KIT, StaffText } from '../ui/kit';
 import { PillSwitchComponent, SwitchRowComponent } from '../ui/controls';
 import { StaffSession } from '../core/session';
+import { FilterOption } from '../core/query';
+import { ChipBarComponent } from '../ui/lists';
 import { fmtNum, parseAmount, parseDate } from '../core/format';
 import {
   ChildPolicy,
@@ -20,7 +22,8 @@ import {
   formDate,
   intOf,
   programStepJson,
-  runFollowUps
+  runFollowUps,
+  jsonEach
 } from './form-kit';
 
 /** A room type of a package (HajjTicketRequest), with its own foreign price and limits (staff tables, type 6). */
@@ -117,7 +120,7 @@ interface HajjGroup {
 @Component({
   selector: 'ts-hajj-form',
   standalone: true,
-  imports: [CommonModule, TranslateModule, ...KIT, ...FORM_KIT, PillSwitchComponent, SwitchRowComponent, RoomsEditorComponent],
+  imports: [CommonModule, TranslateModule, ...KIT, ...FORM_KIT, PillSwitchComponent, SwitchRowComponent, RoomsEditorComponent, ChipBarComponent],
   template: `
     <ts-step-scaffold [title]="'APP.newPackage' | translate" [steps]="steps" [current]="step" [busy]="busy" (back)="step = step - 1" (next)="next()" (jump)="jump($event)">
       <!-- 1: data, groups, points -->
@@ -166,6 +169,7 @@ interface HajjGroup {
             <ts-field [label]="'APP.startingPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [required]="true" [(value)]="f.price"></ts-field>
             <ts-field [label]="'APP.childPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [(value)]="f.childPrice"></ts-field>
           </div>
+          <ts-field [label]="'APP.priceBefore' | translate" [number]="true" [suffix]="'APP.egp' | translate" [hint]="'APP.priceBeforeHint' | translate" [(value)]="f.priceBefore"></ts-field>
           <ts-field [label]="'APP.capacity' | translate" [number]="true" [required]="true" [(value)]="f.capacity"></ts-field>
         </ts-form-section>
         <ts-form-section [title]="'APP.childPricing' | translate" [subtitle]="'APP.childPricingHint' | translate" icon="ti ti-mood-kid" kind="money">
@@ -192,6 +196,11 @@ interface HajjGroup {
             <ts-field [label]="'APP.paragraph' | translate" [lines]="3" [value]="d" (valueChange)="descriptions[i] = $event"></ts-field>
           </div>
           <button type="button" class="btn btn-secondary" (click)="descriptions.push('')"><i class="ti ti-plus"></i>{{ 'APP.addParagraph' | translate }}</button>
+        </ts-form-section>
+        <ts-form-section [title]="'APP.tripFeatures' | translate" [subtitle]="'APP.tripFeaturesHint' | translate" icon="ti ti-checklist" kind="general">
+          <ts-chipbar *ngIf="features" [wrap]="true" [items]="chips(features)" [selected]="featureKeys()" (tap)="toggleFeature(+$event)"></ts-chipbar>
+          <span class="ts-label">{{ 'APP.accommodationType' | translate }}</span>
+          <ts-chipbar *ngIf="accommodations" [wrap]="true" [items]="chips(accommodations)" [selected]="accId ? [accId] : []" (tap)="accId = accId === $event ? null : $event"></ts-chipbar>
         </ts-form-section>
         <ts-form-section [title]="'APP.images' | translate" [subtitle]="'APP.imagesHint' | translate" icon="ti ti-photo" kind="media">
           <ts-images-field [(files)]="images"></ts-images-field>
@@ -237,6 +246,7 @@ export class HajjFormComponent {
     vendor: null as Picked | null,
     price: '',
     childPrice: '',
+    priceBefore: '',
     capacity: '',
     deposit: '',
     refundDays: '',
@@ -256,6 +266,29 @@ export class HajjFormComponent {
   images: File[] = [];
   program: ProgramStep[] = [];
   rooms: HajjRoom[] = [newRoom()];
+  /** What the package includes (TravelFeature, as the old form) and its accommodation type. */
+  features: FilterOption[] | null = null;
+  featureIds = new Set<number>();
+  accommodations: FilterOption[] | null = null;
+  accId: string | null = null;
+
+  constructor() {
+    this.api.lookupGet('/api/TravelFeature/GetAll').subscribe({ next: (r) => (this.features = r), error: () => (this.features = []) });
+    this.api.lookupGet('/api/AccommodationType/GetAllAccommodationTypes').subscribe({ next: (r) => (this.accommodations = r), error: () => (this.accommodations = []) });
+  }
+
+  chips(options: FilterOption[]) {
+    return options.map((o) => ({ key: o.value, label: o.labelAr }));
+  }
+
+  featureKeys(): string[] {
+    return [...this.featureIds].map(String);
+  }
+
+  toggleFeature(id: number): void {
+    this.featureIds.has(id) ? this.featureIds.delete(id) : this.featureIds.add(id);
+    this.featureIds = new Set(this.featureIds);
+  }
 
   readonly kinds = [
     { key: '2', label: this.text.tr('APP.umrah') },
@@ -333,7 +366,7 @@ export class HajjFormComponent {
           HajjCategoryId: f.category?.id ?? null,
           StartDate: starts[0],
           EndDate: end,
-          Dates: starts.map((s) => ({ StartDate: s })),
+          Dates: jsonEach(starts.map((s) => ({ StartDate: s }))),
           NumberOfDays: days,
           DaysInMakkah: intOf(f.makkah) ?? 0,
           DaysInMadinah: intOf(f.madinah) ?? 0,
@@ -348,6 +381,10 @@ export class HajjFormComponent {
           ...(!this.vendor ? { VendorId: f.vendor?.id, IsRecommended: f.recommended } : {}),
           Price: amountOf(f.price),
           ChildPrice: amountOf(f.childPrice),
+          PriceBefore: amountOf(f.priceBefore),
+          Features: [...this.featureIds],
+          // HajjRequest reads this list under the singular name ([FromForm(Name = "AccommodationTypeId")])
+          AccommodationTypeId: this.accId ? [+this.accId] : [],
           Capacity: intOf(f.capacity),
           DepositType: amountOf(f.deposit) == null ? null : f.depositType,
           depositRate: amountOf(f.deposit),
@@ -357,8 +394,8 @@ export class HajjFormComponent {
           CancellationPolicy: f.policy.trim(),
           IsIncludeVate: f.vat,
           IsActive: f.active,
-          ChildPricingPolicies: this.children.map(childPolicyJson),
-          Descriptions: this.descriptions.filter((d) => d.trim()).map((d) => ({ Description: d.trim() })),
+          ChildPricingPolicies: jsonEach(this.children.map(childPolicyJson)),
+          Descriptions: jsonEach(this.descriptions.filter((d) => d.trim()).map((d) => ({ Description: d.trim() }))),
           ImagesFiles: this.images,
           Tickets: this.rooms.map(roomJson)
         })

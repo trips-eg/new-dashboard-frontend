@@ -17,14 +17,36 @@ export function formDate(d: Date): string {
 }
 
 /**
+ * A list read by the API's JsonModelBinder (TripRequest.TripDates, Descriptions, ChildPricingPolicies, TripPricingPeriods;
+ * HajjRequest.Dates, Descriptions, ChildPricingPolicies): each item goes as JSON text under the same key, the way the
+ * old dashboard sent it. Sent as `TripDates[0].StartDate` instead, the binder reads an empty list and the API refuses
+ * the trip with "Invalid Data".
+ */
+export class JsonEach {
+  constructor(readonly items: unknown[]) {}
+}
+
+export const jsonEach = (items: unknown[]) => new JsonEach(items);
+
+/** Dates as formDate (local time, no offset) inside the JSON, as JSON.stringify would otherwise shift them to UTC. */
+function jsonPlain(v: unknown): unknown {
+  if (v instanceof Date) return formDate(v);
+  if (Array.isArray(v)) return v.map(jsonPlain);
+  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v as Record<string, unknown>).map(([k, x]) => [k, jsonPlain(x)]));
+  return v;
+}
+
+/**
  * Turns a nested object into the multipart keys ASP.NET's [FromForm] binder reads: `Descriptions[0].Description`,
- * `TripDates[1].StartDate`, `AccommodationTypeIds[0]`, and the same key repeated for a list of files (`ImagesFiles`).
+ * `TripDates[1].StartDate`, `AccommodationTypeIds[0]`, and the same key repeated for a list of files (`ImagesFiles`)
+ * or for each item of a JsonEach list.
  */
 export function toForm(body: Record<string, unknown>): FormData {
   const form = new FormData();
   const walk = (key: string, v: unknown): void => {
     if (v === null || v === undefined) return;
-    if (v instanceof File) form.append(key, v, v.name);
+    if (v instanceof JsonEach) v.items.forEach((x) => form.append(key, JSON.stringify(jsonPlain(x))));
+    else if (v instanceof File) form.append(key, v, v.name);
     else if (v instanceof Date) form.append(key, formDate(v));
     else if (Array.isArray(v)) v.forEach((x, i) => walk(x instanceof File ? key : `${key}[${i}]`, x));
     else if (typeof v === 'object') Object.entries(v as Record<string, unknown>).forEach(([k, x]) => walk(key ? `${key}.${k}` : k, x));
@@ -113,6 +135,19 @@ export class FormsApi {
         shareReplay(1)
       );
       this.lookups.set(path, o);
+    }
+    return o;
+  }
+
+  /** The same for the lists the API answers to a GET: TravelFeature/GetAll, AccommodationType/GetAllAccommodationTypes. */
+  lookupGet(path: string): Observable<FilterOption[]> {
+    let o = this.lookups.get('GET ' + path);
+    if (!o) {
+      o = this.http.get<any>(path).pipe(
+        map((d) => (Array.isArray(d) ? d : (d?.data ?? [])).map((e: any) => ({ value: String(e.id), labelAr: (e.name ?? '').trim() }))),
+        shareReplay(1)
+      );
+      this.lookups.set('GET ' + path, o);
     }
     return o;
   }

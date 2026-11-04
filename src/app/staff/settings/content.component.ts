@@ -640,6 +640,11 @@ export class CouponFormComponent {
       outingIds: this.idsOf('outing'),
       hajjIds: this.idsOf('hajj'),
       usersId: [],
+      // Coupons.BuyQuantity / GetQuantity / MaxFreeQuantity are NOT NULL (default 0) while the API model has them
+      // nullable, so leaving them out makes the insert fail ("unexpected error"); 0 means "not a buy X get Y offer"
+      buyQuantity: 0,
+      getQuantity: 0,
+      maxFreeQuantity: 0,
       ...this.seg,
       sendViaNotification: f.notify,
       sendViaEmail: f.email

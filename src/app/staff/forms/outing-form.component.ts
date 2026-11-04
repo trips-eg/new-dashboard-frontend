@@ -113,6 +113,7 @@ const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
       <ng-container *ngIf="step === 1">
         <ts-form-section [title]="'APP.priceDisplay' | translate" icon="ti ti-tag" kind="money">
           <ts-field [label]="'APP.savingsRatio' | translate" [number]="true" suffix="%" [hint]="'APP.optional' | translate" [(value)]="f.savings"></ts-field>
+          <ts-field [label]="'APP.priceBefore' | translate" [number]="true" [suffix]="'APP.egp' | translate" [hint]="'APP.priceBeforeHint' | translate" [(value)]="f.priceBefore"></ts-field>
         </ts-form-section>
         <ts-form-section [title]="'APP.paymentAndRefund' | translate" icon="ti ti-wallet" kind="money">
           <ts-field [label]="'APP.depositRate' | translate" [number]="true" suffix="%" [hint]="'APP.optional' | translate" [(value)]="f.deposit"></ts-field>
@@ -310,6 +311,7 @@ export class OutingFormComponent implements OnInit {
     category: null as Picked | null,
     vendor: null as Picked | null,
     savings: '',
+    priceBefore: '',
     deposit: '',
     refundable: false,
     refundDays: '',
@@ -380,6 +382,7 @@ export class OutingFormComponent implements OnInit {
         if (d.outingCategoryId != null) f.category = { id: String(d.outingCategoryId), name: d.outingCategoryName ?? '' };
         if (d.vendorId != null) f.vendor = { id: String(d.vendorId), name: d.vendorName ?? '' };
         f.savings = d.savingsRatio == null ? '' : fmtNum(d.savingsRatio);
+        f.priceBefore = d.priceBefore == null ? '' : fmtNum(d.priceBefore);
         f.deposit = d.depositRate == null ? '' : fmtNum(d.depositRate);
         f.refundable = !!d.isRefundable;
         f.refundDays = d.minimumDaysToRefund == null ? '' : String(d.minimumDaysToRefund);
@@ -567,6 +570,7 @@ export class OutingFormComponent implements OnInit {
       // Created hidden: it is published from the review step once tickets and schedules exist
       IsActive: this.outingId == null ? false : this.active,
       SavingsRatio: amountOf(f.savings),
+      PriceBefore: amountOf(f.priceBefore),
       depositRate: amountOf(f.deposit),
       IsRefundable: f.refundable,
       MinimumDaysToRefund: f.refundable ? intOf(f.refundDays) : null,
