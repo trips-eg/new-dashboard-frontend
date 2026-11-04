@@ -6,6 +6,7 @@ import { Observable, catchError, firstValueFrom, forkJoin, map, of, switchMap } 
 import { KIT, StaffText } from '../ui/kit';
 import { FilterDrawerComponent, LISTS } from '../ui/lists';
 import { SwitchRowComponent } from '../ui/controls';
+import { StaffDialogs } from '../ui/dialogs';
 import { StaffHttp } from '../core/staff-http';
 import { FilterCondition, FilterSchema, FiltersApi, ListResult, PagedList, asPage, emptyQuery, queryJson, StaffQuery } from '../core/query';
 import { P, StaffSession } from '../core/session';
@@ -61,14 +62,24 @@ export class CustomersApi {
   }
 
   /** The customer's file: the user, then their counts, wallet and adjustments (each may fail on its own). */
+  /** PUT /api/Customers/UpdateCustomerStatus/ (CustomerUpdateDto): IActive false blocks the customer, true lets them back in. */
+  setActive(id: number, active: boolean): Observable<unknown> {
+    return this.http.put('/api/Customers/UpdateCustomerStatus/', { id, iActive: active });
+  }
+
   file(id: number): Observable<{ user: any; counts: any; wallet: any; adjustments: any[] }> {
     return this.user(id).pipe(
       switchMap((user) =>
         forkJoin({
           counts: this.counts(id).pipe(catchError(() => of(null))),
           wallet: this.wallet(id).pipe(catchError(() => of(null))),
-          adjustments: this.adjustments(id).pipe(catchError(() => of([])))
-        }).pipe(map((rest) => ({ user, ...rest })))
+          adjustments: this.adjustments(id).pipe(catchError(() => of([]))),
+          // GetUserInfoById has no IActive; GetCustomerById has it (false = blocked)
+          active: this.http.raw<any>('GET', '/api/Customers/GetCustomerById/', undefined, { id }).pipe(
+            map((j) => (j?.data ?? j)?.iActive ?? null),
+            catchError(() => of(null))
+          )
+        }).pipe(map(({ active, ...rest }) => ({ user: active == null ? user : { ...user, iActive: active }, ...rest })))
       )
     );
   }
@@ -149,6 +160,12 @@ export class CustomersComponent implements OnInit, OnDestroy {
               <p class="ts-muted ts-num" *ngIf="phone">{{ phone }}</p>
             </div>
             <a *ngIf="f.wallet?.phone" class="ts-icon-btn ts-icon-btn--outline" [href]="'tel:' + f.wallet.phone" [title]="'WEB.call' | translate"><i class="ti ti-phone"></i></a>
+          </div>
+          <div class="ts-spread" style="margin-top: 12px">
+            <ts-pill [tone]="blocked ? 'danger' : 'ok'">{{ (blocked ? 'APP.blocked' : 'APP.active') | translate }}</ts-pill>
+            <button *ngIf="canBlock" type="button" class="btn" [class.btn-danger]="!blocked" [class.btn-secondary]="blocked" [disabled]="busy" (click)="toggleBlock()">
+              <i class="ti ti-ban"></i>{{ (blocked ? 'APP.unblock' : 'APP.block') | translate }}
+            </button>
           </div>
         </ts-card>
 
@@ -235,6 +252,7 @@ export class CustomersComponent implements OnInit, OnDestroy {
 })
 export class CustomerComponent implements OnInit {
   private readonly api = inject(CustomersApi);
+  private readonly dialogs = inject(StaffDialogs);
   private readonly route = inject(ActivatedRoute);
   private readonly session = inject(StaffSession);
   private readonly text = inject(StaffText);
@@ -252,6 +270,37 @@ export class CustomerComponent implements OnInit {
 
   get canAdjust(): boolean {
     return this.session.can(P.walletEdit);
+  }
+
+  get canBlock(): boolean {
+    return this.session.can(P.customersEdit);
+  }
+
+  /** User.IActive: false means blocked (UpdateCustomerStatus). */
+  get blocked(): boolean {
+    return this.f?.user?.iActive === false || this.f?.user?.isActive === false;
+  }
+
+  busy = false;
+
+  async toggleBlock(): Promise<void> {
+    const block = !this.blocked;
+    const ok = await this.dialogs.confirm({
+      title: this.text.tr(block ? 'APP.block' : 'APP.unblock'),
+      message: this.text.tr(block ? 'APP.blockCustomerQ' : 'APP.unblockCustomerQ'),
+      confirm: this.text.tr(block ? 'APP.block' : 'APP.unblock')
+    });
+    if (!ok) return;
+    this.busy = true;
+    try {
+      await firstValueFrom(this.api.setActive(this.id, !block));
+      this.f!.user = { ...this.f!.user, iActive: !block, isActive: !block };
+      this.text.showDone(this.text.tr('APP.saved'));
+    } catch (e) {
+      this.text.showError(e);
+    } finally {
+      this.busy = false;
+    }
   }
 
   get name(): string {

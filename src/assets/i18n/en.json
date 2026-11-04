@@ -2592,7 +2592,16 @@
     "pricingPeriods": "Pricing periods",
     "pricingPeriodsHint": "A different price per person in certain periods of the year",
     "addPeriod": "Pricing period",
-    "periodInvalid": "Each pricing period needs a start, an end after it and a price."
+    "periodInvalid": "Each pricing period needs a start, an end after it and a price.",
+    "vendorPapers": "Logo and papers",
+    "vendorLogo": "Logo",
+    "taxCardLicence": "Tax card and licence",
+    "commercialRegister": "Commercial register",
+    "papersAddHint": "New pictures are added to the ones already saved",
+    "blockCustomerQ": "The customer will not be able to sign in or book until unblocked. Continue?",
+    "unblockCustomerQ": "The customer will be able to sign in and book again. Continue?",
+    "deleteVendor": "Delete vendor",
+    "deleteVendorQ": "The vendor leaves the list, and its products and bookings may disappear from the lists too. To stop it only, block it instead. Delete it?"
   },
   "WEB": {
     "svNewThisMonth": "New visitors this month",

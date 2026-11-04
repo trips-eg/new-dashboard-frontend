@@ -785,6 +785,7 @@ export class ContractsComponent implements OnDestroy {
       <ts-field [label]="'APP.password' | translate" type="password" [required]="!editing" [hint]="editing ? ('APP.keepPasswordHint' | translate) : null" [(value)]="f.pass"></ts-field>
       <p class="ts-label">{{ 'APP.role' | translate }}</p>
       <ts-chipbar [wrap]="true" [items]="roleChips" [selected]="picked" (tap)="toggleRole($event)"></ts-chipbar>
+      <ts-option-field *ngIf="!editing && needsVendor" [label]="'APP.vendor' | translate" source="vendors" [required]="true" [(value)]="vendor"></ts-option-field>
       <div sheet-foot><button type="button" class="btn btn-primary ts-wide-btn" [disabled]="busy" (click)="save()">{{ 'APP.save' | translate }}</button></div>
     </ts-sheet>
   `
@@ -800,6 +801,13 @@ export class UsersComponent implements OnDestroy {
   f = { first: '', last: '', user: '', email: '', pass: '' };
   roleChips: { key: string; label: string }[] = [];
   picked: string[] = [];
+  /** Role name → RoleType (1 admin, 2 vendor, 4 scanner). A vendor or scanner account belongs to a company. */
+  private roleTypes = new Map<string, number>();
+  vendor: Picked | null = null;
+
+  get needsVendor(): boolean {
+    return this.picked.some((r) => (this.roleTypes.get(r) ?? 1) !== 1);
+  }
 
   get canCreate(): boolean {
     return this.session.can(P.usersCreate);
@@ -823,9 +831,13 @@ export class UsersComponent implements OnDestroy {
     this.editing = u;
     this.f = { first: u?.firstName ?? '', last: u?.lastName ?? '', user: u?.username ?? u?.userName ?? '', email: u?.email ?? '', pass: '' };
     this.picked = u ? (u.roles ?? []).map((r: any) => r.name).filter(Boolean) : [];
+    this.vendor = null;
     try {
       const page = await firstValueFrom(this.api.pageOf('/api/Users/GetAllRoles/', { get: true }));
-      this.roleChips = page.data.filter((r) => r.roleType === 1).map((r) => ({ key: r.name, label: r.name }));
+      // Every role, admin first: a vendor's or a scanner's account is made here too, with its company
+      const roles = [...page.data].sort((a, b) => (a.roleType ?? 9) - (b.roleType ?? 9));
+      this.roleTypes = new Map(roles.map((r) => [r.name, r.roleType]));
+      this.roleChips = roles.map((r) => ({ key: r.name, label: r.name }));
     } catch {
       this.roleChips = [];
     }
@@ -839,6 +851,7 @@ export class UsersComponent implements OnDestroy {
   async save(): Promise<void> {
     const f = this.f;
     if (!f.first.trim() || !f.user.trim() || (!this.editing && !f.pass)) return this.text.showError(this.text.tr('APP.fillRequired'));
+    if (!this.editing && this.needsVendor && !this.vendor) return this.text.showError(this.text.tr('APP.chooseVendor'));
     this.busy = true;
     try {
       if (this.editing) {
@@ -863,7 +876,16 @@ export class UsersComponent implements OnDestroy {
           this.api.send(
             'POST',
             '/api/Users/CreateUser/',
-            toForm({ FirstName: f.first.trim(), LastName: f.last.trim(), Username: f.user.trim(), Email: f.email.trim(), Password: f.pass, Gender: 1, Roles: this.picked })
+            toForm({
+              FirstName: f.first.trim(),
+              LastName: f.last.trim(),
+              Username: f.user.trim(),
+              Email: f.email.trim(),
+              Password: f.pass,
+              Gender: 1,
+              Roles: this.picked,
+              ...(this.needsVendor && this.vendor ? { CompanyId: +this.vendor.id } : {})
+            })
           )
         );
       }

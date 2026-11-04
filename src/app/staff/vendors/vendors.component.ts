@@ -28,6 +28,10 @@ export class VendorsApi {
     return this.http.get('/api/Company/GetCompanyById/', { id });
   }
 
+  remove(id: number): Observable<unknown> {
+    return this.http.raw('DELETE', '/api/Company/DeleteCompany/', undefined, { id });
+  }
+
   /** GET /api/Companies/BlockUnBlockCompany/?id= toggles the block. */
   toggleBlock(id: number): Observable<unknown> {
     return this.http.get('/api/Companies/BlockUnBlockCompany/', { id });
@@ -176,12 +180,16 @@ export class VendorsComponent implements OnDestroy {
         <button *ngIf="canEdit" type="button" class="btn ts-wide-btn" [class.btn-outline-danger]="!c.isBlocked" [class.btn-secondary]="c.isBlocked" (click)="toggleBlock()" style="margin-top: 10px">
           <i class="ti ti-ban"></i>{{ (c.isBlocked ? 'APP.unblock' : 'APP.block') | translate }}
         </button>
+        <button *ngIf="canDelete" type="button" class="btn btn-outline-danger ts-wide-btn" (click)="remove()" style="margin-top: 10px">
+          <i class="ti ti-trash"></i>{{ 'APP.deleteVendor' | translate }}
+        </button>
       </ng-container>
     </div>
   `
 })
 export class VendorComponent implements OnInit {
   private readonly api = inject(VendorsApi);
+  private readonly router = inject(Router);
   private readonly analytics = inject(StaffAnalyticsService);
   private readonly route = inject(ActivatedRoute);
   private readonly session = inject(StaffSession);
@@ -200,9 +208,31 @@ export class VendorComponent implements OnInit {
     return this.session.can(P.companyEdit);
   }
 
+  get canDelete(): boolean {
+    return this.session.can(P.companyDelete);
+  }
+
   ngOnInit(): void {
     this.id = +this.route.snapshot.paramMap.get('id')!;
     this.load();
+  }
+
+  /** DELETE /api/Company/DeleteCompany/?id= marks the company deleted; its products and users are left as they are. */
+  async remove(): Promise<void> {
+    const ok = await this.dialogs.confirm({
+      title: this.text.tr('APP.deleteVendor'),
+      message: this.text.tr('APP.deleteVendorQ'),
+      confirm: this.text.tr('APP.deleteVendor'),
+      danger: true
+    });
+    if (!ok) return;
+    this.api.remove(this.id).subscribe({
+      next: () => {
+        this.text.showDone(this.text.tr('APP.saved'));
+        this.router.navigate(['/a/more/vendors'], { replaceUrl: true });
+      },
+      error: (e) => this.text.showError(e)
+    });
   }
 
   load(): void {
@@ -279,6 +309,14 @@ const MODULE_LABEL: Record<(typeof MODULE_KEYS)[number], string> = { Travel: 'AP
           </ng-container>
           <ts-switch-row [title]="'APP.customTrips' | translate" [(value)]="customTrips"></ts-switch-row>
         </ts-form-section>
+        <ts-form-section [title]="'APP.vendorPapers' | translate" [subtitle]="id ? ('APP.papersAddHint' | translate) : null" icon="ti ti-file-certificate" kind="media">
+          <span class="ts-label">{{ 'APP.vendorLogo' | translate }}</span>
+          <ts-images-field [(files)]="logo" [existing]="existingLogo" [multiple]="false"></ts-images-field>
+          <span class="ts-label">{{ 'APP.taxCardLicence' | translate }}</span>
+          <ts-images-field [(files)]="licence"></ts-images-field>
+          <span class="ts-label">{{ 'APP.commercialRegister' | translate }}</span>
+          <ts-images-field [(files)]="commercial"></ts-images-field>
+        </ts-form-section>
         <ts-form-section *ngIf="!id" [title]="'APP.loginAccount' | translate" icon="ti ti-user-key">
           <div class="ts-two">
             <ts-field [label]="'APP.firstName' | translate" [required]="true" [(value)]="a.first"></ts-field>
@@ -326,6 +364,11 @@ export class VendorFormComponent implements OnInit {
   role: string | null = null;
   roles: any[] = [];
   private salesId: number | null = null;
+  /** CompanyCreateDto's ImageLogo, LicenceDocuments (tax card, licence) and CommercialDocuments, as the old form sent them. */
+  logo: File[] = [];
+  existingLogo: string[] = [];
+  licence: File[] = [];
+  commercial: File[] = [];
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -345,6 +388,7 @@ export class VendorFormComponent implements OnInit {
         this.rates[m] = c[`${key}CommissionRate`] == null ? '' : fmtNum(c[`${key}CommissionRate`]);
       }
       this.customTrips = c.isAcceptingCustomTrip ?? true;
+      this.existingLogo = c.logoUrl ? [c.logoUrl] : [];
       this.salesId = c.salesId ?? null;
     } catch (e) {
       this.error = this.text.error(e);
@@ -377,7 +421,10 @@ export class VendorFormComponent implements OnInit {
       Address: v(this.f.address),
       Description: v(this.f.description),
       IsAcceptingCustomTrip: this.customTrips,
-      ...this.commissions()
+      ...this.commissions(),
+      ImageLogo: this.logo[0],
+      LicenceDocuments: this.licence,
+      CommercialDocuments: this.commercial
     };
     try {
       if (this.id) {
