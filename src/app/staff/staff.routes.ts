@@ -91,6 +91,7 @@ export const STAFF_ROUTES: Routes = [
   { path: 'a/more/tripstars', loadComponent: () => import('./settings/content.component').then((c) => c.TripStarsComponent) },
   { path: 'a/more/tripstars/:id/analytics', loadComponent: () => import('./settings/content.component').then((c) => c.TripStarAnalyticsComponent) },
   { path: 'a/more/sidebars', loadComponent: () => import('./settings/content.component').then((c) => c.SidebarsComponent) },
+  { path: 'a/more/site-visits', loadComponent: () => import('./site-visits/site-visits.component').then((c) => c.SiteVisitsComponent) },
   { path: 'a/more/vendor-comms', loadComponent: () => import('./vendor-comms/vendor-comms.component').then((c) => c.VendorCommsComponent) },
   { path: 'a/more/commission', loadComponent: () => import('./settings/content.component').then((c) => c.CommissionComponent) },
   { path: 'a/more/coupons/new', loadComponent: () => import('./settings/content.component').then((c) => c.CouponFormComponent) },
