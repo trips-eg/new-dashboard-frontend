@@ -93,7 +93,7 @@ h2 {
           background: var(--main-color, var(--ts-navy));
           color: #ffffff;
           border-color: var(--main-color, var(--ts-navy));
-          box-shadow: 0 0 12px rgba(18, 32, 58, 0.3);
+          box-shadow: 0 0 12px rgba(58, 31, 16, 0.3);
         }
         .p-stepper-title {
           color: var(--secondary, var(--ts-navy));
@@ -124,7 +124,7 @@ h2 {
 
       &:focus, &.p-focus {
         border-color: var(--main-color, var(--ts-navy)) !important;
-        box-shadow: 0 0 0 3px rgba(18, 32, 58, 0.15) !important;
+        box-shadow: 0 0 0 3px rgba(58, 31, 16, 0.15) !important;
         outline: none;
       }
     }
@@ -215,7 +215,7 @@ h2 {
     i {
       font-size: 1.25rem;
       color: var(--main-color, var(--ts-navy));
-      background: rgba(18, 32, 58, 0.08);
+      background: rgba(58, 31, 16, 0.08);
       padding: 0.6rem;
       border-radius: 10px;
       display: flex;
@@ -258,9 +258,9 @@ h2 {
   height: 100%;
 
   &.active {
-    background: rgba(18, 32, 58, 0.03);
+    background: rgba(58, 31, 16, 0.03);
     border-color: var(--main-color, var(--ts-navy));
-    box-shadow: 0 2px 8px rgba(18, 32, 58, 0.05);
+    box-shadow: 0 2px 8px rgba(58, 31, 16, 0.05);
 
     label {
       color: var(--secondary, var(--ts-navy));
@@ -356,18 +356,18 @@ h2 {
   &:hover {
     border-color: var(--main-color, var(--ts-navy));
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(18, 32, 58, 0.05);
+    box-shadow: 0 4px 12px rgba(58, 31, 16, 0.05);
   }
 
   &.active {
     border-color: var(--main-color, var(--ts-navy));
-    background: rgba(18, 32, 58, 0.02);
-    box-shadow: 0 4px 15px rgba(18, 32, 58, 0.1);
+    background: rgba(58, 31, 16, 0.02);
+    box-shadow: 0 4px 15px rgba(58, 31, 16, 0.1);
 
     .card-icon {
       background: var(--main-color, var(--ts-navy));
       color: #ffffff;
-      box-shadow: 0 2px 8px rgba(18, 32, 58, 0.3);
+      box-shadow: 0 2px 8px rgba(58, 31, 16, 0.3);
     }
   }
 
@@ -384,7 +384,7 @@ h2 {
     width: 2.25rem;
     height: 2.25rem;
     border-radius: 8px;
-    background: rgba(18, 32, 58, 0.08);
+    background: rgba(58, 31, 16, 0.08);
     color: var(--main-color, var(--ts-navy));
     display: flex;
     align-items: center;
@@ -454,17 +454,17 @@ h2 {
 
   &:hover {
     border-color: var(--main-color, var(--ts-navy));
-    background: rgba(18, 32, 58, 0.02);
+    background: rgba(58, 31, 16, 0.02);
   }
 
   .upload-icon-wrapper {
-    background: rgba(18, 32, 58, 0.08);
+    background: rgba(58, 31, 16, 0.08);
     color: var(--main-color, var(--ts-navy));
   }
 }
 
 .bg-light-blue {
-  background-color: rgba(18, 32, 58, 0.03) !important;
+  background-color: rgba(58, 31, 16, 0.03) !important;
 }
 
 .serial-preview-badge {
@@ -510,7 +510,7 @@ h2 {
   &:hover:not(:disabled) {
     border-color: var(--main-color, var(--ts-navy));
     color: var(--main-color, var(--ts-navy));
-    background-color: rgba(18, 32, 58, 0.04);
+    background-color: rgba(58, 31, 16, 0.04);
     transform: scale(1.05);
   }
 
@@ -518,7 +518,7 @@ h2 {
     background-color: var(--main-color, var(--ts-navy));
     border-color: var(--main-color, var(--ts-navy));
     color: #ffffff;
-    box-shadow: 0 4px 10px rgba(18, 32, 58, 0.25);
+    box-shadow: 0 4px 10px rgba(58, 31, 16, 0.25);
   }
 
   &:disabled {

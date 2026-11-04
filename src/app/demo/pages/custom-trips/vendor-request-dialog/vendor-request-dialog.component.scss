@@ -21,7 +21,7 @@
       width: 44px;
       height: 44px;
       background: var(--ts-navy);
-      box-shadow: 0 4px 12px rgba(18, 32, 58, 0.25);
+      box-shadow: 0 4px 12px rgba(58, 31, 16, 0.25);
     }
 
     .spec-tile {
@@ -88,7 +88,7 @@
       &.selected {
         background: var(--ts-selected);
         border-color: var(--ts-navy) !important;
-        box-shadow: 0 0 0 1px var(--ts-navy), 0 4px 12px rgba(18, 32, 58, 0.12);
+        box-shadow: 0 0 0 1px var(--ts-navy), 0 4px 12px rgba(58, 31, 16, 0.12);
 
         .radio-dot {
           border-color: var(--ts-navy);

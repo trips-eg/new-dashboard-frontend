@@ -2,100 +2,122 @@
 //  TRIPS Staff design tokens, shared by Admin, Vendor and Scanner.
 //  Same values as the Flutter app (lib/core/theme/app_theme.dart in trips-staff-app):
 //  TripsColors, Gap and TripsText. Change a value here, not in a page.
+//  Look: "Luxor arch" (design 23): cream page, dark brown menu, sun orange,
+//  pastel ticket cards. The --ts-navy names stay so pages keep working;
+//  they now hold the dark brown.
 // =====================================================================
 
 :root {
   // Brand
-  --ts-navy: #12203a; // headers, sidebar, links, selection
-  --ts-navy-ink: #0b1527;
-  --ts-navy-soft: #1d2f50;
-  --ts-accent: #f28c0f; // the logo orange: primary button, active marker
-  --ts-accent-hover: #e07f06;
-  --ts-on-accent: #1f1200;
-  --ts-blue: #175cd3;
-  --ts-teal: #0e7c80;
-  --ts-gold: #f7b32b;
+  --ts-navy: #3a1f10; // dark brown: menu, links, selection (was navy)
+  --ts-navy-ink: #2a1509;
+  --ts-navy-soft: #4e2c17;
+  --ts-accent: #e8740f; // sun orange: primary button, active menu item
+  --ts-accent-hover: #d0660a;
+  --ts-on-accent: #2e1608;
+  --ts-blue: #2b5e91;
+  --ts-teal: #2e6b3f;
+  --ts-gold: #f9c23c;
+
+  // The arch banner of the home screens
+  --ts-sun: #f9c23c;
+  --ts-hero: #f39a1e;
+  --ts-hero-deep: #dd7a12;
+  --ts-hero-ink: #2e1608;
+  --ts-accent-text: #b85a08; // orange text on cream
+
+  // Pastel ticket tones (KPI tiles)
+  --ts-k1: #ffe3cc;
+  --ts-k1-ink: #a04a0c;
+  --ts-k2: #fff1c2;
+  --ts-k2-ink: #7a5600;
+  --ts-k3: #e3f2e2;
+  --ts-k3-ink: #2e6b3f;
+  --ts-k4: #e0eef9;
+  --ts-k4-ink: #2b5e91;
 
   // Text
-  --ts-ink: #101828;
-  --ts-ink-nav: #344054;
-  --ts-ink-muted: #475467;
-  --ts-ink-faint: #667085;
-  --ts-on-navy-muted: #b9c2d2;
+  --ts-ink: #3a1f10;
+  --ts-ink-nav: #5a3f2e;
+  --ts-ink-muted: #6b5242;
+  --ts-ink-faint: #7a6556;
+  --ts-on-navy-muted: #e6d2bf;
 
   // Surfaces
   --ts-surface: #ffffff;
-  --ts-page: #f3efe8;
-  --ts-subtle: #f8f5f0;
-  --ts-selected: #e7ecf5;
-  --ts-hover: #efeae2;
+  --ts-page: #fbf6ec;
+  --ts-subtle: #fff9f0;
+  --ts-selected: #ffe9d6;
+  --ts-hover: #f6ecdf;
 
   // Lines
-  --ts-line: #e4ded4;
-  --ts-line-table: #eae4da;
-  --ts-line-input: #7c8798;
-  --ts-line-control: #d0d5dd;
+  --ts-line: #efe2cf;
+  --ts-line-table: #f3e8da;
+  --ts-line-input: #a08c7c;
+  --ts-line-control: #e2d2bc;
 
   // States
   --ts-danger: #d92d20;
   --ts-danger-ink: #b42318;
   --ts-danger-soft: #fef3f2;
   --ts-danger-line: #fecdca;
-  --ts-ok-bg: #ecfdf3;
-  --ts-ok-fg: #146c3e;
-  --ts-ok-line: #abefc6;
-  --ts-pend-bg: #fff4e0;
-  --ts-pend-dot: #f79009;
-  --ts-pend-ink: #b54708;
-  --ts-pend-line: #fedf89;
-  --ts-canc-bg: #f2f4f7;
-  --ts-canc-fg: #475467;
-  --ts-canc-line: #d0d5dd;
-  --ts-done-bg: #eff8ff;
-  --ts-done-fg: #175cd3;
-  --ts-done-line: #b2ddff;
-  --ts-avatar-bg: #fff1e8;
-  --ts-avatar-ink: #9c2a00;
-  --ts-scrim: rgb(18 32 58 / 50%);
+  --ts-ok-bg: #e3f2e2;
+  --ts-ok-fg: #2e6b3f;
+  --ts-ok-line: #b9dfb7;
+  --ts-pend-bg: #fff1c2;
+  --ts-pend-dot: #f39a1e;
+  --ts-pend-ink: #8a5300;
+  --ts-pend-line: #f6d77c;
+  --ts-canc-bg: #f3eee8;
+  --ts-canc-fg: #6b5242;
+  --ts-canc-line: #e2d2bc;
+  --ts-done-bg: #e0eef9;
+  --ts-done-fg: #2b5e91;
+  --ts-done-line: #b6d3ee;
+  --ts-avatar-bg: #ffe3cc;
+  --ts-avatar-ink: #a04a0c;
+  --ts-scrim: rgb(58 31 16 / 50%);
 
   // Modules (icon colour, light background)
   --ts-trip: #c2410c;
-  --ts-trip-bg: #fff1e8;
+  --ts-trip-bg: #ffe3cc;
   --ts-outing: #0e7c80;
-  --ts-outing-bg: #e6f4f4;
-  --ts-hajj: #8a6500;
-  --ts-hajj-bg: #fef7e0;
-  --ts-hotel: #0b5c8a;
-  --ts-hotel-bg: #eaf2f8;
-  --ts-marketing: #c11574;
-  --ts-marketing-bg: #fdf0f7;
+  --ts-outing-bg: #e2f2f1;
+  --ts-hajj: #7a5600;
+  --ts-hajj-bg: #fff1c2;
+  --ts-hotel: #2b5e91;
+  --ts-hotel-bg: #e0eef9;
+  --ts-marketing: #b0306a;
+  --ts-marketing-bg: #fde6ee;
 
   // Bento tones (bg / fg / icon)
-  --ts-revenue-bg: #e8f6ee;
-  --ts-revenue-fg: #0f5132;
-  --ts-revenue-icon: #1e8e5a;
-  --ts-info-bg: #eff8ff;
-  --ts-info-fg: #0b3b8c;
+  --ts-revenue-bg: #e3f2e2;
+  --ts-revenue-fg: #24552f;
+  --ts-revenue-icon: #2e6b3f;
+  --ts-info-bg: #e0eef9;
+  --ts-info-fg: #1f4a75;
 
   // Spacing and radii (Gap)
   --ts-gap-screen: 16px;
   --ts-gap-card: 12px;
   --ts-card-padding: 16px;
   --ts-field-height: 44px;
-  --ts-radius-field: 12px;
-  --ts-radius-card: 18px;
-  --ts-radius-sheet: 20px;
+  --ts-radius-field: 14px;
+  --ts-radius-card: 24px;
+  --ts-radius-sheet: 28px;
   --ts-radius-chip: 999px;
 
-  // Elevation: cards sit on a border, overlays get a soft shadow
-  --ts-shadow-card: 0 1px 2px rgb(16 24 40 / 4%);
-  --ts-shadow-raised: 0 4px 16px rgb(18 32 58 / 8%);
-  --ts-shadow-overlay: 0 16px 40px rgb(18 32 58 / 18%);
-  --ts-focus: 0 0 0 3px rgb(242 140 15 / 35%);
+  // Elevation: soft warm shadows instead of hard borders
+  --ts-shadow-card: 0 1px 2px rgb(58 31 16 / 4%), 0 12px 32px rgb(58 31 16 / 7%);
+  --ts-shadow-raised: 0 2px 4px rgb(58 31 16 / 5%), 0 16px 36px rgb(58 31 16 / 11%);
+  --ts-shadow-overlay: 0 16px 40px rgb(58 31 16 / 18%);
+  --ts-focus: 0 0 0 3px rgb(232 116 15 / 35%);
 
-  // Type
-  --ts-font: 'IBM Plex Sans Arabic', 'Inter', 'Segoe UI', Tahoma, sans-serif;
-  --ts-font-latin: 'Inter', 'IBM Plex Sans Arabic', 'Segoe UI', sans-serif;
+  // Type: Readex Pro for text, Rubik for titles and numbers, Pacifico for the banner tagline
+  --ts-font: 'Readex Pro', 'Rubik', 'Segoe UI', Tahoma, sans-serif;
+  --ts-font-latin: 'Rubik', 'Readex Pro', 'Segoe UI', sans-serif;
+  --ts-font-display: 'Rubik', 'Readex Pro', 'Segoe UI', sans-serif;
+  --ts-font-brand: 'Pacifico', cursive;
   --ts-text-h1: 34px;
   --ts-text-h2: 24px;
   --ts-text-h3: 20px;

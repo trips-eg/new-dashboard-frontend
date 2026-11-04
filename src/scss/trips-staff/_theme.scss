@@ -29,7 +29,7 @@
   --border-radius: var(--ts-radius-field);
 
   --bs-primary: var(--ts-navy);
-  --bs-primary-rgb: 18, 32, 58;
+  --bs-primary-rgb: 58, 31, 16;
   --bs-secondary: var(--ts-ink-muted);
   --bs-body-bg: var(--ts-page);
   --bs-body-color: var(--ts-ink);
@@ -37,7 +37,7 @@
   --bs-border-color: var(--ts-line);
   --bs-border-radius: var(--ts-radius-field);
   --bs-link-color: var(--ts-navy);
-  --bs-link-color-rgb: 18, 32, 58;
+  --bs-link-color-rgb: 58, 31, 16;
   --bs-link-hover-color: var(--ts-accent-hover);
   --bs-heading-color: var(--ts-ink);
   --bs-success: var(--ts-ok-fg);
@@ -75,7 +75,7 @@ h4,
 h5,
 h6 {
   color: var(--ts-ink);
-  font-family: var(--ts-font);
+  font-family: var(--ts-font-display);
 }
 
 a {
@@ -87,7 +87,7 @@ a:hover {
 }
 
 ::selection {
-  background: rgb(242 140 15 / 25%);
+  background: rgb(232 116 15 / 25%);
 }
 
 label {
@@ -135,9 +135,9 @@ hr {
 // ---------- Layout shell ----------
 body.dashboard-layout {
   --nav-ink: var(--ts-on-navy-muted);
-  --nav-muted: #8d99ae;
+  --nav-muted: #b89c86;
   --nav-border: rgb(255 255 255 / 8%);
-  --nav-selected: #22355c;
+  --nav-selected: var(--ts-accent);
   background: var(--ts-page);
 
   // Header: the brand corner continues the navy sidebar, the bar itself is a light app bar
@@ -299,12 +299,13 @@ body.dashboard-layout {
     color: #fff;
   }
 
+  // The current page: an orange pill with dark text, like the menu of design 23
   .pc-sidebar .coded-inner-navbar li.active > :is(a.nav-link, .nav-section-toggle),
   .pc-sidebar .coded-inner-navbar a.nav-link.active {
     background: var(--nav-selected);
-    color: var(--ts-accent);
+    color: var(--ts-on-accent);
     font-weight: 700;
-    border-inline-start-color: var(--ts-accent);
+    border-inline-start-color: transparent;
   }
 
   .pc-sidebar .coded-inner-navbar li.coded-trigger > .nav-section-toggle {
@@ -1697,7 +1698,7 @@ td img {
 
 // ngx-spinner overlay (full screen loader)
 .ngx-spinner-overlay {
-  background-color: rgb(18 32 58 / 72%) !important;
+  background-color: rgb(58 31 16 / 72%) !important;
 }
 
 // ---------- Small screens ----------

@@ -1,0 +1,129 @@
+// =====================================================================
+//  "Luxor arch" (design 23): the shapes on top of the tokens.
+//  Pastel ticket tiles with side notches, soft cards without hard lines,
+//  and the floating dark brown menu. Loaded last from styles.scss.
+//  The colours are in _tokens.scss; the home banner is in _staff-widgets.scss.
+// =====================================================================
+
+// ---------- KPI tiles: pastel tickets with a notch on each side ----------
+// The notches are cut with a mask, so they show whatever is behind the tile.
+.ts-kpi {
+  --notch: 9px;
+  border: 0;
+  border-radius: 26px;
+  -webkit-mask:
+    radial-gradient(circle var(--notch) at 0 50%, #0000 98%, #000) 0 0 / 51% 100% no-repeat,
+    radial-gradient(circle var(--notch) at 100% 50%, #0000 98%, #000) 100% 0 / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle var(--notch) at 0 50%, #0000 98%, #000) 0 0 / 51% 100% no-repeat,
+    radial-gradient(circle var(--notch) at 100% 50%, #0000 98%, #000) 100% 0 / 51% 100% no-repeat;
+}
+
+// The mask hides an outer shadow or outline, so hover lifts and focus draws inside
+a.ts-kpi:hover {
+  box-shadow: none;
+  filter: brightness(0.98);
+}
+
+a.ts-kpi:focus-visible {
+  outline: 0;
+  box-shadow: inset 0 0 0 3px var(--ts-accent);
+}
+
+.ts-kpi.ts-tone-neutral {
+  --tile-bg: var(--ts-k1);
+  --tile-fg: var(--ts-ink);
+  --tile-icon: var(--ts-k1-ink);
+  border-color: transparent !important;
+}
+
+.ts-kpi .ts-kpi__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+}
+
+.ts-kpi .ts-kpi__value {
+  font-family: var(--ts-font-display);
+}
+
+// ---------- Soft cards: a warm shadow instead of a line ----------
+.ts-section,
+.ts-list-card,
+.ts-ticket {
+  border-color: transparent;
+  box-shadow: var(--ts-shadow-card);
+}
+
+.ts-ticket__tear i {
+  border-color: transparent;
+}
+
+.ts-ticket__tear span {
+  border-top-color: var(--ts-line-control);
+}
+
+.ts-section__title h2,
+.ts-card-title {
+  font-family: var(--ts-font-display);
+}
+
+// ---------- Buttons: rounder, like the website ----------
+.p-button:not(.p-button-icon-only),
+.btn {
+  border-radius: 999px;
+}
+
+// ---------- The floating menu (desktop) ----------
+// The menu becomes a dark brown card with rounded corners that floats on the cream page.
+@media (min-width: 1025px) {
+  body.dashboard-layout .pc-sidebar {
+    padding: 12px;
+    background: var(--ts-page);
+  }
+
+  // The brand corner above it sits on the page too: dark logo text on cream
+  body.dashboard-layout .pc-header .m-header {
+    background: var(--ts-page);
+    color: var(--ts-ink);
+  }
+
+  body.dashboard-layout .brand-copy strong {
+    color: var(--ts-ink);
+    font-family: var(--ts-font-display);
+  }
+
+  body.dashboard-layout .brand-copy small {
+    color: var(--ts-ink-faint);
+  }
+
+  body.dashboard-layout .pc-header .m-header .pc-head-link {
+    color: var(--ts-ink-nav);
+  }
+
+  body.dashboard-layout .pc-header .m-header .pc-head-link:is(:hover, :focus-visible, [aria-expanded='true']) {
+    background: var(--ts-hover);
+    color: var(--ts-ink);
+  }
+
+  body.dashboard-layout .pc-sidebar > nav,
+  body.dashboard-layout .pc-sidebar .navbar-wrapper {
+    height: 100%;
+  }
+
+  body.dashboard-layout .pc-sidebar .navbar-wrapper {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 28px;
+    background: var(--ts-navy);
+    box-shadow: 0 16px 36px rgb(58 31 16 / 16%);
+  }
+
+  body.dashboard-layout .pc-sidebar .sidebar-brand-header {
+    background: transparent;
+  }
+}
+
+body.dashboard-layout .pc-sidebar .coded-inner-navbar :is(a.nav-link, .nav-section-toggle) {
+  border-radius: 14px;
+}

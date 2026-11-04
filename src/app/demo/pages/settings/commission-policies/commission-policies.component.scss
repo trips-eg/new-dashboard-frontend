@@ -5,8 +5,8 @@ $indigo-gradient: linear-gradient(135deg, #818cf8 0%, #4f46e5 100%);
 $amber-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
 $slate-light: #f8fafc;
 $slate-border: #e2e8f0;
-$shadow-elegant: 0 10px 30px -10px rgba(18, 32, 58, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
-$shadow-hover: 0 20px 40px -15px rgba(18, 32, 58, 0.12), 0 4px 6px rgba(0, 0, 0, 0.05);
+$shadow-elegant: 0 10px 30px -10px rgba(58, 31, 16, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+$shadow-hover: 0 20px 40px -15px rgba(58, 31, 16, 0.12), 0 4px 6px rgba(0, 0, 0, 0.05);
 $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 .main {
@@ -86,7 +86,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       &:focus {
         border-color: var(--ts-navy);
         background-color: #ffffff;
-        box-shadow: 0 0 0 4px rgba(18, 32, 58, 0.12);
+        box-shadow: 0 0 0 4px rgba(58, 31, 16, 0.12);
         outline: none;
       }
     }
@@ -153,7 +153,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
           &.p-highlight {
             color: var(--ts-navy) !important;
-            background-color: rgba(18, 32, 58, 0.04) !important;
+            background-color: rgba(58, 31, 16, 0.04) !important;
             
             .p-sortable-column-icon {
               color: var(--ts-navy) !important;
@@ -194,7 +194,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           font-weight: 600;
 
           &.p-highlight {
-            background: rgba(18, 32, 58, 0.08);
+            background: rgba(58, 31, 16, 0.08);
             color: var(--ts-navy);
           }
         }
@@ -216,9 +216,9 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   letter-spacing: 0.02em;
 
   &.trip-bg {
-    background-color: rgba(18, 32, 58, 0.08) !important;
+    background-color: rgba(58, 31, 16, 0.08) !important;
     color: var(--ts-navy) !important;
-    border: 1px solid rgba(18, 32, 58, 0.12);
+    border: 1px solid rgba(58, 31, 16, 0.12);
   }
 
   &.outing-bg {
@@ -296,9 +296,9 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   // Fixed Amount Badging
   &.badge-fixed {
-    background-color: rgba(18, 32, 58, 0.08);
+    background-color: rgba(58, 31, 16, 0.08);
     color: var(--ts-navy);
-    border: 1px solid rgba(18, 32, 58, 0.18);
+    border: 1px solid rgba(58, 31, 16, 0.18);
 
     .model-badge-icon {
       color: var(--ts-navy);
@@ -352,9 +352,9 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transition: $transition-smooth !important;
 
   &:hover {
-    background-color: rgba(18, 32, 58, 0.08) !important;
+    background-color: rgba(58, 31, 16, 0.08) !important;
     color: var(--ts-navy) !important;
-    box-shadow: 0 0 0 4px rgba(18, 32, 58, 0.12);
+    box-shadow: 0 0 0 4px rgba(58, 31, 16, 0.12);
 
     ::ng-deep .p-button-icon {
       transform: rotate(45deg);
@@ -470,14 +470,14 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   .filter-chip {
     transition: all 0.2s ease;
-    box-shadow: 0 1px 2px rgba(18, 32, 58, 0.03);
+    box-shadow: 0 1px 2px rgba(58, 31, 16, 0.03);
     background-color: var(--ts-subtle);
     border-color: var(--ts-line) !important;
     color: var(--ts-ink-nav);
     
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 6px -1px rgba(18, 32, 58, 0.08);
+      box-shadow: 0 4px 6px -1px rgba(58, 31, 16, 0.08);
       background-color: var(--ts-line);
     }
 
@@ -528,8 +528,8 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 30px -4px rgba(18, 32, 58, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04) !important;
-    border-color: rgba(18, 32, 58, 0.2) !important;
+    box-shadow: 0 12px 30px -4px rgba(58, 31, 16, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+    border-color: rgba(58, 31, 16, 0.2) !important;
   }
 
   .stat-icon-wrapper {
@@ -549,7 +549,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .trip-theme {
-    background-color: rgba(18, 32, 58, 0.1) !important;
+    background-color: rgba(58, 31, 16, 0.1) !important;
     color: var(--ts-navy) !important;
   }
 

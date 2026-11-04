@@ -35,7 +35,7 @@
 @import 'scss/fonts/tabler-icons.min.css';
 @import 'scss/fonts/phosphor/duotone/style.css';
 
-/* Fonts: IBM Plex Sans Arabic + Inter, loaded in index.html; the family is set in scss/trips-staff/_theme.scss */
+/* Fonts: Readex Pro + Rubik (+ Pacifico for the home banner), loaded in index.html; the family is set in scss/trips-staff/_theme.scss */
 @import 'scss/trips-staff/tokens';
 * {
   text-transform: capitalize;
@@ -1107,3 +1107,4 @@ strong {
 @import './scss/trips-staff/theme';
 @import './scss/trips-staff/staff-widgets';
 @import './scss/trips-staff/staff-app';
+@import './scss/trips-staff/luxor';

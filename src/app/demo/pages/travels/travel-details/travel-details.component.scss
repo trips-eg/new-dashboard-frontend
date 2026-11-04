@@ -65,7 +65,7 @@
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(18, 32, 58, 0.12);
+    box-shadow: 0 6px 18px rgba(58, 31, 16, 0.12);
     border-color: var(--bs-primary, var(--ts-navy)) !important;
   }
 
@@ -126,7 +126,7 @@
 
   &.segment-type-transport {
     background: var(--ts-navy);
-    box-shadow: 0 4px 14px rgba(18, 32, 58, 0.4);
+    box-shadow: 0 4px 14px rgba(58, 31, 16, 0.4);
   }
 
   &.segment-type-hotel {
@@ -136,7 +136,7 @@
 
   &.segment-type-flight {
     background: var(--ts-navy);
-    box-shadow: 0 4px 14px rgba(18, 32, 58, 0.4);
+    box-shadow: 0 4px 14px rgba(58, 31, 16, 0.4);
   }
 
   &.segment-type-tour {
@@ -151,7 +151,7 @@
 
   &.segment-type-default {
     background: var(--ts-navy);
-    box-shadow: 0 4px 14px rgba(18, 32, 58, 0.4);
+    box-shadow: 0 4px 14px rgba(58, 31, 16, 0.4);
   }
 }
 
