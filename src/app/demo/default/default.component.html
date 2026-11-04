@@ -57,8 +57,15 @@
 
 <!-- The TRIPS Staff home (today, what needs action, charts), then the detailed statistics that were here before -->
 <app-staff-home></app-staff-home>
-<h2 class="home-details-title">{{ 'STAFF_UI.MORE_DETAILS' | translate }}</h2>
-<app-vendor-detail [CompanyId]="companyId"></app-vendor-detail>
+<!-- The full statistics, tables and lists: open on a computer, behind a button on a phone (their tables don't fit it) -->
+<div class="home-details-head">
+  <h2 class="home-details-title">{{ 'STAFF_UI.MORE_DETAILS' | translate }}</h2>
+  <button type="button" class="btn btn-secondary home-details-toggle" (click)="showDetails = !showDetails" [attr.aria-expanded]="showDetails">
+    <i class="ti" [class.ti-chevron-down]="!showDetails" [class.ti-chevron-up]="showDetails" aria-hidden="true"></i>
+    {{ (showDetails ? 'STAFF_UI.HIDE_DETAILS' : 'STAFF_UI.SHOW_DETAILS') | translate }}
+  </button>
+</div>
+<app-vendor-detail *ngIf="showDetails" [CompanyId]="companyId"></app-vendor-detail>
 
 <!-- ---------------previous----------------------------------- -->
 

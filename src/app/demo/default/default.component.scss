@@ -115,6 +115,21 @@ strong:hover{
   margin-block-end: 5px;
 }
 
+.home-details-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 28px 0 0;
+  padding-inline: 24px;
+}
+
+.home-details-head .home-details-title {
+  flex: 1;
+  margin: 0;
+  padding-inline: 0;
+}
+
 .home-details-title {
   margin: 28px 0 0;
   padding-inline: 24px;

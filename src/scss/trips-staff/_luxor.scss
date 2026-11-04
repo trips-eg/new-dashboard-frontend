@@ -127,3 +127,36 @@ a.ts-kpi:focus-visible {
 body.dashboard-layout .pc-sidebar .coded-inner-navbar :is(a.nav-link, .nav-section-toggle) {
   border-radius: 14px;
 }
+
+// ---------- Header: the Trips Partners app on Google Play ----------
+body.dashboard-layout .pc-header .header-wrapper .pc-head-link.app-download-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-inline: 14px;
+  border-radius: 999px;
+  background: var(--ts-navy);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+body.dashboard-layout .pc-header .header-wrapper .pc-head-link.app-download-control:is(:hover, :focus-visible) {
+  background: var(--ts-navy-soft);
+  color: #fff;
+}
+
+body.dashboard-layout .pc-header .header-wrapper .pc-head-link.app-download-control i {
+  color: var(--ts-sun);
+  font-size: 18px;
+}
+
+@media (max-width: 767px) {
+  body.dashboard-layout .pc-header .app-download-label {
+    display: none;
+  }
+
+  body.dashboard-layout .pc-header .header-wrapper .pc-head-link.app-download-control {
+    padding-inline: 10px;
+  }
+}

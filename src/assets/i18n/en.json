@@ -118,7 +118,9 @@
     "WEEK": "Week",
     "WEEKLY_EMAIL": "Weekly summary by email",
     "WEEKLY_EMAIL_HINT": "Arrives every week on the day and hour you choose",
-    "WEEKLY_SUMMARY": "Weekly summary"
+    "WEEKLY_SUMMARY": "Weekly summary",
+    "SHOW_DETAILS": "Show full details",
+    "HIDE_DETAILS": "Hide details"
   },
   "SCANNER_UI": {
     "TITLE": "Ticket scanner",
@@ -1582,7 +1584,8 @@
     "ROLE_ADMIN_SUPPORT": "Admin support",
     "ROLE_VENDOR_OWNER": "Vendor owner",
     "ROLE_VENDOR_MANAGER": "Vendor manager",
-    "ROLE_VENDOR_AGENT": "Vendor agent"
+    "ROLE_VENDOR_AGENT": "Vendor agent",
+    "DOWNLOAD_APP": "Get the Trips Partners app"
   },
   "APP": {
     "rqBooked": "Booked",
@@ -2601,7 +2604,11 @@
     "blockCustomerQ": "The customer will not be able to sign in or book until unblocked. Continue?",
     "unblockCustomerQ": "The customer will be able to sign in and book again. Continue?",
     "deleteVendor": "Delete vendor",
-    "deleteVendorQ": "The vendor leaves the list, and its products and bookings may disappear from the lists too. To stop it only, block it instead. Delete it?"
+    "deleteVendorQ": "The vendor leaves the list, and its products and bookings may disappear from the lists too. To stop it only, block it instead. Delete it?",
+    "errGatewayTimeout": "The server took too long to answer. The action may still have gone through; check before repeating it.",
+    "errServer": "The server failed while handling the request.",
+    "bookedBeforeN": "Booked {{n}} times before",
+    "completedN": "{{n}} completed"
   },
   "WEB": {
     "svNewThisMonth": "New visitors this month",

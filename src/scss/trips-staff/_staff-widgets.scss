@@ -1006,6 +1006,13 @@ a.ts-action-row:hover {
   color: var(--ts-danger-ink);
 }
 
+// The message, then a line of details (HTTP status, error code, API path)
+.ts-error > span,
+.toast-container .toast-message {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
 .ts-error button {
   margin-inline-start: auto;
 }

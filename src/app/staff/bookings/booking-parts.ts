@@ -21,7 +21,7 @@ import { fmtNum } from '../core/format';
           <div class="ts-card-row__main">
             <div class="ts-wrap">
               <span class="ts-card-title">{{ b.customer.name }}</span>
-              <ts-tag>{{ b.customer.bookingsCount <= 1 ? ('APP.firstBooking' | translate) : ('APP.bookingsN' | translate: { n: num(b.customer.bookingsCount) }) }}</ts-tag>
+              <ts-tag [tone]="b.customer.bookingsCount > 1 ? 'info' : 'neutral'">{{ customerHistory }}</ts-tag>
             </div>
             <p class="ts-card-sub">{{ subtitle }}</p>
           </div>
@@ -72,13 +72,25 @@ export class BookingCardComponent {
     return { label: `EasyKash${m == null ? '' : ' · ' + this.t(PayMethod.label(m))}`, icon: 'ti ti-credit-card', tone: 'info' };
   }
 
+  /** BookingsCount counts this booking too: "first booking", or how many before it and how many of all were completed. */
+  get customerHistory(): string {
+    const c = this.b.customer;
+    if ((c.bookingsCount ?? 0) <= 1) return this.t('APP.firstBooking');
+    const before = this.t('APP.bookedBeforeN', { n: fmtNum(c.bookingsCount - 1) });
+    return c.completedCount ? `${before} · ${this.t('APP.completedN', { n: fmtNum(c.completedCount) })}` : before;
+  }
+
+  /** The product, then what was booked: each ticket type with its quantity (an outing's tickets), else adults + children. */
   get subtitle(): string {
     const i = this.item;
     if (!i) return '';
-    const parts = [
-      ...(i.adults > 0 ? [this.t('APP.adultsCount', { n: fmtNum(i.adults) })] : []),
-      ...(i.childs > 0 ? [this.t('APP.childsCount', { n: fmtNum(i.childs) })] : [])
-    ].join(' + ');
+    const tickets = (this.b.items ?? []).filter((x) => x.ticketName).map((x) => `${x.ticketName} × ${fmtNum(x.quantity ?? 1)}`);
+    const parts = tickets.length
+      ? tickets.join(' · ')
+      : [
+          ...(i.adults > 0 ? [this.t('APP.adultsCount', { n: fmtNum(i.adults) })] : []),
+          ...(i.childs > 0 ? [this.t('APP.childsCount', { n: fmtNum(i.childs) })] : [])
+        ].join(' + ');
     return [i.name, parts].filter((s) => !!s).join(' · ');
   }
 

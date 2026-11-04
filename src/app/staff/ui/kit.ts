@@ -23,17 +23,32 @@ export class StaffText {
     return this.t.instant(key, params);
   }
 
+  /** What went wrong, then the details the team needs to follow it up: status, error code, the API path, the server's words. */
   error(e: unknown): string {
     if (typeof e === 'string') return e;
     if (e instanceof ApiError) {
-      if (e.message && e.message.trim()) return e.message;
-      if (e.code === 'NETWORK') return this.tr('APP.errNetwork');
-      if (e.code === 'TIMEOUT') return this.tr('APP.errTimeout');
-      if (e.code === 'FORBIDDEN_SCOPE' || e.status === 403) return this.tr('APP.errForbidden');
-      if (e.status === 401) return this.tr('APP.errSessionEnded');
-      if (e.status === 404) return this.tr('APP.errNotOnServer', { path: '' });
-      return e.status ? `${this.tr('APP.errUnexpected')} (${e.status})` : this.tr('APP.errUnexpected');
+      const message = this.errorMessage(e);
+      const details = [
+        e.status ? `HTTP ${e.status}` : null,
+        e.code && e.code !== 'UNEXPECTED' ? e.code : null,
+        e.path,
+        e.detail && e.detail !== message ? e.detail : null
+      ].filter(Boolean);
+      return details.length ? `${message}\n${details.join(' · ')}` : message;
     }
+    if (e instanceof Error && e.message) return `${this.tr('APP.errUnexpected')}\n${e.message}`;
+    return this.tr('APP.errUnexpected');
+  }
+
+  private errorMessage(e: ApiError): string {
+    if (e.message && e.message.trim()) return e.message;
+    if (e.code === 'NETWORK') return this.tr('APP.errNetwork');
+    if (e.code === 'TIMEOUT') return this.tr('APP.errTimeout');
+    if (e.code === 'FORBIDDEN_SCOPE' || e.status === 403) return this.tr('APP.errForbidden');
+    if (e.status === 401) return this.tr('APP.errSessionEnded');
+    if (e.status === 404) return this.tr('APP.errNotOnServer', { path: e.path ?? '' });
+    if (e.status === 504 || e.status === 502) return this.tr('APP.errGatewayTimeout');
+    if (e.status && e.status >= 500) return this.tr('APP.errServer');
     return this.tr('APP.errUnexpected');
   }
 

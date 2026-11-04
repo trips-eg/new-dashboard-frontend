@@ -26,6 +26,8 @@ import { Router } from '@angular/router';
 export class DefaultComponent implements OnInit {
   username = '';
   companyId: any;
+  /** The old detailed sections under the home: shown from tablet width up, a tap away on a phone. */
+  showDetails = typeof window === 'undefined' || window.innerWidth >= 992;
 
   profileCard = [
     {

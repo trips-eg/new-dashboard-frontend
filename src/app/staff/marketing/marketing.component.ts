@@ -334,7 +334,7 @@ export class SearchRecordsComponent implements OnInit, OnDestroy {
         </ts-card>
         <ts-pill-switch [items]="tabs" [selected]="tab" (selectedChange)="tab = $event; load()"></ts-pill-switch>
         <div class="ts-rank-list">
-          <div class="ts-list-card" *ngFor="let r of s.rows?.data ?? []">
+          <div class="ts-list-card" *ngFor="let r of words()">
             <a class="ts-rank-row" [routerLink]="['/a/more/search/records', { title: r.query, query: r.query }]">
               <span class="ts-rank">{{ r.rank }}</span>
               <strong class="ts-grow">{{ r.query }}</strong>
@@ -344,7 +344,7 @@ export class SearchRecordsComponent implements OnInit, OnDestroy {
             <i *ngIf="r.isPinned" class="ti ti-pin-filled" style="color: var(--ts-accent); padding: 0 10px"></i>
             <button *ngIf="!r.isPinned && canEdit" type="button" class="ts-icon-btn" [title]="'APP.pinWord' | translate" (click)="openPin(null, r.query)"><i class="ti ti-pin"></i></button>
           </div>
-          <ts-empty *ngIf="!(s.rows?.data ?? []).length" icon="ti ti-search" [message]="'APP.nothingHereYet' | translate"></ts-empty>
+          <ts-empty *ngIf="!words().length" icon="ti ti-search" [message]="'APP.nothingHereYet' | translate"></ts-empty>
         </div>
       </ng-container>
     </div>
@@ -402,6 +402,20 @@ export class SearchHistoryComponent implements OnInit {
         this.pinned = r.pinned;
       },
       error: (e) => (this.error = e)
+    });
+  }
+
+  /**
+   * The customer app saves a search on every keystroke, so "ال", "الا", "العين الس" show up as searches of their own.
+   * The list keeps whole words: at least 3 letters, and not just the start of a longer word in the same list.
+   */
+  words(): any[] {
+    const rows: any[] = this.s?.rows?.data ?? [];
+    const queries = rows.map((r) => String(r.query ?? '').trim());
+    return rows.filter((r, i) => {
+      const q = queries[i];
+      if ([...q.replace(/\s+/g, '')].length < 3) return false;
+      return !queries.some((other, j) => j !== i && other.length > q.length && other.startsWith(q));
     });
   }
 

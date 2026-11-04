@@ -11,10 +11,31 @@ export class ApiError extends Error {
     readonly status: number | null,
     readonly code: string | null,
     message: string | null,
-    readonly data: unknown = null
+    readonly data: unknown = null,
+    /** The API path that failed (/api/...), and what else the answer said: its status text or a piece of a non-JSON body. */
+    readonly path: string | null = null,
+    readonly detail: string | null = null
   ) {
     super(message ?? '');
   }
+}
+
+/** /api/Travels/AddTravel/ from a full request URL, without the host or the query string. */
+function apiPath(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const i = url.indexOf('/api/');
+  return (i >= 0 ? url.slice(i) : url).split('?')[0];
+}
+
+/** A short readable piece of a non-JSON error body (an IIS or gateway HTML page, a stack trace). */
+function bodyText(body: unknown): string | null {
+  if (typeof body !== 'string') return null;
+  const t = body
+    .replace(/<style[\s\S]*?<\/style>|<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return t ? t.slice(0, 220) : null;
 }
 
 /** The message of an error body: our ApiResponse `message`, or ASP.NET ProblemDetails (`errors`, `title`). */
@@ -79,12 +100,13 @@ export class StaffHttp {
   toError(e: unknown): ApiError {
     if (e instanceof ApiError) return e;
     if (e instanceof HttpErrorResponse) {
-      if (e.status === 0) return new ApiError(0, 'NETWORK', null);
+      const path = apiPath(e.url);
+      if (e.status === 0) return new ApiError(0, 'NETWORK', null, null, path);
       const body = e.error;
       if (body && typeof body === 'object' && !(body instanceof Blob)) {
-        return new ApiError(e.status, body.errorCode ?? null, errorMessageOf(body), body.data ?? null);
+        return new ApiError(e.status, body.errorCode ?? null, errorMessageOf(body), body.data ?? null, path, e.statusText || null);
       }
-      return new ApiError(e.status, e.status === 401 ? 'UNAUTHORIZED' : 'UNEXPECTED', null);
+      return new ApiError(e.status, e.status === 401 ? 'UNAUTHORIZED' : 'UNEXPECTED', null, null, path, bodyText(body) ?? (e.statusText || null));
     }
     return new ApiError(null, 'UNEXPECTED', null);
   }
