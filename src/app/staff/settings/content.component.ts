@@ -25,17 +25,60 @@ import { SettingsApi } from './settings.component';
 @Component({
   selector: 'ts-tripstars',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule, ...KIT],
+  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, ...LISTS],
   template: `
     <div class="ts-screen">
       <ts-appbar [title]="'APP.tripStars' | translate" [subtitle]="'APP.tripStarsHint' | translate">
         <a *ngIf="canCreate" class="ts-fab ts-fab--float" routerLink="/form/tripstar"><i class="ti ti-plus"></i>{{ 'APP.newTripStar' | translate }}</a>
       </ts-appbar>
+      <!-- Suggestions from the data: what to put on Trip Star next -->
+      <section class="ts-reco" *ngIf="canCreate">
+        <div class="ts-reco__head">
+          <span class="ts-reco__icon"><i class="ti ti-bulb"></i></span>
+          <div class="ts-grow">
+            <h2>{{ 'APP.recoTitle' | translate }}</h2>
+            <p>{{ 'APP.recoHint' | translate }}</p>
+          </div>
+          <ts-chipbar [items]="recoDays" [selected]="[String(days)]" (tap)="days = +$event; loadReco()"></ts-chipbar>
+        </div>
+        <ts-segmented [items]="recoTabs()" [selected]="tab" (changed)="tab = $any($event)"></ts-segmented>
+        <ts-loading *ngIf="!reco && !recoError"></ts-loading>
+        <ts-error *ngIf="recoError" [error]="recoError" (retry)="loadReco()"></ts-error>
+        <ng-container *ngIf="reco">
+          <p class="ts-muted ts-small" *ngIf="!list(tab).length">{{ 'APP.recoNone' | translate }}</p>
+          <div class="ts-reco__grid">
+            <article class="ts-reco-card" *ngFor="let r of list(tab)">
+              <div class="ts-reco-card__img">
+                <img *ngIf="mediaOf(r.imageUrl) as src; else noPic" [src]="src" alt="" loading="lazy" />
+                <ng-template #noPic><i class="ti ti-photo-off"></i></ng-template>
+                <ts-tag class="ts-reco-card__kind" tone="info">{{ kindLabel(r.type) | translate }}</ts-tag>
+              </div>
+              <div class="ts-reco-card__body">
+                <strong class="ts-clamp2">{{ r.name }}</strong>
+                <div class="ts-reco-card__stats">
+                  <span *ngIf="r.price"><i class="ti ti-tag"></i>{{ num(r.price) }} {{ 'APP.egp' | translate }}</span>
+                  <span><i class="ti ti-ticket"></i>{{ 'APP.recoBookings' | translate: { n: r.bookings } }}</span>
+                  <span *ngIf="r.views"><i class="ti ti-eye"></i>{{ num(r.views) }}</span>
+                </div>
+                <p class="ts-reco-card__why"><i class="ti ti-info-circle"></i>{{ text.arabic ? r.reasonAr : r.reasonEn }}</p>
+              </div>
+              <button type="button" class="btn btn-primary ts-reco-card__add" [disabled]="adding === key(r)" (click)="addStar(r)">
+                <i [class]="adding === key(r) ? 'pi pi-spin pi-spinner' : 'ti ti-star'"></i>{{ 'APP.addAsStar' | translate }}
+              </button>
+            </article>
+          </div>
+          <details class="ts-reco__rules"><summary>{{ 'APP.recoHow' | translate }}</summary><p>{{ reco.rulesAr }}</p></details>
+        </ng-container>
+      </section>
+
+      <div class="ts-listbar">
+        <ts-chipbar [items]="filters()" [selected]="[filter]" (tap)="filter = $any($event)"></ts-chipbar>
+      </div>
       <ts-loading *ngIf="!stars && !error"></ts-loading>
       <ts-error *ngIf="error" [error]="error" (retry)="load()"></ts-error>
-      <ts-empty *ngIf="stars && !stars.length" [message]="'APP.nothingHereYet' | translate"></ts-empty>
+      <ts-empty *ngIf="stars && !shown().length" [message]="'APP.nothingHereYet' | translate"></ts-empty>
       <div class="ts-list-grid ts-list-grid--cards">
-        <div class="ts-cover-card" *ngFor="let s of stars; let i = index">
+        <div class="ts-cover-card" *ngFor="let s of shown(); let i = index">
           <a class="ts-cover" [routerLink]="'/form/tripstar'" [queryParams]="{ id: s.id }">
             <img *ngIf="img(s) as src; else noImg" [src]="src" alt="" />
             <ng-template #noImg><div class="ts-cover__empty ts-cover__empty--navy"><i class="ti ti-star-filled"></i></div></ng-template>
@@ -56,10 +99,12 @@ import { SettingsApi } from './settings.component';
           </div>
           <div class="ts-cover-card__foot">
             <a class="ts-icon-btn" [routerLink]="['/a/more/tripstars', s.id, 'analytics']" [state]="{ title: title(s), imageUrl: s.imageUrl }" [title]="'APP.analytics' | translate" style="color: var(--ts-blue)"><i class="ti ti-chart-dots"></i></a>
-            <button type="button" class="ts-icon-btn" [disabled]="i === 0 || busy" (click)="reorder(i, i - 1)" [title]="'APP.moveUp' | translate"><i class="ti ti-arrow-up"></i></button>
-            <button type="button" class="ts-icon-btn" [disabled]="i === stars!.length - 1 || busy" (click)="reorder(i, i + 1)" [title]="'APP.moveDown' | translate"><i class="ti ti-arrow-down"></i></button>
+            <ng-container *ngIf="filter === 'all'">
+              <button type="button" class="ts-icon-btn" [disabled]="i === 0 || busy" (click)="reorder(i, i - 1)" [title]="'APP.moveUp' | translate"><i class="ti ti-arrow-up"></i></button>
+              <button type="button" class="ts-icon-btn" [disabled]="i === stars!.length - 1 || busy" (click)="reorder(i, i + 1)" [title]="'APP.moveDown' | translate"><i class="ti ti-arrow-down"></i></button>
+            </ng-container>
             <span class="ts-grow"></span>
-            <label class="form-check form-switch ts-switch"><input class="form-check-input" type="checkbox" [checked]="s.isActive" (change)="toggle(s)" /></label>
+            <label class="ts-switch-line ts-switch-line--bare" [title]="(s.isActive ? 'APP.active' : 'APP.inactive') | translate"><input type="checkbox" role="switch" [checked]="s.isActive" (change)="toggle(s)" /></label>
             <button type="button" class="ts-icon-btn ts-danger-ink" (click)="remove(s)" [title]="'APP.delete' | translate"><i class="ti ti-trash"></i></button>
           </div>
         </div>
@@ -70,12 +115,86 @@ import { SettingsApi } from './settings.component';
 export class TripStarsComponent implements OnInit {
   private readonly api = inject(SettingsApi);
   private readonly session = inject(StaffSession);
-  private readonly text = inject(StaffText);
   private readonly dialogs = inject(StaffDialogs);
   num = fmtNum;
   stars: any[] | null = null;
   error: unknown = null;
   busy = false;
+  readonly String = String;
+  readonly text = inject(StaffText);
+  /** all · active · inactive · expired */
+  filter = 'all';
+  days = 30;
+  tab: 'highDemand' | 'lowPriceLowDemand' | 'other' = 'highDemand';
+  reco: any = null;
+  recoError: unknown = null;
+  adding: string | null = null;
+  readonly recoDays = [30, 90, 180].map((d) => ({ key: String(d), label: this.text.tr('APP.lastNDays', { n: d }) }));
+
+  filters() {
+    const all = this.stars ?? [];
+    const n = (f: string) => all.filter((s) => this.matches(s, f)).length;
+    return ['all', 'active', 'inactive', 'expired'].map((key) => ({ key, label: this.text.tr('APP.starFilter_' + key), count: n(key) }));
+  }
+
+  /** active: on and not past its date · inactive: switched off · expired: past its date. */
+  matches(s: any, f: string): boolean {
+    if (f === 'active') return s.isActive && !this.expired(s);
+    if (f === 'inactive') return !s.isActive && !this.expired(s);
+    if (f === 'expired') return this.expired(s);
+    return true;
+  }
+
+  shown(): any[] {
+    return (this.stars ?? []).filter((s) => this.matches(s, this.filter));
+  }
+
+  recoTabs() {
+    return [
+      { key: 'highDemand', label: this.text.tr('APP.recoHigh'), count: this.reco?.highDemand?.length ?? null },
+      { key: 'lowPriceLowDemand', label: this.text.tr('APP.recoLow'), count: this.reco?.lowPriceLowDemand?.length ?? null },
+      { key: 'other', label: this.text.tr('APP.recoOther'), count: this.reco?.other?.length ?? null }
+    ];
+  }
+
+  list(tab: string): any[] {
+    return this.reco?.[tab] ?? [];
+  }
+
+  key(r: any): string {
+    return `${r.type}-${r.id}`;
+  }
+
+  kindLabel(type: number): string {
+    return type === 1 ? 'APP.moduleTrip' : type === 2 ? 'APP.moduleOuting' : 'APP.moduleHajj';
+  }
+
+  mediaOf(p: string | null): string | null {
+    return mediaUrl(p);
+  }
+
+  loadReco(): void {
+    this.reco = null;
+    this.recoError = null;
+    this.api.get('/api/staff/trip-stars/suggestions', { days: this.days }).subscribe({ next: (d) => (this.reco = d), error: (e) => (this.recoError = e) });
+  }
+
+  /** "Add as Star": one card from the product's name and cover, then both lists refresh. */
+  addStar(r: any): void {
+    this.adding = this.key(r);
+    this.api.post('/api/staff/trip-stars/from-product', { type: r.type, id: r.id }).subscribe({
+      next: () => {
+        this.adding = null;
+        this.text.showDone(this.text.tr('APP.addedAsStar', { n: r.name }));
+        for (const t of ['highDemand', 'lowPriceLowDemand', 'other']) this.reco[t] = (this.reco[t] ?? []).filter((x: any) => this.key(x) !== this.key(r));
+        this.load();
+      },
+      error: (e) => {
+        this.adding = null;
+        this.text.showError(e);
+      }
+    });
+  }
 
   get canCreate(): boolean {
     return this.session.can(P.adCreate);
@@ -83,6 +202,7 @@ export class TripStarsComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+    if (this.canCreate) this.loadReco();
   }
 
   load(): void {

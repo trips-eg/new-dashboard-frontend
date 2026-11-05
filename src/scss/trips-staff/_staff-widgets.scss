@@ -1232,3 +1232,27 @@ a.ts-action-row:hover {
   &__error { display: flex; align-items: center; gap: 6px; margin: 6px 0 0; font-size: 13px; color: var(--ts-danger-ink); }
 }
 @media (max-width: 480px) { .ts-images { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ts-images--wide, .ts-images--single { grid-template-columns: 1fr; } }
+
+// ---------- Round 3: notification reach, Trip Star suggestions ----------
+.ts-notif-reach { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.ts-switch-line--bare { padding: 0; border: 0; }
+.ts-reco {
+  margin-bottom: 18px; padding: 18px 20px; border-radius: var(--ts-radius-card); background: var(--ts-surface);
+  border: 1px solid var(--ts-line); box-shadow: var(--ts-shadow-card);
+  &__head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 12px;
+    h2 { margin: 0; font-size: 18px; font-weight: 800; color: var(--ts-ink); }
+    p { margin: 2px 0 0; font-size: 13px; color: var(--ts-ink-muted); } }
+  &__icon { flex: 0 0 44px; height: 44px; display: grid; place-items: center; border-radius: 14px; background: var(--ts-pend-bg); color: var(--ts-gold, #b7791f); font-size: 24px; }
+  &__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin-top: 12px; }
+  &__rules { margin-top: 12px; font-size: 13px; color: var(--ts-ink-muted); summary { cursor: pointer; color: var(--ts-ink); font-weight: 600; } p { margin: 6px 0 0; } }
+}
+.ts-reco-card {
+  display: flex; flex-direction: column; border: 1px solid var(--ts-line); border-radius: var(--ts-radius-card); overflow: hidden; background: var(--ts-surface);
+  &__img { position: relative; aspect-ratio: 16 / 9; background: var(--ts-subtle); display: grid; place-items: center; color: var(--ts-ink-faint); font-size: 28px;
+    img { width: 100%; height: 100%; object-fit: cover; } }
+  &__kind { position: absolute; top: 8px; inset-inline-start: 8px; }
+  &__body { flex: 1 1 auto; display: flex; flex-direction: column; gap: 6px; padding: 12px; strong { font-size: 15px; color: var(--ts-ink); } }
+  &__stats { display: flex; flex-wrap: wrap; gap: 10px; font-size: 13px; color: var(--ts-ink-muted); span { display: inline-flex; align-items: center; gap: 4px; } }
+  &__why { display: flex; gap: 6px; margin: 0; padding: 8px 10px; border-radius: 10px; background: var(--ts-info-bg); color: var(--ts-ink); font-size: 12.5px; line-height: 1.5; i { flex: 0 0 auto; margin-top: 2px; color: var(--ts-blue, var(--ts-accent)); } }
+  &__add { margin: 0 12px 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+}

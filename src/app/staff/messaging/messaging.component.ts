@@ -209,8 +209,13 @@ export class EmailDetailsComponent implements OnInit {
             <span class="ts-card-row__main">
               <span class="ts-card-title">{{ n.title }}</span>
               <span class="ts-muted ts-clamp2">{{ n.body }}</span>
-              <span class="ts-muted ts-num" *ngIf="n.sentDate || n.totalUsers != null">
-                {{ n.sentDate | ts: 'datetime' }}<ng-container *ngIf="n.totalUsers != null"> · {{ n.readCount ?? 0 | ts }}/{{ n.totalUsers | ts }} <i class="ti ti-checks"></i></ng-container>
+              <span class="ts-muted ts-num" *ngIf="n.sentDate">{{ n.sentDate | ts: 'datetime' }}</span>
+              <!-- Who it reached: signed-in customers and visitors' devices, and how many opened it -->
+              <span class="ts-notif-reach" *ngIf="n.totalUsers != null">
+                <ts-tag tone="info" icon="ti ti-users">{{ 'APP.notifReached' | translate: { n: (n.totalUsers | ts) } }}</ts-tag>
+                <ts-tag *ngIf="n.signedInUsers != null" tone="neutral" icon="ti ti-user-check">{{ 'APP.notifSignedIn' | translate: { n: (n.signedInUsers | ts) } }}</ts-tag>
+                <ts-tag *ngIf="n.visitors" tone="neutral" icon="ti ti-device-mobile">{{ 'APP.notifVisitors' | translate: { n: (n.visitors | ts) } }}</ts-tag>
+                <ts-tag tone="ok" icon="ti ti-checks">{{ 'APP.notifRead' | translate: { n: (n.readCount ?? 0 | ts), p: readPct(n) } }}</ts-tag>
               </span>
             </span>
             <i *ngIf="n.isRead" class="ti ti-checks" style="color: var(--ts-teal)"></i>
@@ -221,6 +226,11 @@ export class EmailDetailsComponent implements OnInit {
   `
 })
 export class NotificationLogComponent implements OnDestroy {
+  /** Opened, in percent of who got it. */
+  readPct(n: any): string {
+    return n.totalUsers ? String(Math.round(((n.readCount ?? 0) * 100) / n.totalUsers)) : '0';
+  }
+
   private readonly api = inject(MessagingApi);
   private readonly session = inject(StaffSession);
   list = new PagedList<any>((q) => this.api.notifications(q));
