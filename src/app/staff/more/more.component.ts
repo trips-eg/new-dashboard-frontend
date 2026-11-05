@@ -252,9 +252,9 @@ export class ProfileComponent {
 export class ScannerApi {
   private readonly http = inject(StaffHttp);
 
-  /** GET ScannerOutingBookingById/?id= → OutingBookingDto, or 404 with the reason. */
+  /** GET /api/staff/scanner/{id}: the scan verdict (ok, or the reason) with the whole ticket: types and counts, serials. */
   check(id: number): Observable<any> {
-    return this.http.get('/api/OutingBooking/ScannerOutingBookingById/', { id });
+    return this.http.get(`/api/staff/scanner/${id}`);
   }
 
   /** GET UseTicketSerialNumber?id= (a GET in the backend). */
@@ -286,49 +286,78 @@ export function parseTicketQr(raw: string): number | null {
         <a class="ts-icon-btn" routerLink="/v/scanner/history" [title]="'APP.scanHistory' | translate"><i class="ti ti-history"></i></a>
       </ts-appbar>
 
-      <ng-container *ngIf="!ticket && !refused">
+      <ng-container *ngIf="!scan">
         <div class="ts-scanner">
           <ngx-scanner-qrcode #scanner [config]="{ fps: 30, vibrate: 200, isBeep: false }" (event)="onScan($event)" (error)="cameraError = true"></ngx-scanner-qrcode>
           <div class="ts-scanner__frame"></div>
           <div class="ts-scanner__busy" *ngIf="busy"><i class="pi pi-spin pi-spinner"></i></div>
-          <button *ngIf="!cameraOn" type="button" class="btn btn-primary ts-scanner__start" (click)="start()"><i class="ti ti-camera"></i>{{ 'APP.tabScanner' | translate }}</button>
+          <button *ngIf="!cameraOn" type="button" class="btn btn-primary ts-scanner__start" (click)="start()"><i class="ti ti-camera"></i>{{ 'APP.scanStartCamera' | translate }}</button>
         </div>
         <p class="ts-muted" *ngIf="cameraError" style="text-align: center">{{ 'APP.cameraUnavailable' | translate }}</p>
         <div class="ts-scanner__manual">
-          <input class="form-control" inputmode="numeric" [placeholder]="'APP.ticketNumber' | translate" [value]="manual" (input)="manual = $any($event.target).value" (keyup.enter)="handle(manual)" />
-          <button type="button" class="btn btn-primary" [disabled]="busy" (click)="handle(manual)">{{ 'APP.check' | translate }}</button>
+          <input class="form-control" inputmode="numeric" [placeholder]="'APP.scanTypeNumber' | translate" [value]="manual" (input)="manual = $any($event.target).value" (keyup.enter)="handle(manual)" />
+          <button type="button" class="btn btn-primary" [disabled]="busy" (click)="handle(manual)"><i class="ti ti-search"></i>{{ 'APP.check' | translate }}</button>
         </div>
       </ng-container>
 
-      <ng-container *ngIf="ticket">
-        <div class="ts-note" [class.ts-note--danger]="ticket.isUsed" [class.ts-note--ok]="!ticket.isUsed">
-          <i class="ti" [class.ti-circle-x-filled]="ticket.isUsed" [class.ti-circle-check-filled]="!ticket.isUsed" style="font-size: 36px"></i>
+      <ng-container *ngIf="scan">
+        <!-- The verdict first, big enough to read at the gate -->
+        <div class="ts-scan-verdict" [ngClass]="'is-' + verdict" role="status">
+          <i class="ti" [ngClass]="verdict === 'ok' ? 'ti-circle-check-filled' : verdict === 'used' ? 'ti-alert-triangle-filled' : 'ti-circle-x-filled'"></i>
           <div>
-            <strong>{{ (ticket.isUsed ? 'APP.ticketUsed' : 'APP.ticketValid') | translate }}</strong>
-            <p>{{ (ticket.isUsed ? 'APP.ticketUsedHint' : 'APP.ticketValidHint') | translate }}</p>
+            <strong>{{ (verdict === 'ok' ? 'APP.ticketValid' : verdict === 'used' ? 'APP.ticketUsed' : 'APP.ticketRefused') | translate }}</strong>
+            <p *ngIf="verdict === 'ok'">{{ 'APP.ticketValidHint' | translate }}</p>
+            <p *ngIf="verdict === 'used'">{{ 'APP.scanUsedAt' | translate: { t: (t?.usedAt | ts: 'short') + ' ' + (t?.usedAt | ts: 'time') } }}</p>
+            <p *ngIf="verdict === 'refused'">{{ scan.message }}</p>
           </div>
         </div>
-        <ts-card>
-          <ts-info [label]="'APP.ticketNumber' | translate" [value]="'#' + ticket.id"></ts-info>
-          <ts-info [label]="'APP.quantity' | translate" [value]="num(ticket.quantity ?? ticket.numberOfSeats)"></ts-info>
-          <ts-info [label]="'APP.date' | translate" [value]="ticket.outingDate | ts: 'day'"></ts-info>
-          <ts-info *ngIf="ticket.startTime" [label]="'APP.time' | translate" [value]="ticket.startTime + (ticket.endTime ? ' – ' + ticket.endTime : '')"></ts-info>
-        </ts-card>
-        <div class="ts-two">
+
+        <div class="ts-scan-ticket" *ngIf="t as t">
+          <div class="ts-scan-ticket__head">
+            <span class="ts-scan-ticket__icon"><i class="ti ti-compass"></i></span>
+            <div>
+              <strong>{{ t.outingName }}</strong>
+              <small *ngIf="t.branchName"><i class="ti ti-map-pin"></i>{{ t.branchName }}</small>
+            </div>
+          </div>
+          <div class="ts-scan-facts">
+            <div><small>{{ 'APP.ticketNumber' | translate }}</small><b class="ts-num">#{{ t.reservationId }}</b></div>
+            <div *ngIf="t.bookingReference"><small>{{ 'APP.bookingRef' | translate }}</small><b class="ts-num"><span class="ts-ltr">{{ t.bookingReference }}</span></b></div>
+            <div><small>{{ 'APP.date' | translate }}</small><b>{{ (t.outingDate || t.from) | ts: 'day' }}</b></div>
+            <div *ngIf="t.startTime"><small>{{ 'APP.time' | translate }}</small><b class="ts-num"><span class="ts-ltr">{{ t.startTime }}{{ t.endTime ? ' – ' + t.endTime : '' }}</span></b></div>
+            <div><small>{{ 'APP.scanPeople' | translate }}</small><b class="ts-num">{{ 'APP.scanPeopleN' | translate: { a: t.adults || t.seats, c: t.children } }}</b></div>
+            <div *ngIf="t.customerName"><small>{{ 'APP.customer' | translate }}</small><b>{{ t.customerName }}<span *ngIf="t.customerPhoneEnd" class="ts-muted ts-num"> ••{{ t.customerPhoneEnd }}</span></b></div>
+          </div>
+
+          <h4 class="ts-sheet-sub"><i class="ti ti-ticket"></i>{{ 'APP.scanTicketTypes' | translate }}</h4>
+          <ul class="ts-scan-types">
+            <li *ngFor="let k of t.tickets">
+              <span class="ts-scan-types__count ts-num">×{{ k.count }}</span>
+              <span class="ts-card-row__main">
+                <strong>{{ k.name }}</strong>
+                <small class="ts-muted" *ngIf="k.description">{{ k.description }}</small>
+              </span>
+              <span class="ts-muted ts-num" *ngIf="k.price">{{ num(k.price) }} {{ 'APP.egp' | translate }}</span>
+            </li>
+            <li *ngIf="!t.tickets.length" class="ts-muted">{{ 'APP.scanNoTypes' | translate }}</li>
+          </ul>
+
+          <ng-container *ngIf="t.serials.length">
+            <h4 class="ts-sheet-sub"><i class="ti ti-barcode"></i>{{ 'APP.scanSerials' | translate }}</h4>
+            <div class="ts-scan-serials">
+              <span *ngFor="let s of t.serials" class="ts-scan-serial ts-num" [class.is-used]="s.isUsed">
+                <i class="ti" [ngClass]="s.isUsed ? 'ti-check' : 'ti-circle'"></i>{{ s.serialNumber }}
+              </span>
+            </div>
+          </ng-container>
+        </div>
+
+        <div class="ts-scan-actions">
           <button type="button" class="btn btn-secondary" (click)="reset()"><i class="ti ti-qrcode"></i>{{ 'APP.scanAnother' | translate }}</button>
-          <button *ngIf="!ticket.isUsed && canUse" type="button" class="btn btn-primary" [disabled]="busy" (click)="use()">
+          <button *ngIf="verdict === 'ok' && canUse" type="button" class="btn btn-primary" [disabled]="busy" (click)="use()">
             <i *ngIf="busy" class="pi pi-spin pi-spinner"></i><i *ngIf="!busy" class="ti ti-login"></i>{{ 'APP.checkIn' | translate }}
           </button>
         </div>
-      </ng-container>
-
-      <ng-container *ngIf="refused">
-        <div class="ts-note ts-note--danger ts-refused">
-          <i class="ti ti-ban" style="font-size: 56px"></i>
-          <strong>{{ 'APP.ticketRefused' | translate }}</strong>
-          <p>{{ refused }}</p>
-        </div>
-        <button type="button" class="btn btn-primary ts-wide-btn" (click)="reset()"><i class="ti ti-qrcode"></i>{{ 'APP.scanAnother' | translate }}</button>
       </ng-container>
     </div>
   `
@@ -343,9 +372,19 @@ export class ScannerComponent implements OnDestroy {
   busy = false;
   cameraOn = false;
   cameraError = false;
-  ticket: any = null;
+  /** The answer of GET /api/staff/scanner/{id}: { ok, code, message, ticket }. */
+  scan: any = null;
   ticketId = 0;
-  refused: string | null = null;
+
+  get t(): any {
+    return this.scan?.ticket ?? null;
+  }
+
+  /** ok: can be checked in · used: checked in before · refused: the reason in scan.message. */
+  get verdict(): 'ok' | 'used' | 'refused' {
+    if (!this.scan?.ok) return 'refused';
+    return this.t?.isUsed ? 'used' : 'ok';
+  }
   private last = '';
   private lastAt = 0;
 
@@ -383,14 +422,14 @@ export class ScannerComponent implements OnDestroy {
     this.last = raw;
     this.lastAt = Date.now();
     const id = parseTicketQr(raw);
-    if (id == null) return void (this.refused = this.text.tr('APP.qrNotATicket'));
+    if (id == null) return void (this.scan = { ok: false, message: this.text.tr('APP.qrNotATicket'), ticket: null });
     this.busy = true;
     try {
-      this.ticket = await firstValueFrom(this.api.check(id));
+      this.scan = await firstValueFrom(this.api.check(id));
       this.ticketId = id;
       this.stop();
     } catch (e) {
-      this.refused = this.text.error(e);
+      this.scan = { ok: false, message: this.text.error(e), ticket: null };
       this.stop();
     } finally {
       this.busy = false;
@@ -404,16 +443,14 @@ export class ScannerComponent implements OnDestroy {
       this.text.showDone(this.text.tr('APP.checkedInDone'));
       this.reset();
     } catch (e) {
-      this.ticket = null;
-      this.refused = this.text.error(e);
+      this.scan = { ...this.scan, ok: false, message: this.text.error(e) };
     } finally {
       this.busy = false;
     }
   }
 
   reset(): void {
-    this.ticket = null;
-    this.refused = null;
+    this.scan = null;
     this.manual = '';
     this.last = '';
   }

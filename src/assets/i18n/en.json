@@ -2648,7 +2648,16 @@
     "cpGroup_visitors": "Visitors (no account)",
     "cpGroup_noBookings": "Signed up, no bookings",
     "cpGroup_completedBookings": "With completed bookings",
-    "cpGroup_cancelledOnly": "Cancelled and never completed"
+    "cpGroup_cancelledOnly": "Cancelled and never completed",
+    "scanStartCamera": "Start the camera",
+    "scanTypeNumber": "Or type the ticket number",
+    "scanUsedAt": "Checked in {{t}}",
+    "scanPeople": "People",
+    "scanPeopleN": "{{a}} adults · {{c}} children",
+    "scanTicketTypes": "Tickets the customer chose",
+    "scanNoTypes": "No ticket types recorded on this booking",
+    "scanSerials": "Serial numbers",
+    "bookingRef": "Booking reference"
   },
   "WEB": {
     "svNewThisMonth": "New visitors this month",

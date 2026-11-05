@@ -1136,3 +1136,46 @@ a.ts-action-row:hover {
 }
 @media (max-width: 480px) { .ts-kv-grid { grid-template-columns: 1fr 1fr; gap: 8px; } }
 .ts-channel .ts-card-row__main > small { display: block; margin-top: 2px; }
+
+// ---------- Round 3: ticket scanner ----------
+.ts-scan-verdict {
+  display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: var(--ts-radius-card); border: 1px solid;
+  > i { font-size: 44px; flex: 0 0 auto; }
+  strong { display: block; font-size: 20px; font-weight: 800; }
+  p { margin: 4px 0 0; }
+  &.is-ok { background: var(--ts-ok-bg); border-color: var(--ts-ok-line); color: var(--ts-ok-fg); }
+  &.is-used { background: var(--ts-pend-bg); border-color: var(--ts-pend-line); color: var(--ts-pend-ink); }
+  &.is-refused { background: var(--ts-danger-soft); border-color: var(--ts-danger-line); color: var(--ts-danger-ink); }
+}
+.ts-scan-ticket {
+  margin-top: 14px; padding: 16px; background: var(--ts-surface); border: 1px solid var(--ts-line); border-radius: var(--ts-radius-card); box-shadow: var(--ts-shadow-card);
+  &__head { display: flex; align-items: center; gap: 12px; padding-bottom: 14px; border-bottom: 2px dashed var(--ts-line);
+    strong { display: block; font-size: 17px; color: var(--ts-ink); }
+    small { display: flex; align-items: center; gap: 4px; color: var(--ts-ink-muted); margin-top: 2px; } }
+  &__icon { flex: 0 0 46px; height: 46px; display: grid; place-items: center; border-radius: 14px; background: var(--ts-outing-bg); color: var(--ts-outing); font-size: 24px; }
+}
+.ts-scan-facts {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; padding: 14px 0 4px;
+  > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  small { color: var(--ts-ink-muted); font-size: 12px; }
+  b { color: var(--ts-ink); font-size: 15px; overflow-wrap: anywhere; }
+}
+.ts-scan-types {
+  list-style: none; margin: 0; padding: 0; display: grid; gap: 8px;
+  li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--ts-radius-field); background: var(--ts-subtle); border: 1px solid var(--ts-line); }
+  &__count { flex: 0 0 auto; min-width: 44px; height: 36px; padding: 0 8px; display: grid; place-items: center; border-radius: 10px; background: var(--ts-navy); color: #fff; font-weight: 800; font-size: 16px; }
+}
+.ts-scan-serials { display: flex; flex-wrap: wrap; gap: 6px; }
+.ts-scan-serial {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: var(--ts-radius-chip); border: 1px solid var(--ts-line); background: var(--ts-surface); font-size: 13px; direction: ltr;
+  &.is-used { background: var(--ts-ok-bg); color: var(--ts-ok-fg); border-color: var(--ts-ok-line); }
+}
+.ts-scan-actions {
+  position: sticky; bottom: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; padding: 12px 0; background: var(--ts-page);
+  .btn { min-height: 52px; font-size: 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  > .btn:only-child { grid-column: 1 / -1; }
+}
+@media (max-width: 330px) { .ts-scan-facts { grid-template-columns: 1fr; } }
+.ts-scan-types .ts-card-row__main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ts-ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+.ts-screen:has(.ts-scan-actions) { padding-bottom: 8px; }

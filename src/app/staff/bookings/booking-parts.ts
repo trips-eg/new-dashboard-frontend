@@ -84,7 +84,10 @@ export class BookingCardComponent {
   get subtitle(): string {
     const i = this.item;
     if (!i) return '';
-    const tickets = (this.b.items ?? []).filter((x) => x.ticketName).map((x) => `${x.ticketName} × ${fmtNum(x.quantity ?? 1)}`);
+    // The tickets the customer chose (several types per outing), else the reservation's one type × seats
+    const tickets = (this.b.items ?? []).flatMap((x: any) =>
+      x.tickets?.length ? x.tickets.map((k: any) => `${k.name} × ${fmtNum(k.count)}`) : x.ticketName ? [`${x.ticketName} × ${fmtNum(x.quantity ?? 1)}`] : []
+    );
     const parts = tickets.length
       ? tickets.join(' · ')
       : [
@@ -145,11 +148,14 @@ export class CustomerCardComponent {
       </div>
       <ts-info [label]="'APP.dayAndTime' | translate" [value]="(item.travelDate ?? item.from) | ts: 'day'" [numeric]="false"></ts-info>
       <ts-info
-        *ngIf="item.ticketName"
+        *ngIf="item.ticketName && !$any(item).tickets?.length"
         [label]="'APP.tickets' | translate"
         [value]="item.ticketName + (item.quantity == null ? '' : ' × ' + item.quantity)"
         [numeric]="false"
       ></ts-info>
+      <ng-container *ngIf="$any(item).tickets?.length">
+        <ts-info *ngFor="let k of $any(item).tickets; let first = first" [label]="first ? ('APP.tickets' | translate) : ''" [value]="k.name + ' × ' + k.count" [numeric]="false"></ts-info>
+      </ng-container>
       <ts-info [label]="'APP.travellers' | translate" [value]="travellers" [numeric]="false"></ts-info>
       <ts-info *ngIf="item.gatheringPoint?.name" [label]="'APP.gatheringPoint' | translate" [value]="item.gatheringPoint?.name" [numeric]="false"></ts-info>
     </ts-card>

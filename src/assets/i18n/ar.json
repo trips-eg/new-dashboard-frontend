@@ -2684,7 +2684,16 @@
     "cpGroup_visitors": "الزوار (من غير حساب)",
     "cpGroup_noBookings": "مسجلين من غير حجوزات",
     "cpGroup_completedBookings": "عندهم حجوزات مكتملة",
-    "cpGroup_cancelledOnly": "لغوا ومكملوش أي حجز"
+    "cpGroup_cancelledOnly": "لغوا ومكملوش أي حجز",
+    "scanStartCamera": "شغّل الكاميرا",
+    "scanTypeNumber": "أو اكتب رقم التذكرة",
+    "scanUsedAt": "اتسجّل دخولها {{t}}",
+    "scanPeople": "الأفراد",
+    "scanPeopleN": "{{a}} كبار · {{c}} أطفال",
+    "scanTicketTypes": "التذاكر اللي اختارها العميل",
+    "scanNoTypes": "مفيش أنواع تذاكر مسجلة على الحجز ده",
+    "scanSerials": "الأرقام التسلسلية",
+    "bookingRef": "رقم الحجز"
   },
   "WEB": {
     "svNewThisMonth": "زوار جداد الشهر ده",
