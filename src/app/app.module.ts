@@ -1,8 +1,10 @@
-import { NgModule, isDevMode } from '@angular/core';
+import { APP_INITIALIZER, NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppRoutingModule } from './app-routing.module';
+import { TranslateService } from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
 import { AppComponent } from './app.component';
 import { AdminComponent } from './theme/layout/admin/admin.component';
 import { NavigationItem } from './theme/layout/admin/navigation/navigation';
@@ -69,7 +71,25 @@ export function HttpLoaderFactory(http: HttpClient) {
   enabled: !isDevMode(),
   registrationStrategy: 'registerWhenStable:30000'
 })],
-  providers: [NavigationItem,MessageService,ToastrService ,DialogService,{provide:HTTP_INTERCEPTORS , useClass:HttpInterceptorInterceptor , multi:true}],
+  providers: [
+    NavigationItem,
+    MessageService,
+    ToastrService,
+    DialogService,
+    { provide: HTTP_INTERCEPTORS, useClass: HttpInterceptorInterceptor, multi: true },
+    // Screens read labels when they are created (this.text.tr in field initialisers); with the language file loaded
+    // before the app starts, they no longer show raw keys on the first page opened
+    { provide: APP_INITIALIZER, useFactory: loadLanguageFirst, deps: [TranslateService], multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}
+
+/** Loads the saved language's file before the first screen; gives up after 5 s so a slow file never blocks the app. */
+export function loadLanguageFirst(translate: TranslateService) {
+  return () =>
+    Promise.race([
+      firstValueFrom(translate.use(localStorage.getItem('Language') || 'en')).catch(() => undefined),
+      new Promise((resolve) => setTimeout(resolve, 5000))
+    ]);
+}

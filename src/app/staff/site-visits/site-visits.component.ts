@@ -140,11 +140,14 @@ export class SiteVisitsComponent implements OnInit {
   d: SiteVisitsReport | null = null;
   error: unknown = null;
   grain: Grain = 'days';
-  grains = [
-    { key: 'days', label: this.text.tr('WEB.svDaily') },
-    { key: 'weeks', label: this.text.tr('WEB.svWeekly') },
-    { key: 'months', label: this.text.tr('WEB.svMonthly') }
-  ];
+  /** A getter: read when the field was created, the labels came out as keys before the translations had loaded. */
+  get grains() {
+    return [
+      { key: 'days', label: this.text.tr('WEB.svDaily') },
+      { key: 'weeks', label: this.text.tr('WEB.svWeekly') },
+      { key: 'months', label: this.text.tr('WEB.svMonthly') }
+    ];
+  }
 
   ngOnInit(): void {
     this.load();
