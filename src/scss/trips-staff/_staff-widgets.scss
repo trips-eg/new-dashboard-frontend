@@ -1190,3 +1190,6 @@ a.ts-action-row:hover {
   .btn { height: var(--ts-field-height, 44px); display: inline-flex; align-items: center; gap: 6px; }
   &__error { flex: 1 0 100%; margin: 0; color: var(--ts-danger-ink); font-size: 13px; }
 }
+
+// ---------- Round 3: add an option from a form ----------
+.ts-new-option { display: flex; gap: 8px; margin-top: 10px; .form-control { flex: 1 1 auto; min-width: 0; height: var(--ts-field-height, 44px); } .btn { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; } }

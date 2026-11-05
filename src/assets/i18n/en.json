@@ -2663,7 +2663,11 @@
     "rangeBothDays": "Pick a start and an end day",
     "rangeEndBeforeStart": "The end day must be after the start day",
     "rangeInFuture": "The end day can't be in the future",
-    "bookingsEachMonth": "Bookings per month"
+    "bookingsEachMonth": "Bookings per month",
+    "editPackage": "Edit package",
+    "newFeatureHint": "Feature not listed? Type its name",
+    "addFeature": "Add feature",
+    "featureExists": "That feature already exists; it's selected"
   },
   "WEB": {
     "svNewThisMonth": "New visitors this month",

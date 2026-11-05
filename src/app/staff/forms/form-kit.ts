@@ -122,6 +122,15 @@ export class FormsApi {
     return this.http.putEn('/api/Travels/UpdateProgramSteps/', steps, { tripId });
   }
 
+  /** PUT /api/Hajj/UpdateHajjProgramSteps/?tripId=: updates the package's steps by id, adds those with id 0. */
+  updateHajjProgram(hajjId: number, steps: unknown[]): Observable<unknown> {
+    return this.http.putEn('/api/Hajj/UpdateHajjProgramSteps/', steps, { tripId: hajjId });
+  }
+
+  deleteHajjProgramStep(id: number) {
+    return this.delete('/api/Hajj/DeleteHajjProgramStep/', id);
+  }
+
   dateSeats(hajjId: number, dates: unknown[]): Observable<unknown> {
     return this.http.put(`/api/staff/hajj/${hajjId}/date-seats`, { dates });
   }
@@ -694,7 +703,59 @@ export function timeOf(d: Date | null, ar: boolean): string {
   return fmtTime(d, ar);
 }
 
+/**
+ * "+ New feature" under the features chips: POST /api/TravelFeature/Create, then the parent adds it to its list and
+ * selects it. The backend answers an existing name with that feature (no duplicates), so it is selected instead.
+ */
+@Component({
+  selector: 'ts-new-feature',
+  standalone: true,
+  imports: [CommonModule, TranslateModule],
+  template: `
+    <div class="ts-new-option">
+      <input class="form-control" [placeholder]="'APP.newFeatureHint' | translate" [value]="name" (input)="name = $any($event.target).value" (keydown.enter)="$event.preventDefault(); add()" maxlength="100" />
+      <button type="button" class="btn btn-secondary" [disabled]="busy || !name.trim()" (click)="add()">
+        <i [class]="busy ? 'pi pi-spin pi-spinner' : 'ti ti-plus'"></i>{{ 'APP.addFeature' | translate }}
+      </button>
+    </div>
+  `
+})
+export class NewFeatureComponent {
+  private readonly http = inject(StaffHttp);
+  private readonly text = inject(StaffText);
+  /** Names already in the list, to pick the existing one without a call. */
+  @Input() existing: { value: string; labelAr: string }[] = [];
+  @Output() created = new EventEmitter<{ value: string; labelAr: string }>();
+  name = '';
+  busy = false;
+
+  add(): void {
+    const name = this.name.trim().replace(/\s+/g, ' ');
+    if (!name || this.busy) return;
+    const same = this.existing.find((o) => o.labelAr.trim().replace(/\s+/g, ' ').toLowerCase() === name.toLowerCase());
+    if (same) {
+      this.created.emit(same);
+      this.name = '';
+      return this.text.showDone(this.text.tr('APP.featureExists'));
+    }
+    this.busy = true;
+    this.http.postEn<any>('/api/TravelFeature/Create', { name }).subscribe({
+      next: (d) => {
+        this.busy = false;
+        if (d?.id == null) return;
+        this.created.emit({ value: String(d.id), labelAr: d.name ?? name });
+        this.name = '';
+      },
+      error: (e) => {
+        this.busy = false;
+        this.text.showError(e);
+      }
+    });
+  }
+}
+
 export const FORM_KIT = [
+  NewFeatureComponent,
   StepScaffoldComponent,
   FormSectionComponent,
   FieldComponent,

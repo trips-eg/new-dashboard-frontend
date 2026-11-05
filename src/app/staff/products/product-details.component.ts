@@ -323,7 +323,7 @@ export class ProductDetailsComponent implements OnInit {
         } else this.commission.show(this.type.value, this.id);
         return;
       case 'edit': {
-        const path = this.type.value === 1 ? '/form/trip' : this.type.value === 2 ? '/form/outing' : '/form/hajj/rooms';
+        const path = this.type.value === 1 ? '/form/trip' : this.type.value === 2 ? '/form/outing' : '/form/hajj';
         this.router.navigate([path], { queryParams: { id: this.id } });
         return;
       }

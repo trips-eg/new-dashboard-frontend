@@ -138,6 +138,7 @@ interface TripDateRow {
         </ts-form-section>
         <ts-form-section [title]="'APP.tripFeatures' | translate" [subtitle]="'APP.tripFeaturesHint' | translate" icon="ti ti-checklist" kind="general">
           <ts-chipbar *ngIf="features" [wrap]="true" [items]="chips(features)" [selected]="featureKeys()" (tap)="toggleFeature(+$event)"></ts-chipbar>
+          <ts-new-feature *ngIf="features" [existing]="features" (created)="featureAdded($event)"></ts-new-feature>
           <span class="ts-label">{{ 'APP.accommodationType' | translate }}</span>
           <ts-chipbar *ngIf="accommodations" [wrap]="true" [items]="chips(accommodations)" [selected]="accId ? [accId] : []" (tap)="accId = accId === $event ? null : $event"></ts-chipbar>
         </ts-form-section>
@@ -251,6 +252,12 @@ export class TripFormComponent implements OnInit {
 
   featureKeys(): string[] {
     return [...this.featureIds].map(String);
+  }
+
+  /** A feature made (or found) from the form: in the list once, and selected. */
+  featureAdded(o: { value: string; labelAr: string }): void {
+    if (this.features && !this.features.some((x) => String(x.value) === o.value)) this.features = [...this.features, o as FilterOption];
+    this.featureIds = new Set([...this.featureIds, +o.value]);
   }
 
   toggleFeature(id: number): void {

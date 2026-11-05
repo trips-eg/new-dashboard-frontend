@@ -2699,7 +2699,11 @@
     "rangeBothDays": "اختار يوم البداية ويوم النهاية",
     "rangeEndBeforeStart": "يوم النهاية لازم يكون بعد يوم البداية",
     "rangeInFuture": "مينفعش تختار يوم لسه ماجاش",
-    "bookingsEachMonth": "الحجوزات كل شهر"
+    "bookingsEachMonth": "الحجوزات كل شهر",
+    "editPackage": "تعديل الباقة",
+    "newFeatureHint": "ميزة مش موجودة؟ اكتب اسمها هنا",
+    "addFeature": "ضيف ميزة",
+    "featureExists": "الميزة دي موجودة بالفعل، اتختارت"
   },
   "WEB": {
     "svNewThisMonth": "زوار جداد الشهر ده",

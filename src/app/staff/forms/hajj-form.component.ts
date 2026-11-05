@@ -2,10 +2,11 @@ import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { catchError, firstValueFrom, of } from 'rxjs';
+import { catchError, firstValueFrom, forkJoin, of } from 'rxjs';
 import { KIT, StaffText } from '../ui/kit';
 import { PillSwitchComponent, SwitchRowComponent } from '../ui/controls';
 import { StaffSession } from '../core/session';
+import { ProductsApi } from '../products/products-api';
 import { FilterOption } from '../core/query';
 import { ChipBarComponent } from '../ui/lists';
 import { fmtNum, parseAmount, parseDate } from '../core/format';
@@ -17,10 +18,12 @@ import {
   ProgramStep,
   amountOf,
   childPolicyError,
+  childPolicyFrom,
   childPolicyJson,
   cleanPoints,
   formDate,
   intOf,
+  programStepFrom,
   programStepJson,
   runFollowUps,
   jsonEach
@@ -108,6 +111,8 @@ export class RoomsEditorComponent {
 }
 
 interface HajjGroup {
+  /** The stored HajjDate when editing: kept by id, so its bookings and seats stay on it. */
+  id?: number | null;
   start: Date | null;
   seats: number | null;
 }
@@ -122,9 +127,11 @@ interface HajjGroup {
   standalone: true,
   imports: [CommonModule, TranslateModule, ...KIT, ...FORM_KIT, PillSwitchComponent, SwitchRowComponent, RoomsEditorComponent, ChipBarComponent],
   template: `
-    <ts-step-scaffold [title]="'APP.newPackage' | translate" [steps]="steps" [current]="step" [busy]="busy" (back)="step = step - 1" (next)="next()" (jump)="jump($event)">
+    <ts-step-scaffold [title]="(id ? 'APP.editPackage' : 'APP.newPackage') | translate" [nextLabel]="id && step === 3 ? ('APP.saveChanges' | translate) : ''" [steps]="steps" [current]="step" [busy]="busy" (back)="step = step - 1" (next)="next()" (jump)="jump($event)">
+      <ts-loading *ngIf="loading"></ts-loading>
+      <ts-error *ngIf="loadError" [error]="loadError" (retry)="load()"></ts-error>
       <!-- 1: data, groups, points -->
-      <ng-container *ngIf="step === 0">
+      <ng-container *ngIf="step === 0 && !loading">
         <ts-form-section [title]="'APP.stepDataPlace' | translate" icon="ti ti-map" kind="place">
           <ts-pill-switch [items]="kinds" [selected]="String(f.type)" (selectedChange)="f.type = +$event"></ts-pill-switch>
           <div style="height: 12px"></div>
@@ -199,11 +206,12 @@ interface HajjGroup {
         </ts-form-section>
         <ts-form-section [title]="'APP.tripFeatures' | translate" [subtitle]="'APP.tripFeaturesHint' | translate" icon="ti ti-checklist" kind="general">
           <ts-chipbar *ngIf="features" [wrap]="true" [items]="chips(features)" [selected]="featureKeys()" (tap)="toggleFeature(+$event)"></ts-chipbar>
+          <ts-new-feature *ngIf="features" [existing]="features" (created)="featureAdded($event)"></ts-new-feature>
           <span class="ts-label">{{ 'APP.accommodationType' | translate }}</span>
           <ts-chipbar *ngIf="accommodations" [wrap]="true" [items]="chips(accommodations)" [selected]="accId ? [accId] : []" (tap)="accId = accId === $event ? null : $event"></ts-chipbar>
         </ts-form-section>
         <ts-form-section [title]="'APP.images' | translate" [subtitle]="'APP.imagesHint' | translate" icon="ti ti-photo" kind="media">
-          <ts-images-field [(files)]="images"></ts-images-field>
+          <ts-images-field [(files)]="images" [existing]="existingImages" (removeExisting)="removeImage($event)"></ts-images-field>
         </ts-form-section>
       </ng-container>
 
@@ -217,8 +225,10 @@ interface HajjGroup {
     </ts-step-scaffold>
   `
 })
-export class HajjFormComponent {
+export class HajjFormComponent implements OnInit {
   private readonly api = inject(FormsApi);
+  private readonly products = inject(ProductsApi);
+  private readonly route = inject(ActivatedRoute);
   private readonly location = inject(Location);
   private readonly session = inject(StaffSession);
   private readonly text = inject(StaffText);
@@ -228,6 +238,19 @@ export class HajjFormComponent {
 
   step = 0;
   busy = false;
+  /** Editing this package (?id=), else a new one. */
+  id: number | null = null;
+  loading = false;
+  loadError: unknown = null;
+  existingImages: string[] = [];
+  private existingImageIds: number[] = [];
+  private removedImageIds: number[] = [];
+  private originalStepIds = new Set<number>();
+  private originalRoomIds = new Set<number>();
+  /** The rule and foreign price as loaded: saved again only when changed. */
+  private rulesAtLoad = '';
+  /** Fields the form doesn't show, sent back as they were (UpdateHajj maps every field). */
+  private kept: Record<string, unknown> = {};
   f: any = {
     type: 2,
     name: '',
@@ -272,6 +295,107 @@ export class HajjFormComponent {
   accommodations: FilterOption[] | null = null;
   accId: string | null = null;
 
+  ngOnInit(): void {
+    const id = this.route.snapshot.queryParams['id'];
+    this.id = id ? +id : null;
+    if (this.id) this.load();
+  }
+
+  /** Fills the form from GetHajjById, the gathering points, the seats per date, the rule and the foreign price. */
+  load(): void {
+    const id = this.id!;
+    this.loading = true;
+    this.loadError = null;
+    forkJoin([
+      this.api.get('/api/Hajj/GetHajjById/', id),
+      this.api.existingPoints(4, id).pipe(catchError(() => of([]))),
+      this.products.dateSeats(id).pipe(catchError(() => of(null))),
+      this.products.bookingRule(4, id).pipe(catchError(() => of(null))),
+      this.products.foreignPrice(4, id).pipe(catchError(() => of(null)))
+    ]).subscribe({
+      next: ([d, points, seats, rule, foreign]) => {
+        const f = this.f;
+        const num = (v: any) => (v == null ? '' : fmtNum(v));
+        f.type = d.type ?? 2;
+        f.name = d.name ?? '';
+        f.days = String(d.numberOfDays ?? '');
+        f.makkah = String(d.daysInMakkah ?? '');
+        f.madinah = String(d.daysInMadinah ?? '');
+        f.resMakkah = d.residenceInMakkah ?? '';
+        f.resMadinah = d.residenceInMadinah ?? '';
+        f.flight = d.flightLine ?? '';
+        f.from = d.fromLocation ?? '';
+        f.to = d.toLocation ?? '';
+        f.link = d.externalLink ?? '';
+        if (d.hajjCategoryId != null) f.category = { id: String(d.hajjCategoryId), name: d.category?.name ?? `#${d.hajjCategoryId}` };
+        if (d.countryId != null) f.country = { id: String(d.countryId), name: d.country?.name ?? `#${d.countryId}` };
+        if (d.cityId != null) f.city = { id: String(d.cityId), name: d.city?.name ?? `#${d.cityId}` };
+        f.vendor = { id: String(d.vendorId), name: d.companyDto?.name ?? `#${d.vendorId}` };
+        f.price = num(d.price);
+        f.childPrice = num(d.childPrice);
+        f.priceBefore = num(d.priceBefore);
+        f.capacity = String(d.capacity ?? '');
+        f.depositType = d.depositType ?? 1;
+        f.deposit = d.depositRate ? fmtNum(d.depositRate) : '';
+        f.payOnArrival = !!d.isAllowPaymentUponArrival;
+        f.refundable = !!d.isRefundable;
+        f.refundDays = d.minimumDaysToRefund ? String(d.minimumDaysToRefund) : '';
+        f.policy = d.cancellationPolicy ?? '';
+        f.vat = !!d.isIncludeVate;
+        f.recommended = !!d.isRecommended;
+        f.active = d.isActive ?? true;
+        const seatsOf = new Map<number, number | null>(((seats?.dates ?? []) as any[]).map((x) => [x.hajjDateId ?? x.id, x.seats ?? null]));
+        this.groups = ((d.dates ?? []) as any[])
+          .map((x) => ({ id: x.id, start: parseDate(x.startDate), seats: seatsOf.get(x.id) ?? null }))
+          .sort((a, b) => (a.start?.getTime() ?? 0) - (b.start?.getTime() ?? 0));
+        if (!this.groups.length) this.groups = [{ id: null, start: parseDate(d.startDate), seats: null }];
+        this.points = points ?? [];
+        this.children = Array.isArray(d.childPricingPolicies) ? d.childPricingPolicies.map(childPolicyFrom) : [];
+        this.descriptions = ((d.descriptions ?? []) as any[]).map((x) => x.description ?? '');
+        if (!this.descriptions.length) this.descriptions = [''];
+        const imgs = ((d.images ?? []) as any[]).filter((x) => x.imageUrl);
+        this.existingImages = imgs.map((x) => x.imageUrl);
+        this.existingImageIds = imgs.map((x) => x.id);
+        this.featureIds = new Set(((d.features ?? []) as any[]).map((x) => x.id));
+        const acc = (d.accommodationTypes ?? [])[0]?.id;
+        this.accId = acc == null ? null : String(acc);
+        this.program = (d.segments ?? []).map(programStepFrom);
+        this.originalStepIds = new Set(this.program.map((s) => s.id).filter((x): x is number => x != null));
+        const rooms: any[] = d.tickets ?? [];
+        this.originalRoomIds = new Set(rooms.map((x) => x.id));
+        this.rooms = rooms.map((x) => ({
+          ...newRoom(),
+          id: x.id,
+          type: x.ticketType ?? '',
+          description: x.description ?? '',
+          price: x.price ?? null,
+          quantity: x.availableQuantity ?? null,
+          active: x.isActive ?? true
+        }));
+        if (!this.rooms.length) this.rooms = [newRoom()];
+        this.rules = {
+          min: String(rule?.minQuantity ?? 1),
+          max: rule?.maxQuantity == null ? '' : String(rule.maxQuantity),
+          foreign: foreign?.price == null ? '' : fmtNum(foreign.price),
+          foreignChild: foreign?.childPrice == null ? '' : fmtNum(foreign.childPrice)
+        };
+        this.rulesAtLoad = JSON.stringify(this.rules);
+        this.kept = { Rating: d.rating ?? 0, IsFake: !!d.isFake, ...(this.vendor ? { IsRecommended: !!d.isRecommended } : {}) };
+        this.loading = false;
+      },
+      error: (e) => {
+        this.loadError = e;
+        this.loading = false;
+      }
+    });
+  }
+
+  removeImage(i: number): void {
+    this.removedImageIds.push(this.existingImageIds[i]);
+    this.existingImages = this.existingImages.filter((_, j) => j !== i);
+    this.existingImageIds = this.existingImageIds.filter((_, j) => j !== i);
+  }
+
   constructor() {
     this.api.lookupGet('/api/TravelFeature/GetAll').subscribe({ next: (r) => (this.features = r), error: () => (this.features = []) });
     this.api.lookupGet('/api/AccommodationType/GetAllAccommodationTypes').subscribe({ next: (r) => (this.accommodations = r), error: () => (this.accommodations = []) });
@@ -283,6 +407,12 @@ export class HajjFormComponent {
 
   featureKeys(): string[] {
     return [...this.featureIds].map(String);
+  }
+
+  /** A feature made (or found) from the form: in the list once, and selected. */
+  featureAdded(o: { value: string; labelAr: string }): void {
+    if (this.features && !this.features.some((x) => String(x.value) === o.value)) this.features = [...this.features, o as FilterOption];
+    this.featureIds = new Set([...this.featureIds, +o.value]);
   }
 
   toggleFeature(id: number): void {
@@ -324,7 +454,7 @@ export class HajjFormComponent {
         const dep = amountOf(f.deposit);
         if (dep != null && (dep < 0 || (f.depositType === 1 && dep > 100))) return 'APP.depositInvalid';
         if (this.descriptions.every((d) => !d.trim())) return 'APP.descriptionRequired';
-        if (!this.images.length) return 'APP.imageRequired';
+        if (!this.images.length && !this.existingImages.length) return 'APP.imageRequired';
         return childPolicyError(this.children);
       }
       case 3:
@@ -351,6 +481,7 @@ export class HajjFormComponent {
       this.step++;
       return;
     }
+    if (this.id) return this.saveEdit();
     this.busy = true;
     const f = this.f;
     const tr = (k: string) => this.text.tr(k);
@@ -437,6 +568,118 @@ export class HajjFormComponent {
         )
       ]);
       this.text.showDone(failed.length ? this.text.tr('APP.savedExcept', { n: [...new Set(failed)].join('، ') }) : tr('APP.productSaved'));
+      this.location.back();
+    } catch (e) {
+      this.text.showError(e);
+    } finally {
+      this.busy = false;
+    }
+  }
+
+  /**
+   * Saves an edited package: PUT UpdateHajj with every field (dates keep their ids, so bookings and seats stay on
+   * them; removed images by id), then the rooms by id (UpdateListHajjTicket, removed rooms deleted), the program by
+   * id, gathering points, seats per date, and the rule and foreign price when they changed.
+   */
+  private async saveEdit(): Promise<void> {
+    const id = this.id!;
+    const f = this.f;
+    const tr = (k: string) => this.text.tr(k);
+    const rooms = this.rooms;
+    if (!rooms.length || rooms.some((r) => !r.type.trim() || r.price == null || r.quantity == null)) return this.text.showError(tr('APP.roomsRequired'));
+    this.busy = true;
+    try {
+      const days = intOf(f.days)!;
+      const groups = [...this.groups].sort((a, b) => a.start!.getTime() - b.start!.getTime());
+      const end = new Date(groups[0].start!);
+      end.setDate(end.getDate() + days);
+      await firstValueFrom(
+        this.api.postForm(
+          '/api/Hajj/UpdateHajj/',
+          {
+            Id: id,
+            ...this.kept,
+            Type: f.type,
+            Name: f.name.trim(),
+            HajjCategoryId: f.category?.id ?? null,
+            StartDate: groups[0].start,
+            EndDate: end,
+            Dates: jsonEach(groups.map((g) => ({ ...(g.id ? { Id: g.id } : {}), StartDate: g.start }))),
+            NumberOfDays: days,
+            DaysInMakkah: intOf(f.makkah) ?? 0,
+            DaysInMadinah: intOf(f.madinah) ?? 0,
+            ResidenceInMakkah: f.resMakkah.trim(),
+            ResidenceInMadinah: f.resMadinah.trim(),
+            CountryId: f.country?.id ?? null,
+            CityId: f.city?.id ?? null,
+            FromLocation: f.from.trim(),
+            ToLocation: f.to.trim(),
+            FlightLine: f.flight.trim(),
+            ExternalLink: f.link.trim(),
+            ...(!this.vendor ? { VendorId: f.vendor?.id, IsRecommended: f.recommended } : {}),
+            Price: amountOf(f.price),
+            ChildPrice: amountOf(f.childPrice),
+            PriceBefore: amountOf(f.priceBefore),
+            Features: [...this.featureIds],
+            AccommodationTypeId: this.accId ? [+this.accId] : [],
+            Capacity: intOf(f.capacity),
+            DepositType: amountOf(f.deposit) == null ? null : f.depositType,
+            depositRate: amountOf(f.deposit),
+            IsAllowPaymentUponArrival: f.payOnArrival,
+            IsRefundable: f.refundable,
+            MinimumDaysToRefund: f.refundable ? intOf(f.refundDays) : null,
+            CancellationPolicy: f.policy.trim(),
+            IsIncludeVate: f.vat,
+            IsActive: f.active,
+            ChildPricingPolicies: jsonEach(this.children.map(childPolicyJson)),
+            Descriptions: jsonEach(this.descriptions.filter((d) => d.trim()).map((d) => ({ Description: d.trim() }))),
+            ImagesFiles: this.images,
+            DeletedImageIds: this.removedImageIds
+          },
+          true
+        )
+      );
+
+      // Rooms by id: removed ones are deleted (the backend refuses a booked room), the rest updated or added
+      const keptRooms = new Set(rooms.filter((r) => r.id != null).map((r) => r.id!));
+      for (const removed of [...this.originalRoomIds].filter((x) => !keptRooms.has(x))) await firstValueFrom(this.api.deleteRoom(removed));
+      await firstValueFrom(this.api.postJson('/api/HajjTickets/UpdateListHajjTicket/', { hajjId: id, tickets: rooms.map((r) => camel(roomJson(r))) }, true));
+
+      const saved = await firstValueFrom(this.api.get('/api/Hajj/GetHajjById/', id).pipe(catchError(() => of({} as any))));
+      const savedDates: any[] = saved?.dates ?? [];
+      const savedRooms: any[] = saved?.tickets ?? [];
+      const sameDay = (a: Date | null, b: Date | null) => !!a && !!b && a.toDateString() === b.toDateString();
+      const steps = this.program.filter((s) => s.title.trim());
+      const removedSteps = [...this.originalStepIds].filter((x) => !steps.some((s) => s.id === x));
+      const r = this.rules;
+      const rulesChanged = JSON.stringify(r) !== this.rulesAtLoad;
+      const failed = await runFollowUps([
+        ...removedSteps.map((stepId) => [tr('APP.stepProgram'), () => this.api.deleteHajjProgramStep(stepId)] as [string, any]),
+        ...(steps.length
+          ? [[tr('APP.stepProgram'), () => this.api.updateHajjProgram(id, steps.map((s) => camel(programStepJson(s, id, true))))] as [string, any]]
+          : []),
+        [tr('APP.gatheringPoints'), () => this.api.gatheringPoints(4, id, cleanPoints(this.points))],
+        ...(rulesChanged ? [[tr('APP.bookingRule'), () => this.api.bookingRule(4, id, intOf(r.min) ?? 1, intOf(r.max))] as [string, any]] : []),
+        ...(rulesChanged && amountOf(r.foreign) != null ? [[tr('APP.foreignPrice'), () => this.api.foreignPrice(4, id, amountOf(r.foreign)!, amountOf(r.foreignChild))] as [string, any]] : []),
+        [
+          tr('APP.dateSeats'),
+          () =>
+            this.api.dateSeats(
+              id,
+              this.groups.flatMap((g) => savedDates.filter((d) => (g.id ? d.id === g.id : sameDay(parseDate(d.startDate), g.start))).map((d) => ({ hajjDateId: d.id, seats: g.seats })))
+            )
+        ] as [string, any],
+        ...rooms.flatMap((room) =>
+          savedRooms
+            .filter((x) => (room.id ? x.id === room.id : x.ticketType === room.type.trim()))
+            .slice(0, 1)
+            .flatMap((x) => [
+              ...(room.foreign != null ? [[tr('APP.foreignPrice'), () => this.api.foreignPrice(6, x.id, room.foreign!, room.foreignChild)] as [string, any]] : []),
+              ...(room.min != null || room.max != null ? [[tr('APP.bookingRule'), () => this.api.bookingRule(6, x.id, room.min ?? 1, room.max)] as [string, any]] : [])
+            ])
+        )
+      ]);
+      this.text.showDone(failed.length ? this.text.tr('APP.savedExcept', { n: [...new Set(failed)].join('، ') }) : tr('APP.saved'));
       this.location.back();
     } catch (e) {
       this.text.showError(e);
