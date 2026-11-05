@@ -61,22 +61,7 @@ interface Group {
         </div>
       </ts-card>
     </ng-container>
-    <!-- The dashboard's screens from before this layout: all still here, one tap away -->
-    <ts-card *ngIf="legacy.length" [title]="'WEB.oldScreens' | translate" icon="ti ti-archive">
-      <div class="ts-legacy">
-        <ng-container *ngFor="let item of legacy">
-          <a *ngIf="item.url" class="ts-chip" [routerLink]="item.url"><i [class]="item.icon"></i>{{ item.title | translate }}</a>
-          <div *ngIf="item.children?.length" class="ts-legacy__group">
-            <small>{{ item.title | translate }}</small>
-            <div class="ts-wrap">
-              <ng-container *ngFor="let c of flat(item.children)">
-                <a class="ts-chip" [routerLink]="c.url">{{ c.title | translate }}</a>
-              </ng-container>
-            </div>
-          </div>
-        </ng-container>
-      </div>
-    </ts-card>
+    <!-- The old screens' list is hidden: their addresses now open the new screens (legacy-redirect.guard.ts) -->
     <ts-card [flush]="true">
       <button type="button" class="ts-menu-row" (click)="toggleLanguage()">
         <i class="ti ti-language"></i>

@@ -15,14 +15,14 @@ export type AnalyticsView = 'growth' | 'sales' | 'custom' | 'reports';
 
 /** Where a number leads (kpiTarget in the app): the dashboard list of the records behind it. */
 const ADMIN_TARGET: Record<string, string> = {
-  bookings: '/all-reservations',
-  cancelRatePct: '/all-reservations',
+  bookings: '/a/bookings',
+  cancelRatePct: '/a/bookings',
   revenue: '/walletTransactions',
   tripsProfit: '/walletTransactions',
   avgBookingValue: '/walletTransactions',
-  newCustomers: '/customers',
-  repeatCustomersPct: '/customers',
-  users: '/customers'
+  newCustomers: '/a/more/customers',
+  repeatCustomersPct: '/a/more/customers',
+  users: '/a/more/customers'
 };
 
 const KPI_ICON: Record<string, string> = {
@@ -210,7 +210,7 @@ export class StaffAnalyticsComponent implements OnInit {
   }
 
   kpiLink(k: Kpi): string | null {
-    return this.isVendor ? (k.key === 'bookings' || k.key === 'cancelRatePct' ? '/all-reservations' : null) : (ADMIN_TARGET[k.key] ?? null);
+    return this.isVendor ? (k.key === 'bookings' || k.key === 'cancelRatePct' ? '/v/bookings' : null) : (ADMIN_TARGET[k.key] ?? null);
   }
 
   // ---- chart helpers ----

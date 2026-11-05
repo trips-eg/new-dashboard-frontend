@@ -11,7 +11,7 @@ import { StaffHttp, mediaUrl } from '../core/staff-http';
 import { PagedList } from '../core/query';
 import { P, StaffSession } from '../core/session';
 import { apiDate, fmtNum, latinDigits, parseAmount } from '../core/format';
-import { FORM_KIT } from '../forms/form-kit';
+import { FORM_KIT, formDate } from '../forms/form-kit';
 import { CatalogItem, CatalogItemsComponent } from '../forms/home-content-forms.component';
 import { CommissionSheetComponent } from '../products/commission-sheet.component';
 import { bookingsLink } from '../bookings/bookings-api';
@@ -574,11 +574,29 @@ const COUPON_SEGMENTS: [string, string][] = [
         </div>
       </ts-form-section>
       <ts-form-section [title]="'APP.whoGetsIt' | translate" icon="ti ti-users-group">
-        <ts-switch-row *ngFor="let s of segments" [title]="s[1] | translate" [(value)]="seg[s[0]]"></ts-switch-row>
+        <ts-switch-row *ngFor="let s of segments" [title]="s[1] | translate" [value]="seg[s[0]]" (valueChange)="seg[s[0]] = $event; audienceChanged()"></ts-switch-row>
         <ts-switch-row [title]="'APP.sendAsNotification' | translate" [(value)]="f.notify"></ts-switch-row>
         <ts-switch-row [title]="'APP.sendAsEmail' | translate" [(value)]="f.email"></ts-switch-row>
-        <button type="button" class="btn btn-secondary ts-wide-btn" (click)="countReach()" style="margin-top: 8px"><i class="ti ti-users"></i>{{ 'APP.countReach' | translate }}</button>
-        <p class="ts-muted" *ngIf="reach" style="margin-top: 8px">{{ reach }}</p>
+        <button type="button" class="btn btn-secondary ts-wide-btn" [disabled]="reachBusy" (click)="countReach()" style="margin-top: 8px">
+          <i [class]="reachBusy ? 'pi pi-spin pi-spinner' : 'ti ti-users'"></i>{{ 'APP.countReach' | translate }}
+        </button>
+        <div class="ts-reach" *ngIf="reach" aria-live="polite">
+          <div class="ts-reach__total">
+            <span class="ts-reach__num ts-num">{{ num(reach.customers) }}</span>
+            <span>{{ 'APP.cpReachCustomers' | translate }}</span>
+          </div>
+          <div class="ts-reach__chips">
+            <ts-tag tone="info" icon="ti ti-bell-ringing">{{ 'APP.cpReachPush' | translate: { n: num(reach.withPush) } }}</ts-tag>
+            <ts-tag tone="info" icon="ti ti-mail">{{ 'APP.cpReachEmail' | translate: { n: num(reach.withEmail) } }}</ts-tag>
+            <ts-tag *ngIf="reach.visitorDevices" tone="neutral" icon="ti ti-device-mobile">{{ 'APP.cpReachVisitors' | translate: { n: num(reach.visitorDevices) } }}</ts-tag>
+          </div>
+          <ul class="ts-reach__groups" *ngIf="reach.groups.length">
+            <li *ngFor="let g of reach.groups"><span>{{ 'APP.cpGroup_' + g.key | translate }}</span><b class="ts-num">{{ num(g.count) }}</b></li>
+          </ul>
+          <p class="ts-muted ts-small" *ngIf="!reach.groups.length">{{ 'APP.couponNoAudience' | translate }}</p>
+          <p class="ts-muted ts-small" *ngIf="reach.groups.length && !reach.customers && !reach.visitorDevices">{{ 'APP.cpReachNone' | translate }}</p>
+          <p class="ts-muted ts-small" *ngIf="reach.visitorDevices && !f.notify">{{ 'APP.cpReachVisitorsPushOnly' | translate }}</p>
+        </div>
       </ts-form-section>
       <div class="ts-sticky-foot">
         <button type="button" class="btn btn-primary ts-wide-btn" [disabled]="busy" (click)="save()"><i *ngIf="busy" class="pi pi-spin pi-spinner"></i>{{ 'APP.save' | translate }}</button>
@@ -615,7 +633,9 @@ export class CouponFormComponent {
   /** The issues show once the first save was tried, then follow every change. */
   showIssues = false;
   busy = false;
-  reach: string | null = null;
+  reach: { groups: { key: string; count: number }[]; customers: number; withPush: number; withEmail: number; visitorDevices: number } | null = null;
+  reachBusy = false;
+  private reachTimer: any;
 
   private idsOf(kind: string): number[] {
     return this.items.filter((i) => i.kind === kind).map((i) => i.id);
@@ -631,8 +651,8 @@ export class CouponFormComponent {
       discountType: +f.type,
       discountAmount: parseAmount(f.amount) ?? 0,
       usageNumber: parseInt(latinDigits(f.uses), 10) || 1,
-      startDate: f.from?.toISOString(),
-      endDate: f.to?.toISOString(),
+      startDate: f.from ? formDate(f.from) : undefined,
+      endDate: f.to ? formDate(f.to) : undefined,
       // CouponScope: 2 General, 3 AppliedOnSpecificItems
       scope: this.items.length ? 3 : 2,
       tripIds: this.idsOf('trip'),
@@ -679,11 +699,31 @@ export class CouponFormComponent {
     return this.issues().some((i) => i.error);
   }
 
+  /**
+   * POST /api/staff/coupons/reach: the customers the chosen groups reach now, counted with the rules the send uses
+   * (a customer in two groups counts once). The old GetTargetedCategories only named the groups, so nothing showed.
+   */
   countReach(): void {
-    this.api.post('/api/Coupons/GetTargetedCategories', this.body()).subscribe({
-      next: (d) => (this.reach = Object.entries(d ?? {}).filter(([, v]) => typeof v === 'number').map(([k, v]) => `${k}: ${fmtNum(v as number)}`).join(' · ')),
-      error: (e) => this.text.showError(e)
+    this.reachBusy = true;
+    const audience = { usersId: [], ...this.seg };
+    this.api.post('/api/staff/coupons/reach', audience).subscribe({
+      next: (d) => {
+        this.reach = d;
+        this.reachBusy = false;
+      },
+      error: (e) => {
+        this.reachBusy = false;
+        this.reach = null;
+        this.text.showError(e);
+      }
     });
+  }
+
+  /** Once counted, the number follows the audience switches. */
+  audienceChanged(): void {
+    if (!this.reach) return;
+    clearTimeout(this.reachTimer);
+    this.reachTimer = setTimeout(() => this.countReach(), 400);
   }
 
   async save(): Promise<void> {

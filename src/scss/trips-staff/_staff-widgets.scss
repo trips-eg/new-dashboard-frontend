@@ -1109,3 +1109,30 @@ a.ts-action-row:hover {
 .ts-bars {
   direction: ltr;
 }
+
+// ---------- Round 3: coupons (usage, distribution sheet, reach) ----------
+.ts-small { font-size: 12px; }
+.ts-coupon-usage { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.ts-coupon-card { cursor: pointer; }
+.ts-kv-grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;
+  > div { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1px solid var(--ts-line); border-radius: var(--ts-radius-field); background: var(--ts-subtle); }
+  b { font-size: 15px; color: var(--ts-ink); }
+}
+.ts-sheet-sub { display: flex; align-items: center; gap: 8px; margin: 18px 0 10px; font-size: 15px; font-weight: 700; color: var(--ts-ink); i { color: var(--ts-accent); } }
+.ts-channel {
+  display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--ts-line); border-radius: var(--ts-radius-field);
+  & + & { margin-top: 8px; }
+  &__icon { flex: 0 0 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: var(--ts-ok-bg); color: var(--ts-ok-fg); font-size: 20px;
+    &.is-off { background: var(--ts-hover); color: var(--ts-ink-faint); } }
+}
+.ts-reach {
+  margin-top: 12px; padding: 14px; border-radius: var(--ts-radius-card); background: var(--ts-info-bg); border: 1px solid var(--ts-line);
+  &__total { display: flex; align-items: baseline; gap: 8px; color: var(--ts-ink); }
+  &__num { font-size: 28px; font-weight: 800; color: var(--ts-navy); line-height: 1; }
+  &__chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+  &__groups { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px;
+    li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-top: 1px dashed var(--ts-line); font-size: 13px; } }
+}
+@media (max-width: 480px) { .ts-kv-grid { grid-template-columns: 1fr 1fr; gap: 8px; } }
+.ts-channel .ts-card-row__main > small { display: block; margin-top: 2px; }

@@ -6,10 +6,10 @@
         <span class="ts-hero__brand" lang="en" aria-hidden="true">More Trips, More Stories</span>
         <div class="ts-hero__top">
           <p class="ts-hero__hello">{{ 'STAFF_UI.GOOD_MORNING' | translate: { n: username } }} · {{ today }}</p>
-          <a class="ts-hero__icon-link" routerLink="/all-reservations" [attr.aria-label]="'STAFF_UI.BOOKINGS' | translate">
+          <a class="ts-hero__icon-link" routerLink="/a/bookings" [attr.aria-label]="'STAFF_UI.BOOKINGS' | translate">
             <i class="ti ti-search" aria-hidden="true"></i>
           </a>
-          <a class="ts-hero__icon-link" routerLink="/notifications" [attr.aria-label]="'notifications' | translate">
+          <a class="ts-hero__icon-link" routerLink="/a/more/notifications" [attr.aria-label]="'notifications' | translate">
             <i class="ti ti-bell" aria-hidden="true"></i>
           </a>
         </div>
@@ -105,7 +105,7 @@
               <h2>{{ 'STAFF_UI.NEEDS_ACTION' | translate }}</h2>
             </div>
           </div>
-          <a class="ts-action-row" routerLink="/all-reservations">
+          <a class="ts-action-row" routerLink="/a/bookings">
             <span class="ts-action-row__icon" style="background: var(--ts-pend-bg); color: var(--ts-pend-ink)">
               <i class="ti ti-clock" aria-hidden="true"></i>
             </span>
@@ -124,7 +124,7 @@
             </span>
             <span class="ts-action-row__count" style="color: var(--ts-teal)">{{ fmtNum(admin.overview.today.productsPendingReview) }}</span>
           </div>
-          <a class="ts-action-row" routerLink="/admin-custom-trip-requests">
+          <a class="ts-action-row" routerLink="/a/more/custom-requests">
             <span class="ts-action-row__icon" style="background: var(--ts-marketing-bg); color: var(--ts-marketing)">
               <i class="ti ti-compass" aria-hidden="true"></i>
             </span>
@@ -137,7 +137,7 @@
             </span>
             <i class="ti ti-chevron-right ts-action-row__chev" aria-hidden="true"></i>
           </a>
-          <a class="ts-action-row" routerLink="/reviews">
+          <a class="ts-action-row" routerLink="/a/more/reviews">
             <span class="ts-action-row__icon" style="background: var(--ts-hajj-bg); color: var(--ts-hajj)">
               <i class="ti ti-star" aria-hidden="true"></i>
             </span>
@@ -147,7 +147,7 @@
             <span class="ts-action-row__count" style="color: var(--ts-hajj)">{{ fmtNum(admin.overview.today.reviewsToReply) }}</span>
             <i class="ti ti-chevron-right ts-action-row__chev" aria-hidden="true"></i>
           </a>
-          <a class="ts-action-row" routerLink="/vendor-settlements">
+          <a class="ts-action-row" routerLink="/a/more/settlements">
             <span class="ts-action-row__icon" style="background: var(--ts-trip-bg); color: var(--ts-trip)">
               <i class="ti ti-wallet" aria-hidden="true"></i>
             </span>
@@ -228,7 +228,7 @@
         </div>
         <h1 id="vendor-hero-title" class="ts-hero__title">{{ 'STAFF_UI.LEAVING_TODAY' | translate: { n: fmtNum(travellers) } }}</h1>
         <div class="ts-hero__actions" *ngIf="canScan">
-          <a class="ts-hero__scan" routerLink="/scanner">
+          <a class="ts-hero__scan" routerLink="/v/scanner">
             <i class="ti ti-scan" aria-hidden="true"></i>
             {{ 'STAFF_UI.SCAN_TICKET' | translate }}
           </a>
@@ -287,7 +287,7 @@
           <div class="ts-section__title">
             <h2>{{ 'STAFF_UI.LEAVING_TODAY_TITLE' | translate }}</h2>
           </div>
-          <a class="ts-section__action" routerLink="/all-reservations">{{ 'STAFF_UI.SEE_ALL' | translate }}</a>
+          <a class="ts-section__action" routerLink="/v/bookings">{{ 'STAFF_UI.SEE_ALL' | translate }}</a>
         </div>
         <div class="ts-empty" *ngIf="!vendor.departures.length">
           <i class="ti ti-calendar-event" aria-hidden="true"></i>

@@ -7,6 +7,7 @@ import { tripStarPermissionGuard } from './shared/guards/trip-star-permission.gu
 import { reviewsAdminGuard } from './shared/guards/reviews-admin.guard';
 import { Permissions } from './theme/layout/admin/navigation/navigation';
 import { STAFF_ROUTES } from './staff/staff.routes';
+import { LEGACY_REDIRECTS } from './shared/guards/legacy-redirect.guard';
 
 const routes: Routes = [
   {
@@ -30,6 +31,8 @@ const routes: Routes = [
     component: AdminComponent,
     // canActivate: [AuthGuard],
     children: [
+      // Old screens with a new one: their addresses open the new screen (the old code stays)
+      ...LEGACY_REDIRECTS,
       {
         path: 'reviews',
         canActivate: [reviewsAdminGuard],
