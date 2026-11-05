@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, Pipe, 
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { RangeKey } from './staff-analytics.service';
+import { RangeKey, presetRange, setCustomRange } from './staff-analytics.service';
 
 // Number formats of the Staff app (core/utils/format.dart), with Latin digits in both languages.
 const intFmt = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
@@ -114,24 +114,46 @@ export class KpiTileComponent {
   @Input() spark?: number[];
 }
 
-/** The range chips at the top of every analytics screen. */
+/**
+ * The range chips at the top of every analytics screen, with "Custom": any From–To (long ones too). The picked days
+ * go to setCustomRange, then 'custom' is emitted, so a screen reads it with presetRange('custom') like any preset.
+ */
 @Component({
   selector: 'ts-range-bar',
   standalone: true,
   imports: [CommonModule, TranslateModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="ts-chips" role="group" [attr.aria-label]="'STAFF_UI.PERIOD' | translate">
-      <button
-        type="button"
-        *ngFor="let k of keys"
-        class="ts-chip"
-        [class.is-selected]="k.key === selected"
-        [attr.aria-pressed]="k.key === selected"
-        (click)="selectedChange.emit(k.key)"
-      >
-        {{ k.label | translate }}
-      </button>
+    <div class="ts-range-bar">
+      <div class="ts-chips ts-chips--wrap" role="group" [attr.aria-label]="'STAFF_UI.PERIOD' | translate">
+        <button
+          type="button"
+          *ngFor="let k of keys"
+          class="ts-chip"
+          [class.is-selected]="k.key === selected"
+          [attr.aria-pressed]="k.key === selected"
+          (click)="pick(k.key)"
+        >
+          {{ k.label | translate }}
+        </button>
+        <button *ngIf="custom" type="button" class="ts-chip" [class.is-selected]="selected === 'custom'" [attr.aria-pressed]="selected === 'custom'" [attr.aria-expanded]="open" (click)="toggle()">
+          <i class="ti ti-calendar-event" aria-hidden="true"></i>
+          <ng-container *ngIf="selected === 'custom' && label; else plain">{{ label }}</ng-container>
+          <ng-template #plain>{{ 'APP.rangeCustom' | translate }}</ng-template>
+        </button>
+      </div>
+      <div class="ts-range-custom" *ngIf="open">
+        <label>
+          <span>{{ 'APP.from' | translate }}</span>
+          <input type="date" class="form-control" [max]="todayIso" [value]="from" (input)="from = $any($event.target).value; error = ''" />
+        </label>
+        <label>
+          <span>{{ 'APP.to' | translate }}</span>
+          <input type="date" class="form-control" [max]="todayIso" [value]="to" (input)="to = $any($event.target).value; error = ''" />
+        </label>
+        <button type="button" class="btn btn-primary" (click)="apply()"><i class="ti ti-check"></i>{{ 'APP.rangeApply' | translate }}</button>
+        <p class="ts-range-custom__error" *ngIf="error" role="alert">{{ error | translate }}</p>
+      </div>
     </div>
   `
 })
@@ -143,7 +165,51 @@ export class RangeBarComponent {
     { key: 'month', label: 'STAFF_UI.THIS_MONTH' },
     { key: 'quarter', label: 'STAFF_UI.LAST_3_MONTHS' }
   ];
+  /** Offer "Custom" (From–To). */
+  @Input() custom = true;
   @Output() selectedChange = new EventEmitter<RangeKey>();
+
+  open = false;
+  from = '';
+  to = '';
+  error = '';
+  label = '';
+  readonly todayIso = isoDay(new Date());
+
+  pick(key: RangeKey): void {
+    this.open = false;
+    this.selectedChange.emit(key);
+  }
+
+  toggle(): void {
+    this.open = !this.open;
+    if (this.open && !this.from) {
+      const r = presetRange('custom');
+      this.from = isoDay(r.from);
+      this.to = isoDay(r.to);
+    }
+  }
+
+  apply(): void {
+    if (!this.from || !this.to) return void (this.error = 'APP.rangeBothDays');
+    const from = new Date(this.from + 'T00:00:00');
+    const to = new Date(this.to + 'T00:00:00');
+    if (to < from) return void (this.error = 'APP.rangeEndBeforeStart');
+    if (to > new Date()) return void (this.error = 'APP.rangeInFuture');
+    setCustomRange(from, to);
+    this.label = `${shortDay(from)} – ${shortDay(to)}`;
+    this.open = false;
+    this.selectedChange.emit('custom');
+  }
+}
+
+function isoDay(d: Date): string {
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+function shortDay(d: Date): string {
+  return `${d.getDate()}/${d.getMonth() + 1}/${String(d.getFullYear()).slice(2)}`;
 }
 
 /** A line with a soft area and month/day labels (TrendChart in the app). */

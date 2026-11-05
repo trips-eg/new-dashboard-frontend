@@ -13,7 +13,7 @@ import { P, StaffSession } from '../core/session';
 import { Tone, itemType } from '../core/enums';
 import { apiDate, fmtCompact, fmtNum, fmtPct } from '../core/format';
 import { FORM_KIT } from '../forms/form-kit';
-import { BarsComponent, KpiTileComponent } from 'src/app/demo/pages/staff-analytics/staff-ui';
+import { BarsComponent, KpiTileComponent, RangeBarComponent } from 'src/app/demo/pages/staff-analytics/staff-ui';
 import { Range, RangeKey, presetRange } from 'src/app/demo/pages/staff-analytics/staff-analytics.service';
 
 function rangeQuery(r: Range | null): Record<string, string> {
@@ -238,12 +238,12 @@ const RANGE_KEYS: { key: RangeKey; label: string }[] = [
 @Component({
   selector: 'ts-search-records',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, ...LISTS],
+  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, ...LISTS, RangeBarComponent],
   template: `
     <div class="ts-screen">
       <ts-appbar [title]="title" [subtitle]="list.total ? ('APP.searchesN' | translate: { n: num(list.total) }) : null"></ts-appbar>
       <div class="ts-listbar">
-        <ts-chipbar [items]="ranges" [selected]="[range.key]" (tap)="setRange($any($event))"></ts-chipbar>
+        <ts-range-bar [keys]="rangeKeys" [selected]="range.key" (selectedChange)="setRange($event)"></ts-range-bar>
       </div>
       <ts-paged-list [list]="list" [emptyMessage]="'APP.nothingHereYet' | translate" emptyIcon="ti ti-search" [grid]="true">
         <ng-template let-r>
@@ -277,7 +277,7 @@ export class SearchRecordsComponent implements OnInit, OnDestroy {
   query: string | null = null;
   zeroOnly = false;
   range: Range = presetRange('last28');
-  ranges = RANGE_KEYS.map((r) => ({ key: r.key, label: this.text.tr(r.label) }));
+  rangeKeys = RANGE_KEYS;
   list!: PagedList<any>;
 
   ngOnInit(): void {
@@ -303,7 +303,7 @@ export class SearchRecordsComponent implements OnInit, OnDestroy {
 @Component({
   selector: 'ts-search-history',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, ...FORM_KIT, KpiTileComponent, PillSwitchComponent, SheetComponent, SwitchRowComponent],
+  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, ...FORM_KIT, KpiTileComponent, PillSwitchComponent, SheetComponent, SwitchRowComponent, RangeBarComponent],
   template: `
     <div class="ts-screen ts-screen--narrow">
       <ts-appbar [title]="'APP.searchHistory' | translate">
@@ -337,6 +337,7 @@ export class SearchRecordsComponent implements OnInit, OnDestroy {
             </button>
           </div>
         </ts-card>
+        <ts-range-bar [keys]="rangeKeys" [selected]="range.key" (selectedChange)="range = presetRange($event); load()"></ts-range-bar>
         <ts-pill-switch [items]="tabs" [selected]="tab" (selectedChange)="tab = $event; load()"></ts-pill-switch>
         <div class="ts-rank-list">
           <div class="ts-list-card" *ngFor="let r of words()">
@@ -370,6 +371,9 @@ export class SearchRecordsComponent implements OnInit, OnDestroy {
   `
 })
 export class SearchHistoryComponent implements OnInit {
+  rangeKeys = RANGE_KEYS;
+  range: Range = presetRange('last28');
+  presetRange = presetRange;
   private readonly api = inject(MarketingApi);
   private readonly session = inject(StaffSession);
   private readonly text = inject(StaffText);
@@ -401,7 +405,7 @@ export class SearchHistoryComponent implements OnInit {
 
   load(): void {
     this.error = null;
-    forkJoin({ s: this.api.search(this.tab, null), pinned: this.api.pinned() }).subscribe({
+    forkJoin({ s: this.api.search(this.tab, this.range), pinned: this.api.pinned() }).subscribe({
       next: (r) => {
         this.s = r.s;
         this.pinned = r.pinned;
@@ -666,10 +670,11 @@ export class UsedCouponsComponent implements OnDestroy {
 @Component({
   selector: 'ts-coupon-analytics',
   standalone: true,
-  imports: [CommonModule, TranslateModule, ...KIT, KpiTileComponent, BarsComponent, PillSwitchComponent],
+  imports: [CommonModule, TranslateModule, ...KIT, KpiTileComponent, BarsComponent, PillSwitchComponent, RangeBarComponent],
   template: `
     <div class="ts-screen ts-screen--narrow">
       <ts-appbar [title]="'APP.couponAnalytics' | translate"></ts-appbar>
+      <ts-range-bar [keys]="rangeKeys" [selected]="range.key" (selectedChange)="range = presetRange($event); load()"></ts-range-bar>
       <ts-loading *ngIf="!d && !error"></ts-loading>
       <ts-error *ngIf="error" [error]="error" (retry)="load()"></ts-error>
       <ng-container *ngIf="d">
@@ -700,6 +705,9 @@ export class CouponAnalyticsComponent implements OnInit {
   compact = fmtCompact;
   pct = (v: number | null | undefined) => fmtPct(v);
   group = 'week';
+  rangeKeys = RANGE_KEYS;
+  range: Range = presetRange('last28');
+  presetRange = presetRange;
   groups = [
     { key: 'day', label: this.text.tr('APP.day') },
     { key: 'week', label: this.text.tr('APP.week') },
@@ -714,7 +722,7 @@ export class CouponAnalyticsComponent implements OnInit {
 
   load(): void {
     this.error = null;
-    this.api.couponAnalytics(null, this.group).subscribe({ next: (d) => (this.d = d), error: (e) => (this.error = e) });
+    this.api.couponAnalytics(this.range, this.group).subscribe({ next: (d) => (this.d = d), error: (e) => (this.error = e) });
   }
 
   usesValues(): number[] {

@@ -125,6 +125,19 @@ export class StaffAnalyticsComponent implements OnInit {
     ];
   }
 
+  /** Days up to ~3 months, weeks up to a year, months beyond: a long custom range stays a readable chart. */
+  seriesGroup(r: Range): 'day' | 'week' | 'month' {
+    const days = Math.round((r.to.getTime() - r.from.getTime()) / 86400000) + 1;
+    return days <= 92 ? 'day' : days <= 366 ? 'week' : 'month';
+  }
+
+  /** The chart title follows its grouping (vendors get weeks unless the range is long). */
+  seriesTitle(vendor = false): string {
+    const g = this.seriesGroup(this.range);
+    if (g === 'month') return 'APP.bookingsEachMonth';
+    return vendor || g === 'week' ? 'STAFF_UI.BOOKINGS_PER_WEEK' : 'STAFF_UI.BOOKINGS_PER_DAY';
+  }
+
   setRange(key: RangeKey): void {
     this.range = presetRange(key);
     this.api.range$.next(this.range);
@@ -162,13 +175,13 @@ export class StaffAnalyticsComponent implements OnInit {
         source = this.isVendor
           ? forkJoin({
               overview: this.api.overview(r),
-              series: this.api.series(r, 'week'),
+              series: this.api.series(r, this.seriesGroup(r) === 'month' ? 'month' : 'week'),
               performance: this.companyId ? this.api.vendorPerformance(this.companyId, r).pipe(catchError(() => of(null))) : of(null),
               top: this.api.ranking(r, 'top', 5)
             })
           : forkJoin({
               overview: this.api.overview(r),
-              series: this.api.series(r, 'day'),
+              series: this.api.series(r, this.seriesGroup(r)),
               engagement: this.api.engagement(r),
               funnel: this.api.funnel(r),
               patterns: this.api.patterns(r)

@@ -2657,7 +2657,13 @@
     "scanTicketTypes": "Tickets the customer chose",
     "scanNoTypes": "No ticket types recorded on this booking",
     "scanSerials": "Serial numbers",
-    "bookingRef": "Booking reference"
+    "bookingRef": "Booking reference",
+    "rangeCustom": "Custom period",
+    "rangeApply": "Apply",
+    "rangeBothDays": "Pick a start and an end day",
+    "rangeEndBeforeStart": "The end day must be after the start day",
+    "rangeInFuture": "The end day can't be in the future",
+    "bookingsEachMonth": "Bookings per month"
   },
   "WEB": {
     "svNewThisMonth": "New visitors this month",

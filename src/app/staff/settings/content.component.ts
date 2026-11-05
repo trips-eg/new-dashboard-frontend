@@ -15,7 +15,7 @@ import { FORM_KIT, formDate } from '../forms/form-kit';
 import { CatalogItem, CatalogItemsComponent } from '../forms/home-content-forms.component';
 import { CommissionSheetComponent } from '../products/commission-sheet.component';
 import { bookingsLink } from '../bookings/bookings-api';
-import { BarsComponent, KpiTileComponent } from 'src/app/demo/pages/staff-analytics/staff-ui';
+import { BarsComponent, KpiTileComponent, RangeBarComponent } from 'src/app/demo/pages/staff-analytics/staff-ui';
 import { Range, RangeKey, presetRange } from 'src/app/demo/pages/staff-analytics/staff-analytics.service';
 import { SettingsApi } from './settings.component';
 
@@ -147,7 +147,7 @@ function change(now: number, before: number): number | null {
 @Component({
   selector: 'ts-tripstar-analytics',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, ChipBarComponent, KpiTileComponent, BarsComponent],
+  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, ChipBarComponent, KpiTileComponent, BarsComponent, RangeBarComponent],
   template: `
     <div class="ts-screen ts-screen--narrow">
       <ts-appbar [title]="'APP.tripStarAnalytics' | translate" [subtitle]="name"></ts-appbar>
@@ -155,7 +155,7 @@ function change(now: number, before: number): number | null {
         <img *ngIf="image; else noImg" [src]="image" alt="" />
         <ng-template #noImg><div class="ts-cover__empty ts-cover__empty--navy"><i class="ti ti-star-filled"></i></div></ng-template>
       </div>
-      <ts-chipbar [items]="ranges" [selected]="[range.key]" (tap)="setRange($any($event))"></ts-chipbar>
+      <ts-range-bar [keys]="rangeKeys" [selected]="range.key" (selectedChange)="setRange($event)"></ts-range-bar>
       <p class="ts-muted" style="margin: 4px 0 10px">{{ 'APP.tripStarProductsNote' | translate }}</p>
       <ts-loading *ngIf="!a && !error"></ts-loading>
       <ts-error *ngIf="error" [error]="error" (retry)="load()"></ts-error>
@@ -202,9 +202,9 @@ export class TripStarAnalyticsComponent implements OnInit {
   name = '';
   image: string | null = null;
   range: Range = presetRange('quarter');
-  ranges = (['week', 'month', 'quarter'] as RangeKey[]).map((k) => ({
+  rangeKeys = (['week', 'month', 'quarter'] as RangeKey[]).map((k) => ({
     key: k,
-    label: this.text.tr(k === 'week' ? 'APP.last7Days' : k === 'month' ? 'APP.thisMonth' : 'APP.last90Days')
+    label: k === 'week' ? 'APP.last7Days' : k === 'month' ? 'APP.thisMonth' : 'APP.last90Days'
   }));
   a: any = null;
   error: unknown = null;

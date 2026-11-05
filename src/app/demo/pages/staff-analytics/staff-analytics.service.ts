@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 /** The date range of the analytics screens, like the chips at the top of the Staff app. */
-export type RangeKey = 'today' | 'week' | 'month' | 'quarter' | 'last28';
+export type RangeKey = 'today' | 'week' | 'month' | 'quarter' | 'last28' | 'custom';
 
 export interface Range {
   key: RangeKey;
@@ -120,9 +120,22 @@ function addDays(d: Date, days: number): Date {
   return x;
 }
 
+/** The last From–To the user picked; presetRange('custom') returns it, so every screen reads it like a preset. */
+let customRange: Range | null = null;
+
+/** Keeps a picked From–To (day starts, From first) for presetRange('custom'). */
+export function setCustomRange(from: Date, to: Date): Range {
+  const a = dayOnly(from);
+  const b = dayOnly(to);
+  customRange = a <= b ? { key: 'custom', from: a, to: b } : { key: 'custom', from: b, to: a };
+  return customRange;
+}
+
 export function presetRange(key: RangeKey): Range {
   const today = dayOnly(new Date());
   switch (key) {
+    case 'custom':
+      return customRange ?? { key: 'last28', from: addDays(today, -27), to: today };
     case 'today':
       return { key, from: today, to: today };
     case 'week':

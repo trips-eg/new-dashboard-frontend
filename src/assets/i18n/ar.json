@@ -2693,7 +2693,13 @@
     "scanTicketTypes": "التذاكر اللي اختارها العميل",
     "scanNoTypes": "مفيش أنواع تذاكر مسجلة على الحجز ده",
     "scanSerials": "الأرقام التسلسلية",
-    "bookingRef": "رقم الحجز"
+    "bookingRef": "رقم الحجز",
+    "rangeCustom": "فترة مخصصة",
+    "rangeApply": "اعرض",
+    "rangeBothDays": "اختار يوم البداية ويوم النهاية",
+    "rangeEndBeforeStart": "يوم النهاية لازم يكون بعد يوم البداية",
+    "rangeInFuture": "مينفعش تختار يوم لسه ماجاش",
+    "bookingsEachMonth": "الحجوزات كل شهر"
   },
   "WEB": {
     "svNewThisMonth": "زوار جداد الشهر ده",

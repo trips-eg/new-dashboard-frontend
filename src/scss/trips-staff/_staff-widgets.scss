@@ -1179,3 +1179,14 @@ a.ts-action-row:hover {
 .ts-scan-types .ts-card-row__main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ts-ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
 .ts-screen:has(.ts-scan-actions) { padding-bottom: 8px; }
+
+// ---------- Round 3: custom period ----------
+.ts-range-bar { margin-bottom: 12px; }
+.ts-range-custom {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; margin-top: 10px; padding: 12px; border: 1px solid var(--ts-line);
+  border-radius: var(--ts-radius-card); background: var(--ts-surface); box-shadow: var(--ts-shadow-card);
+  label { display: flex; flex-direction: column; gap: 4px; flex: 1 1 140px; min-width: 0; font-size: 12px; color: var(--ts-ink-muted); }
+  .form-control { height: var(--ts-field-height, 44px); }
+  .btn { height: var(--ts-field-height, 44px); display: inline-flex; align-items: center; gap: 6px; }
+  &__error { flex: 1 0 100%; margin: 0; color: var(--ts-danger-ink); font-size: 13px; }
+}

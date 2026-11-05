@@ -67,9 +67,9 @@
       <section class="ts-section">
         <div class="ts-section__head">
           <span class="ts-section__chip" aria-hidden="true"><i class="ti ti-chart-line"></i></span>
-          <div class="ts-section__title"><h2>{{ 'STAFF_UI.BOOKINGS_PER_DAY' | translate }}</h2></div>
+          <div class="ts-section__title"><h2>{{ seriesTitle() | translate }}</h2></div>
         </div>
-        <ts-trend-chart [values]="values(data.series, 'bookings')" [labels]="labels(data.series, 'label')" [ariaLabel]="'STAFF_UI.BOOKINGS_PER_DAY' | translate"></ts-trend-chart>
+        <ts-trend-chart [values]="values(data.series, 'bookings')" [labels]="labels(data.series, 'label')" [ariaLabel]="seriesTitle() | translate"></ts-trend-chart>
       </section>
 
       <div class="ts-grid-2">
@@ -136,7 +136,7 @@
       <section class="ts-section">
         <div class="ts-section__head">
           <span class="ts-section__chip" aria-hidden="true"><i class="ti ti-chart-bar"></i></span>
-          <div class="ts-section__title"><h2>{{ 'STAFF_UI.BOOKINGS_PER_WEEK' | translate }}</h2></div>
+          <div class="ts-section__title"><h2>{{ seriesTitle(true) | translate }}</h2></div>
         </div>
         <ts-bars [values]="values(data.series, 'bookings')" [labels]="labels(data.series, 'label')"></ts-bars>
       </section>
