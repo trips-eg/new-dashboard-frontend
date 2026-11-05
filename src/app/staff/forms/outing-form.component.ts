@@ -11,6 +11,7 @@ import { StaffSession } from '../core/session';
 import { FilterOption } from '../core/query';
 import { fmtNum, parseAmount, parseDate } from '../core/format';
 import { ProductsApi } from '../products/products-api';
+import { ApiError } from '../core/staff-http';
 import { FORM_KIT, FormsApi, Picked, amountOf, cleanPoints, formDate, intOf, runFollowUps } from './form-kit';
 
 interface OutingTicket {
@@ -541,8 +542,17 @@ export class OutingFormComponent implements OnInit {
             });
             if (!ok) return;
           }
-          if (!this.active) await firstValueFrom(this.products.setActive(2, this.outingId!, true));
-          this.text.showDone(this.text.tr('APP.productSaved'));
+          let done = 'APP.productSaved';
+          if (!this.active) {
+            try {
+              await firstValueFrom(this.products.setActive(2, this.outingId!, true));
+            } catch (e) {
+              // A vendor's new or changed outing waits for the admins: everything is saved, it only isn't live yet
+              if (!(e instanceof ApiError && e.code === 'FORBIDDEN_SCOPE')) throw e;
+              done = 'APP.savedPendingApproval';
+            }
+          }
+          this.text.showDone(this.text.tr(done));
           this.location.back();
           return;
         }

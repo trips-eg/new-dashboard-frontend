@@ -42,6 +42,15 @@
   --ts-ink-muted: #6b5242;
   --ts-ink-faint: #7a6556;
   --ts-on-navy-muted: #e6d2bf;
+  // The menu (2026-11-06): a light pastel sky fading to a soft sunrise peach, dark sea-blue text, the current
+  // page still in sun orange (pastel travel minimalist; was the dark brown bar)
+  --ts-menu-bg: linear-gradient(180deg, #e3f2fd 0%, #d9edfb 55%, #fdebd9 100%);
+  --ts-menu-solid: #dfeffb;
+  --ts-menu-head: #d3e9f8;
+  --ts-menu-ink: #1f3d5c;
+  --ts-menu-muted: #4d6884;
+  --ts-menu-hover: rgb(255 255 255 / 60%);
+  --ts-menu-line: rgb(31 61 92 / 12%);
 
   // Surfaces
   --ts-surface: #ffffff;

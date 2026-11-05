@@ -17,6 +17,7 @@ import { ConfigureService } from 'src/app/theme/shared/services/configure.servic
 import { NavigationItem } from 'src/app/theme/layout/admin/navigation/navigation';
 import { StaffAnalyticsService, presetRange } from 'src/app/demo/pages/staff-analytics/staff-analytics.service';
 import { VendorCommsApi, VendorMessageRow } from '../vendor-comms/vendor-comms.component';
+import { PasswordSheetComponent } from '../settings/account-sheets';
 
 interface Entry {
   icon: string;
@@ -223,7 +224,7 @@ export class VendorMoreComponent implements OnInit {
 @Component({
   selector: 'ts-profile',
   standalone: true,
-  imports: [CommonModule, TranslateModule, ...KIT],
+  imports: [CommonModule, TranslateModule, ...KIT, PasswordSheetComponent],
   template: `
     <div class="ts-screen ts-screen--narrow">
       <ts-appbar [title]="'APP.myAccount' | translate"></ts-appbar>
@@ -238,11 +239,14 @@ export class VendorMoreComponent implements OnInit {
         <ts-info [label]="'APP.accountType' | translate" [value]="(s.isVendor ? 'APP.vendor' : 'APP.admin') | translate" [numeric]="false"></ts-info>
         <ts-info [label]="'APP.permissionsCount' | translate" [value]="s.permissions.length"></ts-info>
       </ts-card>
+      <button type="button" class="btn btn-secondary ts-wide-btn" (click)="pwOpen = true"><i class="ti ti-key"></i> {{ 'APP.changeMyPassword' | translate }}</button>
     </div>
+    <ts-password-sheet [open]="pwOpen" [own]="true" (openChange)="pwOpen = false"></ts-password-sheet>
   `
 })
 export class ProfileComponent {
   readonly s = inject(StaffSession);
+  pwOpen = false;
 }
 
 // ---------------------------------------------------------------- scanner

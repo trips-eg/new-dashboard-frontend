@@ -10,9 +10,13 @@ export interface BookingCustomer {
   name: string;
   phone?: string | null;
   email?: string | null;
-  bookingsCount: number;
-  completedCount: number;
+  /** Null for a vendor (historyHidden): they don't see the customer's history with Trips. */
+  bookingsCount: number | null;
+  completedCount: number | null;
   cancelledCount?: number | null;
+  historyHidden?: boolean;
+  /** True for a vendor 7 days after the booking: phone and email are no longer sent. */
+  contactHidden?: boolean;
 }
 
 /** StaffBookingItemDto: one reservation inside a booking. */
@@ -23,11 +27,13 @@ export interface BookingItem {
   vendorName?: string | null;
   travelDate?: string | null;
   from?: string | null;
+  to?: string | null;
   adults: number;
   childs: number;
   childAges?: number[];
   ticketName?: string | null;
   quantity?: number | null;
+  tickets?: { name: string; count: number }[] | null;
   gatheringPoint?: { name?: string } | null;
   productPrice: number;
   clientPaid: number;

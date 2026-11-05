@@ -160,3 +160,87 @@ body.dashboard-layout .pc-header .header-wrapper .pc-head-link.app-download-cont
     padding-inline: 10px;
   }
 }
+
+// ---------- The menu in pastel (2026-11-06) ----------
+// Replaces the dark brown menu with a light sky-to-peach card; the brand corner above it follows on small screens.
+body.dashboard-layout {
+  --nav-ink: var(--ts-menu-ink);
+  --nav-muted: var(--ts-menu-muted);
+  --nav-border: var(--ts-menu-line);
+
+  .pc-sidebar {
+    background: var(--ts-menu-solid);
+    background-image: var(--ts-menu-bg);
+  }
+
+  .pc-sidebar .sidebar-brand-header {
+    background: var(--ts-menu-head);
+  }
+
+  .pc-sidebar .coded-inner-navbar :is(a.nav-link, .nav-section-toggle):hover {
+    background: var(--ts-menu-hover);
+    color: var(--ts-menu-ink);
+  }
+
+  .pc-sidebar .coded-inner-navbar li.coded-trigger > .nav-section-toggle {
+    color: var(--ts-menu-ink);
+  }
+
+  .pc-sidebar .coded-inner-navbar .coded-submenu {
+    border-inline-start-color: var(--ts-menu-line);
+  }
+
+  .sidebar-close {
+    background: var(--ts-menu-hover);
+    color: var(--ts-menu-ink);
+  }
+
+  .pc-sidebar ng-scrollbar {
+    --scrollbar-thumb-color: rgb(31 61 92 / 22%);
+    --scrollbar-thumb-hover-color: rgb(31 61 92 / 36%);
+  }
+
+  .pc-header .m-header {
+    background: var(--ts-menu-head);
+    color: var(--ts-menu-ink);
+  }
+
+  .pc-header .m-header .pc-head-link {
+    color: var(--ts-menu-muted);
+  }
+
+  .pc-header .m-header .pc-head-link:is(:hover, :focus-visible, [aria-expanded='true']) {
+    background: var(--ts-menu-hover);
+    color: var(--ts-menu-ink);
+  }
+
+  .brand-copy strong {
+    color: var(--ts-menu-ink);
+  }
+
+  .brand-copy small {
+    color: var(--ts-menu-muted);
+  }
+}
+
+@media (min-width: 1025px) {
+  body.dashboard-layout .pc-sidebar {
+    background: var(--ts-page);
+    background-image: none;
+  }
+
+  body.dashboard-layout .pc-sidebar .navbar-wrapper {
+    background: var(--ts-menu-solid);
+    background-image: var(--ts-menu-bg);
+    border: 1px solid var(--ts-menu-line);
+    box-shadow: 0 16px 36px rgb(31 61 92 / 12%);
+  }
+
+  body.dashboard-layout .pc-sidebar .sidebar-brand-header {
+    background: transparent;
+  }
+
+  body.dashboard-layout .pc-header .m-header {
+    background: var(--ts-page);
+  }
+}

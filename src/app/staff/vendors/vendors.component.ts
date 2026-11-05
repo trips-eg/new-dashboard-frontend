@@ -13,6 +13,7 @@ import { ListResult, PagedList, StaffQuery, asPage, queryJson } from '../core/qu
 import { P, StaffSession } from '../core/session';
 import { fmtCompact, fmtNum, parseAmount } from '../core/format';
 import { FORM_KIT, toForm } from '../forms/form-kit';
+import { AccountRef, AccountSheetComponent, PasswordSheetComponent, splitName } from '../settings/account-sheets';
 import { KpiTileComponent } from 'src/app/demo/pages/staff-analytics/staff-ui';
 import { StaffAnalyticsService, presetRange } from 'src/app/demo/pages/staff-analytics/staff-analytics.service';
 
@@ -461,7 +462,7 @@ export class VendorFormComponent implements OnInit {
 @Component({
   selector: 'ts-vendor-users',
   standalone: true,
-  imports: [CommonModule, TranslateModule, ...KIT, SwitchRowComponent],
+  imports: [CommonModule, TranslateModule, ...KIT, SwitchRowComponent, AccountSheetComponent, PasswordSheetComponent],
   template: `
     <div class="ts-screen ts-screen--narrow">
       <ts-appbar [title]="'APP.vendorTeam' | translate"></ts-appbar>
@@ -480,8 +481,17 @@ export class VendorFormComponent implements OnInit {
             <input class="form-check-input" type="checkbox" [checked]="u.isActive" [disabled]="!canEdit" (change)="setActive(u, $any($event.target).checked)" />
           </label>
         </div>
+        <div class="ts-wrap" *ngIf="canEdit" style="margin-top: 10px">
+          <button type="button" class="btn btn-secondary btn-sm" (click)="editAccount(u)"><i class="ti ti-edit"></i> {{ 'APP.editAccount' | translate }}</button>
+          <button type="button" class="btn btn-secondary btn-sm" (click)="password(u)"><i class="ti ti-key"></i> {{ 'APP.changePassword' | translate }}</button>
+        </div>
+        <p class="ts-muted ts-num" *ngIf="u.username || u.phone" style="margin: 8px 0 0; font-size: 12.5px">
+          {{ u.username }}<ng-container *ngIf="u.phone"> · <span dir="ltr">{{ u.phone }}</span></ng-container>
+        </p>
       </ts-card>
     </div>
+    <ts-account-sheet [open]="!!account" [account]="account" (openChange)="account = null" (saved)="load()"></ts-account-sheet>
+    <ts-password-sheet [open]="!!pwFor" [userId]="pwFor?.userId ?? null" [name]="pwFor?.name ?? ''" (openChange)="pwFor = null"></ts-password-sheet>
   `
 })
 export class VendorUsersComponent implements OnInit {
@@ -492,9 +502,19 @@ export class VendorUsersComponent implements OnInit {
   companyId = 0;
   users: any[] | null = null;
   error: unknown = null;
+  account: AccountRef | null = null;
+  pwFor: { userId: number; name: string } | null = null;
 
   get canEdit(): boolean {
     return this.session.can(P.usersEdit);
+  }
+
+  editAccount(u: any): void {
+    this.account = { userId: u.userId, ...splitName(u.name), username: u.username ?? '', email: u.email, phone: u.phone };
+  }
+
+  password(u: any): void {
+    this.pwFor = { userId: u.userId, name: u.name };
   }
 
   ngOnInit(): void {

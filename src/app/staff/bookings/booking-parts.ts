@@ -5,7 +5,7 @@ import { KIT, StaffText } from '../ui/kit';
 import { LISTS } from '../ui/lists';
 import { BookingStatus, PayMethod, Tone, itemType } from '../core/enums';
 import { BookingCustomer, BookingDetails, BookingItem, BookingRow } from './bookings-api';
-import { fmtNum } from '../core/format';
+import { fmtDate, fmtNum } from '../core/format';
 
 /** BookingCard: one booking in the list, as in the design. */
 @Component({
@@ -21,11 +21,17 @@ import { fmtNum } from '../core/format';
           <div class="ts-card-row__main">
             <div class="ts-wrap">
               <span class="ts-card-title">{{ b.customer.name }}</span>
-              <ts-tag [tone]="b.customer.bookingsCount > 1 ? 'info' : 'neutral'">{{ customerHistory }}</ts-tag>
+              <ts-tag *ngIf="!b.customer.historyHidden" [tone]="(b.customer.bookingsCount ?? 0) > 1 ? 'info' : 'neutral'">{{ customerHistory }}</ts-tag>
             </div>
             <p class="ts-card-sub">{{ subtitle }}</p>
           </div>
           <ts-pill [tone]="tone">{{ waiting ? ('APP.checkReceipt' | translate) : b.statusName }}</ts-pill>
+        </div>
+        <div class="ts-bk-facts">
+          <span *ngIf="people > 0"><i class="ti ti-users"></i>{{ 'APP.peopleN' | translate: { n: num(people) } }}</span>
+          <span *ngIf="date"><i class="ti ti-calendar-event"></i>{{ date }}</span>
+          <span *ngIf="b.customer.phone" class="ts-num" dir="ltr"><i class="ti ti-phone"></i>{{ b.customer.phone }}</span>
+          <span *ngIf="!b.customer.phone && b.customer.contactHidden" class="ts-muted"><i class="ti ti-lock"></i>{{ 'APP.contactHiddenShort' | translate }}</span>
         </div>
         <div class="ts-wrap" style="margin-top: 10px">
           <ts-tag [icon]="pay.icon" [tone]="pay.tone">{{ pay.label }}</ts-tag>
@@ -41,7 +47,28 @@ import { fmtNum } from '../core/format';
         <span class="ts-total">{{ b.netTotal | ts }}</span>
       </div>
     </ts-ticket>
-  `
+  `,
+  styles: [
+    `
+      .ts-bk-facts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 16px;
+        margin-top: 10px;
+        font-size: 13px;
+        color: var(--ts-ink-soft, #4a5568);
+      }
+      .ts-bk-facts span {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .ts-bk-facts i {
+        font-size: 15px;
+        color: var(--ts-ink-faint);
+      }
+    `
+  ]
 })
 export class BookingCardComponent {
   @Input({ required: true }) b!: BookingRow;
@@ -54,6 +81,24 @@ export class BookingCardComponent {
 
   get type() {
     return itemType(this.item?.itemType);
+  }
+
+  /** Everyone on the booking: adults + children, else the tickets' counts (outings), else the quantity. */
+  get people(): number {
+    return (this.b.items ?? []).reduce((sum, i) => {
+      const persons = (i.adults ?? 0) + (i.childs ?? 0);
+      const tickets = (i.tickets ?? []).reduce((n, t) => n + (t.count ?? 0), 0);
+      return sum + (persons || tickets || i.quantity || 0);
+    }, 0);
+  }
+
+  /** The travel or outing date of the first reservation. */
+  get date(): string {
+    const d = this.item?.travelDate ?? this.item?.from;
+    if (d) return fmtDate(d, this.text.arabic);
+    // An open outing ticket: no date, usable until its last day
+    const until = this.item?.to;
+    return until ? this.t('APP.openTicketUntil', { date: fmtDate(until, this.text.arabic) }) : '';
   }
 
   get waiting(): boolean {
@@ -76,7 +121,7 @@ export class BookingCardComponent {
   get customerHistory(): string {
     const c = this.b.customer;
     if ((c.bookingsCount ?? 0) <= 1) return this.t('APP.firstBooking');
-    const before = this.t('APP.bookedBeforeN', { n: fmtNum(c.bookingsCount - 1) });
+    const before = this.t('APP.bookedBeforeN', { n: fmtNum((c.bookingsCount ?? 1) - 1) });
     return c.completedCount ? `${before} · ${this.t('APP.completedN', { n: fmtNum(c.completedCount) })}` : before;
   }
 
@@ -115,10 +160,11 @@ export class BookingCardComponent {
           <p class="ts-card-title">{{ customer.name }}</p>
           <p class="ts-muted ts-num" *ngIf="customer.phone" dir="ltr" style="text-align: start">{{ customer.phone }}</p>
           <p class="ts-muted" *ngIf="customer.email">{{ customer.email }}</p>
+          <p class="ts-muted" *ngIf="customer.contactHidden" style="font-size: 12.5px"><i class="ti ti-lock"></i> {{ 'APP.contactHiddenNote' | translate }}</p>
         </div>
         <a *ngIf="customer.phone" class="btn btn-secondary" [href]="'tel:' + customer.phone" [attr.aria-label]="'WEB.call' | translate"><i class="ti ti-phone"></i></a>
       </div>
-      <div class="ts-three" style="margin-top: 12px">
+      <div class="ts-three" style="margin-top: 12px" *ngIf="!customer.historyHidden">
         <div class="ts-count-box"><strong>{{ customer.bookingsCount | ts }}</strong><span>{{ 'APP.allTheirBookings' | translate }}</span></div>
         <div class="ts-count-box"><strong>{{ customer.completedCount | ts }}</strong><span>{{ 'APP.completed' | translate }}</span></div>
         <div class="ts-count-box"><strong>{{ customer.cancelledCount ?? 0 | ts }}</strong><span>{{ 'APP.cancelled' | translate }}</span></div>

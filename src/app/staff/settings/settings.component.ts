@@ -1,3 +1,4 @@
+import { PasswordSheetComponent } from './account-sheets';
 import { Component, Injectable, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -755,7 +756,7 @@ export class ContractsComponent implements OnDestroy {
 @Component({
   selector: 'ts-users',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, ...LISTS, ...FORM_KIT, SheetComponent, ChipBarComponent],
+  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, ...LISTS, ...FORM_KIT, SheetComponent, ChipBarComponent, PasswordSheetComponent],
   template: `
     <div class="ts-screen">
       <ts-appbar [title]="'APP.users' | translate">
@@ -774,6 +775,9 @@ export class ContractsComponent implements OnDestroy {
               <span class="ts-muted">{{ describe(u) }}</span>
               <ts-pill [tone]="u.iActive !== false ? 'ok' : 'neutral'" style="margin-top: 4px">{{ (u.iActive !== false ? 'APP.active' : 'APP.inactive') | translate }}</ts-pill>
             </span>
+            <button *ngIf="canEdit" type="button" class="ts-icon-btn" [title]="'APP.changePassword' | translate" (click)="pwFor = { userId: u.id, name: nameOf(u) }">
+              <i class="ti ti-key"></i>
+            </button>
             <label *ngIf="canEdit" class="form-check form-switch ts-switch">
               <input class="form-check-input" type="checkbox" [checked]="u.iActive !== false" (change)="setActive(u, $any($event.target).checked)" />
             </label>
@@ -792,9 +796,11 @@ export class ContractsComponent implements OnDestroy {
       <ts-option-field *ngIf="!editing && needsVendor" [label]="'APP.vendor' | translate" source="vendors" [required]="true" [(value)]="vendor"></ts-option-field>
       <div sheet-foot><button type="button" class="btn btn-primary ts-wide-btn" [disabled]="busy" (click)="save()">{{ 'APP.save' | translate }}</button></div>
     </ts-sheet>
+    <ts-password-sheet [open]="!!pwFor" [userId]="pwFor?.userId ?? null" [name]="pwFor?.name ?? ''" (openChange)="pwFor = null"></ts-password-sheet>
   `
 })
 export class UsersComponent implements OnDestroy {
+  pwFor: { userId: number; name: string } | null = null;
   private readonly api = inject(SettingsApi);
   private readonly session = inject(StaffSession);
   private readonly text = inject(StaffText);
