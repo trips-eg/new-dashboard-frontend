@@ -1,3 +1,5 @@
+// Dates go as local time (formDate): the API stores them without an offset, so UTC (toISOString) moved them 2 hours back on every save
+import { formDate } from 'src/app/staff/forms/form-kit';
 import { Component, EventEmitter, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -181,7 +183,7 @@ export class ManasikFormComponent implements OnInit {
     });
 
     if (data.countryId) {
-      this.getCitiesByCountryId(data.countryId);
+      this.getCitiesByCountryId(data.countryId, true);
     }
 
     this.dates.clear();
@@ -544,7 +546,7 @@ export class ManasikFormComponent implements OnInit {
       // Convert dates to ISO string
       if (dateFields.includes(key) && value[key]) {
         const dateValue = new Date(value[key]);
-        formData.append(key, dateValue.toISOString());
+        formData.append(key, formDate(dateValue));
       } else {
         const safeValue = value[key] === null || value[key] === undefined ? '' : value[key];
         formData.append(key, safeValue);
@@ -588,7 +590,7 @@ export class ManasikFormComponent implements OnInit {
           'Dates',
           JSON.stringify({
             id: dateItem.id || 0,
-            startDate: new Date(dateItem.startDate).toISOString()
+            startDate: formDate(new Date(dateItem.startDate))
           })
         );
       });
@@ -695,7 +697,7 @@ export class ManasikFormComponent implements OnInit {
           const dateValue = convertedStep[field] instanceof Date ? convertedStep[field] : new Date(convertedStep[field]);
 
           if (!isNaN(dateValue.getTime())) {
-            convertedStep[field] = dateValue.toISOString();
+            convertedStep[field] = formDate(dateValue);
           }
         }
       });
@@ -882,8 +884,12 @@ export class ManasikFormComponent implements OnInit {
     this.getCountryList(event.filter || '');
   }
 
-  getCitiesByCountryId(countryId: any) {
-    this.form.get('CityId')?.reset();
+  /**
+   * The cities of a country. Picking another country clears the city; loading a saved program keeps its city
+   * (clearing it there left the required City empty, so every edit was blocked as "fill all required fields").
+   */
+  getCitiesByCountryId(countryId: any, keepCity = false) {
+    if (!keepCity) this.form.get('CityId')?.reset();
     if (!countryId) {
       this.cityList = [];
       return;

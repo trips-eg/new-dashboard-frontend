@@ -31,8 +31,12 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { UpdateBannerComponent } from './shared/components/update-banner/update-banner.component';
 import { DialogHostComponent } from './staff/ui/dialogs';
 
+const I18N_STAMP = Date.now().toString(36);
+
 export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+  // IIS serves assets with max-age=1 year, so a fixed URL kept old texts after a deploy (new keys showed raw):
+  // a value per app start makes the browser fetch the current file (about 25 KB gzipped, once per start)
+  return new TranslateHttpLoader(http, './assets/i18n/', `.json?v=${I18N_STAMP}`);
 }
 @NgModule({
   declarations: [

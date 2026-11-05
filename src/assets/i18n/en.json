@@ -2608,7 +2608,8 @@
     "errGatewayTimeout": "The server took too long to answer. The action may still have gone through; check before repeating it.",
     "errServer": "The server failed while handling the request.",
     "bookedBeforeN": "Booked {{n}} times before",
-    "completedN": "{{n}} completed"
+    "completedN": "{{n}} completed",
+    "soldOut": "Sold out"
   },
   "WEB": {
     "svNewThisMonth": "New visitors this month",

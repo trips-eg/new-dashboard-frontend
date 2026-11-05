@@ -308,6 +308,27 @@ const STAFF_ANALYTICS = {
     ]
   };
 
+/** Content & Marketing: moved from More to the sidebar (admins); each screen keeps its own permission. */
+const STAFF_MARKETING = {
+  id: 'staff-marketing',
+  title: 'APP.groupMarketing',
+  type: 'collapse',
+  classes: 'nav-item',
+  icon: 'fas fa-bullhorn',
+  breadcrumbs: false,
+  adminOnly: true,
+  children: [
+    { id: 'mk-custom-requests', title: 'APP.customRequests', type: 'item', classes: 'nav-item', url: '/a/more/custom-requests', icon: 'fas fa-handshake', breadcrumbs: false, permissions: [Permissions.BookingView] },
+    { id: 'mk-reviews', title: 'APP.reviews', type: 'item', classes: 'nav-item', url: '/a/more/reviews', icon: 'fas fa-star', breadcrumbs: false, permissions: [Permissions.CustomersView] },
+    { id: 'mk-notifications', title: 'APP.notifications', type: 'item', classes: 'nav-item', url: '/a/more/notifications', icon: 'fas fa-bell', breadcrumbs: false, permissions: ['Permissions.Notification.View'] },
+    { id: 'mk-emails', title: 'APP.emails', type: 'item', classes: 'nav-item', url: '/a/more/emails', icon: 'fas fa-envelope', breadcrumbs: false, permissions: ['Permissions.Email.View'] },
+    { id: 'mk-search', title: 'APP.search', type: 'item', classes: 'nav-item', url: '/a/more/search', icon: 'fas fa-magnifying-glass', breadcrumbs: false, permissions: ['Permissions.Search.View'] },
+    { id: 'mk-intel', title: 'MI.title', type: 'item', classes: 'nav-item', url: '/a/more/marketing-intel', icon: 'fas fa-chart-column', breadcrumbs: false, permissions: [Permissions.FinancialView] },
+    { id: 'mk-site-visits', title: 'WEB.siteVisits', type: 'item', classes: 'nav-item', url: '/a/more/site-visits', icon: 'fas fa-globe', breadcrumbs: false, permissions: [Permissions.BookingView] },
+    { id: 'mk-expiring', title: 'APP.expiring', type: 'item', classes: 'nav-item', url: '/a/products/expiring', icon: 'fas fa-clock', breadcrumbs: false, permissions: [Permissions.BookingView] }
+  ]
+};
+
 /** The dashboard menu before the TRIPS Staff tabs; shown under "Old screens" so no screen is lost. */
 const LegacyItems = [
   {
@@ -970,6 +991,7 @@ const NavigationItems = [
     permissions: [Permissions.BookingView],
     vendorOnly: true
   },
+  STAFF_MARKETING,
   {
     id: 'a-more',
     title: 'APP.tabMore',

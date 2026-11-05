@@ -16,5 +16,8 @@
       <strong>Trips</strong>
     </a>
   </div>
+  <button *ngIf="showBack" type="button" class="pc-head-link header-back" (click)="goBack()" [attr.aria-label]="'APP.back' | translate" [title]="'APP.back' | translate">
+    <i class="ti ti-arrow-right" aria-hidden="true"></i>
+  </button>
   <span class="workspace-label">{{ 'NAV_UI.WORKSPACE' | translate }}</span>
 </div>

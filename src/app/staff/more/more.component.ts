@@ -196,19 +196,6 @@ export class AdminMoreComponent implements OnInit {
             { icon: 'ti ti-sparkles', label: 'Trip Star', ...trip, route: '/a/more/tripstars' },
             { icon: 'ti ti-layout-rows', label: 'APP.sidebars', ...trip, route: '/a/more/sidebars' }
           ]
-        },
-        {
-          title: 'APP.groupMarketing',
-          entries: [
-            { icon: 'ti ti-heart-handshake', label: 'APP.customRequests', ...mkt, route: '/a/more/custom-requests', count: t?.customRequestsNoOffers },
-            { icon: 'ti ti-star', label: 'APP.reviews', ...hajj, route: '/a/more/reviews', perm: P.customersView, count: t?.reviewsToReply },
-            { icon: 'ti ti-bell', label: 'APP.notifications', ...teal, route: '/a/more/notifications', perm: P.notificationView },
-            { icon: 'ti ti-mail', label: 'APP.emails', ...nav, route: '/a/more/emails', perm: P.emailView },
-            { icon: 'ti ti-search', label: 'APP.search', ...main, route: '/a/more/search', perm: P.searchView },
-            { icon: 'ti ti-chart-arrows-vertical', label: 'MI.title', ...mkt, route: '/a/more/marketing-intel', perm: P.financialView },
-            { icon: 'ti ti-world', label: 'WEB.siteVisits', ...teal, route: '/a/more/site-visits', perm: P.bookingView },
-            { icon: 'ti ti-clock-hour-4', label: 'APP.expiring', ...trip, route: '/a/products/expiring', query: { type: '1', window: 'expired' }, count: t?.productsExpiredVisible }
-          ]
         }
       ],
       '/a/more/profile'

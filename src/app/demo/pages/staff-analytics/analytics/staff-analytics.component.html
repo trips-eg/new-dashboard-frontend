@@ -243,7 +243,7 @@
         </div>
         <p class="ts-empty-note" *ngIf="!data.bottom?.length">{{ 'STAFF_UI.NOTHING_YET' | translate }}</p>
         <div class="ts-row" *ngFor="let r of data.bottom">
-          <span class="ts-row__label">{{ r.name }} <small *ngIf="r.alert" class="status-badge status-pending">{{ r.alert }}</small></span>
+          <span class="ts-row__label">{{ r.name }} <small *ngIf="r.alert" class="status-badge status-pending">{{ ('APP.' + r.alert) | translate }}</small></span>
           <span class="ts-row__value">{{ fmtNum(r.bookings) }}</span>
         </div>
       </section>

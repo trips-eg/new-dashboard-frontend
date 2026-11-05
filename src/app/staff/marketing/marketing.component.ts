@@ -336,7 +336,7 @@ export class SearchRecordsComponent implements OnInit, OnDestroy {
         <div class="ts-rank-list">
           <div class="ts-list-card" *ngFor="let r of words()">
             <a class="ts-rank-row" [routerLink]="['/a/more/search/records', { title: r.query, query: r.query }]">
-              <span class="ts-rank">{{ r.rank }}</span>
+              <span class="ts-rank-badge">{{ r.rank }}</span>
               <strong class="ts-grow">{{ r.query }}</strong>
               <strong class="ts-num">{{ r.count | ts }}</strong>
               <ts-pill *ngIf="r.trendPct != null" [tone]="r.trendPct >= 0 ? 'ok' : 'danger'">{{ signed(r.trendPct) }}</ts-pill>
