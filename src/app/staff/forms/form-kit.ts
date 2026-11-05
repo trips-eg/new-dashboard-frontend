@@ -431,38 +431,78 @@ export class DateFieldComponent {
   }
 }
 
-/** ImagesField: picked photos (new files) plus the ones already on the server, the first one the cover. */
+/**
+ * ImagesField: the one image uploader of the forms. Picked photos (new files) and the ones already saved, the first
+ * one the cover; a tile per image with a preview, replace and remove; drop files on it or pick them; the formats
+ * and size are checked before anything is sent. [multiple]="false" keeps one image (a logo, a banner).
+ */
 @Component({
   selector: 'ts-images-field',
   standalone: true,
   imports: [CommonModule, TranslateModule, TagComponent],
   template: `
-    <div class="ts-images">
+    <div
+      class="ts-images"
+      [class.ts-images--wide]="shape === 'wide'"
+      [class.ts-images--single]="!multiple"
+      [class.is-dragging]="dragging"
+      (dragover)="$event.preventDefault(); dragging = true"
+      (dragleave)="dragging = false"
+      (drop)="$event.preventDefault(); dragging = false; add($event.dataTransfer?.files ?? null)"
+    >
       <div class="ts-images__tile" *ngFor="let e of existing; let i = index">
-        <img [src]="url(e)" alt="" />
-        <ts-tag *ngIf="i === 0" tone="info" class="ts-images__cover">{{ 'APP.cover' | translate }}</ts-tag>
-        <button *ngIf="removeExisting.observed" type="button" class="ts-images__remove" (click)="removeExisting.emit(i)" aria-label="×"><i class="ti ti-x"></i></button>
+        <img [src]="url(e)" alt="" loading="lazy" />
+        <ts-tag *ngIf="i === 0 && multiple" tone="info" class="ts-images__cover">{{ 'APP.cover' | translate }}</ts-tag>
+        <div class="ts-images__actions">
+          <button *ngIf="removeExisting.observed" type="button" class="ts-images__btn ts-images__btn--danger" (click)="removeExisting.emit(i)" [attr.aria-label]="'APP.removeImage' | translate" [title]="'APP.removeImage' | translate">
+            <i class="ti ti-trash"></i>
+          </button>
+        </div>
       </div>
       <div class="ts-images__tile" *ngFor="let f of files; let i = index">
         <img [src]="preview(f)" alt="" />
-        <ts-tag *ngIf="!existing.length && i === 0" tone="info" class="ts-images__cover">{{ 'APP.cover' | translate }}</ts-tag>
-        <button type="button" class="ts-images__remove" (click)="remove(i)" aria-label="×"><i class="ti ti-x"></i></button>
+        <ts-tag *ngIf="multiple && !existing.length && i === 0" tone="info" class="ts-images__cover">{{ 'APP.cover' | translate }}</ts-tag>
+        <ts-tag tone="ok" class="ts-images__new">{{ 'APP.newImage' | translate }}</ts-tag>
+        <div class="ts-images__actions">
+          <label class="ts-images__btn" [title]="'APP.replaceImage' | translate">
+            <i class="ti ti-replace"></i>
+            <input type="file" [accept]="accept" (change)="replace(i, $any($event.target).files); $any($event.target).value = ''" />
+          </label>
+          <button type="button" class="ts-images__btn ts-images__btn--danger" (click)="remove(i)" [attr.aria-label]="'APP.removeImage' | translate" [title]="'APP.removeImage' | translate">
+            <i class="ti ti-trash"></i>
+          </button>
+        </div>
       </div>
-      <label class="ts-images__add">
-        <i class="ti ti-camera-plus"></i>
-        <span>{{ 'APP.addImage' | translate }}</span>
-        <input type="file" accept="image/*" [multiple]="multiple" (change)="add($any($event.target).files); $any($event.target).value = ''" />
+      <label class="ts-images__add" *ngIf="multiple || (!files.length && !existing.length)">
+        <span class="ts-images__add-icon"><i class="ti ti-cloud-upload"></i></span>
+        <strong>{{ (multiple ? 'APP.addImages' : 'APP.addImage') | translate }}</strong>
+        <small>{{ 'APP.dropOrPick' | translate }}</small>
+        <input type="file" [accept]="accept" [multiple]="multiple" (change)="add($any($event.target).files); $any($event.target).value = ''" />
       </label>
     </div>
+    <p class="ts-images__hint">
+      <i class="ti ti-info-circle"></i>
+      {{ 'APP.imageFormats' | translate: { mb: maxMb } }}<ng-container *ngIf="size"> · {{ 'APP.imageSize' | translate: { s: size } }}</ng-container>
+    </p>
+    <p class="ts-images__error" *ngIf="error" role="alert"><i class="ti ti-alert-circle"></i>{{ error }}</p>
   `
 })
 export class ImagesFieldComponent implements OnDestroy {
+  private readonly text = inject(StaffText);
   @Input() files: File[] = [];
   @Input() existing: string[] = [];
   @Input() multiple = true;
+  /** square tiles (products) or wide (banners). */
+  @Input() shape: 'square' | 'wide' = 'square';
+  /** The suggested size, e.g. "1200×600". */
+  @Input() size: string | null = null;
+  @Input() maxMb = 5;
   @Output() filesChange = new EventEmitter<File[]>();
   /** Removes a saved image by its index in [existing]; not bound when the backend cannot delete one. */
   @Output() removeExisting = new EventEmitter<number>();
+  readonly accept = 'image/png,image/jpeg,image/webp';
+  dragging = false;
+  error = '';
   private previews = new Map<File, string>();
 
   url(p: string): string {
@@ -478,9 +518,27 @@ export class ImagesFieldComponent implements OnDestroy {
     return u;
   }
 
+  /** The files that pass: PNG, JPG or WebP, up to maxMb each; the rest are named in the error. */
+  private accepted(list: FileList | null): File[] {
+    this.error = '';
+    const all = Array.from(list ?? []);
+    const ok = all.filter((f) => /^image\/(png|jpe?g|webp)$/.test(f.type) && f.size <= this.maxMb * 1024 * 1024);
+    const bad = all.filter((f) => !ok.includes(f));
+    if (bad.length) this.error = this.text.tr('APP.imageRejected', { n: bad.map((f) => f.name).join('، '), mb: this.maxMb });
+    return ok;
+  }
+
   add(list: FileList | null): void {
-    if (!list?.length) return;
-    this.files = [...this.files, ...Array.from(list)];
+    const ok = this.accepted(list);
+    if (!ok.length) return;
+    this.files = this.multiple ? [...this.files, ...ok] : [ok[0]];
+    this.filesChange.emit(this.files);
+  }
+
+  replace(i: number, list: FileList | null): void {
+    const ok = this.accepted(list);
+    if (!ok.length) return;
+    this.files = this.files.map((f, j) => (j === i ? ok[0] : f));
     this.filesChange.emit(this.files);
   }
 

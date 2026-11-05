@@ -1,0 +1,241 @@
+// The forms of the dashboard (Round 3): sections as cards with an icon, the step header, fields with a suffix,
+// switches, validation and the save bar. The form components (forms/form-kit.ts) had these classes with no styles,
+// so every Add/Edit form showed as bare stacked fields.
+
+// ---------- a section of a form ----------
+.ts-form-section {
+  position: relative;
+  margin: 0 0 16px;
+  padding: 18px 20px 20px;
+  background: var(--ts-surface);
+  border: 1px solid var(--ts-line);
+  border-inline-start: 4px solid var(--ts-accent);
+  border-radius: var(--ts-radius-card);
+  box-shadow: var(--ts-shadow-card);
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: -2px 0 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--ts-line);
+
+    h2 { margin: 0; font-size: 17px; font-weight: 700; color: var(--ts-ink); line-height: 1.3; }
+    p { margin: 2px 0 0; font-size: 13px; color: var(--ts-ink-muted); }
+    .btn-link { padding: 0; font-weight: 600; text-decoration: none; }
+  }
+
+  &__chip {
+    flex: 0 0 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    font-size: 21px;
+    background: var(--ts-selected);
+    color: var(--ts-accent);
+  }
+
+  > .ts-field:last-child,
+  > ts-field:last-child .ts-field,
+  > ts-date-field:last-child .ts-field { margin-bottom: 0; }
+}
+
+// ---------- the header of a multi-step form ----------
+.ts-steps-head {
+  margin: 0 0 16px;
+  padding: 18px 20px;
+  background: var(--ts-surface);
+  border: 1px solid var(--ts-line);
+  border-radius: var(--ts-radius-card);
+  box-shadow: var(--ts-shadow-card);
+
+  h1 { margin: 0; font-size: 22px; font-weight: 800; color: var(--ts-ink); }
+  strong { font-size: 15px; color: var(--ts-ink); }
+}
+
+.ts-steps-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 44px;
+  height: 28px;
+  padding: 0 10px;
+  margin-inline-end: 8px;
+  border-radius: 999px;
+  background: var(--ts-navy);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ts-steps-bar {
+  display: flex;
+  gap: 6px;
+  margin-top: 14px;
+
+  button {
+    flex: 1 1 0;
+    height: 6px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: var(--ts-line);
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &.is-done { background: var(--ts-accent); }
+    &:hover { background: var(--ts-accent-hover, var(--ts-accent)); }
+  }
+}
+
+// ---------- fields ----------
+.ts-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+
+  > .form-control { flex: 1 1 auto; min-width: 0; }
+}
+
+.ts-suffix {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  margin-inline-start: -1px;
+  border: 1px solid var(--ts-line-input, var(--ts-line));
+  border-start-end-radius: var(--ts-radius-field);
+  border-end-end-radius: var(--ts-radius-field);
+  background: var(--ts-subtle);
+  color: var(--ts-ink-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.ts-input-wrap:has(.ts-suffix) > .form-control {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+
+.ts-form-section .form-control,
+.ts-form-section .form-select {
+  min-height: var(--ts-field-height, 44px);
+  border-radius: var(--ts-radius-field);
+  border-color: var(--ts-line-input, var(--ts-line));
+  background-color: var(--ts-surface);
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:focus {
+    border-color: var(--ts-accent);
+    box-shadow: 0 0 0 3px var(--ts-focus, rgba(232, 89, 12, 0.18));
+  }
+}
+
+.ts-form-section textarea.form-control { min-height: 96px; }
+
+// Dates read the same way in Arabic and English
+.ts-form-section input[type='date'],
+.ts-form-section input[type='datetime-local'] { direction: ltr; text-align: end; }
+
+// A field with an error
+.ts-field:has(small.err) .form-control { border-color: var(--ts-danger-ink); }
+
+// ---------- switches: an on/off pill instead of a bare checkbox ----------
+.ts-switch-line input[role='switch'] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 0 0 auto;
+  position: relative;
+  width: 46px;
+  height: 26px;
+  margin: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ts-line);
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    inset-inline-start: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    transition: inset-inline-start 0.2s;
+  }
+
+  &:checked { background: var(--ts-accent); }
+  &:checked::after { inset-inline-start: 23px; }
+  &:focus-visible { outline: 3px solid var(--ts-focus, rgba(232, 89, 12, 0.3)); outline-offset: 2px; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.ts-switch-line > span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  strong { font-size: 14px; font-weight: 600; color: var(--ts-ink); }
+  small { font-size: 12px; color: var(--ts-ink-muted); }
+}
+
+// ---------- rows inside a section ----------
+.ts-saved-row,
+.ts-time-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border: 1px solid var(--ts-line);
+  border-radius: var(--ts-radius-field);
+  background: var(--ts-subtle);
+}
+
+.ts-time-row > * { flex: 1 1 0; min-width: 0; }
+.ts-time-row > button { flex: 0 0 auto; }
+
+.ts-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+.ts-ticket-preview {
+  margin-top: 12px;
+  padding: 14px;
+  border: 2px dashed var(--ts-line);
+  border-radius: var(--ts-radius-card);
+  background: var(--ts-subtle);
+}
+
+.ts-rq-hero__main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
+// ---------- the save bar ----------
+.ts-sticky-foot {
+  z-index: 5;
+  margin-top: 8px;
+  padding: 12px 0;
+  background: linear-gradient(to top, var(--ts-page) 75%, transparent);
+
+  .btn { min-height: 48px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+}
+
+// Space under the last section so the save bar never covers a field
+.ts-screen:has(> .ts-sticky-foot),
+.ts-screen:has(.ts-steps-head) { padding-bottom: 24px; }
+
+@media (max-width: 576px) {
+  .ts-form-section { padding: 14px; }
+  .ts-form-section__chip { flex-basis: 36px; height: 36px; font-size: 18px; }
+  .ts-steps-head { padding: 14px; }
+  .ts-steps-head h1 { font-size: 19px; }
+}
+
+.ts-form-error { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; padding: 10px 12px; border-radius: var(--ts-radius-field); background: var(--ts-danger-soft); color: var(--ts-danger-ink); font-size: 13px; }

@@ -333,29 +333,51 @@ export class CatalogItemsComponent {
       <ts-loading *ngIf="loading"></ts-loading>
       <ts-error *ngIf="loadError" [error]="loadError" (retry)="load()"></ts-error>
       <ng-container *ngIf="!loading && !loadError">
-        <p class="ts-label">{{ 'APP.customerSees' | translate }}</p>
-        <label class="ts-star-preview" [style.background-image]="previewUrl ? 'url(' + previewUrl + ')' : null">
-          <span class="ts-star-preview__badge">TRIP STAR</span>
-          <span class="ts-grow"></span>
-          <strong>{{ shownTitle() || ('APP.title' | translate) }}</strong>
-          <small *ngIf="shownSubtitle()">{{ shownSubtitle() }}</small>
-          <em>{{ 'APP.tapToChangeImage' | translate }}</em>
-          <input type="file" accept="image/*" hidden (change)="pickImage($any($event.target).files)" />
-        </label>
-        <section class="ts-section">
-          <ts-field [label]="'APP.titleAr' | translate" [required]="true" [(value)]="f.titleAr"></ts-field>
-          <ts-field [label]="'APP.titleEn' | translate" [(value)]="f.title"></ts-field>
-          <ts-field [label]="'APP.subtitleAr' | translate" [(value)]="f.descriptionAr"></ts-field>
-          <ts-field [label]="'APP.subtitleEn' | translate" [(value)]="f.description"></ts-field>
-          <ts-field [label]="'APP.linkUrl' | translate" [hint]="'APP.optional' | translate" [(value)]="f.link"></ts-field>
+        <ts-form-section [title]="'APP.adImage' | translate" [subtitle]="'APP.adImageHint' | translate" icon="ti ti-photo" kind="media">
+          <ts-images-field
+            [files]="image ? [image] : []"
+            (filesChange)="pickFile($event[0] ?? null)"
+            [existing]="!image && imageUrl ? [imageUrl] : []"
+            [multiple]="false"
+            shape="wide"
+            size="1200×600"
+          ></ts-images-field>
+        </ts-form-section>
+
+        <ts-form-section [title]="'APP.adTexts' | translate" [subtitle]="'APP.adTextsHint' | translate" icon="ti ti-typography">
+          <div class="ts-two">
+            <ts-field [label]="'APP.titleAr' | translate" [required]="true" [(value)]="f.titleAr" [error]="tried && !f.titleAr.trim() ? ('APP.fieldRequired' | translate) : null"></ts-field>
+            <ts-field [label]="'APP.titleEn' | translate" [(value)]="f.title"></ts-field>
+          </div>
+          <div class="ts-two">
+            <ts-field [label]="'APP.subtitleAr' | translate" [(value)]="f.descriptionAr"></ts-field>
+            <ts-field [label]="'APP.subtitleEn' | translate" [(value)]="f.description"></ts-field>
+          </div>
+        </ts-form-section>
+
+        <ts-form-section [title]="'APP.adLinkAndDates' | translate" icon="ti ti-link" kind="schedule">
+          <ts-field [label]="'APP.linkUrl' | translate" hint="https://" [(value)]="f.link" [error]="linkError() | translate"></ts-field>
           <ts-date-field [label]="'APP.expiryDate' | translate" [(value)]="f.expiry"></ts-date-field>
-        </section>
+          <p class="ts-muted ts-small" *ngIf="expired()">{{ 'APP.adExpiredNote' | translate }}</p>
+        </ts-form-section>
+
+        <ts-form-section [title]="'APP.customerSees' | translate" icon="ti ti-device-mobile" kind="general">
+          <div class="ts-star-preview" [style.background-image]="previewUrl ? 'url(' + previewUrl + ')' : null">
+            <span class="ts-star-preview__badge">TRIP STAR</span>
+            <span class="ts-grow"></span>
+            <strong>{{ shownTitle() || ('APP.title' | translate) }}</strong>
+            <small *ngIf="shownSubtitle()">{{ shownSubtitle() }}</small>
+          </div>
+        </ts-form-section>
+
         <ts-form-section [title]="'APP.cardItems' | translate" [subtitle]="'APP.cardItemsHint' | translate" icon="ti ti-package">
           <ts-catalog-items [(items)]="items" [kinds]="['trip', 'outing', 'hajj']"></ts-catalog-items>
         </ts-form-section>
-        <div class="ts-sticky-foot">
-          <button type="button" class="btn btn-primary ts-wide-btn" [disabled]="busy" (click)="save()">
-            <i *ngIf="busy" class="pi pi-spin pi-spinner"></i>{{ 'APP.save' | translate }}
+        <p class="ts-form-error" *ngIf="tried && !items.length" role="alert"><i class="ti ti-alert-circle"></i>{{ 'APP.itemsRequired' | translate }}</p>
+        <div class="ts-sticky-foot ts-wide-row">
+          <button type="button" class="btn btn-secondary" [disabled]="busy" (click)="cancel()"><i class="ti ti-x"></i>{{ 'APP.cancel' | translate }}</button>
+          <button type="button" class="btn btn-primary" style="flex: 2" [disabled]="busy" (click)="save()">
+            <i [class]="busy ? 'pi pi-spin pi-spinner' : 'ti ti-check'"></i>{{ (id ? 'APP.saveChanges' : 'APP.publishAd') | translate }}
           </button>
         </div>
       </ng-container>
@@ -421,12 +443,27 @@ export class TripStarFormComponent implements OnInit, OnDestroy {
     return (this.text.arabic ? this.f.descriptionAr : this.f.description).trim();
   }
 
-  pickImage(list: FileList | null): void {
-    const file = list?.[0];
-    if (!file) return;
+  /** The picked banner (or none: back to the saved one). */
+  pickFile(file: File | null): void {
     this.image = file;
     if (this.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(this.previewUrl);
-    this.previewUrl = URL.createObjectURL(file);
+    this.previewUrl = file ? URL.createObjectURL(file) : mediaUrl(this.imageUrl);
+  }
+
+  /** Shown after the first save attempt. */
+  tried = false;
+
+  linkError(): string {
+    const l = this.f.link.trim();
+    return l && !/^https?:\/\/\S+\.\S+/i.test(l) ? 'APP.linkInvalid' : '';
+  }
+
+  expired(): boolean {
+    return !!this.f.expiry && this.f.expiry < new Date(new Date().toDateString());
+  }
+
+  cancel(): void {
+    this.location.back();
   }
 
   /** `[{"id":12,"order":1}, …]` for one kind; the order is the position in the whole card. */
@@ -435,7 +472,10 @@ export class TripStarFormComponent implements OnInit, OnDestroy {
   }
 
   async save(): Promise<void> {
-    if (!this.f.title.trim() && !this.f.titleAr.trim()) return this.text.showError(this.text.tr('APP.fillRequired'));
+    this.tried = true;
+    if (!this.f.titleAr.trim()) return this.text.showError(this.text.tr('APP.fillRequired'));
+    if (this.linkError()) return this.text.showError(this.text.tr('APP.linkInvalid'));
+    if (!this.id && !this.image) return this.text.showError(this.text.tr('APP.imageRequired'));
     if (!this.items.length) return this.text.showError(this.text.tr('APP.itemsRequired'));
     this.busy = true;
     const body: Record<string, unknown> = {

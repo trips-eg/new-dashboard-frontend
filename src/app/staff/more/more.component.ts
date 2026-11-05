@@ -178,7 +178,7 @@ export class AdminMoreComponent implements OnInit {
             { icon: 'ti ti-percentage', label: 'APP.commissionPolicies', ...hajj, route: '/a/more/commission', perm: P.financialView },
             { icon: 'ti ti-gift', label: 'APP.autoCoupons', ...mkt, route: '/a/more/coupons/auto', perm: P.couponsView },
             { icon: 'ti ti-adjustments', label: 'APP.customTripSettings', ...mkt, route: '/a/more/custom-requests-settings', perm: P.customTripSettingView },
-            { icon: 'ti ti-sparkles', label: 'Trip Star', ...trip, route: '/a/more/tripstars' },
+            { icon: 'ti ti-sparkles', label: 'APP.tripStars', ...trip, route: '/a/more/tripstars' },
             { icon: 'ti ti-layout-rows', label: 'APP.sidebars', ...trip, route: '/a/more/sidebars' }
           ]
         }

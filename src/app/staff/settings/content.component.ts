@@ -28,7 +28,7 @@ import { SettingsApi } from './settings.component';
   imports: [CommonModule, RouterModule, TranslateModule, ...KIT],
   template: `
     <div class="ts-screen">
-      <ts-appbar title="Trip Stars">
+      <ts-appbar [title]="'APP.tripStars' | translate" [subtitle]="'APP.tripStarsHint' | translate">
         <a *ngIf="canCreate" class="ts-fab ts-fab--float" routerLink="/form/tripstar"><i class="ti ti-plus"></i>{{ 'APP.newTripStar' | translate }}</a>
       </ts-appbar>
       <ts-loading *ngIf="!stars && !error"></ts-loading>

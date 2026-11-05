@@ -309,11 +309,10 @@ const SEGMENTS: [string, string][] = [
       <ts-card>
         <ts-field [label]="'APP.title' | translate" [required]="true" [(value)]="title"></ts-field>
         <ts-field [label]="'APP.body' | translate" [lines]="4" [required]="true" [(value)]="body"></ts-field>
-        <label class="btn btn-secondary ts-wide-btn">
-          <i class="ti ti-photo"></i>{{ (image ? 'APP.changeImage' : 'APP.addImage') | translate }}
-          <input type="file" accept="image/*" hidden (change)="image = $any($event.target).files?.[0] ?? null" />
-        </label>
-        <small class="ts-muted" *ngIf="image">{{ image.name }}</small>
+        <div class="ts-field">
+          <span>{{ 'APP.image' | translate }} <small class="ts-muted">({{ 'APP.optional' | translate }})</small></span>
+          <ts-images-field [files]="image ? [image] : []" (filesChange)="image = $event[0] ?? null" [multiple]="false" shape="wide" [maxMb]="2"></ts-images-field>
+        </div>
       </ts-card>
       <ts-card [title]="'APP.sendTo' | translate" icon="ti ti-users-group">
         <ts-switch-row *ngFor="let s of segments" [title]="s[1] | translate" [(value)]="on[s[0]]"></ts-switch-row>

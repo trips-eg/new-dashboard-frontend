@@ -401,11 +401,15 @@ export class LookupsComponent {
         <ts-field [label]="'APP.order' | translate" [number]="true" [(value)]="f.sequence"></ts-field>
         <ts-switch-row [title]="'APP.active' | translate" [(value)]="f.active"></ts-switch-row>
       </ng-container>
-      <label *ngIf="k.multipart && k.key !== 'branches'" class="btn btn-secondary ts-wide-btn">
-        <i class="ti ti-photo"></i>{{ (f.image ? 'APP.changeImage' : 'APP.addImage') | translate }}
-        <input type="file" accept="image/*" hidden (change)="f.image = $any($event.target).files?.[0] ?? null" />
-      </label>
-      <small class="ts-muted" *ngIf="f.image">{{ f.image.name }}</small>
+      <div *ngIf="k.multipart && k.key !== 'branches'" class="ts-field">
+        <span>{{ 'APP.image' | translate }}</span>
+        <ts-images-field
+          [files]="f.image ? [f.image] : []"
+          (filesChange)="f.image = $event[0] ?? null"
+          [existing]="!f.image && editing && img(editing) ? [img(editing)!] : []"
+          [multiple]="false"
+        ></ts-images-field>
+      </div>
       <div sheet-foot>
         <button type="button" class="btn btn-primary ts-wide-btn" [disabled]="saving" (click)="save()">{{ 'APP.save' | translate }}</button>
       </div>
