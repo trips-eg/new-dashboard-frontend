@@ -419,6 +419,10 @@ const routes: Routes = [
           import('./demo/pages/settings/financial-settings/financial-settings.component').then((m) => m.FinancialSettingsComponent)
       },
       {
+        path: 'home-content',
+        loadComponent: () => import('./demo/pages/settings/home-content/home-content.component').then((m) => m.HomeContentComponent)
+      },
+      {
         path: 'notifications',
         loadComponent: () => import('./demo/pages/notifications/notifications.component').then((m) => m.NotificationsComponent)
       },
