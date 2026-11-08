@@ -200,7 +200,8 @@ export class APIs {
     setcoupons: 'Coupons/AddCoupons',
     deletecoupons: 'Coupons/DeleteCoupons?id=',
     getusedcoupons: 'Coupons/GetAllUsedCoupons',
-    getcouponById: 'Coupons/GetCouponsById?id='
+    getcouponById: 'Coupons/GetCouponsById?id=',
+    bonusRules: 'Coupons/Settings/Bonus'
   };
   public static roomGroups = {
     GetAllroomGroups: 'RoomGroups/GetAllRoomGroups',

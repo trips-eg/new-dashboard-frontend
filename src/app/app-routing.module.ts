@@ -414,6 +414,11 @@ const routes: Routes = [
           import('./demo/pages/settings/mobile-policies/mobile-policies.component').then((m) => m.MobilePoliciesComponent)
       },
       {
+        path: 'bonus-settings',
+        loadComponent: () =>
+          import('./demo/pages/settings/bonus-settings/bonus-settings.component').then((m) => m.BonusSettingsComponent)
+      },
+      {
         path: 'financial-settings',
         loadComponent: () =>
           import('./demo/pages/settings/financial-settings/financial-settings.component').then((m) => m.FinancialSettingsComponent)
