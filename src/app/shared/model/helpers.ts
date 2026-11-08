@@ -55,7 +55,8 @@ export class APIs {
     GetNotificationById: 'Notification/GetNotification?Id=',
     AddNotification: 'Notification/SendNotification',
     update: 'Notification/UpdateNotification',
-    delete: 'Notification/DeleteNotification?id='
+    delete: 'Notification/DeleteNotification?id=',
+    suggest: 'Notification/Suggest'
   };
 
   public static Outing = {

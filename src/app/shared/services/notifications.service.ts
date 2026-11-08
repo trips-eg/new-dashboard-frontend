@@ -25,4 +25,8 @@ export class NotificationsService {
   deleteNotification(id: number) {
     return this.ApiCallerService.delete(`${this.endPoints.delete}${id}`);
   }
+  // title and body ideas for the item picked (AI when the server has a key, else templates)
+  suggest(request: { itemType?: string | null; itemId?: number | null; idea?: string | null }) {
+    return this.ApiCallerService.post(this.endPoints.suggest, request);
+  }
 }
