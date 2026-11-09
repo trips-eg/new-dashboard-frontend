@@ -60,7 +60,9 @@ export const P = {
   customTripSettingView: 'Permissions.CustomTripSetting.View',
   vendorContractView: 'Permissions.VendorContract.View',
   policyView: 'Permissions.Policy.View',
-  outingCategoryView: 'Permissions.OutingCategory.View'
+  outingCategoryView: 'Permissions.OutingCategory.View',
+  /** A vendor's own product reviews (the «التقييمات» switch of the vendor permissions); admins use Customers.View. */
+  reviewsView: 'Permissions.Reviews.View'
 } as const;
 
 /**

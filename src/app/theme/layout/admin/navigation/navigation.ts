@@ -988,7 +988,8 @@ const NavigationItems = [
     url: '/v/products',
     icon: 'fas fa-layer-group',
     breadcrumbs: false,
-    permissions: [Permissions.BookingView],
+    // The «المنتجات» switch of the vendor permissions: any of the four product views
+    permissions: [Permissions.TravelView, Permissions.OutingsView, Permissions.HajjView, Permissions.HotelView],
     vendorOnly: true
   },
   STAFF_MARKETING,
@@ -1011,7 +1012,8 @@ const NavigationItems = [
     url: '/v/more',
     icon: 'fas fa-grip',
     breadcrumbs: false,
-    permissions: [Permissions.BookingView],
+    // Always there for a vendor (requests, reports, profile); each entry inside checks its own permission
+    permissions: [],
     vendorOnly: true
   }
 ];
