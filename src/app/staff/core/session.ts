@@ -60,7 +60,9 @@ export const P = {
   customTripSettingView: 'Permissions.CustomTripSetting.View',
   vendorContractView: 'Permissions.VendorContract.View',
   policyView: 'Permissions.Policy.View',
-  outingCategoryView: 'Permissions.OutingCategory.View'
+  outingCategoryView: 'Permissions.OutingCategory.View',
+  supportChatView: 'Permissions.SupportChat.View',
+  supportChatReply: 'Permissions.SupportChat.Reply'
 } as const;
 
 /**
