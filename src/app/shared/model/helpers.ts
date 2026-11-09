@@ -317,6 +317,13 @@ export class APIs {
     deleteRoomFeatureMapping: 'RoomFeatureMapping/DeleteRoomFeatureMapping?id='
   };
 
+  // The customer app's home content (trust block + home icons), docs/redesign/PHASE3_SPEC.md section 3
+  public static HomeContent = {
+    get: 'staff/home-content',
+    saveTrust: 'staff/home-content/trust',
+    icon: 'staff/home-content/icons/'
+  };
+
   public static Reports = {
     getOutingSummary: 'Reports/GetOutingSummary',
     getTravelSummary: 'Reports/GetTripSummary',
