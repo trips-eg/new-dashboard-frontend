@@ -452,7 +452,7 @@ export class DateFieldComponent {
     >
       <div class="ts-images__tile" *ngFor="let e of existing; let i = index">
         <img [src]="url(e)" alt="" loading="lazy" />
-        <ts-tag *ngIf="i === 0 && multiple" tone="info" class="ts-images__cover">{{ 'APP.cover' | translate }}</ts-tag>
+        <ts-tag *ngIf="i === 0 && multiple && cover" tone="info" class="ts-images__cover">{{ 'APP.cover' | translate }}</ts-tag>
         <div class="ts-images__actions">
           <button *ngIf="removeExisting.observed" type="button" class="ts-images__btn ts-images__btn--danger" (click)="removeExisting.emit(i)" [attr.aria-label]="'APP.removeImage' | translate" [title]="'APP.removeImage' | translate">
             <i class="ti ti-trash"></i>
@@ -461,7 +461,7 @@ export class DateFieldComponent {
       </div>
       <div class="ts-images__tile" *ngFor="let f of files; let i = index">
         <img [src]="preview(f)" alt="" />
-        <ts-tag *ngIf="multiple && !existing.length && i === 0" tone="info" class="ts-images__cover">{{ 'APP.cover' | translate }}</ts-tag>
+        <ts-tag *ngIf="multiple && cover && !existing.length && i === 0" tone="info" class="ts-images__cover">{{ 'APP.cover' | translate }}</ts-tag>
         <ts-tag tone="ok" class="ts-images__new">{{ 'APP.newImage' | translate }}</ts-tag>
         <div class="ts-images__actions">
           <label class="ts-images__btn" [title]="'APP.replaceImage' | translate">
@@ -492,6 +492,8 @@ export class ImagesFieldComponent implements OnDestroy {
   @Input() files: File[] = [];
   @Input() existing: string[] = [];
   @Input() multiple = true;
+  /** The first picture is the cover (products, banners); off for papers like a tax card. */
+  @Input() cover = true;
   /** square tiles (products) or wide (banners). */
   @Input() shape: 'square' | 'wide' = 'square';
   /** The suggested size, e.g. "1200×600". */
