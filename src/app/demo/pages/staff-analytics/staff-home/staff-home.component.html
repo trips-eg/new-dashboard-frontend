@@ -115,7 +115,7 @@
             <span class="ts-action-row__count" style="color: var(--ts-pend-ink)">{{ fmtNum(admin.overview.today.instaPayPending) }}</span>
             <i class="ti ti-chevron-right ts-action-row__chev" aria-hidden="true"></i>
           </a>
-          <div class="ts-action-row">
+          <a class="ts-action-row" routerLink="/a/products/approvals">
             <span class="ts-action-row__icon" style="background: var(--ts-outing-bg); color: var(--ts-teal)">
               <i class="ti ti-check" aria-hidden="true"></i>
             </span>
@@ -123,7 +123,8 @@
               <strong>{{ 'STAFF_UI.PRODUCTS_TO_REVIEW' | translate }}</strong>
             </span>
             <span class="ts-action-row__count" style="color: var(--ts-teal)">{{ fmtNum(admin.overview.today.productsPendingReview) }}</span>
-          </div>
+            <i class="ti ti-chevron-right ts-action-row__chev" aria-hidden="true"></i>
+          </a>
           <a class="ts-action-row" routerLink="/a/more/custom-requests">
             <span class="ts-action-row__icon" style="background: var(--ts-marketing-bg); color: var(--ts-marketing)">
               <i class="ti ti-compass" aria-hidden="true"></i>
