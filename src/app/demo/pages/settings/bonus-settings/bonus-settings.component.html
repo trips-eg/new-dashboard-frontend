@@ -1,0 +1,84 @@
+<div class="main">
+  <sub-header
+    [mainHeader]="'bonus settings' | translate"
+    [mainSection]="'coupons' | translate"
+    [subSection]="'bonus settings' | translate"
+  ></sub-header>
+
+  <form [formGroup]="form" (ngSubmit)="save()" class="product-form shadow-3 p-4">
+    <p-panel [header]="t('الرصيد الترحيبي في الحجز', 'Welcome bonus at checkout')" styleClass="mt-3">
+      <div class="formgrid grid">
+        <div class="field col-12 flex align-items-center gap-3">
+          <p-inputSwitch formControlName="enabled" inputId="enabled"></p-inputSwitch>
+          <label for="enabled" class="m-0">
+            <b>{{ t('الرصيد الترحيبي شغال', 'The welcome bonus is on') }}</b>
+            <div class="text-600">
+              {{ t('لو قفلته، الرصيد الترحيبي اللي في محافظ العملاء مش هيدفع في أي حجز لحد ما تفتحه تاني (الرصيد نفسه ما بيتمسحش).',
+                   'When off, customers\' welcome bonus pays for no booking until it is on again (the balance itself stays).') }}
+            </div>
+          </label>
+        </div>
+
+        <div class="field col-12 flex align-items-center gap-3">
+          <p-inputSwitch formControlName="allowWithCoupon" inputId="allowWithCoupon"></p-inputSwitch>
+          <label for="allowWithCoupon" class="m-0">
+            <b>{{ t('مسموح بالكوبون والرصيد الترحيبي في نفس الحجز', 'Coupon and welcome bonus allowed on the same booking') }}</b>
+            <div class="text-600">
+              {{ t('لو مقفول: العميل اللي استخدم كوبون (خصم أو كاش باك) ما ياخدش خصم من الرصيد الترحيبي في الحجز ده.',
+                   'When off: a booking with a coupon (discount or cashback) takes nothing from the welcome bonus.') }}
+            </div>
+          </label>
+        </div>
+
+        <div class="field col-12 flex align-items-center gap-3">
+          <p-inputSwitch formControlName="isGeneral" inputId="isGeneral"></p-inputSwitch>
+          <label for="isGeneral" class="m-0">
+            <b>{{ t('على كل الأماكن', 'On every place') }}</b>
+            <div class="text-600">
+              {{ t('اقفله عشان تختار الأماكن اللي الرصيد الترحيبي يتطبق عليها بس، زي الكوبون.',
+                   'Turn it off to choose the only places the welcome bonus applies to, like a coupon.') }}
+            </div>
+          </label>
+        </div>
+
+        <ng-container *ngIf="!isGeneral">
+          <div class="field col-12">
+            <span class="p-fluid">
+              <label>{{ 'Select Trips' | translate }}</label>
+              <p-multiSelect formControlName="tripIds" [options]="tripsOptions$ | async" display="comma" optionLabel="label"
+                optionValue="value" [filter]="true" placeholder="{{ 'Select Trips' | translate }}"></p-multiSelect>
+            </span>
+          </div>
+          <div class="field col-12">
+            <span class="p-fluid">
+              <label>{{ 'Select Rooms' | translate }}</label>
+              <p-multiSelect formControlName="roomIds" [options]="roomsOptions$ | async" display="comma" optionLabel="label"
+                optionValue="value" [filter]="true" placeholder="{{ 'Select Rooms' | translate }}"></p-multiSelect>
+            </span>
+          </div>
+          <div class="field col-12">
+            <span class="p-fluid">
+              <label>{{ t('اختار الخروجات', 'Select outings') }}</label>
+              <p-multiSelect formControlName="outingIds" [options]="outingsOptions$ | async" display="comma" optionLabel="label"
+                optionValue="value" [filter]="true"></p-multiSelect>
+            </span>
+          </div>
+          <div class="field col-12">
+            <span class="p-fluid">
+              <label>{{ t('اختار باقات الحج والعمرة', 'Select Hajj / Umrah packages') }}</label>
+              <p-multiSelect formControlName="hajjIds" [options]="hajjOptions$ | async" display="comma" optionLabel="label"
+                optionValue="value" [filter]="true"></p-multiSelect>
+            </span>
+          </div>
+          <div class="col-12 text-danger" *ngIf="placesMissing">
+            {{ t('اختار مكان واحد على الأقل، أو رجّع "على كل الأماكن".', 'Choose at least one place, or turn "On every place" back on.') }}
+          </div>
+        </ng-container>
+      </div>
+    </p-panel>
+
+    <div class="flex justify-content-end mt-3">
+      <button pButton type="submit" [disabled]="placesMissing || saving" [label]="t('حفظ', 'Save')" icon="pi pi-check"></button>
+    </div>
+  </form>
+</div>

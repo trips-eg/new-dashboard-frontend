@@ -42,8 +42,13 @@
 
         <!-- Discount Amount — يظهر فقط عند النوع 1 أو 2 -->
         <div class="field col-12 col-md-6" *ngIf="!isBuyXGetX">
-          <label for="discountAmount" class="font-semibold mb-1 block">{{ 'Discount rate' | translate }}</label>
-          <p-inputNumber id="discountAmount" suffix="%" formControlName="discountAmount" class="w-full"></p-inputNumber>
+          <label for="discountAmount" class="font-semibold mb-1 block">
+            {{ 'Discount rate' | translate }}
+          </label>
+          <p-inputNumber id="discountAmount" [suffix]="isPercentType ? '%' : ' ج.م'" formControlName="discountAmount" class="w-full"></p-inputNumber>
+          <small class="block mt-1 text-600" *ngIf="isCashback">
+            {{ lang === 'ar' ? 'العميل بيدفع السعر كامل، والمبلغ ده بيتحط في محفظته بعد ما الحجز يتدفع، وبيترجع لو الحجز اتلغى.' : 'The customer pays the full price; this goes to their wallet once the booking is paid, and is taken back if it is cancelled.' }}
+          </small>
           <div class="text-danger mt-1" *ngIf="couponForm.get('discountAmount')?.invalid && couponForm.get('discountAmount')?.touched">
             <div *ngIf="couponForm.get('discountAmount')?.errors?.['required']">
               {{ 'This field is required' | translate }}

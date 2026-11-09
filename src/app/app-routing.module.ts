@@ -29,7 +29,7 @@ const routes: Routes = [
   {
     path: '',
     component: AdminComponent,
-    // canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
     children: [
       // Old screens with a new one: their addresses open the new screen (the old code stays)
       ...LEGACY_REDIRECTS,
@@ -499,6 +499,11 @@ const routes: Routes = [
           import('./demo/pages/settings/mobile-policies/mobile-policies.component').then((m) => m.MobilePoliciesComponent)
       },
       {
+        path: 'bonus-settings',
+        loadComponent: () =>
+          import('./demo/pages/settings/bonus-settings/bonus-settings.component').then((m) => m.BonusSettingsComponent)
+      },
+      {
         path: 'financial-settings',
         loadComponent: () =>
           import('./demo/pages/settings/financial-settings/financial-settings.component').then((m) => m.FinancialSettingsComponent)
@@ -507,6 +512,10 @@ const routes: Routes = [
         path: 'commission-policies',
         loadComponent: () =>
           import('./demo/pages/settings/commission-policies/commission-policies.component').then((m) => m.CommissionPoliciesComponent)
+      },
+      {
+        path: 'home-content',
+        loadComponent: () => import('./demo/pages/settings/home-content/home-content.component').then((m) => m.HomeContentComponent)
       },
       {
         path: 'notifications',
