@@ -67,6 +67,11 @@ export class VendorsApi {
   }
 }
 
+/** The saved papers of a company (CompanyDocumentDto: { id, url }), as image paths for [existing]. */
+export function savedPapers(docs: unknown): string[] {
+  return Array.isArray(docs) ? docs.map((d) => (d && typeof d === 'object' ? (d as { url?: unknown }).url : null)).filter((u): u is string => typeof u === 'string' && !!u.trim()) : [];
+}
+
 function statusOf(v: any): { label: string; tone: 'danger' | 'cancelled' | 'ok' } {
   return v.status === 'blocked'
     ? { label: 'APP.blocked', tone: 'danger' }
@@ -314,9 +319,9 @@ const MODULE_LABEL: Record<(typeof MODULE_KEYS)[number], string> = { Travel: 'AP
           <span class="ts-label">{{ 'APP.vendorLogo' | translate }}</span>
           <ts-images-field [(files)]="logo" [existing]="existingLogo" [multiple]="false"></ts-images-field>
           <span class="ts-label">{{ 'APP.taxCardLicence' | translate }}</span>
-          <ts-images-field [(files)]="licence"></ts-images-field>
+          <ts-images-field [(files)]="licence" [existing]="existingLicence" [cover]="false"></ts-images-field>
           <span class="ts-label">{{ 'APP.commercialRegister' | translate }}</span>
-          <ts-images-field [(files)]="commercial"></ts-images-field>
+          <ts-images-field [(files)]="commercial" [existing]="existingCommercial" [cover]="false"></ts-images-field>
         </ts-form-section>
         <ts-form-section *ngIf="!id" [title]="'APP.loginAccount' | translate" icon="ti ti-user-key">
           <div class="ts-two">
@@ -368,6 +373,9 @@ export class VendorFormComponent implements OnInit {
   /** CompanyCreateDto's ImageLogo, LicenceDocuments (tax card, licence) and CommercialDocuments, as the old form sent them. */
   logo: File[] = [];
   existingLogo: string[] = [];
+  /** The papers saved when the vendor was added (GetCompanyById → licenceDocuments / commercialDocuments). */
+  existingLicence: string[] = [];
+  existingCommercial: string[] = [];
   licence: File[] = [];
   commercial: File[] = [];
 
@@ -390,6 +398,8 @@ export class VendorFormComponent implements OnInit {
       }
       this.customTrips = c.isAcceptingCustomTrip ?? true;
       this.existingLogo = c.logoUrl ? [c.logoUrl] : [];
+      this.existingLicence = savedPapers(c.licenceDocuments);
+      this.existingCommercial = savedPapers(c.commercialDocuments);
       this.salesId = c.salesId ?? null;
     } catch (e) {
       this.error = this.text.error(e);
