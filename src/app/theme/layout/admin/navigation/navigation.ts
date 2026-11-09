@@ -252,7 +252,11 @@ export const Permissions = {
 
   // Home content of the customer app (trust block + home icons)
   HomeContentView: 'Permissions.HomeContent.View',
-  HomeContentEdit: 'Permissions.HomeContent.Edit'
+  HomeContentEdit: 'Permissions.HomeContent.Edit',
+
+  // The in-app support chat (الدعم / الشات)
+  SupportChatView: 'Permissions.SupportChat.View',
+  SupportChatReply: 'Permissions.SupportChat.Reply'
 };
 
 /** The analytics screens of the TRIPS Staff app. */
@@ -1014,6 +1018,17 @@ const NavigationItems = [
     breadcrumbs: false,
     permissions: [Permissions.BookingView],
     vendorOnly: true
+  },
+  {
+    id: 'a-support-chat',
+    title: 'SUPPORT.navTitle',
+    type: 'item',
+    classes: 'nav-item',
+    url: '/a/support-chat',
+    icon: 'fas fa-comments',
+    breadcrumbs: false,
+    permissions: [Permissions.SupportChatView],
+    adminOnly: true
   },
   STAFF_MARKETING,
   {

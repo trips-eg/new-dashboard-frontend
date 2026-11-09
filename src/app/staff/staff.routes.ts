@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { tripStarPermissionGuard } from '../shared/guards/trip-star-permission.guard';
 
 /**
  * The screens of the TRIPS Staff app, at the same paths as in the app (/a/... for admins, /v/... for vendors).
@@ -74,6 +75,14 @@ export const STAFF_ROUTES: Routes = [
   { path: 'v/more/requests', loadComponent: () => import('./requests/requests.component').then((c) => c.CustomRequestsComponent), data: { vendor: true } },
   { path: 'v/more/requests/:id', loadComponent: () => import('./requests/requests.component').then((c) => c.CustomRequestComponent), data: { vendor: true } },
   { path: 'v/more/offers', loadComponent: () => import('./requests/requests.component').then((c) => c.VendorOffersComponent) },
+
+  // ---- admin: support chat (الدعم / الشات); the open conversation is ?c={id}, so the inbox stays as it is ----
+  {
+    path: 'a/support-chat',
+    canActivate: [tripStarPermissionGuard],
+    data: { permission: 'Permissions.SupportChat.View' },
+    loadComponent: () => import('./support-chat/support-chat.component').then((c) => c.SupportChatComponent)
+  },
 
   // ---- More, settings, profile ----
   { path: 'a/more', loadComponent: () => import('./more/more.component').then((c) => c.AdminMoreComponent) },

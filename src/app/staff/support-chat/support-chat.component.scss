@@ -1,0 +1,347 @@
+// الدعم / الشات: the inbox and the conversation side by side; one at a time below 992px.
+
+.sc-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) 1fr;
+  gap: var(--ts-gap-card, 16px);
+  height: calc(100vh - var(--ts-header-height, 64px) - 150px);
+  min-height: 480px;
+}
+
+.sc-inbox,
+.sc-chat {
+  background: var(--ts-surface);
+  border: 1px solid var(--ts-line);
+  border-radius: var(--ts-radius-card);
+  box-shadow: var(--ts-shadow-card);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sc-inbox {
+  padding: 12px;
+  gap: 10px;
+}
+
+.sc-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.sc-row {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  text-align: start;
+  background: none;
+  border: 0;
+  border-radius: var(--ts-radius-field);
+  padding: 10px 8px;
+  color: var(--ts-ink);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ts-hover);
+  }
+  &.is-selected {
+    background: var(--ts-selected);
+  }
+  &.is-unread .sc-row__name,
+  &.is-unread .sc-row__preview {
+    font-weight: 700;
+    color: var(--ts-ink);
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  &__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  &__name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  &__time {
+    color: var(--ts-ink-faint);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  &__preview {
+    color: var(--ts-ink-muted);
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  &__you {
+    color: var(--ts-ink-faint);
+  }
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  &__badge {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 11px;
+    background: var(--ts-accent);
+    color: var(--ts-on-accent);
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+  }
+}
+
+.sc-more {
+  align-self: center;
+}
+
+.sc-chat {
+  &--empty {
+    justify-content: center;
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--ts-line);
+    flex-wrap: wrap;
+  }
+  &__who {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+    span {
+      color: var(--ts-ink-muted);
+      font-size: 13px;
+      text-align: start;
+    }
+  }
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+}
+
+.sc-back {
+  display: none;
+  background: none;
+  border: 0;
+  font-size: 20px;
+  color: var(--ts-ink);
+}
+
+.sc-assign {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--ts-ink-muted);
+  select {
+    height: 36px;
+    border: 1px solid var(--ts-line-input);
+    border-radius: var(--ts-radius-field);
+    background: var(--ts-surface);
+    color: var(--ts-ink);
+    padding: 0 8px;
+  }
+}
+
+.sc-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--ts-page);
+}
+
+.sc-older {
+  align-self: center;
+}
+
+// The customer on the start side, Trips on the end side (like the app, seen from the other end)
+.sc-msg {
+  display: flex;
+  justify-content: flex-start;
+
+  &--staff {
+    justify-content: flex-end;
+    .sc-bubble {
+      background: var(--ts-navy);
+      color: var(--ts-navy-ink, #fff);
+      border-end-end-radius: 4px;
+      border-end-start-radius: 16px;
+    }
+    .sc-meta {
+      color: var(--ts-on-navy-muted, rgba(255, 255, 255, 0.75));
+    }
+  }
+}
+
+.sc-bubble {
+  max-width: min(72%, 520px);
+  background: var(--ts-surface);
+  border: 1px solid var(--ts-line);
+  border-radius: 16px;
+  border-end-start-radius: 4px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sc-text {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.sc-meta {
+  font-size: 11px;
+  color: var(--ts-ink-faint);
+  align-self: flex-end;
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.sc-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: var(--ts-selected);
+  border-radius: 10px;
+  padding: 6px;
+  color: var(--ts-ink);
+  text-decoration: none;
+  img {
+    width: 52px;
+    height: 52px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  span {
+    display: flex;
+    flex-direction: column;
+  }
+  small {
+    color: var(--ts-ink-muted);
+  }
+}
+
+.sc-photo img {
+  max-width: 100%;
+  max-height: 280px;
+  border-radius: 10px;
+  display: block;
+}
+
+.sc-composer {
+  border-top: 1px solid var(--ts-line);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+  }
+  textarea {
+    flex: 1;
+    resize: none;
+    border: 1px solid var(--ts-line-input);
+    border-radius: var(--ts-radius-field);
+    padding: 8px 10px;
+    background: var(--ts-surface);
+    color: var(--ts-ink);
+    min-height: 44px;
+    max-height: 160px;
+  }
+}
+
+.sc-attach {
+  margin: 0;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--ts-radius-field);
+  color: var(--ts-ink-muted);
+  cursor: pointer;
+  position: relative;
+  font-size: 20px;
+  &:hover {
+    background: var(--ts-hover);
+  }
+  input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+}
+
+.sc-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ts-ink-muted);
+}
+
+.sc-readonly {
+  margin: 0;
+  padding: 12px 16px;
+  border-top: 1px solid var(--ts-line);
+  color: var(--ts-ink-muted);
+  font-size: 13px;
+}
+
+@media (max-width: 991.98px) {
+  .sc-layout {
+    grid-template-columns: 1fr;
+    height: calc(100vh - var(--ts-header-height, 64px) - 120px);
+  }
+  .sc-has-open .sc-inbox {
+    display: none;
+  }
+  .sc-screen:not(.sc-has-open) .sc-chat {
+    display: none;
+  }
+  .sc-back {
+    display: inline-flex;
+  }
+  .sc-bubble {
+    max-width: 88%;
+  }
+}
