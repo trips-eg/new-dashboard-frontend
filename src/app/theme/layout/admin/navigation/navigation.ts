@@ -671,6 +671,16 @@ const NavigationItems = [
         permissions: [Permissions.SalesAgencyCreate]
       },
       {
+        id: 'bonus-settings',
+        title: 'bonus settings',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/bonus-settings',
+        icon: 'fa-solid fa-gift',
+        breadcrumbs: false,
+        permissions: [Permissions.CouponsCreate]
+      },
+      {
         id: 'financial-settings',
         title: 'financial settings',
         type: 'item',

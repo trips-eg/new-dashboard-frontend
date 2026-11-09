@@ -55,7 +55,8 @@ export class APIs {
     GetNotificationById: 'Notification/GetNotification?Id=',
     AddNotification: 'Notification/SendNotification',
     update: 'Notification/UpdateNotification',
-    delete: 'Notification/DeleteNotification?id='
+    delete: 'Notification/DeleteNotification?id=',
+    suggest: 'Notification/Suggest'
   };
 
   public static Outing = {
@@ -200,7 +201,8 @@ export class APIs {
     setcoupons: 'Coupons/AddCoupons',
     deletecoupons: 'Coupons/DeleteCoupons?id=',
     getusedcoupons: 'Coupons/GetAllUsedCoupons',
-    getcouponById: 'Coupons/GetCouponsById?id='
+    getcouponById: 'Coupons/GetCouponsById?id=',
+    bonusRules: 'Coupons/Settings/Bonus'
   };
   public static roomGroups = {
     GetAllroomGroups: 'RoomGroups/GetAllRoomGroups',

@@ -25,5 +25,12 @@ export class CouponsService {
   getUsedCoupons(criteria: any): Observable<any> {
     return this.ApiCallerService.post(this.ensPoints.getusedcoupons, criteria);
   }
+  // the welcome bonus rules (on/off, with a coupon, places)
+  getBonusRules(): Observable<any> {
+    return this.ApiCallerService.get(this.ensPoints.bonusRules);
+  }
+  updateBonusRules(rules: any): Observable<any> {
+    return this.ApiCallerService.post(this.ensPoints.bonusRules, rules);
+  }
   constructor() {}
 }

@@ -40,7 +40,10 @@
           <label for="discountAmount">
             {{ 'Discount rate' | translate }}
           </label>
-          <p-inputNumber id="discountAmount" suffix="%" formControlName="discountAmount" class="w-full"></p-inputNumber>
+          <p-inputNumber id="discountAmount" [suffix]="isPercentType ? '%' : ' ج.م'" formControlName="discountAmount" class="w-full"></p-inputNumber>
+          <small class="block mt-1 text-600" *ngIf="isCashback">
+            {{ lang === 'ar' ? 'العميل بيدفع السعر كامل، والمبلغ ده بيتحط في محفظته بعد ما الحجز يتدفع، وبيترجع لو الحجز اتلغى.' : 'The customer pays the full price; this goes to their wallet once the booking is paid, and is taken back if it is cancelled.' }}
+          </small>
           <div class="text-danger" *ngIf="couponForm.get('discountAmount')?.invalid && couponForm.get('discountAmount')?.touched">
             <div *ngIf="couponForm.get('discountAmount')?.errors?.['required']">
               {{ 'This field is required' | translate }}
