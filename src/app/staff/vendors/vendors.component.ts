@@ -15,6 +15,7 @@ import { fmtCompact, fmtNum, parseAmount } from '../core/format';
 import { FORM_KIT, toForm } from '../forms/form-kit';
 import { AccountRef, AccountSheetComponent, PasswordSheetComponent, splitName } from '../settings/account-sheets';
 import { KpiTileComponent } from 'src/app/demo/pages/staff-analytics/staff-ui';
+import { VendorPermissionsComponent } from './vendor-permissions';
 import { StaffAnalyticsService, presetRange } from 'src/app/demo/pages/staff-analytics/staff-analytics.service';
 
 @Injectable({ providedIn: 'root' })
@@ -129,7 +130,7 @@ export class VendorsComponent implements OnDestroy {
 @Component({
   selector: 'ts-vendor',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, KpiTileComponent],
+  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, KpiTileComponent, VendorPermissionsComponent],
   template: `
     <div class="ts-screen ts-screen--narrow">
       <ts-appbar [title]="c?.name || ('APP.vendor' | translate)">
@@ -177,6 +178,7 @@ export class VendorsComponent implements OnDestroy {
             </ts-info>
           </ts-card>
         </ng-container>
+        <ts-vendor-permissions *ngIf="canEdit" [companyId]="id"></ts-vendor-permissions>
         <a class="btn btn-secondary ts-wide-btn" [routerLink]="['/a/more/vendors', id, 'users']"><i class="ti ti-users"></i>{{ 'APP.vendorTeam' | translate }}</a>
         <button *ngIf="canEdit" type="button" class="btn ts-wide-btn" [class.btn-outline-danger]="!c.isBlocked" [class.btn-secondary]="c.isBlocked" (click)="toggleBlock()" style="margin-top: 10px">
           <i class="ti ti-ban"></i>{{ (c.isBlocked ? 'APP.unblock' : 'APP.block') | translate }}

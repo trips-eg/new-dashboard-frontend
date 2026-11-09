@@ -49,7 +49,10 @@ export class StaffHomeComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   readonly isVendor = this.config.userRoles().some((r: string) => r.startsWith('Vendor.'));
+  // The vendor permissions switches (bookings, scanner, settlements): their shortcuts hide without them
   readonly canScan = this.config.userPermissions().includes('Permissions.Scanner.View');
+  readonly canBookings = this.config.userPermissions().includes('Permissions.Booking.View');
+  readonly canSettlements = this.config.userPermissions().includes('Permissions.CompanyWallet.View');
   readonly companyId = this.config.vendorId();
   readonly username = this.config.UserName() ?? '';
 

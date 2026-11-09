@@ -263,11 +263,12 @@
           [delta]="kpi(vendor.month, 'bookings')?.changePct ?? null"
         ></ts-kpi>
         <ts-kpi
+          *ngIf="canSettlements"
           [label]="'STAFF_UI.REMAINING_FOR_ME' | translate"
           icon="ti ti-wallet"
           tone="revenue"
           [value]="fmtNum(vendor.today.today.remainingDue)"
-          [link]="companyId ? ['/vendor-details', companyId] : null"
+          link="/v/more/settlements"
         ></ts-kpi>
         <ts-kpi
           [label]="'STAFF_UI.MY_RATING' | translate"
@@ -287,7 +288,7 @@
           <div class="ts-section__title">
             <h2>{{ 'STAFF_UI.LEAVING_TODAY_TITLE' | translate }}</h2>
           </div>
-          <a class="ts-section__action" routerLink="/v/bookings">{{ 'STAFF_UI.SEE_ALL' | translate }}</a>
+          <a *ngIf="canBookings" class="ts-section__action" routerLink="/v/bookings">{{ 'STAFF_UI.SEE_ALL' | translate }}</a>
         </div>
         <div class="ts-empty" *ngIf="!vendor.departures.length">
           <i class="ti ti-calendar-event" aria-hidden="true"></i>

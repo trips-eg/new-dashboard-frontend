@@ -210,9 +210,9 @@ export class VendorMoreComponent implements OnInit {
       ...(this.session.acceptsCustomTrips
         ? [{ icon: 'ti ti-heart-handshake', label: 'APP.customRequests', color: 'var(--ts-marketing, #c2187a)', bg: 'var(--ts-marketing-bg, #fde7f3)', route: '/v/more/requests' }]
         : []),
-      { icon: 'ti ti-wallet', label: 'APP.mySettlements', color: 'var(--ts-navy)', bg: 'var(--ts-selected)', route: '/v/more/settlements' },
+      { icon: 'ti ti-wallet', label: 'APP.mySettlements', color: 'var(--ts-navy)', bg: 'var(--ts-selected)', route: '/v/more/settlements', perm: P.companyWalletView },
       { icon: 'ti ti-chart-bar', label: 'APP.myReports', color: 'var(--ts-teal)', bg: 'var(--ts-outing-bg)', route: '/v/more/analytics' },
-      { icon: 'ti ti-star', label: 'APP.myProductReviews', color: 'var(--ts-hajj)', bg: 'var(--ts-hajj-bg)', route: '/v/more/reviews' },
+      { icon: 'ti ti-star', label: 'APP.myProductReviews', color: 'var(--ts-hajj)', bg: 'var(--ts-hajj-bg)', route: '/v/more/reviews', perm: P.reviewsView },
       { icon: 'ti ti-bell', label: 'APP.notifications', color: 'var(--ts-teal)', bg: 'var(--ts-outing-bg)', route: '/v/notifications' },
       { icon: 'ti ti-history', label: 'APP.scanHistory', color: 'var(--ts-ink-nav)', bg: 'var(--ts-hover)', route: '/v/scanner/history', perm: P.scannerView }
     ];
@@ -554,10 +554,16 @@ export class VendorNotificationsComponent implements OnInit {
   private readonly products = inject(ProductsApi);
   private readonly comms = inject(VendorCommsApi);
   private readonly text = inject(StaffText);
+  private readonly session = inject(StaffSession);
   num = fmtNum;
   events: VendorEvent[] | null = null;
   error: unknown = null;
   seen: number | null = null;
+
+  /** The «حجوزاتي» switch: without it the bookings list isn't asked for and a booking event doesn't open /v/bookings. */
+  get canBookings(): boolean {
+    return this.session.can(P.bookingView);
+  }
 
   ngOnInit(): void {
     try {
@@ -572,7 +578,7 @@ export class VendorNotificationsComponent implements OnInit {
   load(): void {
     this.error = null;
     forkJoin({
-      b: this.bookings.list(emptyQuery({ pageSize: 20 })).pipe(map((r) => r.page.data)),
+      b: this.canBookings ? this.bookings.list(emptyQuery({ pageSize: 20 })).pipe(map((r) => r.page.data)) : of([] as BookingRow[]),
       approved: this.products.approvals(2).pipe(map((p) => p.data), catchError(() => of([]))),
       returned: this.products.approvals(3).pipe(map((p) => p.data), catchError(() => of([]))),
       // The server's "new confirmed booking" notifications (sent with the vendor's WhatsApp message)
@@ -592,7 +598,7 @@ export class VendorNotificationsComponent implements OnInit {
       detail: [c.bookingReference ? `#${c.bookingReference}` : '', ...c.message.split('\n').filter((l) => /👤|📍|🗓️|👥|👶/.test(l))]
         .filter(Boolean)
         .join(' · '),
-      route: c.bookingId ? `/v/bookings/${c.bookingId}` : null,
+      route: c.bookingId && this.canBookings ? `/v/bookings/${c.bookingId}` : null,
       readAt: c.readAt
     }));
     out.push(...bookings

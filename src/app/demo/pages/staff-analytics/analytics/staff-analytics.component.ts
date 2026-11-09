@@ -83,6 +83,8 @@ export class StaffAnalyticsComponent implements OnInit {
 
   readonly isVendor = this.config.userRoles().some((r: string) => r.startsWith('Vendor.'));
   readonly canCoupons = this.config.userPermissions().includes('Permissions.Coupons.Create');
+  /** The vendor's «حجوزاتي» switch: without it a number doesn't open /v/bookings. */
+  readonly canBookings = this.config.userPermissions().includes('Permissions.Booking.View');
   readonly companyId: number | null = this.config.vendorId();
 
   view: AnalyticsView = 'growth';
@@ -223,7 +225,8 @@ export class StaffAnalyticsComponent implements OnInit {
   }
 
   kpiLink(k: Kpi): string | null {
-    return this.isVendor ? (k.key === 'bookings' || k.key === 'cancelRatePct' ? '/v/bookings' : null) : (ADMIN_TARGET[k.key] ?? null);
+    if (this.isVendor) return this.canBookings && (k.key === 'bookings' || k.key === 'cancelRatePct') ? '/v/bookings' : null;
+    return ADMIN_TARGET[k.key] ?? null;
   }
 
   // ---- chart helpers ----
