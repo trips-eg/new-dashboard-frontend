@@ -1,0 +1,13 @@
+- Generating browser application bundles (phase: setup)...
+✔ Browser application bundle generation complete.
+✔ Browser application bundle generation complete.
+- Copying assets...
+✔ Copying assets complete.
+- Generating index html...
+✖ Index html generation failed.
+Inlining of fonts failed. An error has occurred while retrieving https://fonts.googleapis.com/css?family=Roboto:300,500,400,600,700 over the internet.
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+real	15m20.741s
+user	0m0.154s
+sys	0m0.152s

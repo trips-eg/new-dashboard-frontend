@@ -42,6 +42,10 @@ export class HttpInterceptorInterceptor implements HttpInterceptor {
 
     return next.handle(authReq).pipe(
       catchError((err) => {
+        // An expired or revoked session goes back to the login page (not for the login call itself)
+        if (err && err.status === 401 && !/Authentication\//i.test(req.url)) {
+          this._configService.Logout();
+        }
         if ((err && err.status === 403) || err.status === 0) {
           err.error = { Message: '', status: 0 };
           err.error.status = 401;

@@ -24,7 +24,7 @@ const routes: Routes = [
   {
     path: '',
     component: AdminComponent,
-    // canActivate: [AuthGuard],
+    canActivate: [AuthGuard],
     children: [
       {
         path: '',
@@ -417,6 +417,10 @@ const routes: Routes = [
         path: 'financial-settings',
         loadComponent: () =>
           import('./demo/pages/settings/financial-settings/financial-settings.component').then((m) => m.FinancialSettingsComponent)
+      },
+      {
+        path: 'home-content',
+        loadComponent: () => import('./demo/pages/settings/home-content/home-content.component').then((m) => m.HomeContentComponent)
       },
       {
         path: 'notifications',
