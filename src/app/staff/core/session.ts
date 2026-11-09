@@ -43,6 +43,7 @@ export const P = {
   roomsDelete: 'Permissions.Rooms.Delete',
   couponsView: 'Permissions.Coupons.View',
   couponsCreate: 'Permissions.Coupons.Create',
+  couponsEdit: 'Permissions.Coupons.Edit',
   couponsDelete: 'Permissions.Coupons.Delete',
   financialView: 'Permissions.Financial.View',
   financialEdit: 'Permissions.Financial.Edit',

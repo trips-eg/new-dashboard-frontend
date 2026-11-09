@@ -83,7 +83,16 @@ export interface BookingDetails {
     netTotal?: number;
   };
   emails: { to?: string; date?: string; isSend?: boolean }[];
-  actions: { canConfirmInstaPay?: boolean; canCancelInstaPay?: boolean; canResendEmail?: boolean };
+  actions: {
+    canConfirmInstaPay?: boolean;
+    canCancelInstaPay?: boolean;
+    canResendEmail?: boolean;
+    /** Pending card / cash booking (not a draft): an admin confirms it as paid outside the app. */
+    canConfirmPending?: boolean;
+    /** Pending, confirmed or paid (InstaPay pending has its own cancel). */
+    canCancel?: boolean;
+    isPaid?: boolean;
+  };
 }
 
 /** StaffItemType → the BookingType numbers CheckoutSummaryRequest.itemType uses (Travel 2, Hajj 3, Outing 4). */
@@ -115,6 +124,16 @@ export class BookingsApi {
 
   cancelInstaPay(id: number): Observable<unknown> {
     return this.http.put('/api/CustomerBooking/CancelInstaPayBooking/', {}, { id });
+  }
+
+  /** POST /api/staff/bookings/{id}/confirm (Booking.Edit, admins): a pending booking paid outside the app; emails it. */
+  confirmPending(id: number): Observable<{ status: number; emailSent: boolean }> {
+    return this.http.post(`/api/staff/bookings/${id}/confirm`);
+  }
+
+  /** POST /api/staff/bookings/{id}/cancel (Booking.Edit, admins): seats back, wallet / bonus part back to the wallet. */
+  cancelBooking(id: number): Observable<unknown> {
+    return this.http.post(`/api/staff/bookings/${id}/cancel`);
   }
 
   /** POST /api/staff/bookings/quote: runs the customer checkout for that customer. Every amount comes from it. */

@@ -661,10 +661,16 @@ const COUPON_SEGMENTS: [string, string][] = [
 @Component({
   selector: 'ts-coupon-form',
   standalone: true,
-  imports: [CommonModule, TranslateModule, ...KIT, ...FORM_KIT, PillSwitchComponent, SwitchRowComponent, CatalogItemsComponent],
+  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, ...FORM_KIT, PillSwitchComponent, SwitchRowComponent, CatalogItemsComponent],
   template: `
     <div class="ts-screen ts-screen--narrow">
-      <ts-appbar [title]="'APP.newCoupon' | translate"></ts-appbar>
+      <ts-appbar [title]="(editId ? 'APP.cpEdit' : 'APP.newCoupon') | translate" [subtitle]="editId ? f.code : null"></ts-appbar>
+      <ts-loading *ngIf="loading"></ts-loading>
+      <ts-error *ngIf="loadError" [error]="loadError" (retry)="load()"></ts-error>
+      <ng-container *ngIf="!loading && !loadError">
+      <div class="ts-note ts-note--pending" *ngIf="editId && used">
+        <i class="ti ti-alert-triangle"></i>{{ 'APP.cpEditUsedNote' | translate: { n: num(used) } }}
+      </div>
       <ng-container *ngIf="showIssues">
         <div class="ts-note ts-note--ok" *ngIf="!issues().length"><i class="ti ti-circle-check" style="color: var(--ts-ok-fg)"></i>{{ 'APP.couponAllGood' | translate }}</div>
         <div class="ts-note" *ngIf="issues().length" [class.ts-note--danger]="hasError()" [class.ts-note--pending]="!hasError()">
@@ -681,19 +687,26 @@ const COUPON_SEGMENTS: [string, string][] = [
         <ts-catalog-items [(items)]="items" [kinds]="['trip', 'outing', 'hajj']"></ts-catalog-items>
       </ts-form-section>
       <ts-form-section [title]="'APP.discountAndDates' | translate" icon="ti ti-discount" kind="money">
-        <ts-field [label]="'APP.couponCode' | translate" [required]="true" [(value)]="f.code"></ts-field>
+        <ts-field [label]="'APP.couponCode' | translate" [required]="true" [readonly]="!!editId" [hint]="editId ? ('APP.cpCodeFixed' | translate) : null" [(value)]="f.code"></ts-field>
         <ts-field [label]="'APP.description' | translate" [(value)]="f.desc"></ts-field>
         <ts-field [label]="'APP.couponWarningMessage' | translate" [hint]="'APP.couponWarningHint' | translate" [lines]="2" [(value)]="f.warning"></ts-field>
         <p class="ts-muted">{{ 'APP.couponWarningExplain' | translate }}</p>
         <ts-pill-switch [items]="types" [selected]="f.type" (selectedChange)="f.type = $event"></ts-pill-switch>
-        <ts-field [label]="'APP.discount' | translate" [number]="true" [suffix]="f.type === '2' ? '%' : ('APP.egp' | translate)" [required]="true" [(value)]="f.amount" style="display: block; margin-top: 12px"></ts-field>
+        <p class="ts-muted ts-small" *ngIf="isCashback" style="margin-top: 8px">{{ 'APP.cpCashbackExplain' | translate }}</p>
+        <ts-field [label]="(isCashback ? 'APP.cpCashbackAmount' : 'APP.discount') | translate" [number]="true" [suffix]="isPercent ? '%' : ('APP.egp' | translate)" [required]="true" [(value)]="f.amount" style="display: block; margin-top: 12px"></ts-field>
         <ts-field [label]="'APP.usesAllowed' | translate" [number]="true" [(value)]="f.uses"></ts-field>
         <div class="ts-two">
           <ts-date-field [label]="'APP.from' | translate" [(value)]="f.from"></ts-date-field>
           <ts-date-field [label]="'APP.to' | translate" [(value)]="f.to"></ts-date-field>
         </div>
       </ts-form-section>
-      <ts-form-section [title]="'APP.whoGetsIt' | translate" icon="ti ti-users-group">
+      <ts-form-section *ngIf="editId" [title]="'APP.whoGetsIt' | translate" icon="ti ti-users-group">
+        <p class="ts-muted">{{ 'APP.cpAudienceFixed' | translate: { n: num(sentTo) } }}</p>
+        <a *ngIf="sentTo" class="btn btn-secondary ts-wide-btn" [routerLink]="['/a/more/coupons', editId, 'recipients']">
+          <i class="ti ti-users"></i>{{ 'APP.cpRecipients' | translate }}
+        </a>
+      </ts-form-section>
+      <ts-form-section *ngIf="!editId" [title]="'APP.whoGetsIt' | translate" icon="ti ti-users-group">
         <ts-switch-row *ngFor="let s of segments" [title]="s[1] | translate" [value]="seg[s[0]]" (valueChange)="seg[s[0]] = $event; audienceChanged()"></ts-switch-row>
         <ts-switch-row [title]="'APP.sendAsNotification' | translate" [(value)]="f.notify"></ts-switch-row>
         <ts-switch-row [title]="'APP.sendAsEmail' | translate" [(value)]="f.email"></ts-switch-row>
@@ -721,20 +734,86 @@ const COUPON_SEGMENTS: [string, string][] = [
       <div class="ts-sticky-foot">
         <button type="button" class="btn btn-primary ts-wide-btn" [disabled]="busy" (click)="save()"><i *ngIf="busy" class="pi pi-spin pi-spinner"></i>{{ 'APP.save' | translate }}</button>
       </div>
+      </ng-container>
     </div>
   `
 })
-export class CouponFormComponent {
+export class CouponFormComponent implements OnInit {
   private readonly api = inject(SettingsApi);
   private readonly location = inject(Location);
   private readonly text = inject(StaffText);
   private readonly dialogs = inject(StaffDialogs);
+  private readonly route = inject(ActivatedRoute);
   num = fmtNum;
   readonly segments = COUPON_SEGMENTS;
+  /** DiscountType: 2 percent · 1 fixed · 4 cashback amount · 5 cashback percent (nothing off now; the wallet gets it once paid). */
   types = [
     { key: '2', label: this.text.tr('APP.percentage') },
-    { key: '1', label: this.text.tr('APP.fixedAmount') }
+    { key: '1', label: this.text.tr('APP.fixedAmount') },
+    { key: '5', label: this.text.tr('APP.cpCashbackPercent') },
+    { key: '4', label: this.text.tr('APP.cpCashbackValue') }
   ];
+  /** The coupon being edited (route a/more/coupons/:id/edit); null for a new one. */
+  readonly editId: number | null = Number(this.route.snapshot.paramMap.get('id')) || null;
+  loading = false;
+  loadError: unknown = null;
+  /** Paid uses so far: editing the discount changes it for the next customers only. */
+  used = 0;
+  sentTo = 0;
+  /** Rooms a coupon made in the old screens applies to: kept on save (this form has no room picker). */
+  private roomIds: number[] = [];
+  /** Kept as loaded: the edit doesn't change them. */
+  private kept: Record<string, unknown> = {};
+
+  get isPercent(): boolean {
+    return this.f.type === '2' || this.f.type === '5';
+  }
+
+  get isCashback(): boolean {
+    return this.f.type === '4' || this.f.type === '5';
+  }
+
+  ngOnInit(): void {
+    if (this.editId) this.load();
+  }
+
+  load(): void {
+    this.loading = true;
+    this.loadError = null;
+    this.api.get(`/api/staff/coupons/${this.editId}`).subscribe({
+      next: (c: any) => {
+        this.f = {
+          ...this.f,
+          code: c.code ?? '',
+          desc: c.description ?? '',
+          warning: c.warningMessage ?? '',
+          amount: c.discountAmount != null ? String(c.discountAmount) : '',
+          uses: String(c.usageNumber ?? 1),
+          type: String(c.discountType ?? 2),
+          from: c.startDate ? new Date(c.startDate) : null,
+          to: c.endDate ? new Date(c.endDate) : null
+        };
+        // Buy X get Y keeps its type (this form has no fields for it)
+        if (c.discountType === 3) this.types = [...this.types, { key: '3', label: this.text.tr('APP.buyXGetX') }];
+        const all: any[] = c.items ?? [];
+        this.items = all.filter((i) => i.kind !== 'room').map((i) => ({ kind: i.kind, id: i.id, name: i.name ?? `#${i.id}` }));
+        this.roomIds = all.filter((i) => i.kind === 'room').map((i) => i.id);
+        this.used = c.usedCount ?? 0;
+        this.sentTo = c.sent?.customers ?? 0;
+        this.kept = {
+          userLimit: c.userLimit,
+          buyQuantity: c.buyQuantity ?? 0,
+          getQuantity: c.getQuantity ?? 0,
+          maxFreeQuantity: c.maxFreeQuantity ?? 0
+        };
+        this.loading = false;
+      },
+      error: (e) => {
+        this.loadError = e;
+        this.loading = false;
+      }
+    });
+  }
   f = {
     code: `TRIPS${Date.now() % 100000}`,
     desc: '',
@@ -774,9 +853,10 @@ export class CouponFormComponent {
       startDate: f.from ? formDate(f.from) : undefined,
       endDate: f.to ? formDate(f.to) : undefined,
       // CouponScope: 2 General, 3 AppliedOnSpecificItems
-      scope: this.items.length ? 3 : 2,
+      scope: this.items.length || this.roomIds.length ? 3 : 2,
       tripIds: this.idsOf('trip'),
-      roomIds: [],
+      // The update replaces the products with the ones sent: rooms from the old screens go back as they were
+      roomIds: this.roomIds,
       outingIds: this.idsOf('outing'),
       hajjIds: this.idsOf('hajj'),
       usersId: [],
@@ -785,9 +865,8 @@ export class CouponFormComponent {
       buyQuantity: 0,
       getQuantity: 0,
       maxFreeQuantity: 0,
-      ...this.seg,
-      sendViaNotification: f.notify,
-      sendViaEmail: f.email
+      // Editing never sends the coupon again: no audience, no channels
+      ...(this.editId ? { ...this.kept, sendViaNotification: false, sendViaEmail: false } : { ...this.seg, sendViaNotification: f.notify, sendViaEmail: f.email })
     };
   }
 
@@ -805,13 +884,14 @@ export class CouponFormComponent {
     if (f.code.trim().includes(' ')) out.push({ field: t('APP.couponCode'), message: t('APP.couponCodeSpaces'), error: true });
     if (amount == null || amount <= 0) out.push({ field: t('APP.discount'), message: t('APP.couponDiscountRequired'), error: true });
     // Percent: basePrice × amount / 100, so more than 100% would take more than the price
-    if (f.type === '2' && amount != null && amount > 100) out.push({ field: t('APP.discount'), message: t('APP.couponPercentOver100'), error: true });
+    if (this.isPercent && amount != null && amount > 100) out.push({ field: t('APP.discount'), message: t('APP.couponPercentOver100'), error: true });
     if (f.type === '2' && amount === 100) out.push({ field: t('APP.discount'), message: t('APP.couponPercentFree') });
+    if (this.editId && uses < this.used) out.push({ field: t('APP.usesAllowed'), message: this.text.tr('APP.cpUsesBelowUsed', { n: this.used }), error: true });
     if (isNaN(uses) || uses < 1) out.push({ field: t('APP.usesAllowed'), message: t('APP.couponUsesRequired'), error: true });
     if (f.from && f.to && f.to < f.from) out.push({ field: t('APP.to'), message: t('APP.couponEndBeforeStart'), error: true });
     if (f.to && f.to < new Date()) out.push({ field: t('APP.to'), message: t('APP.couponAlreadyEnded') });
-    if (!this.items.length) out.push({ field: t('APP.couponAppliesTo'), message: t('APP.couponAppliesToAll') });
-    if ((f.notify || f.email) && !Object.values(this.seg).some((v) => v)) out.push({ field: t('APP.whoGetsIt'), message: t('APP.couponNoAudience') });
+    if (!this.items.length && !this.roomIds.length) out.push({ field: t('APP.couponAppliesTo'), message: t('APP.couponAppliesToAll') });
+    if (!this.editId && (f.notify || f.email) && !Object.values(this.seg).some((v) => v)) out.push({ field: t('APP.whoGetsIt'), message: t('APP.couponNoAudience') });
     return out;
   }
 
@@ -863,9 +943,138 @@ export class CouponFormComponent {
     }
     this.busy = true;
     try {
-      await firstValueFrom(this.api.send('POST', '/api/Coupons/AddCoupons/', this.body()));
-      this.text.showDone(this.text.tr('APP.couponCreated'));
+      if (this.editId) {
+        await firstValueFrom(this.api.send('PUT', `/api/staff/coupons/${this.editId}`, this.body()));
+        this.text.showDone(this.text.tr('APP.cpSaved'));
+      } else {
+        await firstValueFrom(this.api.send('POST', '/api/Coupons/AddCoupons/', this.body()));
+        this.text.showDone(this.text.tr('APP.couponCreated'));
+      }
       this.location.back();
+    } catch (e) {
+      this.text.showError(e);
+    } finally {
+      this.busy = false;
+    }
+  }
+}
+
+// ---------------------------------------------------------------- bonus rules
+
+/** Where the old screens read a product's name by id (the booking screens use the same calls). */
+const BONUS_NAME_PATH: Record<'trip' | 'outing' | 'hajj', string> = {
+  trip: '/api/Travels/GetTravelById/',
+  outing: '/api/Outings/GetOutingById/',
+  hajj: '/api/Hajj/GetHajjById/'
+};
+
+/**
+ * a-bonus-rules: the welcome bonus rules (GET / POST /api/Coupons/Settings/Bonus, the same rows the old "Bonus
+ * settings" screen saves): on/off, whether it can be used on a booking that has a coupon, and the places it covers.
+ */
+@Component({
+  selector: 'ts-bonus-rules',
+  standalone: true,
+  imports: [CommonModule, TranslateModule, ...KIT, ...FORM_KIT, SwitchRowComponent, CatalogItemsComponent],
+  template: `
+    <div class="ts-screen ts-screen--narrow">
+      <ts-appbar [title]="'APP.bonusRules' | translate" [subtitle]="'APP.bonusRulesHint' | translate"></ts-appbar>
+      <ts-loading *ngIf="loading"></ts-loading>
+      <ts-error *ngIf="error" [error]="error" (retry)="load()"></ts-error>
+      <ng-container *ngIf="!loading && !error">
+        <ts-form-section [title]="'APP.bonusUse' | translate" icon="ti ti-gift">
+          <ts-switch-row [title]="'APP.bonusEnabled' | translate" [subtitle]="'APP.bonusEnabledHint' | translate" [(value)]="r.enabled"></ts-switch-row>
+          <ts-switch-row [title]="'APP.bonusWithCoupon' | translate" [subtitle]="(r.allowWithCoupon ? 'APP.bonusWithCouponOn' : 'APP.bonusWithCouponOff') | translate"
+            [disabled]="!r.enabled" [(value)]="r.allowWithCoupon"></ts-switch-row>
+        </ts-form-section>
+        <ts-form-section [title]="'APP.bonusPlaces' | translate" [subtitle]="r.isGeneral ? ('APP.allProducts' | translate) : ('APP.itemsN' | translate: { n: num(items.length + roomIds.length) })" icon="ti ti-map-pin">
+          <ts-switch-row [title]="'APP.bonusAllPlaces' | translate" [disabled]="!r.enabled" [(value)]="r.isGeneral"></ts-switch-row>
+          <ng-container *ngIf="!r.isGeneral">
+            <ts-catalog-items [(items)]="items" [kinds]="['trip', 'outing', 'hajj']"></ts-catalog-items>
+            <p class="ts-muted ts-small" *ngIf="roomIds.length">{{ 'APP.bonusRoomsKept' | translate: { n: num(roomIds.length) } }}</p>
+          </ng-container>
+        </ts-form-section>
+        <div class="ts-sticky-foot">
+          <button type="button" class="btn btn-primary ts-wide-btn" [disabled]="busy || !canEdit" (click)="save()">
+            <i *ngIf="busy" class="pi pi-spin pi-spinner"></i>{{ 'APP.save' | translate }}
+          </button>
+        </div>
+      </ng-container>
+    </div>
+  `
+})
+export class BonusRulesComponent implements OnInit {
+  private readonly api = inject(SettingsApi);
+  private readonly text = inject(StaffText);
+  private readonly session = inject(StaffSession);
+  num = fmtNum;
+  loading = true;
+  error: unknown = null;
+  busy = false;
+  r = { enabled: true, allowWithCoupon: false, isGeneral: true };
+  items: CatalogItem[] = [];
+  /** Rooms chosen in the old screen: kept as they are (this screen has no room picker). */
+  roomIds: number[] = [];
+
+  get canEdit(): boolean {
+    return this.session.can(P.couponsEdit);
+  }
+
+  ngOnInit(): void {
+    this.load();
+  }
+
+  async load(): Promise<void> {
+    this.loading = true;
+    this.error = null;
+    try {
+      const d: any = await firstValueFrom(this.api.get('/api/Coupons/Settings/Bonus'));
+      this.r = { enabled: d?.enabled ?? true, allowWithCoupon: d?.allowWithCoupon ?? false, isGeneral: d?.isGeneral ?? true };
+      this.roomIds = d?.roomIds ?? [];
+      this.items = await this.named([
+        ...(d?.tripIds ?? []).map((id: number) => ({ kind: 'trip' as const, id })),
+        ...(d?.outingIds ?? []).map((id: number) => ({ kind: 'outing' as const, id })),
+        ...(d?.hajjIds ?? []).map((id: number) => ({ kind: 'hajj' as const, id }))
+      ]);
+    } catch (e) {
+      this.error = e;
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  /** The saved ids carry no names: each is read once (a deleted product keeps its number). */
+  private async named(refs: { kind: 'trip' | 'outing' | 'hajj'; id: number }[]): Promise<CatalogItem[]> {
+    return Promise.all(
+      refs.map(async (x) => {
+        try {
+          const d: any = await firstValueFrom(this.api.get(BONUS_NAME_PATH[x.kind], { id: x.id }));
+          return { kind: x.kind, id: x.id, name: d?.name ?? d?.nameAr ?? `#${x.id}` };
+        } catch {
+          return { kind: x.kind, id: x.id, name: `#${x.id}` };
+        }
+      })
+    );
+  }
+
+  private idsOf(kind: string): number[] {
+    return this.items.filter((i) => i.kind === kind).map((i) => i.id);
+  }
+
+  async save(): Promise<void> {
+    if (!this.r.isGeneral && !this.items.length && !this.roomIds.length) return this.text.showError(this.text.tr('APP.bonusPickPlace'));
+    this.busy = true;
+    try {
+      await firstValueFrom(
+        this.api.send('POST', '/api/Coupons/Settings/Bonus', {
+          ...this.r,
+          tripIds: this.idsOf('trip'),
+          roomIds: this.roomIds,
+          outingIds: this.idsOf('outing'),
+          hajjIds: this.idsOf('hajj')
+        })
+      );
+      this.text.showDone(this.text.tr('APP.saved'));
     } catch (e) {
       this.text.showError(e);
     } finally {

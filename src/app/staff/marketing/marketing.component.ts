@@ -20,6 +20,22 @@ function rangeQuery(r: Range | null): Record<string, string> {
   return r ? { from: apiDate(r.from), to: apiDate(r.to) } : {};
 }
 
+/** DiscountType: 1 fixed · 2 percent · 3 buy X get Y · 4 cashback amount · 5 cashback percent (to the wallet after payment). */
+export function couponDiscount(c: any, text: StaffText): string {
+  switch (c?.discountType) {
+    case 2:
+      return fmtPct(c.discountAmount);
+    case 3:
+      return text.tr('APP.buyXGetX');
+    case 4:
+      return text.tr('APP.cpCashbackOf', { n: `${fmtNum(c.discountAmount)} ${text.tr('APP.egp')}` });
+    case 5:
+      return text.tr('APP.cpCashbackOf', { n: fmtPct(c.discountAmount) });
+    default:
+      return `${fmtNum(c?.discountAmount)} ${text.tr('APP.egp')}`;
+  }
+}
+
 @Injectable({ providedIn: 'root' })
 export class MarketingApi {
   private readonly http = inject(StaffHttp);
@@ -46,6 +62,23 @@ export class MarketingApi {
   /** GET /api/staff/coupons/{id}/distribution: the notifications and emails saved when the coupon was sent. */
   couponDistribution(id: number): Observable<any> {
     return this.http.get(`/api/staff/coupons/${id}/distribution`);
+  }
+
+  /** GET /api/staff/coupons/{id}: the coupon, its products, on/off, uses and what was sent (for the edit form too). */
+  coupon(id: number): Observable<any> {
+    return this.http.get(`/api/staff/coupons/${id}`);
+  }
+
+  /** PUT /api/staff/coupons/{id}/active (Coupons.Edit): while off, the cart and checkout refuse it like an expired one. */
+  setCouponActive(id: number, isActive: boolean): Observable<any> {
+    return this.http.put(`/api/staff/coupons/${id}/active`, { isActive });
+  }
+
+  /** GET /api/staff/coupons/{id}/recipients: the customers it was sent to, newest first (phone with Customers.View). */
+  couponRecipients(id: number, q: StaffQuery): Observable<ListResult<any>> {
+    return this.http
+      .get<any>(`/api/staff/coupons/${id}/recipients`, { pageIndex: q.pageIndex, pageSize: 20, ...(q.search ? { search: q.search } : {}) })
+      .pipe(map((d) => ({ page: asPage<any>(d) })));
   }
 
   /** POST /api/Coupons/GetAllUsedCoupons: who used which coupon and when (a vendor gets their own coupons only). */
@@ -486,7 +519,7 @@ export class SearchHistoryComponent implements OnInit {
 @Component({
   selector: 'ts-coupons',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, ...LISTS, SheetComponent],
+  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, ...LISTS, SheetComponent, SwitchRowComponent],
   template: `
     <div class="ts-screen">
       <ts-appbar [title]="'APP.coupons' | translate">
@@ -511,6 +544,11 @@ export class SearchHistoryComponent implements OnInit {
               </span>
             </span>
             <ts-pill [tone]="tone(c.status)">{{ 'APP.cpStatus_' + c.status | translate }}</ts-pill>
+            <button *ngIf="canEdit" type="button" class="ts-icon-btn" (click)="$event.stopPropagation(); toggle(c)" [disabled]="busyId === c.id"
+              [title]="(c.isActive === false ? 'APP.cpTurnOn' : 'APP.cpTurnOff') | translate">
+              <i [class]="busyId === c.id ? 'pi pi-spin pi-spinner' : c.isActive === false ? 'ti ti-player-play' : 'ti ti-player-pause'"></i>
+            </button>
+            <a *ngIf="canEdit" class="ts-icon-btn" [routerLink]="['/a/more/coupons', c.id, 'edit']" (click)="$event.stopPropagation()" [title]="'APP.edit' | translate"><i class="ti ti-pencil"></i></a>
             <button *ngIf="canDelete" type="button" class="ts-icon-btn ts-danger-ink" (click)="$event.stopPropagation(); remove(c)" [title]="'APP.delete' | translate"><i class="ti ti-trash"></i></button>
           </div>
         </ng-template>
@@ -519,6 +557,8 @@ export class SearchHistoryComponent implements OnInit {
 
     <ts-sheet [open]="!!picked" (openChange)="picked = null" [title]="picked?.code ?? ''" [footer]="false">
       <ng-container *ngIf="picked">
+        <ts-switch-row *ngIf="canEdit" [title]="'APP.cpActiveSwitch' | translate" [subtitle]="'APP.cpActiveHint' | translate"
+          [value]="picked.isActive !== false" [disabled]="busyId === picked.id" (valueChange)="toggle(picked, $event)"></ts-switch-row>
         <div class="ts-kv-grid">
           <div><small class="ts-muted">{{ 'APP.discount' | translate }}</small><b>{{ discount(picked) }}</b></div>
           <div><small class="ts-muted">{{ 'APP.cpStatus' | translate }}</small><b>{{ 'APP.cpStatus_' + picked.status | translate }}</b></div>
@@ -544,7 +584,13 @@ export class SearchHistoryComponent implements OnInit {
             <ts-pill [tone]="ch.d.used ? 'ok' : 'neutral'">{{ (ch.d.used ? 'APP.cpSent' : 'APP.cpNotUsed') | translate }}</ts-pill>
           </div>
           <p class="ts-muted ts-small" *ngIf="dist.notification.used || dist.email.used">{{ 'APP.cpDistTotal' | translate: { n: dist.customers } }}</p>
+          <a *ngIf="dist.notification.used || dist.email.used" class="btn btn-secondary ts-wide-btn" [routerLink]="['/a/more/coupons', picked.id, 'recipients']">
+            <i class="ti ti-users"></i>{{ 'APP.cpRecipients' | translate }}
+          </a>
         </ng-container>
+        <a *ngIf="canEdit" class="btn btn-primary ts-wide-btn" style="margin-top: 10px" [routerLink]="['/a/more/coupons', picked.id, 'edit']">
+          <i class="ti ti-pencil"></i>{{ 'APP.cpEdit' | translate }}
+        </a>
       </ng-container>
     </ts-sheet>
   `
@@ -558,14 +604,19 @@ export class CouponsComponent implements OnDestroy {
   picked: any = null;
   dist: any = null;
   distError: unknown = null;
+  busyId: number | null = null;
 
-  readonly statuses = ['all', 'active', 'inactive', 'upcoming', 'expired', 'used', 'unused'].map((key) => ({
+  readonly statuses = ['all', 'active', 'disabled', 'inactive', 'upcoming', 'expired', 'used', 'unused'].map((key) => ({
     key,
     label: this.text.tr('APP.cpFilter_' + key)
   }));
 
   get canCreate(): boolean {
     return this.session.can(P.couponsCreate);
+  }
+
+  get canEdit(): boolean {
+    return this.session.can(P.couponsEdit);
   }
 
   get canDelete(): boolean {
@@ -577,11 +628,39 @@ export class CouponsComponent implements OnDestroy {
   }
 
   discount(c: any): string {
-    return c.discountType === 2
-      ? fmtPct(c.discountAmount)
-      : c.discountType === 3
-        ? this.text.tr('APP.buyXGetX')
-        : `${fmtNum(c.discountAmount)} ${this.text.tr('APP.egp')}`;
+    return couponDiscount(c, this.text);
+  }
+
+  /** On/off (PUT …/active); the row takes the status the backend answers with. */
+  async toggle(c: any, on?: boolean): Promise<void> {
+    const next = on ?? c.isActive === false;
+    if (
+      !next &&
+      !(await this.dialogs.confirm({
+        title: this.text.tr('APP.cpTurnOff'),
+        message: this.text.tr('APP.cpTurnOffQ', { n: c.code }),
+        confirm: this.text.tr('APP.cpTurnOff'),
+        danger: true
+      }))
+    ) {
+      if (this.picked?.id === c.id) this.picked = { ...this.picked };
+      return;
+    }
+    this.busyId = c.id;
+    this.api.setCouponActive(c.id, next).subscribe({
+      next: (d: any) => {
+        const row = { ...c, isActive: d?.isActive ?? next, status: d?.status ?? (next ? c.status : 'disabled') };
+        this.list.replaceWhere((x: any) => x.id === c.id, row);
+        if (this.picked?.id === c.id) this.picked = row;
+        this.busyId = null;
+        this.text.showDone(this.text.tr(next ? 'APP.cpTurnedOn' : 'APP.cpTurnedOff'));
+      },
+      error: (e) => {
+        this.busyId = null;
+        if (this.picked?.id === c.id) this.picked = { ...this.picked };
+        this.text.showError(e);
+      }
+    });
   }
 
   channels(d: any): { icon: string; label: string; d: any }[] {
@@ -617,6 +696,58 @@ export class CouponsComponent implements OnDestroy {
     });
     if (!ok) return;
     this.api.deleteCoupon(c.id).subscribe({ next: () => this.list.removeWhere((x: any) => x.id === c.id), error: (e) => this.text.showError(e) });
+  }
+
+  ngOnDestroy(): void {
+    this.list.destroy();
+  }
+}
+
+/** a-coupon-recipients: the customers a coupon was sent to (notification / email), newest first, and who used it. */
+@Component({
+  selector: 'ts-coupon-recipients',
+  standalone: true,
+  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, ...LISTS],
+  template: `
+    <div class="ts-screen">
+      <ts-appbar [title]="'APP.cpRecipients' | translate" [subtitle]="code"></ts-appbar>
+      <div class="ts-listbar">
+        <ts-search [hint]="'APP.cpRecipientsSearch' | translate" (changed)="list.setSearch($event)"></ts-search>
+      </div>
+      <p class="ts-muted ts-small" *ngIf="!list.loading && !list.error">{{ 'APP.cpRecipientsCount' | translate: { n: num(list.total) } }}</p>
+      <ts-paged-list [list]="list" emptyIcon="ti ti-users" [grid]="true">
+        <ng-template let-r>
+          <a class="ts-list-card" [routerLink]="['/a/more/customers', r.userId]">
+            <ts-icon-tile icon="ti ti-user"></ts-icon-tile>
+            <span class="ts-card-row__main">
+              <strong class="ts-card-title">{{ r.name || '—' }}</strong>
+              <span class="ts-muted ts-num" *ngIf="r.phone">{{ r.phone }}</span>
+              <span class="ts-coupon-usage">
+                <ts-tag *ngIf="r.byNotification" tone="info" icon="ti ti-bell-ringing">{{ 'APP.cpByNotificationShort' | translate }}</ts-tag>
+                <ts-tag *ngIf="r.byEmail" tone="info" icon="ti ti-mail">{{ 'APP.cpByEmail' | translate }}</ts-tag>
+                <ts-tag *ngIf="r.used" tone="ok" icon="ti ti-check">{{ 'APP.cpRecipientUsed' | translate }}</ts-tag>
+              </span>
+            </span>
+            <span class="ts-end-col ts-muted ts-num" *ngIf="r.sentAt">
+              <small>{{ r.sentAt | ts: 'short' }}</small>
+              <small>{{ r.sentAt | ts: 'time' }}</small>
+            </span>
+          </a>
+        </ng-template>
+      </ts-paged-list>
+    </div>
+  `
+})
+export class CouponRecipientsComponent implements OnInit, OnDestroy {
+  private readonly api = inject(MarketingApi);
+  private readonly route = inject(ActivatedRoute);
+  num = fmtNum;
+  code = '';
+  private readonly id = Number(this.route.snapshot.paramMap.get('id'));
+  list = new PagedList<any>((q) => this.api.couponRecipients(this.id, q));
+
+  ngOnInit(): void {
+    this.api.coupon(this.id).subscribe({ next: (c) => (this.code = c?.code ?? ''), error: () => {} });
   }
 
   ngOnDestroy(): void {

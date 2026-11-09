@@ -105,6 +105,9 @@ export const STAFF_ROUTES: Routes = [
   { path: 'a/more/vendor-comms', loadComponent: () => import('./vendor-comms/vendor-comms.component').then((c) => c.VendorCommsComponent) },
   { path: 'a/more/commission', loadComponent: () => import('./settings/content.component').then((c) => c.CommissionComponent) },
   { path: 'a/more/coupons/new', loadComponent: () => import('./settings/content.component').then((c) => c.CouponFormComponent) },
+  { path: 'a/more/coupons/:id/edit', loadComponent: () => import('./settings/content.component').then((c) => c.CouponFormComponent) },
+  { path: 'a/more/coupons/:id/recipients', loadComponent: () => import('./marketing/marketing.component').then((c) => c.CouponRecipientsComponent) },
+  { path: 'a/more/bonus-rules', loadComponent: () => import('./settings/content.component').then((c) => c.BonusRulesComponent) },
 
   // ---- vendor: scanner, notifications, More ----
   { path: 'v/scanner', loadComponent: () => import('./more/more.component').then((c) => c.ScannerComponent) },

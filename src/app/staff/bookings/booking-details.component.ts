@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { KIT, StaffText } from '../ui/kit';
 import { BookingStatus } from '../core/enums';
@@ -14,7 +14,7 @@ import { BOOKING_PARTS } from './booking-parts';
 @Component({
   selector: 'ts-booking-details',
   standalone: true,
-  imports: [CommonModule, TranslateModule, ...KIT, ...BOOKING_PARTS],
+  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, ...BOOKING_PARTS],
   template: `
     <div class="ts-screen ts-screen--narrow">
       <ts-appbar
@@ -24,6 +24,17 @@ import { BOOKING_PARTS } from './booking-parts';
         <button *ngIf="b && !vendor && canEdit && b.actions.canResendEmail" type="button" class="btn btn-secondary" [disabled]="busy" (click)="resend()">
           <i [class]="busy ? 'pi pi-spin pi-spinner' : 'ti ti-mail'"></i>{{ 'APP.resendEmail' | translate }}
         </button>
+        <ng-container *ngIf="b && !vendor && canEdit">
+          <a *ngIf="b.actions.canConfirmInstaPay" class="btn btn-primary" [routerLink]="['/a/bookings', b.id, 'instapay']">
+            <i class="ti ti-receipt"></i>{{ 'APP.reviewReceipt' | translate }}
+          </a>
+          <button *ngIf="b.actions.canCancel" type="button" class="btn btn-outline-danger" [disabled]="busy" (click)="cancel()">
+            <i class="ti ti-x"></i>{{ 'APP.cancelBooking' | translate }}
+          </button>
+          <button *ngIf="b.actions.canConfirmPending" type="button" class="btn btn-primary" [disabled]="busy" (click)="confirmPending()">
+            <i [class]="busy ? 'pi pi-spin pi-spinner' : 'ti ti-check'"></i>{{ 'APP.bkConfirmPending' | translate }}
+          </button>
+        </ng-container>
       </ts-appbar>
       <ts-loading *ngIf="loading"></ts-loading>
       <ts-error *ngIf="error" [error]="error" (retry)="load()"></ts-error>
@@ -61,6 +72,7 @@ export class BookingDetailsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly session = inject(StaffSession);
   private readonly text = inject(StaffText);
+  private readonly dialogs = inject(StaffDialogs);
 
   vendor = false;
   b: BookingDetails | null = null;
@@ -113,6 +125,55 @@ export class BookingDetailsComponent implements OnInit {
       next: () => {
         this.busy = false;
         this.text.showDone(this.text.tr('APP.emailResent'));
+        this.load();
+      },
+      error: (e) => {
+        this.busy = false;
+        this.text.showError(e);
+      }
+    });
+  }
+
+  /** A pending card / cash booking the customer paid outside the app: completed as after a payment, then emailed. */
+  async confirmPending(): Promise<void> {
+    if (!this.b) return;
+    const t = (k: string, p?: any) => this.text.tr(k, p);
+    const ok = await this.dialogs.confirm({
+      title: t('APP.bkConfirmPending'),
+      message: t('APP.bkConfirmPendingQ', { n: this.b.reference }),
+      confirm: t('APP.bkConfirmPending')
+    });
+    if (!ok) return;
+    this.busy = true;
+    this.api.confirmPending(this.b.id).subscribe({
+      next: (r) => {
+        this.busy = false;
+        this.text.showDone(t(r?.emailSent === false ? 'APP.bkConfirmedNoEmail' : 'APP.bkConfirmed'));
+        this.load();
+      },
+      error: (e) => {
+        this.busy = false;
+        this.text.showError(e);
+      }
+    });
+  }
+
+  /** Cancel: seats back; a paid booking's wallet / bonus part goes back to the wallet (a card payment is refunded apart). */
+  async cancel(): Promise<void> {
+    if (!this.b) return;
+    const t = (k: string, p?: any) => this.text.tr(k, p);
+    const ok = await this.dialogs.confirm({
+      title: t('APP.cancelBooking'),
+      message: t(this.b.actions.isPaid ? 'APP.bkCancelPaidQ' : 'APP.bkCancelQ', { n: this.b.reference }),
+      confirm: t('APP.cancelBooking'),
+      danger: true
+    });
+    if (!ok) return;
+    this.busy = true;
+    this.api.cancelBooking(this.b.id).subscribe({
+      next: () => {
+        this.busy = false;
+        this.text.showDone(t('APP.bookingCancelled'));
         this.load();
       },
       error: (e) => {

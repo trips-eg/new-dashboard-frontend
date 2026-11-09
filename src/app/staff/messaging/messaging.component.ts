@@ -12,6 +12,7 @@ import { FilterSchema, FiltersApi, ListResult, PagedList, StaffQuery, asPage, qu
 import { P, StaffSession } from '../core/session';
 import { fmtNum } from '../core/format';
 import { FORM_KIT } from '../forms/form-kit';
+import { CatalogItem, CatalogItemsComponent } from '../forms/home-content-forms.component';
 import { KpiTileComponent } from 'src/app/demo/pages/staff-analytics/staff-ui';
 
 @Injectable({ providedIn: 'root' })
@@ -44,16 +45,43 @@ export class MessagingApi {
     return this.http.raw('DELETE', '/api/Notification/DeleteNotification/', undefined, { Id: id });
   }
 
-  /** POST /api/Notification/SendNotification (multipart NotificationRequest), answered unwrapped. */
-  send(o: { title: string; body: string; image: File | null; segments: Record<string, boolean> }): Observable<unknown> {
+  /**
+   * POST /api/Notification/SendNotification (multipart NotificationRequest), answered unwrapped. ItemType / ItemId:
+   * the trip, outing or Hajj package the customer app opens when the notification is tapped.
+   */
+  send(o: { title: string; body: string; image: File | null; segments: Record<string, boolean>; item?: NotifyItem | null }): Observable<unknown> {
     const form = new FormData();
     form.append('title', o.title);
     form.append('body', o.body);
     Object.entries(o.segments).forEach(([k, v]) => form.append(k, String(v)));
     if (o.image) form.append('Image', o.image, o.image.name);
+    if (o.item) {
+      form.append('ItemType', o.item.itemType);
+      form.append('ItemId', String(o.item.itemId));
+    }
     return this.http.raw('POST', '/api/Notification/SendNotification', form);
   }
+
+  /**
+   * POST /api/Notification/Suggest: title and body ideas from the item picked and the day (the weekend, the month),
+   * written by Claude when the server has an Anthropic key, else templates. Sends nothing.
+   */
+  suggest(o: { item?: NotifyItem | null; idea?: string }): Observable<{ title: string; body: string; source: string }[]> {
+    return this.http.post<any[]>('/api/Notification/Suggest', {
+      itemType: o.item?.itemType ?? null,
+      itemId: o.item?.itemId ?? null,
+      idea: o.idea?.trim() || null
+    });
+  }
 }
+
+/** The item a notification opens: NotificationItemLink types "trip", "picnic" (outing), "religion" (Hajj / Umrah). */
+export interface NotifyItem {
+  itemType: 'trip' | 'picnic' | 'religion';
+  itemId: number;
+}
+
+const NOTIFY_ITEM_TYPE: Record<string, NotifyItem['itemType']> = { trip: 'trip', outing: 'picnic', hajj: 'religion' };
 
 /** a-emails: the email log, failures first, with resend. */
 @Component({
@@ -312,10 +340,31 @@ const SEGMENTS: [string, string][] = [
 @Component({
   selector: 'ts-notify',
   standalone: true,
-  imports: [CommonModule, TranslateModule, ...KIT, ...FORM_KIT, SwitchRowComponent],
+  imports: [CommonModule, TranslateModule, ...KIT, ...FORM_KIT, SwitchRowComponent, CatalogItemsComponent],
   template: `
     <div class="ts-screen ts-screen--narrow">
       <ts-appbar [title]="'APP.sendNotification' | translate"></ts-appbar>
+      <ts-card [title]="'APP.ntItem' | translate" [subtitle]="'APP.ntItemHint' | translate" icon="ti ti-link">
+        <ts-catalog-items [items]="item ? [item] : []" (itemsChange)="pickItem($event)" [kinds]="['trip', 'outing', 'hajj']"></ts-catalog-items>
+      </ts-card>
+      <ts-card [title]="'APP.ntSuggest' | translate" [subtitle]="'APP.ntSuggestHint' | translate" icon="ti ti-sparkles">
+        <ts-field [label]="'APP.ntIdea' | translate" [hint]="'APP.ntIdeaHint' | translate" [(value)]="idea"></ts-field>
+        <button type="button" class="btn btn-secondary ts-wide-btn" [disabled]="suggesting" (click)="suggest()" style="margin-top: 8px">
+          <i [class]="suggesting ? 'pi pi-spin pi-spinner' : 'ti ti-sparkles'"></i>{{ 'APP.ntSuggestBtn' | translate }}
+        </button>
+        <div class="ts-stack" style="margin-top: 10px" *ngIf="ideas.length">
+          <button type="button" class="ts-list-card is-link" *ngFor="let s of ideas" (click)="useIdea(s)" style="text-align: start; width: 100%">
+            <span class="ts-card-row__main">
+              <strong class="ts-card-title">{{ s.title }}</strong>
+              <span class="ts-muted">{{ s.body }}</span>
+            </span>
+            <ts-tag [tone]="s.source === 'ai' ? 'info' : 'neutral'" [icon]="s.source === 'ai' ? 'ti ti-sparkles' : 'ti ti-template'">
+              {{ (s.source === 'ai' ? 'APP.ntByAi' : 'APP.ntTemplate') | translate }}
+            </ts-tag>
+          </button>
+          <p class="ts-muted ts-small">{{ 'APP.ntUseHint' | translate }}</p>
+        </div>
+      </ts-card>
       <ts-card>
         <ts-field [label]="'APP.title' | translate" [required]="true" [(value)]="title"></ts-field>
         <ts-field [label]="'APP.body' | translate" [lines]="4" [required]="true" [(value)]="body"></ts-field>
@@ -354,14 +403,54 @@ export class NotifyComponent {
   image: File | null = null;
   on: Record<string, boolean> = { LoginUser: true, Anonymous: false, LoggedInZeroBookings: false, HighestCompletedBookings: false, HighestCancelledBookings: false };
   busy = false;
+  /** The one product the notification opens (the picker allows several: the last one picked wins). */
+  item: CatalogItem | null = null;
+  idea = '';
+  ideas: { title: string; body: string; source: string }[] = [];
+  suggesting = false;
+
+  private get link(): NotifyItem | null {
+    const type = this.item ? NOTIFY_ITEM_TYPE[this.item.kind] : undefined;
+    return this.item && type ? { itemType: type, itemId: this.item.id } : null;
+  }
+
+  pickItem(items: CatalogItem[]): void {
+    const next = items.find((i) => !this.item || i.kind !== this.item.kind || i.id !== this.item.id) ?? items[items.length - 1] ?? null;
+    this.item = next;
+    this.ideas = [];
+  }
+
+  suggest(): void {
+    this.suggesting = true;
+    this.api.suggest({ item: this.link, idea: this.idea }).subscribe({
+      next: (list) => {
+        this.ideas = list ?? [];
+        this.suggesting = false;
+        if (!this.ideas.length) this.text.showError(this.text.tr('APP.ntNoIdeas'));
+      },
+      error: (e) => {
+        this.suggesting = false;
+        this.text.showError(e);
+      }
+    });
+  }
+
+  useIdea(s: { title: string; body: string }): void {
+    this.title = s.title;
+    this.body = s.body;
+  }
 
   async send(): Promise<void> {
     if (!this.title.trim() || !this.body.trim()) return this.text.showError(this.text.tr('APP.fillRequired'));
-    const ok = await this.dialogs.confirm({ title: this.text.tr('APP.sendNotification'), message: this.text.tr('APP.sendNotificationQ'), confirm: this.text.tr('APP.send') });
+    const ok = await this.dialogs.confirm({
+      title: this.text.tr('APP.sendNotification'),
+      message: this.item ? this.text.tr('APP.ntSendWithItemQ', { n: this.item.name }) : this.text.tr('APP.sendNotificationQ'),
+      confirm: this.text.tr('APP.send')
+    });
     if (!ok) return;
     this.busy = true;
     try {
-      await firstValueFrom(this.api.send({ title: this.title.trim(), body: this.body.trim(), image: this.image, segments: this.on }));
+      await firstValueFrom(this.api.send({ title: this.title.trim(), body: this.body.trim(), image: this.image, segments: this.on, item: this.link }));
       this.text.showDone(this.text.tr('APP.notificationSent'));
       this.location.back();
     } catch (e) {

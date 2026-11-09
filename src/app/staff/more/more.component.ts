@@ -178,6 +178,7 @@ export class AdminMoreComponent implements OnInit {
             { icon: 'ti ti-receipt', label: 'APP.financeSettings', ...hajj, route: '/a/more/finance-settings', perm: P.financialView },
             { icon: 'ti ti-percentage', label: 'APP.commissionPolicies', ...hajj, route: '/a/more/commission', perm: P.financialView },
             { icon: 'ti ti-gift', label: 'APP.autoCoupons', ...mkt, route: '/a/more/coupons/auto', perm: P.couponsView },
+            { icon: 'ti ti-coins', label: 'APP.bonusRules', ...mkt, route: '/a/more/bonus-rules', perm: P.couponsView },
             { icon: 'ti ti-adjustments', label: 'APP.customTripSettings', ...mkt, route: '/a/more/custom-requests-settings', perm: P.customTripSettingView },
             { icon: 'ti ti-sparkles', label: 'APP.tripStars', ...trip, route: '/a/more/tripstars' },
             { icon: 'ti ti-layout-rows', label: 'APP.sidebars', ...trip, route: '/a/more/sidebars' }
