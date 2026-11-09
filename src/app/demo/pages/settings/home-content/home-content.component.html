@@ -1,0 +1,324 @@
+<div class="main home-content" dir="rtl">
+  <sub-header [mainHeader]="'home content' | translate" [mainSection]="'Settings' | translate"></sub-header>
+
+  <div *ngIf="loading && !trust" class="card p-4 text-center text-muted">جاري التحميل...</div>
+
+  <div *ngIf="loadError && !trust" class="card p-4 text-center">
+    <p class="text-danger mb-3">{{ loadError }}</p>
+    <button type="button" class="btn btn-primary" (click)="load()">حاول تاني</button>
+  </div>
+
+  <ng-container *ngIf="trust">
+    <!-- Status bar -->
+    <div class="hc-toolbar card p-3 mb-3">
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <span class="badge bg-light text-dark">النسخة {{ version }}</span>
+        <span *ngIf="isDirty" class="badge bg-warning text-dark">فيه تعديلات مش محفوظة</span>
+        <span *ngIf="!canEdit" class="badge bg-secondary">عرض بس (مالكش صلاحية التعديل)</span>
+      </div>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline-secondary" (click)="load()" [disabled]="loading || saving">
+          <i class="fa-solid fa-rotate"></i> تحميل من جديد
+        </button>
+        <button type="button" class="btn btn-primary hc-save" (click)="save()" [disabled]="!canSave">
+          <i class="fa-solid fa-floppy-disk"></i> {{ saving ? 'جاري الحفظ...' : 'حفظ قسم الثقة' }}
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="conflict" class="alert alert-warning d-flex justify-content-between align-items-center hc-conflict">
+      <span>حد تاني حفظ تعديل على المحتوى ده في نفس الوقت. حمّل الصفحة تاني عشان تشوف آخر نسخة (تعديلاتك اللي مش محفوظة هتضيع).</span>
+      <button type="button" class="btn btn-warning btn-sm" (click)="load()">حمّل آخر نسخة</button>
+    </div>
+
+    <div *ngIf="errors.length" class="alert alert-danger hc-errors">
+      <strong>راجع البيانات دي:</strong>
+      <ul class="mb-0 mt-2">
+        <li *ngFor="let e of errors">{{ e }}</li>
+      </ul>
+    </div>
+
+    <div class="hc-layout">
+      <!-- Editor -->
+      <div class="hc-editor">
+        <fieldset [disabled]="!canEdit || saving">
+          <!-- Trust block -->
+          <div class="card p-3 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">قسم الثقة</h5>
+              <label class="d-flex align-items-center gap-2 mb-0">
+                <span>ظاهر في الرئيسية</span>
+                <p-inputSwitch [(ngModel)]="trust.isVisible" [disabled]="!canEdit || saving"></p-inputSwitch>
+              </label>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label" for="hc-kicker">الجملة الصغيرة فوق العنوان</label>
+                <input id="hc-kicker" class="form-control" [(ngModel)]="trust.kicker" [maxlength]="maxText" />
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label" for="hc-title">العنوان *</label>
+                <input id="hc-title" class="form-control" [(ngModel)]="trust.title" [maxlength]="maxText" />
+              </div>
+
+              <div class="col-12 col-md-4" *ngFor="let c of colorFields">
+                <label class="form-label">{{ c.label }} *</label>
+                <div class="hc-color">
+                  <p-colorPicker
+                    [ngModel]="pickerValue(trustColor(c.field))"
+                    (ngModelChange)="setTrustColor(c.field, $event.toUpperCase())"
+                    [disabled]="!canEdit || saving"
+                    appendTo="body"
+                  ></p-colorPicker>
+                  <input
+                    class="form-control hc-hex"
+                    dir="ltr"
+                    [class.is-invalid]="!isColor(trustColor(c.field))"
+                    [ngModel]="trustColor(c.field)"
+                    (ngModelChange)="setTrustColor(c.field, $event)"
+                    maxlength="7"
+                    placeholder="#RRGGBB"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="card p-3 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">الأرقام ({{ trust.stats.length }} من {{ maxStats }})</h5>
+              <button type="button" class="btn btn-sm btn-outline-primary" (click)="addStat()" [disabled]="trust.stats.length >= maxStats">
+                <i class="fa-solid fa-plus"></i> رقم جديد
+              </button>
+            </div>
+
+            <div class="hc-item" *ngFor="let stat of trust.stats; let i = index; trackBy: trackByIndex">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong>الرقم {{ i + 1 }}</strong>
+                <div class="d-flex gap-1">
+                  <button type="button" class="btn btn-sm btn-light" title="لفوق" (click)="moveStat(i, -1)" [disabled]="i === 0">
+                    <i class="fa-solid fa-arrow-up"></i>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-light" title="لتحت" (click)="moveStat(i, 1)" [disabled]="i === trust.stats.length - 1">
+                    <i class="fa-solid fa-arrow-down"></i>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-danger" title="امسح" (click)="removeStat(i)" [disabled]="trust.stats.length <= minStats">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="row g-2">
+                <div class="col-12 col-md-4">
+                  <label class="form-label">المفتاح</label>
+                  <input class="form-control" dir="ltr" list="hc-stat-keys" [(ngModel)]="stat.key" (ngModelChange)="onStatKeyChange(stat)" />
+                </div>
+                <div class="col-12 col-md-4">
+                  <label class="form-label">الاسم *</label>
+                  <input class="form-control" [(ngModel)]="stat.label" [maxlength]="maxText" />
+                </div>
+                <div class="col-12 col-md-4">
+                  <label class="form-label">طريقة الرقم</label>
+                  <select class="form-select" [(ngModel)]="stat.mode">
+                    <option value="auto" [disabled]="!canBeAuto(stat)">أوتوماتيك (من السيستم)</option>
+                    <option value="manual">يدوي</option>
+                  </select>
+                </div>
+                <div class="col-12 col-md-4">
+                  <label class="form-label">القيمة {{ stat.mode === 'manual' ? '*' : '' }}</label>
+                  <input *ngIf="stat.mode === 'manual'" class="form-control" dir="ltr" [(ngModel)]="stat.value" [maxlength]="maxText" placeholder="+100K" />
+                  <input *ngIf="stat.mode === 'auto'" class="form-control" dir="ltr" [value]="statValue(stat)" disabled />
+                  <small *ngIf="stat.mode === 'auto'" class="text-muted">بيتحسب لوحده من السيستم</small>
+                </div>
+                <div class="col-6 col-md-4">
+                  <label class="form-label">لون الرقم</label>
+                  <div class="hc-color">
+                    <p-colorPicker
+                      [ngModel]="pickerValue(stat.color, '#1E4FA3')"
+                      (ngModelChange)="stat.color = $event.toUpperCase()"
+                      [disabled]="!canEdit || saving"
+                      appendTo="body"
+                    ></p-colorPicker>
+                    <input class="form-control hc-hex" dir="ltr" [class.is-invalid]="stat.color && !isColor(stat.color)" [(ngModel)]="stat.color" maxlength="7" placeholder="#RRGGBB" />
+                  </div>
+                </div>
+                <div class="col-6 col-md-4">
+                  <label class="form-label">لون خلفية الرقم</label>
+                  <div class="hc-color">
+                    <p-colorPicker
+                      [ngModel]="pickerValue(stat.tint, '#EAF1FB')"
+                      (ngModelChange)="stat.tint = $event.toUpperCase()"
+                      [disabled]="!canEdit || saving"
+                      appendTo="body"
+                    ></p-colorPicker>
+                    <input class="form-control hc-hex" dir="ltr" [class.is-invalid]="stat.tint && !isColor(stat.tint)" [(ngModel)]="stat.tint" maxlength="7" placeholder="#RRGGBB" />
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <label class="form-label">الأيقونة المدمجة في التطبيق</label>
+                  <select class="form-select" [(ngModel)]="stat.iconKey">
+                    <option [ngValue]="null">من غير</option>
+                    <option *ngFor="let ic of builtInIcons" [ngValue]="ic.key">{{ ic.label }} ({{ ic.key }})</option>
+                    <option *ngIf="stat.iconKey && !isBuiltIn(stat.iconKey)" [ngValue]="stat.iconKey">{{ stat.iconKey }}</option>
+                  </select>
+                </div>
+                <div class="col-12 col-md-6">
+                  <label class="form-label">أيقونة مرفوعة</label>
+                  <ng-container *ngTemplateOutlet="slotControl; context: { $implicit: statSlot(stat) }"></ng-container>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Badges -->
+          <div class="card p-3 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">المميزات ({{ trust.badges.length }} من {{ maxBadges }})</h5>
+              <button type="button" class="btn btn-sm btn-outline-primary" (click)="addBadge()" [disabled]="trust.badges.length >= maxBadges">
+                <i class="fa-solid fa-plus"></i> ميزة جديدة
+              </button>
+            </div>
+            <p *ngIf="!trust.badges.length" class="text-muted mb-0">مفيش مميزات.</p>
+
+            <div class="hc-item" *ngFor="let badge of trust.badges; let i = index; trackBy: trackBadge">
+              <div class="row g-2 align-items-end">
+                <div class="col-12 col-md-5">
+                  <label class="form-label">الميزة {{ i + 1 }} *</label>
+                  <input class="form-control" [(ngModel)]="badge.text" [maxlength]="maxText" />
+                </div>
+                <div class="col-8 col-md-4">
+                  <label class="form-label">الأيقونة المدمجة</label>
+                  <select class="form-select" [(ngModel)]="badge.iconKey">
+                    <option [ngValue]="null">من غير</option>
+                    <option *ngFor="let ic of builtInIcons" [ngValue]="ic.key">{{ ic.label }} ({{ ic.key }})</option>
+                    <option *ngIf="badge.iconKey && !isBuiltIn(badge.iconKey)" [ngValue]="badge.iconKey">{{ badge.iconKey }}</option>
+                  </select>
+                </div>
+                <div class="col-4 col-md-3 text-end">
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeBadge(i)"><i class="fa-solid fa-trash"></i> امسح</button>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">أيقونة مرفوعة</label>
+                  <ng-container *ngTemplateOutlet="slotControl; context: { $implicit: badgeSlot(i) }"></ng-container>
+                </div>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Icon slots -->
+        <div class="card p-3 mb-3">
+          <h5 class="mb-1">أيقونات الرئيسية</h5>
+          <p class="text-muted small mb-3">SVG أو PNG أو WebP، 200 KB بالكتير. الأيقونة بتتحفظ أول ما ترفعها، و«رجوع للأصلي» بيرجّع أيقونة التطبيق.</p>
+
+          <div *ngFor="let group of slotGroups" class="mb-3 hc-group">
+            <h6 class="hc-group-title">{{ group.title }}</h6>
+            <div class="hc-slots">
+              <div class="hc-slot" *ngFor="let slot of group.slots; trackBy: trackBySlot">
+                <div class="hc-slot-icon">
+                  <img *ngIf="iconUrl(slot.key) as src" [src]="src" [alt]="slot.labelAr" />
+                  <span *ngIf="!iconUrl(slot.key)" class="hc-default">الافتراضي</span>
+                </div>
+                <div class="hc-slot-label" [title]="slot.key">{{ slot.labelAr }}</div>
+                <ng-container *ngTemplateOutlet="slotButtons; context: { $implicit: slot.key }"></ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live phone preview -->
+      <div class="hc-preview-col">
+        <div class="hc-phone" aria-label="معاينة">
+          <div class="hc-screen">
+            <div class="hc-topbar">
+              <span class="hc-top-icon">
+                <img *ngIf="iconUrl('menu') as src" [src]="src" alt="" />
+                <i *ngIf="!iconUrl('menu')" class="fa-solid fa-bars"></i>
+              </span>
+              <span class="hc-logo">Trips</span>
+              <span class="hc-top-icon">
+                <img *ngIf="iconUrl('notifications') as src" [src]="src" alt="" />
+                <i *ngIf="!iconUrl('notifications')" class="fa-regular fa-bell"></i>
+              </span>
+            </div>
+
+            <div class="hc-sections">
+              <div class="hc-section-card" *ngFor="let s of sectionSlots; trackBy: trackBySlot">
+                <div class="hc-section-inner">
+                  <img *ngIf="iconUrl(s.key) as src" [src]="src" alt="" />
+                  <i *ngIf="!iconUrl(s.key)" [ngClass]="sectionFallback(s.key)"></i>
+                  <span>{{ s.labelAr }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hc-trust" [class.hc-hidden]="!trust.isVisible" [style.background]="pickerValue(trust.backgroundColor, '#1E4FA3')">
+              <span *ngIf="!trust.isVisible" class="hc-hidden-tag">مخفي</span>
+              <div class="hc-kicker" *ngIf="trust.kicker" [style.color]="pickerValue(trust.accentColor, '#FFC24B')">{{ trust.kicker }}</div>
+              <div class="hc-title" [style.color]="pickerValue(trust.textColor, '#FFFFFF')">{{ trust.title || 'العنوان' }}</div>
+
+              <div class="hc-stats">
+                <div class="hc-stat" *ngFor="let stat of trust.stats; trackBy: trackByIndex" [style.background]="pickerValue(stat.tint, '#FFFFFF')">
+                  <span class="hc-stat-icon" [style.color]="pickerValue(stat.color, '#1E4FA3')">
+                    <img *ngIf="iconUrl(statSlot(stat)) as src" [src]="src" alt="" />
+                    <i *ngIf="!iconUrl(statSlot(stat))" [ngClass]="builtInIcon(stat.iconKey)"></i>
+                  </span>
+                  <span class="hc-stat-value" dir="ltr" [style.color]="pickerValue(stat.color, '#1E4FA3')">{{ statValue(stat) }}</span>
+                  <span class="hc-stat-label">{{ stat.label || '—' }}</span>
+                </div>
+              </div>
+
+              <div class="hc-badges" *ngIf="trust.badges.length">
+                <span class="hc-badge" *ngFor="let badge of trust.badges; let i = index; trackBy: trackBadge" [style.color]="pickerValue(trust.textColor, '#FFFFFF')">
+                  <span class="hc-badge-icon" [style.color]="pickerValue(trust.accentColor, '#FFC24B')">
+                    <img *ngIf="iconUrl(badgeSlot(i)) as src" [src]="src" alt="" />
+                    <i *ngIf="!iconUrl(badgeSlot(i))" [ngClass]="builtInIcon(badge.iconKey)"></i>
+                  </span>
+                  {{ badge.text || '—' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="text-muted small text-center mt-2">معاينة تقريبية؛ الأيقونات الافتراضية في التطبيق ممكن تختلف شوية.</p>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<!-- Upload / reset buttons of one slot -->
+<ng-template #slotButtons let-slot>
+  <div class="hc-slot-actions">
+    <label class="btn btn-sm btn-outline-primary mb-0" [class.disabled]="!canEdit || !!busySlot">
+      <i class="fa-solid fa-upload"></i> {{ busySlot === slot ? 'جاري الرفع...' : 'رفع' }}
+      <input type="file" hidden accept=".svg,.png,.webp,image/svg+xml,image/png,image/webp" [disabled]="!canEdit || !!busySlot" (change)="onIconSelected(slot, $event)" />
+    </label>
+    <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="!canEdit || !!busySlot || !icons[slot]" (click)="resetIcon(slot)">
+      رجوع للأصلي
+    </button>
+  </div>
+</ng-template>
+
+<!-- Slot icon + buttons, inside the stat / badge editors -->
+<ng-template #slotControl let-slot>
+  <div *ngIf="slotExists(slot); else noSlot" class="d-flex align-items-center gap-2 flex-wrap">
+    <span class="hc-slot-icon hc-slot-icon-sm">
+      <img *ngIf="iconUrl(slot) as src" [src]="src" alt="" />
+      <span *ngIf="!iconUrl(slot)" class="hc-default">الافتراضي</span>
+    </span>
+    <ng-container *ngTemplateOutlet="slotButtons; context: { $implicit: slot }"></ng-container>
+  </div>
+  <ng-template #noSlot>
+    <small class="text-muted">المفتاح ده مالوش أيقونة قابلة للرفع؛ هتظهر الأيقونة المدمجة.</small>
+  </ng-template>
+</ng-template>
+
+<datalist id="hc-stat-keys">
+  <option value="companies">الشركات (أوتوماتيك)</option>
+  <option value="customers">العملاء (أوتوماتيك)</option>
+  <option value="products">الرحلات والخروجات (أوتوماتيك)</option>
+  <option value="downloads">التحميلات</option>
+</datalist>

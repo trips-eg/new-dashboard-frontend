@@ -15,6 +15,11 @@ import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { CheckboxModule } from 'primeng/checkbox';
+import { inject } from '@angular/core';
+import { map, Observable, of } from 'rxjs';
+import { TravelTripsService } from 'src/app/shared/services/travel-trips.service';
+import { OutingService } from 'src/app/shared/services/outing.service';
+import { HajjUmmrahService } from 'src/app/shared/services/hajj-ummrah.service';
 
 @Component({
   selector: 'app-notifications-form',
@@ -51,6 +56,22 @@ export class NotificationsFormComponent {
   searchTerm: string = '';
   hasMoreUsers: boolean = true;
 
+  // The item the notification opens in the app (phase 5)
+  private trips = inject(TravelTripsService);
+  private outings = inject(OutingService);
+  private hajj = inject(HajjUmmrahService);
+  itemTypes = [
+    { label: 'بدون (يفتح الأبلكيشن بس)', value: null },
+    { label: 'رحلة', value: 'trip' },
+    { label: 'خروجة', value: 'picnic' },
+    { label: 'حج / عمرة', value: 'religion' }
+  ];
+  itemOptions$: Observable<{ label: string; value: number }[]> = of([]);
+
+  // Title and body ideas (AI on the server when it has a key, else templates)
+  suggestions: { title: string; body: string; source: string }[] = [];
+  suggesting = false;
+
   constructor(
     private fb: FormBuilder,
     public ref: DynamicDialogRef,
@@ -65,10 +86,42 @@ export class NotificationsFormComponent {
       LoginUser: [true],
       Anonymous: [false],
       usersId: [[]],
+      itemType: [null],
+      itemId: [null],
       image: [null]
     });
 
     this.loadUsers();
+  }
+
+  onItemTypeChange(type: string | null) {
+    this.form.patchValue({ itemId: null });
+    const opts = (res: any) => (res?.data?.data ?? []).map((x: any) => ({ label: x.name, value: x.id }));
+    const all = { pageIndex: 1, pageSize: 1000, isPagingEnabled: false };
+    this.itemOptions$ =
+      type === 'trip' ? this.trips.getAllTravels(all).pipe(map(opts))
+      : type === 'picnic' ? this.outings.getAllOutings(all).pipe(map(opts))
+      : type === 'religion' ? this.hajj.getAllManasik(all).pipe(map(opts))
+      : of([]);
+  }
+
+  suggest() {
+    this.suggesting = true;
+    const v = this.form.getRawValue();
+    this.notificationsService.suggest({ itemType: v.itemType, itemId: v.itemId, idea: v.title || null }).subscribe({
+      next: (res: any) => {
+        this.suggestions = res?.data ?? [];
+        this.suggesting = false;
+      },
+      error: () => {
+        this.suggesting = false;
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'مقدرناش نجيب اقتراحات، جرّب تاني' });
+      }
+    });
+  }
+
+  useSuggestion(s: { title: string; body: string }) {
+    this.form.patchValue({ title: s.title, body: s.body });
   }
 
   loadUsers(page: number = 1, search: string = '', append: boolean = false) {
@@ -198,6 +251,14 @@ export class NotificationsFormComponent {
         }
       });
     } else {
+      // the item it opens in the app
+      const itemType = this.form.get('itemType')?.value;
+      const itemId = this.form.get('itemId')?.value;
+      if (itemType && itemId) {
+        formData.append('ItemType', itemType);
+        formData.append('ItemId', String(itemId));
+      }
+
       // Add mode: Only send UsersId if LoginUser is true
       if (loginUser && Array.isArray(usersIdValue)) {
         usersIdValue.forEach((id: number) => {

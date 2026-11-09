@@ -66,7 +66,8 @@ export class APIs {
     GetNotificationById: 'Notification/GetNotification?Id=',
     AddNotification: 'Notification/SendNotification',
     update: 'Notification/UpdateNotification',
-    delete: 'Notification/DeleteNotification?id='
+    delete: 'Notification/DeleteNotification?id=',
+    suggest: 'Notification/Suggest'
   };
 
   public static Outing = {
@@ -241,7 +242,8 @@ export class APIs {
     getWeekendItems: 'Coupons/Settings/GetWeekendCouponItems',
     updateWeekendItems: 'Coupons/Settings/UpdateWeekendCouponItems',
     getBirthdayItems: 'Coupons/Settings/GetBirthdayCouponItems',
-    updateBirthdayItems: 'Coupons/Settings/UpdateBirthdayCouponItems'
+    updateBirthdayItems: 'Coupons/Settings/UpdateBirthdayCouponItems',
+    bonusRules: 'Coupons/Settings/Bonus'
   };
   public static roomGroups = {
     GetAllroomGroups: 'RoomGroups/GetAllRoomGroups',
@@ -350,6 +352,13 @@ export class APIs {
     addRoomFeatureMapping: 'RoomFeatureMapping/AddRoomFeatureMapping',
     updateRoomFeatureMapping: 'RoomFeatureMapping/UpdateRoomFeatureMapping',
     deleteRoomFeatureMapping: 'RoomFeatureMapping/DeleteRoomFeatureMapping?id='
+  };
+
+  // The customer app's home content (trust block + home icons), docs/redesign/PHASE3_SPEC.md section 3
+  public static HomeContent = {
+    get: 'staff/home-content',
+    saveTrust: 'staff/home-content/trust',
+    icon: 'staff/home-content/icons/'
   };
 
   public static Reports = {

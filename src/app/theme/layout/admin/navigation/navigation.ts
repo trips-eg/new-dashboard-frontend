@@ -248,7 +248,11 @@ export const Permissions = {
   NotificationsDelete: 'Permissions.Notification.Delete',
 
   // Reports permissions
-  ReportsView: 'Permissions.Reports.View'
+  ReportsView: 'Permissions.Reports.View',
+
+  // Home content of the customer app (trust block + home icons)
+  HomeContentView: 'Permissions.HomeContent.View',
+  HomeContentEdit: 'Permissions.HomeContent.Edit'
 };
 
 /** The analytics screens of the TRIPS Staff app. */
@@ -867,6 +871,16 @@ const LegacyItems = [
         permissions: [Permissions.SalesAgencyCreate]
       },
       {
+        id: 'bonus-settings',
+        title: 'bonus settings',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/bonus-settings',
+        icon: 'fa-solid fa-gift',
+        breadcrumbs: false,
+        permissions: [Permissions.CouponsCreate]
+      },
+      {
         id: 'financial-settings',
         title: 'financial settings',
         type: 'item',
@@ -885,6 +899,16 @@ const LegacyItems = [
         icon: 'fa-solid fa-file-invoice-dollar',
         breadcrumbs: false,
         permissions: [Permissions.SalesAgencyCreate]
+      },
+      {
+        id: 'home-content',
+        title: 'home content',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/home-content',
+        icon: 'fa-solid fa-mobile-screen',
+        breadcrumbs: false,
+        permissions: [Permissions.HomeContentView]
       },
       {
         id: 'scanner',

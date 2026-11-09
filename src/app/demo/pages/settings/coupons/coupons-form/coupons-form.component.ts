@@ -60,7 +60,9 @@ export class CouponsFormComponent implements OnInit {
   discountTypeOptions = [
     { label: 'Fixed Amount', labelAr: 'مبلغ ثابت', value: 1 },
     { label: 'Percentage', labelAr: 'نسبة مئوية', value: 2 },
-    { label: 'Buy X Get X', labelAr: 'اشتري X واحصل على X', value: 3 }
+    { label: 'Buy X Get X', labelAr: 'اشتري X واحصل على X', value: 3 },
+    { label: 'Cashback (amount)', labelAr: 'كاش باك (مبلغ ثابت)', value: 4 },
+    { label: 'Cashback (percentage)', labelAr: 'كاش باك (نسبة مئوية)', value: 5 }
   ];
 
   get discountTypeOptionsTranslated() {
@@ -68,6 +70,16 @@ export class CouponsFormComponent implements OnInit {
       label: this.lang === 'ar' ? opt.labelAr : opt.label,
       value: opt.value
     }));
+  }
+
+  // نسبة مئوية: الخصم بالنسبة أو الكاش باك بالنسبة
+  get isPercentType(): boolean {
+    return [2, 5].includes(this.couponForm?.get('discountType')?.value);
+  }
+
+  // كاش باك: العميل بيدفع السعر كامل، والمبلغ بيتحط في محفظته بعد ما الحجز يتدفع
+  get isCashback(): boolean {
+    return [4, 5].includes(this.couponForm?.get('discountType')?.value);
   }
 
   // هل النوع المختار هو Buy X Get X
@@ -201,7 +213,12 @@ export class CouponsFormComponent implements OnInit {
       maxFreeQuantity?.setValidators([Validators.required, Validators.min(1)]);
     } else {
       // Percentage أو Fixed — discountAmount مطلوب، الـ 3 fields تُصفَّر
-      discountAmount?.setValidators([Validators.required, Validators.min(1), Validators.max(100)]);
+      // لحد 100 للنسبة بس، المبلغ الثابت من غير حد أقصى
+      discountAmount?.setValidators(
+        [2, 5].includes(discountType)
+          ? [Validators.required, Validators.min(1), Validators.max(100)]
+          : [Validators.required, Validators.min(1)]
+      );
       buyQuantity?.clearValidators();
       getQuantity?.clearValidators();
       maxFreeQuantity?.clearValidators();

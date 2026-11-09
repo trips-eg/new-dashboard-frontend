@@ -2951,5 +2951,7 @@
     "accountHint_3": "رقم حساب Instagram Business",
     "accountHint_4": "Advertiser ID",
     "footer": "آخر سحب للصفحة {{at}} · كل رقم بعملة حسابه زي ما المنصة سجلته · المصادر اللي مش متربطة مابيظهرلهاش أرقام."
-  }
+  },
+  "bonus settings": "إعدادات الرصيد الترحيبي",
+  "home content": "محتوى الرئيسية"
 }

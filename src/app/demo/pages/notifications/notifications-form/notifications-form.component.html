@@ -11,6 +11,59 @@
     <small class="p-error" *ngIf="form.get('body')?.touched && form.get('body')?.invalid">Message body is required</small>
   </div>
 
+  <!-- The item the notification opens in the app, and title/body ideas (phase 5) -->
+  <ng-container *ngIf="mode === 'Add'">
+    <div class="field col-12 md:col-6">
+      <label for="itemType">يفتح إيه في الأبلكيشن</label>
+      <p-dropdown
+        id="itemType"
+        [options]="itemTypes"
+        formControlName="itemType"
+        optionLabel="label"
+        optionValue="value"
+        (onChange)="onItemTypeChange($event.value)"
+      ></p-dropdown>
+    </div>
+    <div class="field col-12 md:col-6" *ngIf="form.get('itemType')?.value">
+      <label for="itemId">اختار</label>
+      <p-dropdown
+        id="itemId"
+        [options]="(itemOptions$ | async) ?? []"
+        formControlName="itemId"
+        optionLabel="label"
+        optionValue="value"
+        [filter]="true"
+        placeholder="اختار من القايمة"
+      ></p-dropdown>
+    </div>
+
+    <div class="field col-12">
+      <button
+        pButton
+        type="button"
+        icon="pi pi-sparkles"
+        class="p-button-outlined"
+        label="اقترح عنوان ونص"
+        [loading]="suggesting"
+        (click)="suggest()"
+      ></button>
+      <small class="block mt-1 text-600">
+        بيكتب اقتراحات من المكان اللي اخترته واليوم (زي الويك اند). لو كاتب فكرة في العنوان، بياخدها في الاعتبار. اضغط على اقتراح عشان يتحط في العنوان والنص.
+      </small>
+      <div class="grid mt-2" *ngIf="suggestions.length">
+        <div class="col-12 md:col-6" *ngFor="let s of suggestions">
+          <div class="surface-border border-1 border-round p-2 cursor-pointer hover:surface-100" (click)="useSuggestion(s)">
+            <div class="font-bold">
+              {{ s.title }}
+              <span class="text-xs text-primary" *ngIf="s.source === 'ai'">AI</span>
+            </div>
+            <div class="text-600 text-sm">{{ s.body }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
   <div class="field col-12" *ngIf="mode === 'Add'">
     <label>User Type</label>
     <div class="flex gap-3 mt-2">

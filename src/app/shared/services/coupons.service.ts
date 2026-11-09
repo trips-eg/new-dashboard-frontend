@@ -61,5 +61,12 @@ export class CouponsService {
   updateBirthdayItems(data: any): Observable<any> {
     return this.ApiCallerService.post(this.ensPoints.updateBirthdayItems, data);
   }
+  // the welcome bonus rules (on/off, with a coupon, places)
+  getBonusRules(): Observable<any> {
+    return this.ApiCallerService.get(this.ensPoints.bonusRules);
+  }
+  updateBonusRules(rules: any): Observable<any> {
+    return this.ApiCallerService.post(this.ensPoints.bonusRules, rules);
+  }
   constructor() {}
 }

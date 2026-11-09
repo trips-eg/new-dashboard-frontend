@@ -2915,5 +2915,7 @@
     "accountHint_3": "Instagram business account id",
     "accountHint_4": "Advertiser ID",
     "footer": "Page read {{at}} · each number in its account's currency as the platform reported it · sources not connected show no numbers."
-  }
+  },
+  "bonus settings": "Welcome Bonus Settings",
+  "home content": "Home Content"
 }
