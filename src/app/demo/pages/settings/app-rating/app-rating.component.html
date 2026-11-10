@@ -1,0 +1,102 @@
+<div class="main app-rating" dir="rtl">
+  <sub-header [mainHeader]="'app rating' | translate" [mainSection]="'Settings' | translate"></sub-header>
+
+  <div *ngIf="loading && !settings" class="card p-4 text-center text-muted">جاري التحميل...</div>
+  <div *ngIf="error && !settings" class="card p-4 text-center">
+    <p class="text-danger mb-3">{{ error }}</p>
+    <button type="button" class="btn btn-primary" (click)="load()">حاول تاني</button>
+  </div>
+
+  <ng-container *ngIf="settings">
+    <!-- When the popup shows -->
+    <div class="card p-3 mb-3">
+      <h5 class="mb-3">إمتى يظهر popup تقييم الأبلكيشن</h5>
+      <div class="ar-row">
+        <span>يظهر للعملاء</span>
+        <p-inputSwitch [(ngModel)]="settings.enabled" [disabled]="!canEdit"></p-inputSwitch>
+      </div>
+      <div class="ar-row">
+        <span>يظهر بعد كام يوم من تحميل الأبلكيشن؟</span>
+        <input type="number" class="form-control ar-num" min="0" max="365" [(ngModel)]="settings.daysAfterInstall" [disabled]="!canEdit" />
+      </div>
+      <div class="ar-row">
+        <span>لو العميل قال "مش دلوقتي"، يظهر تاني بعد كام يوم؟</span>
+        <input type="number" class="form-control ar-num" min="1" max="365" [(ngModel)]="settings.snoozeDays" [disabled]="!canEdit" />
+      </div>
+      <div class="ar-row">
+        <span>يروح Google Play / App Store من كام نجمة؟ (أقل من كده التقييم بيتحفظ هنا بس)</span>
+        <select class="form-select ar-num" [(ngModel)]="settings.storeMinStars" [disabled]="!canEdit">
+          <option *ngFor="let n of [1, 2, 3, 4, 5]" [ngValue]="n">{{ n }} ★</option>
+        </select>
+      </div>
+      <div class="d-flex justify-content-end gap-2 mt-2">
+        <span *ngIf="!canEdit" class="badge bg-secondary align-self-center">عرض بس (مالكش صلاحية التعديل)</span>
+        <button type="button" class="btn btn-primary" (click)="save()" [disabled]="!canEdit || !valid || saving">
+          {{ saving ? 'جاري الحفظ...' : 'حفظ' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Totals -->
+    <div class="card p-3 mb-3" *ngIf="summary">
+      <div class="d-flex flex-wrap gap-4 align-items-center">
+        <div class="ar-avg">
+          <div class="ar-avg-num">{{ summary.average | number: '1.1-1' }}</div>
+          <div class="ar-stars">{{ starsText(roundedAverage) }}</div>
+          <div class="text-muted small">{{ summary.count }} تقييم · {{ summary.sentToStore }} راحوا المتجر</div>
+        </div>
+        <div class="flex-grow-1">
+          <div class="ar-bar" *ngFor="let s of [5, 4, 3, 2, 1]">
+            <span class="ar-bar-label">{{ s }} ★</span>
+            <div class="ar-bar-track"><div class="ar-bar-fill" [style.width.%]="percent(summary.perStar[s - 1])"></div></div>
+            <span class="ar-bar-count">{{ summary.perStar[s - 1] }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- The ratings -->
+    <div class="card p-3">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <button type="button" *ngFor="let f of starFilters" class="btn btn-sm" [class.btn-primary]="stars === f" [class.btn-outline-secondary]="stars !== f" (click)="filter(f)">
+          {{ f ? f + ' ★' : 'الكل' }}
+        </button>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>العميل</th>
+              <th>التقييم</th>
+              <th>التعليق</th>
+              <th>راح المتجر؟</th>
+              <th>الجهاز</th>
+              <th>التاريخ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of rows">
+              <td>
+                <div>{{ r.customerName || 'زائر' }}</div>
+                <div class="text-muted small" dir="ltr">{{ r.phone }}</div>
+              </td>
+              <td class="ar-stars">{{ starsText(r.stars) }}</td>
+              <td>{{ r.comment || '—' }}</td>
+              <td>{{ r.sentToStore ? 'أيوه' : 'لأ' }}</td>
+              <td>{{ r.platform || '—' }} {{ r.appVersion }}</td>
+              <td dir="ltr">{{ r.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+            <tr *ngIf="!rows.length && !loading">
+              <td colspan="6" class="text-center text-muted p-4">لسه مفيش تقييمات</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="d-flex justify-content-between align-items-center" *ngIf="pages > 1">
+        <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="pageIndex <= 1 || loading" (click)="load(pageIndex - 1)">السابق</button>
+        <span class="small text-muted">صفحة {{ pageIndex }} من {{ pages }}</span>
+        <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="pageIndex >= pages || loading" (click)="load(pageIndex + 1)">التالي</button>
+      </div>
+    </div>
+  </ng-container>
+</div>

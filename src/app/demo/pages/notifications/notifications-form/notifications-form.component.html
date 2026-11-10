@@ -24,7 +24,7 @@
         (onChange)="onItemTypeChange($event.value)"
       ></p-dropdown>
     </div>
-    <div class="field col-12 md:col-6" *ngIf="form.get('itemType')?.value">
+    <div class="field col-12 md:col-6" *ngIf="form.get('itemType')?.value && !noItemTypes.includes(form.get('itemType')?.value)">
       <label for="itemId">اختار</label>
       <p-dropdown
         id="itemId"

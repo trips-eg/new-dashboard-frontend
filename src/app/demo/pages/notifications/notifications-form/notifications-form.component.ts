@@ -20,6 +20,8 @@ import { map, Observable, of } from 'rxjs';
 import { TravelTripsService } from 'src/app/shared/services/travel-trips.service';
 import { OutingService } from 'src/app/shared/services/outing.service';
 import { HajjUmmrahService } from 'src/app/shared/services/hajj-ummrah.service';
+import { CouponsService } from 'src/app/shared/services/coupons.service';
+import { TripStarService } from 'src/app/shared/services/trip-star.service';
 
 @Component({
   selector: 'app-notifications-form',
@@ -60,12 +62,20 @@ export class NotificationsFormComponent {
   private trips = inject(TravelTripsService);
   private outings = inject(OutingService);
   private hajj = inject(HajjUmmrahService);
+  private coupons = inject(CouponsService);
+  private stars = inject(TripStarService);
+  // app 1.0.51: also a coupon, one of the home's "نجوم النهارده" cards and the wallet (no item to pick)
   itemTypes = [
-    { label: 'بدون (يفتح الأبلكيشن بس)', value: null },
+    { label: 'بدون (إشعار عام، يفتح قايمة الإشعارات)', value: null },
     { label: 'رحلة', value: 'trip' },
     { label: 'خروجة', value: 'picnic' },
-    { label: 'حج / عمرة', value: 'religion' }
+    { label: 'حج / عمرة', value: 'religion' },
+    { label: 'كوبون', value: 'coupon' },
+    { label: 'عرض من نجوم النهارده', value: 'ad' },
+    { label: 'المحفظة', value: 'wallet' }
   ];
+  /** Types that open something without picking an item. */
+  readonly noItemTypes = ['wallet'];
   itemOptions$: Observable<{ label: string; value: number }[]> = of([]);
 
   // Title and body ideas (AI on the server when it has a key, else templates)
@@ -102,6 +112,16 @@ export class NotificationsFormComponent {
       type === 'trip' ? this.trips.getAllTravels(all).pipe(map(opts))
       : type === 'picnic' ? this.outings.getAllOutings(all).pipe(map(opts))
       : type === 'religion' ? this.hajj.getAllManasik(all).pipe(map(opts))
+      : type === 'coupon'
+        ? this.coupons.getCoupons(all).pipe(map((res: any) => (res?.data?.data ?? []).map((c: any) => ({
+            label: c.description ? `${c.code} · ${c.description}` : c.code,
+            value: c.id
+          }))))
+      : type === 'ad'
+        ? this.stars.list({ pageIndex: 1, pageSize: 200, isPagingEnabled: false, IsActive: true }).pipe(map((res: any) => (res?.data?.data ?? []).map((s: any) => ({
+            label: s.titleAr || s.title || `#${s.id}`,
+            value: s.id
+          }))))
       : of([]);
   }
 
@@ -257,6 +277,8 @@ export class NotificationsFormComponent {
       if (itemType && itemId) {
         formData.append('ItemType', itemType);
         formData.append('ItemId', String(itemId));
+      } else if (itemType && this.noItemTypes.includes(itemType)) {
+        formData.append('ItemType', itemType);
       }
 
       // Add mode: Only send UsersId if LoginUser is true

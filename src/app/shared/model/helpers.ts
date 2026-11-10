@@ -355,6 +355,12 @@ export class APIs {
   };
 
   // The customer app's home content (trust block + home icons), docs/redesign/PHASE3_SPEC.md section 3
+  // The customer app's rating popup (app 1.0.51): when it asks, and what customers rated
+  public static AppRating = {
+    get: 'staff/app-rating',
+    settings: 'staff/app-rating/settings'
+  };
+
   public static HomeContent = {
     get: 'staff/home-content',
     saveTrust: 'staff/home-content/trust',

@@ -518,6 +518,10 @@ const routes: Routes = [
         loadComponent: () => import('./demo/pages/settings/home-content/home-content.component').then((m) => m.HomeContentComponent)
       },
       {
+        path: 'app-rating',
+        loadComponent: () => import('./demo/pages/settings/app-rating/app-rating.component').then((m) => m.AppRatingComponent)
+      },
+      {
         path: 'notifications',
         loadComponent: () => import('./demo/pages/notifications/notifications.component').then((m) => m.NotificationsComponent)
       },

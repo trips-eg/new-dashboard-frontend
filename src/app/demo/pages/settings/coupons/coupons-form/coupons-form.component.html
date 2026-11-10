@@ -62,6 +62,15 @@
           </div>
         </div>
 
+        <!-- Cashback (percent): the most it gives per booking (app 1.0.51) -->
+        <div class="field col-12 col-md-6" *ngIf="couponForm.get('discountType')?.value === 5">
+          <label for="maxCashback" class="font-semibold mb-1 block">{{ 'Max cashback' | translate }}</label>
+          <p-inputNumber id="maxCashback" formControlName="maxCashback" suffix=" ج.م" [min]="0" class="w-full"></p-inputNumber>
+          <small class="block mt-1 text-600">
+            {{ lang === 'ar' ? 'مثلاً 10% لحد 300 ج.م. سيبها فاضية لو مفيش حد.' : 'e.g. 10% up to 300 EGP. Leave it empty for no cap.' }}
+          </small>
+        </div>
+
         <!-- Buy X Get X Fields — تظهر فقط عند النوع 3 -->
         <ng-container *ngIf="isBuyXGetX">
           <div class="field col-12 col-md-4">

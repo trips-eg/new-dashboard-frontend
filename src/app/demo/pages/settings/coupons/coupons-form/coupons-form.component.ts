@@ -159,7 +159,9 @@ export class CouponsFormComponent implements OnInit {
       // حقول Buy X Get X الجديدة
       buyQuantity: [null],
       getQuantity: [null],
-      maxFreeQuantity: [null]
+      maxFreeQuantity: [null],
+      // app 1.0.51: a percent cashback's most per booking (EGP); empty = no cap
+      maxCashback: [null]
     });
 
     // عند تغيير نطاق الكوبون نحدث isGenral للتوافق
@@ -303,6 +305,7 @@ export class CouponsFormComponent implements OnInit {
       buyQuantity: formValue.buyQuantity ?? 0,
       getQuantity: formValue.getQuantity ?? 0,
       maxFreeQuantity: formValue.maxFreeQuantity ?? 0,
+      maxCashback: formValue.discountType === 5 && formValue.maxCashback > 0 ? formValue.maxCashback : null,
       startDate: formValue.startDate ? new Date(formValue.startDate).toISOString() : new Date().toISOString(),
       endDate: formValue.endDate ? new Date(formValue.endDate).toISOString() : new Date().toISOString(),
       tripIds: isGeneral ? [] : (formValue.tripIds || []),

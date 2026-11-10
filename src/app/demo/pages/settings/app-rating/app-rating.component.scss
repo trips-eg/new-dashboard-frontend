@@ -1,0 +1,13 @@
+.app-rating {
+  .ar-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 10px 0; border-bottom: 1px solid #f1ece7; }
+  .ar-row:last-of-type { border-bottom: 0; }
+  .ar-num { width: 110px; flex: none; }
+  .ar-avg { text-align: center; min-width: 160px; }
+  .ar-avg-num { font-size: 40px; font-weight: 800; line-height: 1; }
+  .ar-stars { color: #e8a400; letter-spacing: 2px; white-space: nowrap; }
+  .ar-bar { display: flex; align-items: center; gap: 10px; margin: 4px 0; }
+  .ar-bar-label { width: 40px; font-size: 13px; }
+  .ar-bar-track { flex: 1; height: 8px; background: #f1ece7; border-radius: 8px; overflow: hidden; }
+  .ar-bar-fill { height: 100%; background: #e8a400; border-radius: 8px; }
+  .ar-bar-count { width: 40px; font-size: 13px; text-align: left; }
+}

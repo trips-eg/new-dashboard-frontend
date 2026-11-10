@@ -183,7 +183,9 @@ export class AdminMoreComponent implements OnInit {
             { icon: 'ti ti-sparkles', label: 'APP.tripStars', ...trip, route: '/a/more/tripstars' },
             { icon: 'ti ti-layout-rows', label: 'APP.sidebars', ...trip, route: '/a/more/sidebars' },
             // The customer app's home icons, trust section, bottom and top bars (the existing screen, /home-content)
-            { icon: 'ti ti-device-mobile', label: 'home content', ...trip, route: '/home-content', perm: P.homeContentView }
+            { icon: 'ti ti-device-mobile', label: 'home content', ...trip, route: '/home-content', perm: P.homeContentView },
+            // The customer app's rating popup: when it shows, and the ratings (app 1.0.51)
+            { icon: 'ti ti-star', label: 'app rating', ...mkt, route: '/app-rating', perm: P.homeContentView }
           ]
         }
       ],
