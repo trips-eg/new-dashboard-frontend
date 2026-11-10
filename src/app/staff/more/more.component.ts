@@ -185,7 +185,8 @@ export class AdminMoreComponent implements OnInit {
             // The customer app's home icons, trust section, bottom and top bars (the existing screen, /home-content)
             { icon: 'ti ti-device-mobile', label: 'home content', ...trip, route: '/home-content', perm: P.homeContentView },
             // The customer app's rating popup: when it shows, and the ratings (app 1.0.51)
-            { icon: 'ti ti-star', label: 'app rating', ...mkt, route: '/app-rating', perm: P.homeContentView }
+            { icon: 'ti ti-star', label: 'app rating', ...mkt, route: '/app-rating', perm: P.homeContentView },
+            { icon: 'ti ti-user-plus', label: 'invite friends', ...mkt, route: '/referrals', perm: P.homeContentView }
           ]
         }
       ],

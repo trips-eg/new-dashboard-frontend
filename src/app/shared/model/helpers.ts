@@ -361,6 +361,12 @@ export class APIs {
     settings: 'staff/app-rating/settings'
   };
 
+  // "invite friends" (app 1.0.51): amounts, rules and who invited whom
+  public static Referrals = {
+    get: 'staff/referrals',
+    settings: 'staff/referrals/settings'
+  };
+
   public static HomeContent = {
     get: 'staff/home-content',
     saveTrust: 'staff/home-content/trust',

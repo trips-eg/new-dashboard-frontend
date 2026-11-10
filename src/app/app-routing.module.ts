@@ -522,6 +522,10 @@ const routes: Routes = [
         loadComponent: () => import('./demo/pages/settings/app-rating/app-rating.component').then((m) => m.AppRatingComponent)
       },
       {
+        path: 'referrals',
+        loadComponent: () => import('./demo/pages/settings/referrals/referrals.component').then((m) => m.ReferralsComponent)
+      },
+      {
         path: 'notifications',
         loadComponent: () => import('./demo/pages/notifications/notifications.component').then((m) => m.NotificationsComponent)
       },

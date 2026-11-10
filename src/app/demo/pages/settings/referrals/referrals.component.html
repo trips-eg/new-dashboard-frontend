@@ -1,0 +1,119 @@
+<div class="main referrals" dir="rtl">
+  <sub-header [mainHeader]="'invite friends' | translate" [mainSection]="'Settings' | translate"></sub-header>
+
+  <div *ngIf="loading && !settings" class="card p-4 text-center text-muted">جاري التحميل...</div>
+  <div *ngIf="error && !settings" class="card p-4 text-center">
+    <p class="text-danger mb-3">{{ error }}</p>
+    <button type="button" class="btn btn-primary" (click)="load()">حاول تاني</button>
+  </div>
+
+  <ng-container *ngIf="settings">
+    <div class="card p-3 mb-3">
+      <h5 class="mb-1">ادعُ صحابك</h5>
+      <p class="text-muted small mb-3">
+        العميل الجديد بيكتب كود صاحبه وهو بيعمل حساب فياخد مبلغه، واللي دعاه ياخد مبلغه نقدي أول ما الصاحب يدفع أول حجز.
+      </p>
+      <div class="rf-row">
+        <span>الخاصية شغالة</span>
+        <p-inputSwitch [(ngModel)]="settings.enabled" [disabled]="!canEdit"></p-inputSwitch>
+      </div>
+      <div class="rf-row">
+        <span>العميل اللي دعا ياخد (ج، نقدي)</span>
+        <input type="number" class="form-control rf-num" min="0" max="5000" [(ngModel)]="settings.inviterAmount" [disabled]="!canEdit" />
+      </div>
+      <div class="rf-row">
+        <span>الصاحب الجديد ياخد (ج)</span>
+        <input type="number" class="form-control rf-num" min="0" max="5000" [(ngModel)]="settings.inviteeAmount" [disabled]="!canEdit" />
+      </div>
+      <div class="rf-row">
+        <span>نوع رصيد الصاحب</span>
+        <select class="form-select rf-num" [(ngModel)]="settings.inviteeCreditType" [disabled]="!canEdit">
+          <option [ngValue]="1">ترحيبي</option>
+          <option [ngValue]="2">نقدي</option>
+        </select>
+      </div>
+      <div class="rf-row">
+        <span>أقل قيمة لأول حجز علشان اللي دعا ياخد (ج)</span>
+        <input type="number" class="form-control rf-num" min="0" [(ngModel)]="settings.minFirstBookingAmount" [disabled]="!canEdit" />
+      </div>
+      <div class="rf-row">
+        <span>أقصى عدد دعوات بتكسب للعميل في الشهر</span>
+        <input type="number" class="form-control rf-num" min="0" max="1000" [(ngModel)]="settings.maxRewardsPerMonth" [disabled]="!canEdit" />
+      </div>
+      <div class="rf-row">
+        <span>الكود يتكتب في أول كام يوم من عمل الحساب؟</span>
+        <input type="number" class="form-control rf-num" min="1" max="90" [(ngModel)]="settings.applyWithinDays" [disabled]="!canEdit" />
+      </div>
+      <div class="d-flex justify-content-end gap-2 mt-2">
+        <span *ngIf="!canEdit" class="badge bg-secondary align-self-center">عرض بس (مالكش صلاحية التعديل)</span>
+        <button type="button" class="btn btn-primary" (click)="save()" [disabled]="!canEdit || !valid || saving">
+          {{ saving ? 'جاري الحفظ...' : 'حفظ' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="card p-3 mb-3">
+      <div class="d-flex flex-wrap gap-4">
+        <div>
+          <div class="rf-big">{{ count }}</div>
+          <div class="text-muted small">دعوة</div>
+        </div>
+        <div>
+          <div class="rf-big">{{ rewarded }}</div>
+          <div class="text-muted small">اتصرفت (الصاحب حجز)</div>
+        </div>
+        <div>
+          <div class="rf-big">{{ paidOut | number: '1.0-0' }} ج</div>
+          <div class="text-muted small">اتصرف في المحافظ</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-3">
+      <h6 class="mb-3">آخر الدعوات</h6>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>اللي دعا</th>
+              <th>الصاحب</th>
+              <th>الكود</th>
+              <th>الحالة</th>
+              <th>التاريخ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of rows">
+              <td>
+                <div>{{ r.inviterName }}</div>
+                <div class="text-muted small" dir="ltr">{{ r.inviterPhone }}</div>
+              </td>
+              <td>
+                <div>{{ r.inviteeName }}</div>
+                <div class="text-muted small" dir="ltr">{{ r.inviteePhone }}</div>
+              </td>
+              <td dir="ltr">{{ r.code }}</td>
+              <td>
+                <span *ngIf="r.rewardedAt" class="badge bg-success">اتصرفت · {{ r.inviterAmount | number: '1.0-0' }} ج</span>
+                <span *ngIf="!r.rewardedAt" class="badge bg-warning text-dark">مستنية حجز</span>
+              </td>
+              <td dir="ltr">{{ r.createdAt | date: 'dd/MM/yyyy' }}</td>
+            </tr>
+            <tr *ngIf="!rows.length && !loading">
+              <td colspan="5" class="text-center text-muted p-4">لسه مفيش دعوات</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="d-flex justify-content-between align-items-center" *ngIf="pages > 1">
+        <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="pageIndex <= 1 || loading" (click)="load(pageIndex - 1)">
+          السابق
+        </button>
+        <span class="small text-muted">صفحة {{ pageIndex }} من {{ pages }}</span>
+        <button type="button" class="btn btn-outline-secondary btn-sm" [disabled]="pageIndex >= pages || loading" (click)="load(pageIndex + 1)">
+          التالي
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</div>
