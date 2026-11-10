@@ -6,6 +6,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Observable, Subscription, firstValueFrom, map } from 'rxjs';
 import { KIT, StaffText } from '../ui/kit';
 import { LISTS } from '../ui/lists';
+import { SwitchRowComponent } from '../ui/controls';
 import { StaffHttp, mediaUrl } from '../core/staff-http';
 import { ApiPage, asPage } from '../core/query';
 import { P, StaffSession } from '../core/session';
@@ -34,16 +35,20 @@ export interface SupportRow {
   assignedTo?: SupportPerson | null;
   lastMessagePreview?: string | null;
   lastMessageAt: string;
-  lastMessageSender?: 'customer' | 'staff' | null;
+  lastMessageSender?: 'customer' | 'staff' | 'assistant' | 'system' | null;
   unreadCount: number;
   item?: SupportItem | null;
+  /** 1.0.51: the AI assistant handed it to the team, and why. */
+  needsHuman?: boolean;
+  handoverReason?: string | null;
   createdAt?: string;
   closedAt?: string | null;
 }
 
 export interface SupportMessage {
   id: number;
-  sender: 'customer' | 'staff';
+  /** 1.0.51: 'assistant' is the AI assistant, 'system' a note ("سارة من فريق Trips معاك دلوقتي"). */
+  sender: 'customer' | 'staff' | 'assistant' | 'system';
   senderName?: string | null;
   text?: string | null;
   imageUrl?: string | null;
@@ -63,9 +68,18 @@ export interface SupportCounts {
   unread: number;
   open: number;
   mine: number;
+  needsHuman?: number;
 }
 
-export type SupportTab = 'open' | 'mine' | 'unassigned' | 'closed';
+/** 1.0.51: the chat's AI assistant. */
+export interface SupportAiSettings {
+  enabled: boolean;
+  teamHours: string;
+  /** Read only: the Anthropic key is on the server. */
+  hasKey: boolean;
+}
+
+export type SupportTab = 'open' | 'human' | 'mine' | 'unassigned' | 'closed';
 
 @Injectable({ providedIn: 'root' })
 export class SupportChatApi {
@@ -74,7 +88,7 @@ export class SupportChatApi {
 
   inbox(tab: SupportTab, q: string, pageIndex: number, pageSize = 20): Observable<ApiPage<SupportRow>> {
     const status = tab === 'closed' ? 'closed' : 'open';
-    const assigned = tab === 'mine' || tab === 'unassigned' ? tab : null;
+    const assigned = tab === 'mine' || tab === 'unassigned' || tab === 'human' ? tab : null;
     return this.http.get<any>(`${this.base}/conversations`, { status, assigned, q, pageIndex, pageSize }).pipe(map((d) => asPage<SupportRow>(d)));
   }
 
@@ -112,6 +126,19 @@ export class SupportChatApi {
   agents(): Observable<SupportPerson[]> {
     return this.http.get<SupportPerson[]>(`${this.base}/agents`);
   }
+
+  aiSettings(): Observable<SupportAiSettings> {
+    return this.http.get<SupportAiSettings>(`${this.base}/ai-settings`);
+  }
+
+  saveAiSettings(s: { enabled: boolean; teamHours: string }): Observable<SupportAiSettings> {
+    return this.http.put<SupportAiSettings>(`${this.base}/ai-settings`, s);
+  }
+
+  /** A suggested reply the agent can edit and send. */
+  draft(id: number): Observable<string> {
+    return this.http.post<string>(`${this.base}/conversations/${id}/ai-draft`);
+  }
 }
 
 /** The product page of an item card: trip → trips, picnic → outings, religion → hajj. */
@@ -139,7 +166,7 @@ export const SUPPORT_POLL = { inboxMs: 15_000, messagesMs: 5_000 };
 @Component({
   selector: 'ts-support-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, TranslateModule, ...KIT, ...LISTS],
+  imports: [CommonModule, FormsModule, RouterModule, TranslateModule, ...KIT, ...LISTS, SwitchRowComponent],
   styleUrls: ['./support-chat.component.scss'],
   template: `
     <div class="ts-screen sc-screen" [class.sc-has-open]="openId">
@@ -148,6 +175,19 @@ export const SUPPORT_POLL = { inboxMs: 15_000, messagesMs: 5_000 };
       <div class="sc-layout">
         <!-- inbox -->
         <section class="sc-inbox" [attr.aria-label]="'SUPPORT.inbox' | translate">
+          <div *ngIf="ai" class="sc-ai" data-test="sc-ai">
+            <ts-switch-row
+              [title]="'SUPPORT.aiTitle' | translate"
+              [subtitle]="(ai.hasKey ? 'SUPPORT.aiSub' : 'SUPPORT.aiNoKey') | translate"
+              [value]="ai.enabled"
+              [disabled]="!canReply || aiSaving"
+              (valueChange)="saveAi($event)"
+            ></ts-switch-row>
+            <label *ngIf="canReply" class="sc-ai__hours">
+              <span>{{ 'SUPPORT.teamHours' | translate }}</span>
+              <input type="text" maxlength="60" [ngModel]="ai.teamHours" (change)="saveAi(ai.enabled, $any($event.target).value)" />
+            </label>
+          </div>
           <ts-segmented [items]="tabs" [selected]="tab" (changed)="setTab($any($event))"></ts-segmented>
           <ts-search [hint]="'SUPPORT.searchHint' | translate" [value]="q" (changed)="search($event)"></ts-search>
 
@@ -165,9 +205,11 @@ export const SUPPORT_POLL = { inboxMs: 15_000, messagesMs: 5_000 };
                     <time class="sc-row__time">{{ r.lastMessageAt | ts: 'datetime' }}</time>
                   </span>
                   <span class="sc-row__preview">
-                    <span *ngIf="r.lastMessageSender === 'staff'" class="sc-row__you">{{ 'SUPPORT.you' | translate }}: </span>{{ r.lastMessagePreview || '—' }}
+                    <span *ngIf="r.lastMessageSender === 'staff'" class="sc-row__you">{{ 'SUPPORT.you' | translate }}: </span>
+                    <span *ngIf="r.lastMessageSender === 'assistant'" class="sc-row__ai">✨ {{ 'SUPPORT.assistant' | translate }}: </span>{{ r.lastMessagePreview || '—' }}
                   </span>
                   <span class="sc-row__meta">
+                    <ts-tag *ngIf="r.needsHuman" tone="danger" icon="ti ti-user-exclamation">{{ 'SUPPORT.needsHuman' | translate }}{{ r.handoverReason ? ' · ' + r.handoverReason : '' }}</ts-tag>
                     <ts-tag *ngIf="r.item" tone="info" icon="ti ti-link">{{ supportItemType(r.item.type) | translate }}: {{ r.item.name || '#' + r.item.id }}</ts-tag>
                     <ts-tag *ngIf="r.assignedTo" tone="neutral" icon="ti ti-user">{{ r.assignedTo.name }}</ts-tag>
                   </span>
@@ -208,8 +250,11 @@ export const SUPPORT_POLL = { inboxMs: 15_000, messagesMs: 5_000 };
             <button *ngIf="hasOlder" type="button" class="btn btn-link sc-older" [disabled]="olderLoading" (click)="loadOlder()">{{ 'SUPPORT.older' | translate }}</button>
             <ts-loading *ngIf="messagesLoading && !messages.length"></ts-loading>
             <ts-error *ngIf="messagesError && !messages.length" [error]="messagesError" (retry)="open(openId!)"></ts-error>
-            <div *ngFor="let m of messages; trackBy: byId" class="sc-msg" [class.sc-msg--staff]="m.sender === 'staff'" [attr.data-test]="'sc-msg-' + m.id">
+            <ng-container *ngFor="let m of messages; trackBy: byId">
+            <p *ngIf="m.sender === 'system'" class="sc-note" [attr.data-test]="'sc-msg-' + m.id">{{ m.text }}</p>
+            <div *ngIf="m.sender !== 'system'" class="sc-msg" [class.sc-msg--staff]="m.sender === 'staff' || m.sender === 'assistant'" [class.sc-msg--ai]="m.sender === 'assistant'" [attr.data-test]="'sc-msg-' + m.id">
               <div class="sc-bubble">
+                <small *ngIf="m.sender === 'assistant'" class="sc-ai-who">✨ {{ 'SUPPORT.assistant' | translate }}</small>
                 <a *ngIf="m.item as it" class="sc-item" [routerLink]="supportItemLink(it)">
                   <img *ngIf="mediaUrl(it.imageUrl) as src" [src]="src" alt="" loading="lazy" />
                   <span>
@@ -227,6 +272,7 @@ export const SUPPORT_POLL = { inboxMs: 15_000, messagesMs: 5_000 };
                 </span>
               </div>
             </div>
+            </ng-container>
           </div>
 
           <form *ngIf="canReply; else readOnly" class="sc-composer" (ngSubmit)="send()">
@@ -249,6 +295,9 @@ export const SUPPORT_POLL = { inboxMs: 15_000, messagesMs: 5_000 };
                 (keydown.enter)="enter($any($event))"
                 data-test="sc-text"
               ></textarea>
+              <button *ngIf="ai?.hasKey" type="button" class="btn btn-secondary sc-draft" [disabled]="busy || drafting" (click)="suggest()" data-test="sc-draft" [title]="'SUPPORT.draftHint' | translate">
+                <i class="ti ti-sparkles" aria-hidden="true"></i>{{ (drafting ? 'SUPPORT.drafting' : 'SUPPORT.draft') | translate }}
+              </button>
               <button type="submit" class="btn btn-primary" [disabled]="busy || (!text.trim() && !file)" data-test="sc-send">
                 <i class="ti ti-send" aria-hidden="true"></i>{{ 'SUPPORT.send' | translate }}
               </button>
@@ -298,6 +347,11 @@ export class SupportChatComponent implements OnInit, OnDestroy {
   file: File | null = null;
   busy = false;
 
+  /** 1.0.51: the AI assistant's settings; null until loaded (or not allowed). */
+  ai: SupportAiSettings | null = null;
+  aiSaving = false;
+  drafting = false;
+
   private atBottom = true;
   private searchTimer: any;
   private timers: any[] = [];
@@ -312,6 +366,7 @@ export class SupportChatComponent implements OnInit, OnDestroy {
     const c = this.counts;
     return [
       { key: 'open', label: this.text$.tr('SUPPORT.tabOpen'), count: c?.open ?? null, alert: !!c?.unread },
+      { key: 'human', label: this.text$.tr('SUPPORT.tabHuman'), count: c?.needsHuman ?? null, alert: !!c?.needsHuman },
       { key: 'mine', label: this.text$.tr('SUPPORT.tabMine'), count: c?.mine ?? null },
       { key: 'unassigned', label: this.text$.tr('SUPPORT.tabUnassigned') },
       { key: 'closed', label: this.text$.tr('SUPPORT.tabClosed') }
@@ -328,6 +383,7 @@ export class SupportChatComponent implements OnInit, OnDestroy {
     );
     this.reloadInbox();
     if (this.canReply) this.api.agents().subscribe({ next: (a) => (this.agents = a ?? []), error: () => (this.agents = []) });
+    this.api.aiSettings().subscribe({ next: (s) => (this.ai = s), error: () => (this.ai = null) });
     this.timers.push(setInterval(() => this.visible() && this.refreshInbox(), SUPPORT_POLL.inboxMs));
     this.timers.push(setInterval(() => this.visible() && this.poll(), SUPPORT_POLL.messagesMs));
   }
@@ -562,6 +618,42 @@ export class SupportChatComponent implements OnInit, OnDestroy {
       },
       error: (e) => {
         this.busy = false;
+        this.text$.showError(e);
+      }
+    });
+  }
+
+  /** Switches the AI assistant on or off, or changes the team's hours. */
+  saveAi(enabled: boolean, teamHours?: string): void {
+    if (!this.ai || this.aiSaving) return;
+    const hours = (teamHours ?? this.ai.teamHours).trim();
+    if (!hours) return;
+    this.aiSaving = true;
+    this.api.saveAiSettings({ enabled, teamHours: hours }).subscribe({
+      next: (s) => {
+        this.ai = s;
+        this.aiSaving = false;
+        this.text$.showDone(this.text$.tr(s.enabled && !s.hasKey ? 'SUPPORT.aiSavedNoKey' : 'SUPPORT.aiSaved'));
+      },
+      error: (e) => {
+        this.aiSaving = false;
+        this.text$.showError(e);
+      }
+    });
+  }
+
+  /** Fills the reply box with the assistant's suggestion; the agent reads it and sends it (or not). */
+  suggest(): void {
+    const id = this.openId;
+    if (!id || this.drafting) return;
+    this.drafting = true;
+    this.api.draft(id).subscribe({
+      next: (d) => {
+        if (this.openId === id && d) this.text = d;
+        this.drafting = false;
+      },
+      error: (e) => {
+        this.drafting = false;
         this.text$.showError(e);
       }
     });

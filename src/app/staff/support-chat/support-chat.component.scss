@@ -345,3 +345,56 @@
     max-width: 88%;
   }
 }
+
+// 1.0.51: the chat's AI assistant
+.sc-ai {
+  border: 1px solid #e9e2f5;
+  background: #faf7fe;
+  border-radius: 14px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+}
+.sc-ai__hours {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  margin-top: 6px;
+  input {
+    width: 160px;
+    border: 1px solid #ddd5ce;
+    border-radius: 8px;
+    padding: 4px 8px;
+  }
+}
+.sc-row__ai {
+  color: #6b3fa0;
+  font-weight: 700;
+}
+.sc-note {
+  align-self: center;
+  margin: 6px auto;
+  background: #ece7e3;
+  color: #6e6259;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 4px 12px;
+  text-align: center;
+  max-width: 80%;
+}
+.sc-msg--ai .sc-bubble {
+  background: #f2ecfa;
+  border: 1px solid #e3d6f4;
+}
+.sc-ai-who {
+  display: block;
+  color: #6b3fa0;
+  font-weight: 800;
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+.sc-draft {
+  white-space: nowrap;
+}
