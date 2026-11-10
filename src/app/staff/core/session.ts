@@ -44,6 +44,7 @@ export const P = {
   couponsView: 'Permissions.Coupons.View',
   couponsCreate: 'Permissions.Coupons.Create',
   couponsEdit: 'Permissions.Coupons.Edit',
+  homeContentView: 'Permissions.HomeContent.View',
   couponsDelete: 'Permissions.Coupons.Delete',
   financialView: 'Permissions.Financial.View',
   financialEdit: 'Permissions.Financial.Edit',

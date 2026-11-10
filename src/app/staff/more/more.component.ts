@@ -181,7 +181,9 @@ export class AdminMoreComponent implements OnInit {
             { icon: 'ti ti-coins', label: 'APP.bonusRules', ...mkt, route: '/a/more/bonus-rules', perm: P.couponsView },
             { icon: 'ti ti-adjustments', label: 'APP.customTripSettings', ...mkt, route: '/a/more/custom-requests-settings', perm: P.customTripSettingView },
             { icon: 'ti ti-sparkles', label: 'APP.tripStars', ...trip, route: '/a/more/tripstars' },
-            { icon: 'ti ti-layout-rows', label: 'APP.sidebars', ...trip, route: '/a/more/sidebars' }
+            { icon: 'ti ti-layout-rows', label: 'APP.sidebars', ...trip, route: '/a/more/sidebars' },
+            // The customer app's home icons, trust section, bottom and top bars (the existing screen, /home-content)
+            { icon: 'ti ti-device-mobile', label: 'home content', ...trip, route: '/home-content', perm: P.homeContentView }
           ]
         }
       ],
