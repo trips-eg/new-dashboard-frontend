@@ -284,6 +284,17 @@ describe('HomeContentComponent', () => {
       expect(component.statValue(component.trust!.stats[1])).toBe('+100K');
     });
 
+    it('fixes an automatic number when the admin types one, and can go back to the live count', () => {
+      const stat = component.trust!.stats[0];
+      component.editAutoStat(stat, '+500');
+      expect(stat.mode).toBe('manual');
+      expect(stat.value).toBe('+500');
+      expect(component.statValue(stat)).toBe('+500');
+      expect(component.autoStatValue(stat)).toBe('+134');
+      stat.mode = 'auto';
+      expect(component.statValue(stat)).toBe('+134');
+    });
+
     it('uploads an icon and shows it', () => {
       service.uploadIcon.and.returnValue(of({ slot: 'nav.home', url: '/images/HomeContent/n.png', version: 8 }));
       const file = new File([new Uint8Array(10)], 'home.png', { type: 'image/png' });

@@ -287,6 +287,17 @@ export class HomeContentComponent implements OnInit {
     return AUTO_STAT_KEYS.includes((stat.key ?? '').trim());
   }
 
+  /** Typing in an automatic number fixes it: the stat becomes manual with the typed value. */
+  editAutoStat(stat: HomeTrustStat, value: string): void {
+    stat.mode = 'manual';
+    stat.value = value;
+  }
+
+  /** The live count an automatic number would show (to offer going back to it). */
+  autoStatValue(stat: HomeTrustStat): string {
+    return formatCount((this.autoValues as any)[(stat.key ?? '').trim()]);
+  }
+
   addBadge(): void {
     if (!this.trust || this.trust.badges.length >= MAX_BADGES) return;
     this.trust.badges.push({ text: '', iconKey: null });

@@ -128,9 +128,20 @@
                 </div>
                 <div class="col-12 col-md-4">
                   <label class="form-label">القيمة {{ stat.mode === 'manual' ? '*' : '' }}</label>
-                  <input *ngIf="stat.mode === 'manual'" class="form-control" dir="ltr" [(ngModel)]="stat.value" [maxlength]="maxText" placeholder="+100K" />
-                  <input *ngIf="stat.mode === 'auto'" class="form-control" dir="ltr" [value]="statValue(stat)" disabled />
-                  <small *ngIf="stat.mode === 'auto'" class="text-muted">بيتحسب لوحده من السيستم</small>
+                  <!-- Always editable: typing in an automatic number turns it manual with what was typed -->
+                  <input
+                    class="form-control"
+                    dir="ltr"
+                    [ngModel]="stat.mode === 'auto' ? statValue(stat) : stat.value"
+                    (ngModelChange)="editAutoStat(stat, $event)"
+                    [maxlength]="maxText"
+                    placeholder="+100K"
+                  />
+                  <small *ngIf="stat.mode === 'auto'" class="text-muted">بيتحسب لوحده من السيستم. لو كتبت رقم، هيتثبت الرقم اللي كتبته.</small>
+                  <small *ngIf="stat.mode === 'manual' && canBeAuto(stat)" class="text-muted">
+                    رقم ثابت.
+                    <button type="button" class="btn btn-link btn-sm p-0 align-baseline" (click)="stat.mode = 'auto'">رجّعه أوتوماتيك ({{ autoStatValue(stat) }})</button>
+                  </small>
                 </div>
                 <div class="col-6 col-md-4">
                   <label class="form-label">لون الرقم</label>
