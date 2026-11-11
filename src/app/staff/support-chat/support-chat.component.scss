@@ -194,13 +194,15 @@
   &--staff {
     justify-content: flex-end;
     .sc-bubble {
-      background: var(--ts-navy);
-      color: var(--ts-navy-ink, #fff);
+      // a light bubble with dark text: the dark navy hid the text
+      background: #fdebd9;
+      border-color: #f3cfa8;
+      color: #2b1d10;
       border-end-end-radius: 4px;
       border-end-start-radius: 16px;
     }
     .sc-meta {
-      color: var(--ts-on-navy-muted, rgba(255, 255, 255, 0.75));
+      color: #7a6350;
     }
   }
 }
