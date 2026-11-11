@@ -28,8 +28,32 @@ export interface AutoNotifySettings {
   quietTo: number;
   occasions: AutoOccasion[];
   occasionsAreDefault: boolean;
+  /** Which reasons count and the numbers behind them. */
+  rules: Record<string, any>;
   hasKey: boolean;
 }
+
+/** The reasons the admin controls: a switch and the numbers behind each one (keys of the backend's AutoRules). */
+const RULE_GROUPS: { key: string; label: string; hint: string; fields: { k: string; label: string; suffix?: string }[] }[] = [
+  { key: 'occasions', label: 'APP.anRuleOccasions', hint: 'APP.anRuleOccasionsHint', fields: [] },
+  { key: 'discount', label: 'APP.anRuleDiscount', hint: 'APP.anRuleDiscountHint', fields: [{ k: 'minDiscountPercent', label: 'APP.anFMinDiscount', suffix: '%' }] },
+  { key: 'newItems', label: 'APP.anRuleNew', hint: 'APP.anRuleNewHint', fields: [{ k: 'newWithinDays', label: 'APP.anFNewDays', suffix: 'APP.anDay' }] },
+  { key: 'popular', label: 'APP.anRulePopular', hint: 'APP.anRulePopularHint', fields: [{ k: 'popularMinBookings', label: 'APP.anFPopular' }] },
+  {
+    key: 'rising', label: 'APP.anRuleRising', hint: 'APP.anRuleRisingHint',
+    fields: [{ k: 'risingMinBookings', label: 'APP.anFRisingMin' }, { k: 'risingPercent', label: 'APP.anFRisingPercent', suffix: '%' }]
+  },
+  {
+    key: 'promote', label: 'APP.anRulePromote', hint: 'APP.anRulePromoteHint',
+    fields: [{ k: 'promoteMaxBookings', label: 'APP.anFPromoteMax' }, { k: 'promoteOlderThanDays', label: 'APP.anFPromoteOld', suffix: 'APP.anDay' }]
+  },
+  {
+    key: 'seats', label: 'APP.anRuleSeats', hint: 'APP.anRuleSeatsHint',
+    fields: [{ k: 'seatsMax', label: 'APP.anFSeatsMax' }, { k: 'seatsWithinDays', label: 'APP.anFSeatsDays', suffix: 'APP.anDay' }]
+  },
+  { key: 'coupons', label: 'APP.anRuleCoupons', hint: 'APP.anRuleCouponsHint', fields: [{ k: 'couponEndsWithinDays', label: 'APP.anFCouponDays', suffix: 'APP.anDay' }] },
+  { key: 'weekend', label: 'APP.anRuleWeekend', hint: 'APP.anRuleWeekendHint', fields: [] }
+];
 
 export interface AutoNotification {
   id: number;
@@ -90,8 +114,9 @@ const KIND_LABEL: Record<string, string> = {
           <p class="ts-muted ts-small">{{ 'APP.anRules' | translate }}</p>
           <div class="ts-two" *ngIf="canEdit" style="margin-top: 10px">
             <button type="button" class="btn btn-secondary" (click)="openOccasions()" data-test="an-occasions"><i class="ti ti-calendar-event"></i>{{ 'APP.anOccasions' | translate }} ({{ s.occasions.length }})</button>
-            <button type="button" class="btn btn-primary" [disabled]="busy" (click)="save()" data-test="an-save"><i *ngIf="busy" class="pi pi-spin pi-spinner"></i>{{ 'APP.save' | translate }}</button>
+            <button type="button" class="btn btn-secondary" (click)="openRules()" data-test="an-rules"><i class="ti ti-adjustments"></i>{{ 'APP.anRules2' | translate }}</button>
           </div>
+          <button *ngIf="canEdit" type="button" class="btn btn-primary ts-wide-btn" [disabled]="busy" (click)="save()" data-test="an-save" style="margin-top: 10px"><i *ngIf="busy" class="pi pi-spin pi-spinner"></i>{{ 'APP.save' | translate }}</button>
         </ts-card>
 
         <button *ngIf="canEdit" type="button" class="btn btn-secondary ts-wide-btn" [disabled]="generating" (click)="generate()" data-test="an-generate" style="margin: 4px 0 12px">
@@ -140,6 +165,23 @@ const KIND_LABEL: Record<string, string> = {
       <div sheet-foot><button type="button" class="btn btn-primary ts-wide-btn" [disabled]="busy" (click)="approve()"><i class="ti ti-send"></i>{{ 'APP.anSendNow' | translate }}</button></div>
     </ts-sheet>
 
+    <ts-sheet [open]="rulesOpen" (openChange)="rulesOpen = false" [title]="'APP.anRules2' | translate" [wide]="true">
+      <p class="ts-muted ts-small">{{ 'APP.anRulesHint' | translate }}</p>
+      <div class="ts-list-card" *ngFor="let g of ruleGroups" style="display: block; margin-top: 10px" [attr.data-test]="'an-rule-' + g.key">
+        <ts-switch-row [title]="g.label | translate" [subtitle]="g.hint | translate" [value]="!!rulesDraft[g.key]" (valueChange)="rulesDraft[g.key] = $event"></ts-switch-row>
+        <div class="ts-two" *ngIf="g.fields.length && rulesDraft[g.key]">
+          <ts-field *ngFor="let f of g.fields" [label]="f.label | translate" [number]="true" [suffix]="f.suffix ? (f.suffix === '%' ? '%' : (f.suffix | translate)) : null" [value]="'' + rulesDraft[f.k]" (valueChange)="rulesDraft[f.k] = +$event"></ts-field>
+        </div>
+      </div>
+      <div class="ts-list-card" style="display: block; margin-top: 10px">
+        <ts-field [label]="'APP.anFSameItem' | translate" [hint]="'APP.anFSameItemHint' | translate" [number]="true" [suffix]="'APP.anDay' | translate" [value]="'' + rulesDraft['sameItemDays']" (valueChange)="rulesDraft['sameItemDays'] = +$event"></ts-field>
+      </div>
+      <div sheet-foot class="ts-two">
+        <button type="button" class="btn btn-outline-secondary" [disabled]="busy" (click)="resetRules()">{{ 'APP.anResetRules' | translate }}</button>
+        <button type="button" class="btn btn-primary" [disabled]="busy" (click)="saveRules()">{{ 'APP.save' | translate }}</button>
+      </div>
+    </ts-sheet>
+
     <ts-sheet [open]="occasionsOpen" (openChange)="occasionsOpen = false" [title]="'APP.anOccasions' | translate" [wide]="true">
       <p class="ts-muted ts-small">{{ 'APP.anOccasionsHint' | translate }}</p>
       <button type="button" class="btn btn-secondary ts-wide-btn" (click)="addOccasion()"><i class="ti ti-plus"></i>{{ 'APP.anAddOccasion' | translate }}</button>
@@ -177,6 +219,9 @@ export class AutoNotificationsComponent implements OnInit {
   editTitle = '';
   editBody = '';
   occasionsOpen = false;
+  rulesOpen = false;
+  readonly ruleGroups = RULE_GROUPS;
+  rulesDraft: Record<string, any> = {};
   occasionDraft: (AutoOccasion & { dateValue: Date | null })[] = [];
 
   get canEdit(): boolean {
@@ -225,11 +270,11 @@ export class AutoNotificationsComponent implements OnInit {
     return n.status === 2 ? 'ok' : n.status === 4 ? 'pending' : 'neutral';
   }
 
-  async save(extra: Partial<AutoNotifySettings> & { resetOccasions?: boolean } = {}): Promise<void> {
+  async save(extra: Partial<AutoNotifySettings> & { resetOccasions?: boolean; resetRules?: boolean } = {}): Promise<void> {
     if (!this.s || this.busy) return;
     const s = this.s;
     // turning on sending by itself is the one change worth a second look
-    if (extra.occasions === undefined && !extra.resetOccasions && s.enabled && s.autoSend && !(await this.dialogs.confirm({
+    if (Object.keys(extra).length === 0 && s.enabled && s.autoSend && !(await this.dialogs.confirm({
       title: this.text.tr('APP.anAutoSend'),
       message: this.text.tr('APP.anAutoSendQ', { n: s.maxPerWeek }),
       confirm: this.text.tr('APP.save')
@@ -305,6 +350,25 @@ export class AutoNotificationsComponent implements OnInit {
         this.text.showError(e);
       }
     });
+  }
+
+  // ---- which reasons count, and the numbers behind them
+
+  openRules(): void {
+    if (!this.s) return;
+    this.rulesDraft = { ...this.s.rules };
+    this.rulesOpen = true;
+  }
+
+  async saveRules(): Promise<void> {
+    await this.save({ rules: { ...this.rulesDraft } });
+    this.rulesOpen = false;
+  }
+
+  async resetRules(): Promise<void> {
+    if (!(await this.dialogs.confirm({ title: this.text.tr('APP.anResetRules'), message: this.text.tr('APP.anResetRulesQ'), confirm: this.text.tr('APP.anResetRules'), danger: true }))) return;
+    await this.save({ resetRules: true });
+    this.rulesOpen = false;
   }
 
   // ---- the occasions it writes about
