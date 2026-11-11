@@ -373,7 +373,7 @@ export class SupportChatComponent implements OnInit, OnDestroy {
   drafting = false;
   guideOpen = false;
   guideText = '';
-  readonly guideMax = 8000;
+  readonly guideMax = 12000;
 
   private atBottom = true;
   private searchTimer: any;
