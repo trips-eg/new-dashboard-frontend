@@ -3016,6 +3016,13 @@
     "teamHours": "Team hours",
     "aiSaved": "AI settings saved",
     "aiSavedNoKey": "Saved. The AI won't reply until the key is on the server",
+    "aiGuide": "Assistant's app guide",
+    "aiGuideDefault": "Default",
+    "aiGuideEdited": "Edited",
+    "aiGuideTitle": "Assistant's app guide",
+    "aiGuideHint": "The assistant answers questions like \"how do I make an account\" or \"how do I pay\" from this text only. Write the steps as they are in the app, and update it when something changes.",
+    "aiGuideReset": "Back to the default",
+    "aiGuideSaved": "Saved the assistant's guide",
     "draft": "Suggest reply",
     "drafting": "Writing…",
     "draftHint": "The AI writes a reply you read and edit before sending"

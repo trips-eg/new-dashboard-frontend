@@ -7,6 +7,7 @@ import { Observable, Subscription, firstValueFrom, map } from 'rxjs';
 import { KIT, StaffText } from '../ui/kit';
 import { LISTS } from '../ui/lists';
 import { SwitchRowComponent } from '../ui/controls';
+import { SheetComponent } from '../ui/dialogs';
 import { StaffHttp, mediaUrl } from '../core/staff-http';
 import { ApiPage, asPage } from '../core/query';
 import { P, StaffSession } from '../core/session';
@@ -75,6 +76,10 @@ export interface SupportCounts {
 export interface SupportAiSettings {
   enabled: boolean;
   teamHours: string;
+  /** How the app works, in the admin's words: the assistant answers "how do I…" questions from it. */
+  guide: string;
+  /** Read only: Trips' default guide (not changed yet). */
+  guideIsDefault: boolean;
   /** Read only: the Anthropic key is on the server. */
   hasKey: boolean;
 }
@@ -131,7 +136,8 @@ export class SupportChatApi {
     return this.http.get<SupportAiSettings>(`${this.base}/ai-settings`);
   }
 
-  saveAiSettings(s: { enabled: boolean; teamHours: string }): Observable<SupportAiSettings> {
+  /** guide: undefined keeps the saved one, '' goes back to Trips' default. */
+  saveAiSettings(s: { enabled: boolean; teamHours: string; guide?: string }): Observable<SupportAiSettings> {
     return this.http.put<SupportAiSettings>(`${this.base}/ai-settings`, s);
   }
 
@@ -166,7 +172,7 @@ export const SUPPORT_POLL = { inboxMs: 15_000, messagesMs: 5_000 };
 @Component({
   selector: 'ts-support-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, TranslateModule, ...KIT, ...LISTS, SwitchRowComponent],
+  imports: [CommonModule, FormsModule, RouterModule, TranslateModule, ...KIT, ...LISTS, SwitchRowComponent, SheetComponent],
   styleUrls: ['./support-chat.component.scss'],
   template: `
     <div class="ts-screen sc-screen" [class.sc-has-open]="openId">
@@ -187,6 +193,11 @@ export const SUPPORT_POLL = { inboxMs: 15_000, messagesMs: 5_000 };
               <span>{{ 'SUPPORT.teamHours' | translate }}</span>
               <input type="text" maxlength="60" [ngModel]="ai.teamHours" (change)="saveAi(ai.enabled, $any($event.target).value)" />
             </label>
+            <button *ngIf="canReply" type="button" class="sc-ai__guide" (click)="openGuide()" data-test="sc-ai-guide">
+              <i class="ti ti-book-2"></i>
+              <span>{{ 'SUPPORT.aiGuide' | translate }}</span>
+              <small>{{ (ai.guideIsDefault ? 'SUPPORT.aiGuideDefault' : 'SUPPORT.aiGuideEdited') | translate }}</small>
+            </button>
           </div>
           <ts-segmented [items]="tabs" [selected]="tab" (changed)="setTab($any($event))"></ts-segmented>
           <ts-search [hint]="'SUPPORT.searchHint' | translate" [value]="q" (changed)="search($event)"></ts-search>
@@ -310,6 +321,15 @@ export const SUPPORT_POLL = { inboxMs: 15_000, messagesMs: 5_000 };
         </ng-template>
       </div>
     </div>
+    <ts-sheet [open]="guideOpen" (openChange)="guideOpen = false" [title]="'SUPPORT.aiGuideTitle' | translate" [wide]="true">
+      <p class="ts-muted sc-guide__hint">{{ 'SUPPORT.aiGuideHint' | translate }}</p>
+      <textarea class="sc-guide__text" dir="rtl" rows="18" [maxLength]="guideMax" [(ngModel)]="guideText" data-test="sc-ai-guide-text"></textarea>
+      <small class="ts-muted">{{ guideText.length }} / {{ guideMax }}</small>
+      <div sheet-foot class="ts-two">
+        <button type="button" class="btn btn-outline-secondary" [disabled]="aiSaving || ai?.guideIsDefault" (click)="saveGuide('')">{{ 'SUPPORT.aiGuideReset' | translate }}</button>
+        <button type="button" class="btn btn-primary" [disabled]="aiSaving" (click)="saveGuide(guideText)">{{ 'APP.save' | translate }}</button>
+      </div>
+    </ts-sheet>
   `
 })
 export class SupportChatComponent implements OnInit, OnDestroy {
@@ -351,6 +371,9 @@ export class SupportChatComponent implements OnInit, OnDestroy {
   ai: SupportAiSettings | null = null;
   aiSaving = false;
   drafting = false;
+  guideOpen = false;
+  guideText = '';
+  readonly guideMax = 8000;
 
   private atBottom = true;
   private searchTimer: any;
@@ -634,6 +657,32 @@ export class SupportChatComponent implements OnInit, OnDestroy {
         this.ai = s;
         this.aiSaving = false;
         this.text$.showDone(this.text$.tr(s.enabled && !s.hasKey ? 'SUPPORT.aiSavedNoKey' : 'SUPPORT.aiSaved'));
+      },
+      error: (e) => {
+        this.aiSaving = false;
+        this.text$.showError(e);
+      }
+    });
+  }
+
+  /** The app guide the assistant answers "how do I…" questions from. */
+  openGuide(): void {
+    if (!this.ai) return;
+    this.guideText = this.ai.guide ?? '';
+    this.guideOpen = true;
+  }
+
+  /** Saves the guide; '' goes back to Trips' default one. */
+  saveGuide(guide: string): void {
+    if (!this.ai || this.aiSaving) return;
+    this.aiSaving = true;
+    this.api.saveAiSettings({ enabled: this.ai.enabled, teamHours: this.ai.teamHours, guide }).subscribe({
+      next: (s) => {
+        this.ai = s;
+        this.aiSaving = false;
+        this.guideText = s.guide;
+        if (guide !== '') this.guideOpen = false;
+        this.text$.showDone(this.text$.tr('SUPPORT.aiGuideSaved'));
       },
       error: (e) => {
         this.aiSaving = false;
