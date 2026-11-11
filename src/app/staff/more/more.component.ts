@@ -186,7 +186,9 @@ export class AdminMoreComponent implements OnInit {
             { icon: 'ti ti-device-mobile', label: 'home content', ...trip, route: '/home-content', perm: P.homeContentView },
             // The customer app's rating popup: when it shows, and the ratings (app 1.0.51)
             { icon: 'ti ti-star', label: 'app rating', ...mkt, route: '/app-rating', perm: P.homeContentView },
-            { icon: 'ti ti-user-plus', label: 'invite friends', ...mkt, route: '/referrals', perm: P.homeContentView }
+            { icon: 'ti ti-user-plus', label: 'invite friends', ...mkt, route: '/referrals', perm: P.homeContentView },
+            // Notifications the system writes by itself: drafts to approve, the log, the limits
+            { icon: 'ti ti-robot', label: 'APP.autoNotify', ...mkt, route: '/a/more/auto-notifications', perm: P.notificationView }
           ]
         }
       ],

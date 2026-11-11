@@ -69,6 +69,7 @@ export const STAFF_ROUTES: Routes = [
   { path: 'a/more/notifications', loadComponent: () => import('./messaging/messaging.component').then((c) => c.NotificationLogComponent) },
   { path: 'a/more/notifications/:id', loadComponent: () => import('./messaging/messaging.component').then((c) => c.NotificationDetailsComponent) },
   { path: 'a/more/notify', loadComponent: () => import('./messaging/messaging.component').then((c) => c.NotifyComponent) },
+  { path: 'a/more/auto-notifications', loadComponent: () => import('./messaging/auto-notifications.component').then((c) => c.AutoNotificationsComponent) },
   { path: 'a/more/custom-requests', loadComponent: () => import('./requests/requests.component').then((c) => c.CustomRequestsComponent) },
   { path: 'a/more/custom-requests/:id', loadComponent: () => import('./requests/requests.component').then((c) => c.CustomRequestComponent) },
   { path: 'v/more/reviews', loadComponent: () => import('./marketing/marketing.component').then((c) => c.ReviewsComponent), data: { vendor: true } },
