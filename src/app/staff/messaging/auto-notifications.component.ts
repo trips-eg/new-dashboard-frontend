@@ -53,7 +53,12 @@ const KIND_LABEL: Record<string, string> = {
   seats: 'APP.anKindSeats',
   coupon: 'APP.anKindCoupon',
   weekend: 'APP.anKindWeekend',
-  umrah: 'APP.anKindUmrah'
+  umrah: 'APP.anKindUmrah',
+  discount: 'APP.anKindDiscount',
+  new: 'APP.anKindNew',
+  popular: 'APP.anKindPopular',
+  rising: 'APP.anKindRising',
+  promote: 'APP.anKindPromote'
 };
 
 /**
