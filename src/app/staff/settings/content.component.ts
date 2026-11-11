@@ -706,7 +706,10 @@ const COUPON_SEGMENTS: [string, string][] = [
           <ts-field [label]="(isCashback ? 'APP.cpCashbackAmount' : 'APP.discount') | translate" [number]="true" [suffix]="isPercent ? '%' : ('APP.egp' | translate)" [required]="true" [(value)]="f.amount" style="display: block; margin-top: 12px"></ts-field>
         </ng-template>
         <ts-field *ngIf="f.type === '5'" [label]="'APP.cpMaxCashback' | translate" [hint]="'APP.cpMaxCashbackHint' | translate" [number]="true" [suffix]="'APP.egp' | translate" [(value)]="f.maxCashback"></ts-field>
-        <ts-field [label]="'APP.usesAllowed' | translate" [number]="true" [(value)]="f.uses"></ts-field>
+        <ts-field [label]="'APP.usesAllowed' | translate" [hint]="'APP.cpUsesAllHint' | translate" [number]="true" [(value)]="f.uses"></ts-field>
+        <label class="ts-label">{{ 'APP.cpPerCustomer' | translate }}</label>
+        <ts-pill-switch [items]="userLimits" [selected]="f.userLimit" (selectedChange)="f.userLimit = $event"></ts-pill-switch>
+        <p class="ts-muted ts-small" style="margin-top: 6px">{{ 'APP.cpPerCustomerHint' | translate }}</p>
         <div class="ts-two">
           <ts-date-field [label]="'APP.from' | translate" [(value)]="f.from"></ts-date-field>
           <ts-date-field [label]="'APP.to' | translate" [(value)]="f.to"></ts-date-field>
@@ -785,6 +788,17 @@ export class CouponFormComponent implements OnInit {
     { key: '4', label: this.text.tr('APP.cpCashbackValue') },
     { key: '3', label: this.text.tr('APP.buyXGetX') }
   ];
+  /** Uses per customer (UserLimit); a coupon set to 3, 4 or 5 times in the old screens shows its own choice. */
+  get userLimits(): { key: string; label: string }[] {
+    const out = [
+      { key: '2', label: this.text.tr('APP.cpLimitOnce') },
+      { key: '3', label: this.text.tr('APP.cpLimitTwice') },
+      { key: '1', label: this.text.tr('APP.cpLimitUnlimited') }
+    ];
+    const n = +this.f.userLimit;
+    if (n > 3) out.splice(2, 0, { key: String(n), label: this.text.tr('APP.cpLimitTimes', { n: n - 1 }) });
+    return out;
+  }
   readonly audienceModes = [
     { key: 'groups', label: this.text.tr('APP.cpAudienceGroups') },
     { key: 'some', label: this.text.tr('APP.cpAudienceSome') }
@@ -805,8 +819,6 @@ export class CouponFormComponent implements OnInit {
   sentTo = 0;
   /** Rooms a coupon made in the old screens applies to: kept on save (this form has no room picker). */
   private roomIds: number[] = [];
-  /** Kept as loaded: the edit doesn't change them. */
-  private kept: Record<string, unknown> = {};
 
   get isPercent(): boolean {
     return this.f.type === '2' || this.f.type === '5';
@@ -877,7 +889,10 @@ export class CouponFormComponent implements OnInit {
         this.roomIds = all.filter((i) => i.kind === 'room').map((i) => i.id);
         this.used = c.usedCount ?? 0;
         this.sentTo = c.sent?.customers ?? 0;
-        this.kept = { userLimit: c.userLimit };
+        // UserLimit 1 unlimited, 2 once, 3 twice … 6 five times. Coupons made by this page before it had the
+        // choice were saved with 0, which the save refuses and checkout reads as "used up": they start at once,
+        // as the cart already counts them.
+        this.f.userLimit = [1, 2, 3, 4, 5, 6].includes(+c.userLimit) ? String(c.userLimit) : '2';
         this.loading = false;
       },
       error: (e) => {
@@ -899,6 +914,8 @@ export class CouponFormComponent implements OnInit {
     get: '1',
     maxFree: '',
     maxCashback: '',
+    /** UserLimit: how many times one customer may use it (2 once, 3 twice … 6 five times, 1 unlimited) */
+    userLimit: '2',
     notify: true,
     email: false
   };
@@ -942,8 +959,10 @@ export class CouponFormComponent implements OnInit {
       getQuantity: this.isBuyGet ? parseInt(latinDigits(f.get), 10) || 0 : 0,
       maxFreeQuantity: this.isBuyGet ? parseInt(latinDigits(f.maxFree), 10) || 0 : 0,
       maxCashback: f.type === '5' ? parseAmount(f.maxCashback) ?? 0 : 0,
+      // Sent on create and edit: without it the coupon was saved with 0, which checkout refuses
+      userLimit: +f.userLimit || 2,
       // Editing never sends the coupon again: no audience, no channels
-      ...(this.editId ? { ...this.kept, sendViaNotification: false, sendViaEmail: false } : { ...this.seg, sendViaNotification: f.notify, sendViaEmail: f.email })
+      ...(this.editId ? { sendViaNotification: false, sendViaEmail: false } : { ...this.seg, sendViaNotification: f.notify, sendViaEmail: f.email })
     };
   }
 
