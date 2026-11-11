@@ -5,7 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Observable, firstValueFrom, map } from 'rxjs';
 import { KIT, StaffText } from '../ui/kit';
 import { LISTS } from '../ui/lists';
-import { SwitchRowComponent } from '../ui/controls';
+import { SearchPickerComponent, SwitchRowComponent } from '../ui/controls';
 import { SheetComponent, StaffDialogs } from '../ui/dialogs';
 import { StaffHttp, mediaUrl } from '../core/staff-http';
 import { FilterSchema, FiltersApi, ListResult, PagedList, StaffQuery, asPage, queryJson } from '../core/query';
@@ -62,24 +62,51 @@ export class MessagingApi {
     return this.http.raw('POST', '/api/Notification/SendNotification', form);
   }
 
+  /** Coupons by code or description, for "opens a coupon". */
+  searchCoupons(q: string): Observable<any[]> {
+    return this.http
+      .get<any>('/api/staff/coupons', { status: 'all', pageIndex: 1, pageSize: 20, ...(q ? { search: q } : {}) })
+      .pipe(map((d) => asPage<any>(d).data ?? []));
+  }
+
+  /** The home's active Trips Star cards, for "opens a Trips Star card". */
+  searchStars(q: string): Observable<any[]> {
+    return this.http
+      .raw<any>('GET', '/api/TripStar/GetAllTripStars/', undefined, { pageIndex: 1, pageSize: 200, isPagingEnabled: false, IsActive: true })
+      .pipe(
+        map((res) => {
+          const rows: any[] = res?.data?.data ?? [];
+          const term = q.trim().toLowerCase();
+          return term ? rows.filter((s) => `${s.titleAr ?? ''} ${s.title ?? ''}`.toLowerCase().includes(term)) : rows;
+        })
+      );
+  }
+
   /**
    * POST /api/Notification/Suggest: title and body ideas from the item picked and the day (the weekend, the month),
    * written by Claude when the server has an Anthropic key, else templates. Sends nothing.
    */
   suggest(o: { item?: NotifyItem | null; idea?: string }): Observable<{ title: string; body: string; source: string }[]> {
     return this.http.post<any[]>('/api/Notification/Suggest', {
-      itemType: o.item?.itemType ?? null,
-      itemId: o.item?.itemId ?? null,
+      // ideas are written for the three listings only
+      itemType: o.item && ['trip', 'picnic', 'religion'].includes(o.item.itemType) ? o.item.itemType : null,
+      itemId: o.item && ['trip', 'picnic', 'religion'].includes(o.item.itemType) ? o.item.itemId : null,
       idea: o.idea?.trim() || null
     });
   }
 }
 
-/** The item a notification opens: NotificationItemLink types "trip", "picnic" (outing), "religion" (Hajj / Umrah). */
+/**
+ * What a notification opens (NotificationItemLink.LinkTypes): "trip", "picnic" (outing), "religion" (Hajj / Umrah),
+ * a "coupon", an "ad" (one of the home's Trips Star cards) or the "wallet" (no id).
+ */
 export interface NotifyItem {
-  itemType: 'trip' | 'picnic' | 'religion';
+  itemType: 'trip' | 'picnic' | 'religion' | 'coupon' | 'ad' | 'wallet';
   itemId: number;
 }
+
+/** The choices of "الإشعار يفتح على": none, the three listings (a catalog picker), a coupon, a Trips Star card, the wallet. */
+export type NotifyTarget = 'none' | 'trip' | 'outing' | 'hajj' | 'coupon' | 'ad' | 'wallet';
 
 const NOTIFY_ITEM_TYPE: Record<string, NotifyItem['itemType']> = { trip: 'trip', outing: 'picnic', hajj: 'religion' };
 
@@ -340,13 +367,33 @@ const SEGMENTS: [string, string][] = [
 @Component({
   selector: 'ts-notify',
   standalone: true,
-  imports: [CommonModule, TranslateModule, ...KIT, ...FORM_KIT, SwitchRowComponent, CatalogItemsComponent],
+  imports: [CommonModule, TranslateModule, ...KIT, ...FORM_KIT, SwitchRowComponent, CatalogItemsComponent, SearchPickerComponent, SheetComponent],
   template: `
     <div class="ts-screen ts-screen--narrow">
       <ts-appbar [title]="'APP.sendNotification' | translate"></ts-appbar>
       <ts-card [title]="'APP.ntItem' | translate" [subtitle]="'APP.ntItemHint' | translate" icon="ti ti-link">
-        <ts-catalog-items [items]="item ? [item] : []" (itemsChange)="pickItem($event)" [kinds]="['trip', 'outing', 'hajj']"></ts-catalog-items>
+        <div class="ts-stack" data-test="nt-target">
+          <button type="button" *ngFor="let t of targets" class="ts-list-card is-link" [class.is-selected]="target === t.key" (click)="setTarget(t.key)" style="text-align: start; width: 100%" [attr.data-test]="'nt-target-' + t.key">
+            <span class="ts-card-row__main">
+              <strong class="ts-card-title">{{ t.label | translate }}</strong>
+              <span class="ts-muted ts-small" *ngIf="t.hint">{{ t.hint | translate }}</span>
+            </span>
+            <i class="ti" [class.ti-circle-check]="target === t.key" [class.ti-circle]="target !== t.key"></i>
+          </button>
+        </div>
+        <ts-catalog-items *ngIf="target === 'trip' || target === 'outing' || target === 'hajj'" [items]="item ? [item] : []" (itemsChange)="pickItem($event)" [kinds]="[$any(target)]"></ts-catalog-items>
+        <div *ngIf="target === 'coupon' || target === 'ad'" style="margin-top: 10px">
+          <button type="button" class="btn btn-secondary ts-wide-btn" (click)="pickerOpen = true" data-test="nt-pick">
+            <i class="ti" [class.ti-discount-2]="target === 'coupon'" [class.ti-stars]="target === 'ad'"></i>
+            {{ picked ? picked.name : (target === 'coupon' ? 'APP.ntPickCoupon' : 'APP.ntPickStar') | translate }}
+          </button>
+        </div>
+        <p class="ts-muted ts-small" *ngIf="target === 'wallet'" style="margin-top: 8px">{{ 'APP.ntWalletNote' | translate }}</p>
+        <p class="ts-muted ts-small" *ngIf="target === 'none'" style="margin-top: 8px">{{ 'APP.ntNoneNote' | translate }}</p>
       </ts-card>
+      <ts-sheet [open]="pickerOpen" (openChange)="pickerOpen = false" [title]="(target === 'coupon' ? 'APP.ntPickCoupon' : 'APP.ntPickStar') | translate" [footer]="false">
+        <ts-search-picker *ngIf="pickerOpen" [search]="target === 'coupon' ? searchCoupons : searchStars" [title]="pickerTitle" [subtitle]="pickerSubtitle" (picked)="pickRow($event)"></ts-search-picker>
+      </ts-sheet>
       <ts-card [title]="'APP.ntSuggest' | translate" [subtitle]="'APP.ntSuggestHint' | translate" icon="ti ti-sparkles">
         <ts-field [label]="'APP.ntIdea' | translate" [hint]="'APP.ntIdeaHint' | translate" [(value)]="idea"></ts-field>
         <button type="button" class="btn btn-secondary ts-wide-btn" [disabled]="suggesting" (click)="suggest()" style="margin-top: 8px">
@@ -409,9 +456,57 @@ export class NotifyComponent {
   ideas: { title: string; body: string; source: string }[] = [];
   suggesting = false;
 
+  readonly targets: { key: NotifyTarget; label: string; hint?: string }[] = [
+    { key: 'none', label: 'APP.ntTargetNone', hint: 'APP.ntTargetNoneHint' },
+    { key: 'trip', label: 'APP.ntTargetTrip' },
+    { key: 'outing', label: 'APP.ntTargetOuting' },
+    { key: 'hajj', label: 'APP.ntTargetHajj' },
+    { key: 'coupon', label: 'APP.ntTargetCoupon', hint: 'APP.ntTargetCouponHint' },
+    { key: 'ad', label: 'APP.ntTargetAd', hint: 'APP.ntTargetAdHint' },
+    { key: 'wallet', label: 'APP.ntTargetWallet', hint: 'APP.ntTargetWalletHint' }
+  ];
+  target: NotifyTarget = 'none';
+  pickerOpen = false;
+  /** The coupon or Trips Star card picked. */
+  picked: { id: number; name: string } | null = null;
+  searchCoupons = (q: string) => this.api.searchCoupons(q);
+  searchStars = (q: string) => this.api.searchStars(q);
+  pickerTitle = (r: any) => (this.target === 'coupon' ? r.code : r.titleAr || r.title || `#${r.id}`);
+  pickerSubtitle = (r: any) => (this.target === 'coupon' ? r.description ?? '' : '');
+
+  setTarget(t: NotifyTarget): void {
+    if (this.target === t) return;
+    this.target = t;
+    this.item = null;
+    this.picked = null;
+    this.ideas = [];
+  }
+
+  pickRow(r: any): void {
+    this.picked = { id: r.id, name: this.pickerTitle(r) };
+    this.pickerOpen = false;
+  }
+
+  /** What the app opens: null for a general notification. */
   private get link(): NotifyItem | null {
-    const type = this.item ? NOTIFY_ITEM_TYPE[this.item.kind] : undefined;
-    return this.item && type ? { itemType: type, itemId: this.item.id } : null;
+    switch (this.target) {
+      case 'wallet':
+        return { itemType: 'wallet', itemId: 0 };
+      case 'coupon':
+      case 'ad':
+        return this.picked ? { itemType: this.target, itemId: this.picked.id } : null;
+      case 'none':
+        return null;
+      default: {
+        const type = this.item ? NOTIFY_ITEM_TYPE[this.item.kind] : undefined;
+        return this.item && type ? { itemType: type, itemId: this.item.id } : null;
+      }
+    }
+  }
+
+  /** The name the confirmation shows. */
+  private get linkName(): string {
+    return this.target === 'wallet' ? this.text.tr('APP.ntTargetWallet') : this.item?.name ?? this.picked?.name ?? '';
   }
 
   pickItem(items: CatalogItem[]): void {
@@ -442,9 +537,11 @@ export class NotifyComponent {
 
   async send(): Promise<void> {
     if (!this.title.trim() || !this.body.trim()) return this.text.showError(this.text.tr('APP.fillRequired'));
+    // a target was chosen but nothing picked: it would go out as a general notification
+    if (!['none', 'wallet'].includes(this.target) && !this.link) return this.text.showError(this.text.tr('APP.ntPickFirst'));
     const ok = await this.dialogs.confirm({
       title: this.text.tr('APP.sendNotification'),
-      message: this.item ? this.text.tr('APP.ntSendWithItemQ', { n: this.item.name }) : this.text.tr('APP.sendNotificationQ'),
+      message: this.link ? this.text.tr('APP.ntSendWithItemQ', { n: this.linkName }) : this.text.tr('APP.sendNotificationQ'),
       confirm: this.text.tr('APP.send')
     });
     if (!ok) return;

@@ -7,7 +7,7 @@ import { Observable, Subscription, firstValueFrom, map } from 'rxjs';
 import { KIT, StaffText } from '../ui/kit';
 import { LISTS } from '../ui/lists';
 import { SwitchRowComponent } from '../ui/controls';
-import { SheetComponent } from '../ui/dialogs';
+import { SheetComponent, StaffDialogs } from '../ui/dialogs';
 import { StaffHttp, mediaUrl } from '../core/staff-http';
 import { ApiPage, asPage } from '../core/query';
 import { P, StaffSession } from '../core/session';
@@ -72,14 +72,21 @@ export interface SupportCounts {
   needsHuman?: number;
 }
 
+/** One question and its answer; a customer question only has to mean the same. */
+export interface SupportFaq {
+  id: string;
+  question: string;
+  answer: string;
+}
+
 /** 1.0.51: the chat's AI assistant. */
 export interface SupportAiSettings {
   enabled: boolean;
   teamHours: string;
-  /** How the app works, in the admin's words: the assistant answers "how do I…" questions from it. */
-  guide: string;
-  /** Read only: Trips' default guide (not changed yet). */
-  guideIsDefault: boolean;
+  /** The questions and answers the assistant answers from: Trips' default ones until the admin changes them. */
+  faqs: SupportFaq[];
+  /** Read only: the list is Trips' default one (not changed yet). */
+  faqsAreDefault: boolean;
   /** Read only: the Anthropic key is on the server. */
   hasKey: boolean;
 }
@@ -136,8 +143,8 @@ export class SupportChatApi {
     return this.http.get<SupportAiSettings>(`${this.base}/ai-settings`);
   }
 
-  /** guide: undefined keeps the saved one, '' goes back to Trips' default. */
-  saveAiSettings(s: { enabled: boolean; teamHours: string; guide?: string }): Observable<SupportAiSettings> {
+  /** faqs: left out keeps the saved list; resetFaqs goes back to Trips' default one. */
+  saveAiSettings(s: { enabled: boolean; teamHours: string; faqs?: SupportFaq[]; resetFaqs?: boolean }): Observable<SupportAiSettings> {
     return this.http.put<SupportAiSettings>(`${this.base}/ai-settings`, s);
   }
 
@@ -193,10 +200,10 @@ export const SUPPORT_POLL = { inboxMs: 15_000, messagesMs: 5_000 };
               <span>{{ 'SUPPORT.teamHours' | translate }}</span>
               <input type="text" maxlength="60" [ngModel]="ai.teamHours" (change)="saveAi(ai.enabled, $any($event.target).value)" />
             </label>
-            <button *ngIf="canReply" type="button" class="sc-ai__guide" (click)="openGuide()" data-test="sc-ai-guide">
+            <button *ngIf="canReply" type="button" class="sc-ai__guide" (click)="openFaqs()" data-test="sc-ai-faqs">
               <i class="ti ti-book-2"></i>
-              <span>{{ 'SUPPORT.aiGuide' | translate }}</span>
-              <small>{{ (ai.guideIsDefault ? 'SUPPORT.aiGuideDefault' : 'SUPPORT.aiGuideEdited') | translate }}</small>
+              <span>{{ 'SUPPORT.aiFaqs' | translate }}</span>
+              <small>{{ 'SUPPORT.aiFaqsCount' | translate: { n: ai.faqs.length } }}</small>
             </button>
           </div>
           <ts-segmented [items]="tabs" [selected]="tab" (changed)="setTab($any($event))"></ts-segmented>
@@ -321,18 +328,31 @@ export const SUPPORT_POLL = { inboxMs: 15_000, messagesMs: 5_000 };
         </ng-template>
       </div>
     </div>
-    <ts-sheet [open]="guideOpen" (openChange)="guideOpen = false" [title]="'SUPPORT.aiGuideTitle' | translate" [wide]="true">
-      <p class="ts-muted sc-guide__hint">{{ 'SUPPORT.aiGuideHint' | translate }}</p>
-      <textarea class="sc-guide__text" dir="rtl" rows="18" [maxLength]="guideMax" [(ngModel)]="guideText" data-test="sc-ai-guide-text"></textarea>
-      <small class="ts-muted">{{ guideText.length }} / {{ guideMax }}</small>
+    <ts-sheet [open]="faqOpen" (openChange)="faqOpen = false" [title]="'SUPPORT.aiFaqsTitle' | translate" [wide]="true">
+      <p class="ts-muted sc-guide__hint">{{ 'SUPPORT.aiFaqsHint' | translate }}</p>
+      <label class="ts-search sc-faq__search">
+        <i class="ti ti-search" aria-hidden="true"></i>
+        <input type="search" [placeholder]="'SUPPORT.aiFaqsSearch' | translate" [(ngModel)]="faqQuery" />
+      </label>
+      <button type="button" class="btn btn-secondary ts-wide-btn" (click)="addFaq()" data-test="sc-faq-add"><i class="ti ti-plus"></i>{{ 'SUPPORT.aiFaqsAdd' | translate }}</button>
+      <div class="sc-faq" *ngFor="let f of faqDraft; let i = index; trackBy: faqTrack" [hidden]="!faqMatches(f)" [attr.data-test]="'sc-faq-' + i">
+        <input type="text" class="sc-faq__q" dir="rtl" maxlength="200" [(ngModel)]="f.question" [placeholder]="'SUPPORT.aiFaqsQuestion' | translate" />
+        <textarea class="sc-faq__a" dir="rtl" rows="4" maxlength="1500" [(ngModel)]="f.answer" [placeholder]="'SUPPORT.aiFaqsAnswer' | translate"></textarea>
+        <div class="sc-faq__foot">
+          <small class="ts-muted">{{ f.answer.length }} / 1500</small>
+          <button type="button" class="btn btn-link text-danger" (click)="removeFaq(i)"><i class="ti ti-trash"></i>{{ 'APP.delete' | translate }}</button>
+        </div>
+      </div>
+      <p class="ts-muted" *ngIf="!faqDraft.length">{{ 'SUPPORT.aiFaqsEmpty' | translate }}</p>
       <div sheet-foot class="ts-two">
-        <button type="button" class="btn btn-outline-secondary" [disabled]="aiSaving || ai?.guideIsDefault" (click)="saveGuide('')">{{ 'SUPPORT.aiGuideReset' | translate }}</button>
-        <button type="button" class="btn btn-primary" [disabled]="aiSaving" (click)="saveGuide(guideText)">{{ 'APP.save' | translate }}</button>
+        <button type="button" class="btn btn-outline-secondary" [disabled]="aiSaving || ai?.faqsAreDefault" (click)="resetFaqs()">{{ 'SUPPORT.aiFaqsReset' | translate }}</button>
+        <button type="button" class="btn btn-primary" [disabled]="aiSaving" (click)="saveFaqs()">{{ 'APP.save' | translate }}</button>
       </div>
     </ts-sheet>
   `
 })
 export class SupportChatComponent implements OnInit, OnDestroy {
+  private readonly dialogs = inject(StaffDialogs);
   private readonly api = inject(SupportChatApi);
   private readonly session = inject(StaffSession);
   private readonly text$ = inject(StaffText);
@@ -371,9 +391,9 @@ export class SupportChatComponent implements OnInit, OnDestroy {
   ai: SupportAiSettings | null = null;
   aiSaving = false;
   drafting = false;
-  guideOpen = false;
-  guideText = '';
-  readonly guideMax = 12000;
+  faqOpen = false;
+  faqQuery = '';
+  faqDraft: SupportFaq[] = [];
 
   private atBottom = true;
   private searchTimer: any;
@@ -665,24 +685,66 @@ export class SupportChatComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** The app guide the assistant answers "how do I…" questions from. */
-  openGuide(): void {
+  /** The questions and answers the assistant answers from (editable copy). */
+  openFaqs(): void {
     if (!this.ai) return;
-    this.guideText = this.ai.guide ?? '';
-    this.guideOpen = true;
+    this.faqDraft = this.ai.faqs.map((f) => ({ ...f }));
+    this.faqQuery = '';
+    this.faqOpen = true;
   }
 
-  /** Saves the guide; '' goes back to Trips' default one. */
-  saveGuide(guide: string): void {
+  faqTrack = (_: number, f: SupportFaq) => f;
+
+  faqMatches(f: SupportFaq): boolean {
+    const q = this.faqQuery.trim().toLowerCase();
+    return !q || f.question.toLowerCase().includes(q) || f.answer.toLowerCase().includes(q);
+  }
+
+  /** A new empty question at the top, so it is the first thing in view. */
+  addFaq(): void {
+    this.faqQuery = '';
+    this.faqDraft = [{ id: '', question: '', answer: '' }, ...this.faqDraft];
+  }
+
+  removeFaq(i: number): void {
+    this.faqDraft = this.faqDraft.filter((_, k) => k !== i);
+  }
+
+  saveFaqs(): void {
     if (!this.ai || this.aiSaving) return;
+    if (this.faqDraft.some((f) => !!f.question.trim() !== !!f.answer.trim())) return this.text$.showError(this.text$.tr('SUPPORT.aiFaqsBoth'));
     this.aiSaving = true;
-    this.api.saveAiSettings({ enabled: this.ai.enabled, teamHours: this.ai.teamHours, guide }).subscribe({
+    this.api.saveAiSettings({ enabled: this.ai.enabled, teamHours: this.ai.teamHours, faqs: this.faqDraft }).subscribe({
       next: (s) => {
         this.ai = s;
         this.aiSaving = false;
-        this.guideText = s.guide;
-        if (guide !== '') this.guideOpen = false;
-        this.text$.showDone(this.text$.tr('SUPPORT.aiGuideSaved'));
+        this.faqOpen = false;
+        this.text$.showDone(this.text$.tr('SUPPORT.aiFaqsSaved'));
+      },
+      error: (e) => {
+        this.aiSaving = false;
+        this.text$.showError(e);
+      }
+    });
+  }
+
+  /** Back to Trips' default questions and answers (what was added or edited is lost). */
+  async resetFaqs(): Promise<void> {
+    if (!this.ai || this.aiSaving) return;
+    const ok = await this.dialogs.confirm({
+      title: this.text$.tr('SUPPORT.aiFaqsReset'),
+      message: this.text$.tr('SUPPORT.aiFaqsResetQ'),
+      confirm: this.text$.tr('SUPPORT.aiFaqsReset'),
+      danger: true
+    });
+    if (!ok) return;
+    this.aiSaving = true;
+    this.api.saveAiSettings({ enabled: this.ai.enabled, teamHours: this.ai.teamHours, resetFaqs: true }).subscribe({
+      next: (s) => {
+        this.ai = s;
+        this.faqDraft = s.faqs.map((f) => ({ ...f }));
+        this.aiSaving = false;
+        this.text$.showDone(this.text$.tr('SUPPORT.aiFaqsSaved'));
       },
       error: (e) => {
         this.aiSaving = false;

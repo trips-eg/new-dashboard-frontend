@@ -5,8 +5,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { Subject, Subscription, debounceTime, firstValueFrom } from 'rxjs';
 import { KIT, StaffText } from '../ui/kit';
 import { ChipBarComponent, LISTS } from '../ui/lists';
-import { PillSwitchComponent, SwitchRowComponent } from '../ui/controls';
-import { StaffDialogs } from '../ui/dialogs';
+import { PillSwitchComponent, SearchPickerComponent, SwitchRowComponent } from '../ui/controls';
+import { SheetComponent, StaffDialogs } from '../ui/dialogs';
 import { StaffHttp, mediaUrl } from '../core/staff-http';
 import { PagedList } from '../core/query';
 import { P, StaffSession } from '../core/session';
@@ -661,7 +661,7 @@ const COUPON_SEGMENTS: [string, string][] = [
 @Component({
   selector: 'ts-coupon-form',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, ...FORM_KIT, PillSwitchComponent, SwitchRowComponent, CatalogItemsComponent],
+  imports: [CommonModule, RouterModule, TranslateModule, ...KIT, ...FORM_KIT, PillSwitchComponent, SwitchRowComponent, CatalogItemsComponent, SearchPickerComponent, SheetComponent],
   template: `
     <div class="ts-screen ts-screen--narrow">
       <ts-appbar [title]="(editId ? 'APP.cpEdit' : 'APP.newCoupon') | translate" [subtitle]="editId ? f.code : null"></ts-appbar>
@@ -693,7 +693,19 @@ const COUPON_SEGMENTS: [string, string][] = [
         <p class="ts-muted">{{ 'APP.couponWarningExplain' | translate }}</p>
         <ts-pill-switch [items]="types" [selected]="f.type" (selectedChange)="f.type = $event"></ts-pill-switch>
         <p class="ts-muted ts-small" *ngIf="isCashback" style="margin-top: 8px">{{ 'APP.cpCashbackExplain' | translate }}</p>
-        <ts-field [label]="(isCashback ? 'APP.cpCashbackAmount' : 'APP.discount') | translate" [number]="true" [suffix]="isPercent ? '%' : ('APP.egp' | translate)" [required]="true" [(value)]="f.amount" style="display: block; margin-top: 12px"></ts-field>
+        <ng-container *ngIf="isBuyGet; else amountField">
+          <p class="ts-muted ts-small" style="margin: 8px 0">{{ 'APP.cpBuyGetExplain' | translate }}</p>
+          <div class="ts-two">
+            <ts-field [label]="'APP.cpBuyQuantity' | translate" [number]="true" [required]="true" [(value)]="f.buy"></ts-field>
+            <ts-field [label]="'APP.cpGetQuantity' | translate" [number]="true" [required]="true" [(value)]="f.get"></ts-field>
+          </div>
+          <ts-field [label]="'APP.cpMaxFree' | translate" [hint]="'APP.cpMaxFreeHint' | translate" [number]="true" [(value)]="f.maxFree"></ts-field>
+          <p class="ts-muted ts-small" *ngIf="buyGetLine()">{{ buyGetLine() }}</p>
+        </ng-container>
+        <ng-template #amountField>
+          <ts-field [label]="(isCashback ? 'APP.cpCashbackAmount' : 'APP.discount') | translate" [number]="true" [suffix]="isPercent ? '%' : ('APP.egp' | translate)" [required]="true" [(value)]="f.amount" style="display: block; margin-top: 12px"></ts-field>
+        </ng-template>
+        <ts-field *ngIf="f.type === '5'" [label]="'APP.cpMaxCashback' | translate" [hint]="'APP.cpMaxCashbackHint' | translate" [number]="true" [suffix]="'APP.egp' | translate" [(value)]="f.maxCashback"></ts-field>
         <ts-field [label]="'APP.usesAllowed' | translate" [number]="true" [(value)]="f.uses"></ts-field>
         <div class="ts-two">
           <ts-date-field [label]="'APP.from' | translate" [(value)]="f.from"></ts-date-field>
@@ -707,7 +719,22 @@ const COUPON_SEGMENTS: [string, string][] = [
         </a>
       </ts-form-section>
       <ts-form-section *ngIf="!editId" [title]="'APP.whoGetsIt' | translate" icon="ti ti-users-group">
+        <ts-pill-switch [items]="audienceModes" [selected]="specific ? 'some' : 'groups'" (selectedChange)="setSpecific($event === 'some')"></ts-pill-switch>
+        <ng-container *ngIf="specific">
+          <p class="ts-muted ts-small" style="margin: 8px 0">{{ 'APP.cpSpecificExplain' | translate }}</p>
+          <div class="ts-chips" *ngIf="customers.length">
+            <span class="ts-chip" *ngFor="let c of customers">
+              {{ c.name }}<small class="ts-muted" *ngIf="c.phone"> · {{ c.phone }}</small>
+              <button type="button" class="ts-icon-btn" (click)="removeCustomer(c.id)" [attr.aria-label]="'APP.delete' | translate"><i class="ti ti-x"></i></button>
+            </span>
+          </div>
+          <button type="button" class="btn btn-secondary ts-wide-btn" (click)="customerPicker = true" data-test="cp-add-customer">
+            <i class="ti ti-user-plus"></i>{{ 'APP.cpAddCustomer' | translate }}
+          </button>
+        </ng-container>
+        <ng-container *ngIf="!specific">
         <ts-switch-row *ngFor="let s of segments" [title]="s[1] | translate" [value]="seg[s[0]]" (valueChange)="seg[s[0]] = $event; audienceChanged()"></ts-switch-row>
+        </ng-container>
         <ts-switch-row [title]="'APP.sendAsNotification' | translate" [(value)]="f.notify"></ts-switch-row>
         <ts-switch-row [title]="'APP.sendAsEmail' | translate" [(value)]="f.email"></ts-switch-row>
         <button type="button" class="btn btn-secondary ts-wide-btn" [disabled]="reachBusy" (click)="countReach()" style="margin-top: 8px">
@@ -735,6 +762,9 @@ const COUPON_SEGMENTS: [string, string][] = [
         <button type="button" class="btn btn-primary ts-wide-btn" [disabled]="busy" (click)="save()"><i *ngIf="busy" class="pi pi-spin pi-spinner"></i>{{ 'APP.save' | translate }}</button>
       </div>
       </ng-container>
+      <ts-sheet [open]="customerPicker" (openChange)="customerPicker = false" [title]="'APP.cpAddCustomer' | translate" [footer]="false">
+        <ts-search-picker *ngIf="customerPicker" [search]="searchCustomers" [title]="customerTitle" [subtitle]="customerSubtitle" (picked)="addCustomer($event)"></ts-search-picker>
+      </ts-sheet>
     </div>
   `
 })
@@ -744,15 +774,28 @@ export class CouponFormComponent implements OnInit {
   private readonly text = inject(StaffText);
   private readonly dialogs = inject(StaffDialogs);
   private readonly route = inject(ActivatedRoute);
+  private readonly http = inject(StaffHttp);
   num = fmtNum;
   readonly segments = COUPON_SEGMENTS;
-  /** DiscountType: 2 percent · 1 fixed · 4 cashback amount · 5 cashback percent (nothing off now; the wallet gets it once paid). */
+  /** DiscountType: 2 percent · 1 fixed · 4 cashback amount · 5 cashback percent (nothing off now; the wallet gets it once paid) · 3 buy X get X. */
   types = [
     { key: '2', label: this.text.tr('APP.percentage') },
     { key: '1', label: this.text.tr('APP.fixedAmount') },
     { key: '5', label: this.text.tr('APP.cpCashbackPercent') },
-    { key: '4', label: this.text.tr('APP.cpCashbackValue') }
+    { key: '4', label: this.text.tr('APP.cpCashbackValue') },
+    { key: '3', label: this.text.tr('APP.buyXGetX') }
   ];
+  readonly audienceModes = [
+    { key: 'groups', label: this.text.tr('APP.cpAudienceGroups') },
+    { key: 'some', label: this.text.tr('APP.cpAudienceSome') }
+  ];
+  /** Specific customers instead of the groups. */
+  specific = false;
+  customers: { id: number; name: string; phone?: string }[] = [];
+  customerPicker = false;
+  searchCustomers = (q: string) => this.http.get<any[]>('/api/staff/users/search', { q, take: 20 });
+  customerTitle = (r: any) => r?.name ?? r?.fullName ?? `#${r?.id}`;
+  customerSubtitle = (r: any) => r?.phone ?? r?.phoneNumber ?? '';
   /** The coupon being edited (route a/more/coupons/:id/edit); null for a new one. */
   readonly editId: number | null = Number(this.route.snapshot.paramMap.get('id')) || null;
   loading = false;
@@ -771,6 +814,38 @@ export class CouponFormComponent implements OnInit {
 
   get isCashback(): boolean {
     return this.f.type === '4' || this.f.type === '5';
+  }
+
+  get isBuyGet(): boolean {
+    return this.f.type === '3';
+  }
+
+  /** "احجز 3 وواحد علينا (لحد 2 مجاني)": what the offer says, as the customer will read it. */
+  buyGetLine(): string {
+    const b = parseInt(latinDigits(this.f.buy), 10) || 0;
+    const g = parseInt(latinDigits(this.f.get), 10) || 0;
+    if (b < 1 || g < 1) return '';
+    const max = parseInt(latinDigits(this.f.maxFree), 10) || 0;
+    return this.text.tr(max > 0 ? 'APP.cpBuyGetLineMax' : 'APP.cpBuyGetLine', { b, g, m: max });
+  }
+
+  setSpecific(on: boolean): void {
+    this.specific = on;
+    this.reach = null;
+    if (on) Object.keys(this.seg).forEach((k) => (this.seg[k] = false));
+    else this.seg['loginUser'] = true;
+  }
+
+  addCustomer(r: any): void {
+    if (!r?.id || this.customers.some((c) => c.id === r.id)) return;
+    this.customers = [...this.customers, { id: r.id, name: this.customerTitle(r), phone: this.customerSubtitle(r) }];
+    this.customerPicker = false;
+    this.audienceChanged();
+  }
+
+  removeCustomer(id: number): void {
+    this.customers = this.customers.filter((c) => c.id !== id);
+    this.audienceChanged();
   }
 
   ngOnInit(): void {
@@ -793,19 +868,16 @@ export class CouponFormComponent implements OnInit {
           from: c.startDate ? new Date(c.startDate) : null,
           to: c.endDate ? new Date(c.endDate) : null
         };
-        // Buy X get Y keeps its type (this form has no fields for it)
-        if (c.discountType === 3) this.types = [...this.types, { key: '3', label: this.text.tr('APP.buyXGetX') }];
+        this.f.buy = String(c.buyQuantity ?? 0);
+        this.f.get = String(c.getQuantity ?? 0);
+        this.f.maxFree = String(c.maxFreeQuantity ?? 0);
+        this.f.maxCashback = c.maxCashback ? String(c.maxCashback) : '';
         const all: any[] = c.items ?? [];
         this.items = all.filter((i) => i.kind !== 'room').map((i) => ({ kind: i.kind, id: i.id, name: i.name ?? `#${i.id}` }));
         this.roomIds = all.filter((i) => i.kind === 'room').map((i) => i.id);
         this.used = c.usedCount ?? 0;
         this.sentTo = c.sent?.customers ?? 0;
-        this.kept = {
-          userLimit: c.userLimit,
-          buyQuantity: c.buyQuantity ?? 0,
-          getQuantity: c.getQuantity ?? 0,
-          maxFreeQuantity: c.maxFreeQuantity ?? 0
-        };
+        this.kept = { userLimit: c.userLimit };
         this.loading = false;
       },
       error: (e) => {
@@ -823,6 +895,10 @@ export class CouponFormComponent implements OnInit {
     type: '2',
     from: new Date() as Date | null,
     to: new Date(Date.now() + 30 * 864e5) as Date | null,
+    buy: '2',
+    get: '1',
+    maxFree: '',
+    maxCashback: '',
     notify: true,
     email: false
   };
@@ -848,7 +924,7 @@ export class CouponFormComponent implements OnInit {
       // Shown by the cart when the coupon is valid but nothing in the cart is covered; empty → the backend's default
       warningMessage: f.warning.trim() || null,
       discountType: +f.type,
-      discountAmount: parseAmount(f.amount) ?? 0,
+      discountAmount: this.isBuyGet ? 0 : parseAmount(f.amount) ?? 0,
       usageNumber: parseInt(latinDigits(f.uses), 10) || 1,
       startDate: f.from ? formDate(f.from) : undefined,
       endDate: f.to ? formDate(f.to) : undefined,
@@ -859,12 +935,13 @@ export class CouponFormComponent implements OnInit {
       roomIds: this.roomIds,
       outingIds: this.idsOf('outing'),
       hajjIds: this.idsOf('hajj'),
-      usersId: [],
+      usersId: this.editId ? [] : this.customers.map((c) => c.id),
       // Coupons.BuyQuantity / GetQuantity / MaxFreeQuantity are NOT NULL (default 0) while the API model has them
       // nullable, so leaving them out makes the insert fail ("unexpected error"); 0 means "not a buy X get Y offer"
-      buyQuantity: 0,
-      getQuantity: 0,
-      maxFreeQuantity: 0,
+      buyQuantity: this.isBuyGet ? parseInt(latinDigits(f.buy), 10) || 0 : 0,
+      getQuantity: this.isBuyGet ? parseInt(latinDigits(f.get), 10) || 0 : 0,
+      maxFreeQuantity: this.isBuyGet ? parseInt(latinDigits(f.maxFree), 10) || 0 : 0,
+      maxCashback: f.type === '5' ? parseAmount(f.maxCashback) ?? 0 : 0,
       // Editing never sends the coupon again: no audience, no channels
       ...(this.editId ? { ...this.kept, sendViaNotification: false, sendViaEmail: false } : { ...this.seg, sendViaNotification: f.notify, sendViaEmail: f.email })
     };
@@ -882,7 +959,12 @@ export class CouponFormComponent implements OnInit {
     const out: CouponIssue[] = [];
     if (!f.code.trim()) out.push({ field: t('APP.couponCode'), message: t('APP.couponCodeRequired'), error: true });
     if (f.code.trim().includes(' ')) out.push({ field: t('APP.couponCode'), message: t('APP.couponCodeSpaces'), error: true });
-    if (amount == null || amount <= 0) out.push({ field: t('APP.discount'), message: t('APP.couponDiscountRequired'), error: true });
+    if (this.isBuyGet) {
+      const b = parseInt(latinDigits(f.buy), 10) || 0;
+      const g = parseInt(latinDigits(f.get), 10) || 0;
+      if (b < 1 || g < 1) out.push({ field: t('APP.buyXGetX'), message: t('APP.cpBuyGetRequired'), error: true });
+    } else if (amount == null || amount <= 0) out.push({ field: t('APP.discount'), message: t('APP.couponDiscountRequired'), error: true });
+    if (!this.editId && this.specific && !this.customers.length) out.push({ field: t('APP.whoGetsIt'), message: t('APP.cpNoCustomers'), error: true });
     // Percent: basePrice × amount / 100, so more than 100% would take more than the price
     if (this.isPercent && amount != null && amount > 100) out.push({ field: t('APP.discount'), message: t('APP.couponPercentOver100'), error: true });
     if (f.type === '2' && amount === 100) out.push({ field: t('APP.discount'), message: t('APP.couponPercentFree') });
@@ -891,7 +973,7 @@ export class CouponFormComponent implements OnInit {
     if (f.from && f.to && f.to < f.from) out.push({ field: t('APP.to'), message: t('APP.couponEndBeforeStart'), error: true });
     if (f.to && f.to < new Date()) out.push({ field: t('APP.to'), message: t('APP.couponAlreadyEnded') });
     if (!this.items.length && !this.roomIds.length) out.push({ field: t('APP.couponAppliesTo'), message: t('APP.couponAppliesToAll') });
-    if (!this.editId && (f.notify || f.email) && !Object.values(this.seg).some((v) => v)) out.push({ field: t('APP.whoGetsIt'), message: t('APP.couponNoAudience') });
+    if (!this.editId && !this.specific && (f.notify || f.email) && !Object.values(this.seg).some((v) => v)) out.push({ field: t('APP.whoGetsIt'), message: t('APP.couponNoAudience') });
     return out;
   }
 
@@ -905,7 +987,7 @@ export class CouponFormComponent implements OnInit {
    */
   countReach(): void {
     this.reachBusy = true;
-    const audience = { usersId: [], ...this.seg };
+    const audience = { usersId: this.customers.map((c) => c.id), ...this.seg };
     this.api.post('/api/staff/coupons/reach', audience).subscribe({
       next: (d) => {
         this.reach = d;

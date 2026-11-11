@@ -391,14 +391,37 @@
   margin-top: 0;
   font-size: 13px;
 }
-.sc-guide__text {
+.sc-faq__search {
+  margin-bottom: 8px;
+}
+.sc-faq {
+  border: 1px solid #e9e2f5;
+  background: #faf7fe;
+  border-radius: 12px;
+  padding: 10px;
+  margin-top: 10px;
+}
+.sc-faq__q,
+.sc-faq__a {
   width: 100%;
   border: 1px solid #ddd5ce;
   border-radius: 10px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   font-size: 14px;
   line-height: 1.7;
+  background: #fff;
+}
+.sc-faq__q {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.sc-faq__a {
   resize: vertical;
+}
+.sc-faq__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .sc-row__ai {
   color: #6b3fa0;
