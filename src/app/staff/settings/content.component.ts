@@ -737,6 +737,8 @@ const COUPON_SEGMENTS: [string, string][] = [
         </ng-container>
         <ng-container *ngIf="!specific">
         <ts-switch-row *ngFor="let s of segments" [title]="s[1] | translate" [value]="seg[s[0]]" (valueChange)="seg[s[0]] = $event; audienceChanged()"></ts-switch-row>
+        <!-- A coupon made for groups is in their «كوبوناتي» (signed-in customers), sent or not -->
+        <p class="ts-muted ts-small" style="margin: 6px 0">{{ 'APP.cpGroupsSeeIt' | translate }}</p>
         </ng-container>
         <ts-switch-row [title]="'APP.sendAsNotification' | translate" [(value)]="f.notify"></ts-switch-row>
         <ts-switch-row [title]="'APP.sendAsEmail' | translate" [(value)]="f.email"></ts-switch-row>
