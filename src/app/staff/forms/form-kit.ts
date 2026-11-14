@@ -362,8 +362,19 @@ export class RichTextComponent {
   emit(v: string | null): void {
     this.html = v ?? '';
     // an emptied editor leaves "<p><br></p>": that is no description
-    this.valueChange.emit(isBlankHtml(this.html) ? '' : this.html);
+    this.valueChange.emit(isBlankHtml(this.html) ? '' : cleanEditorHtml(this.html));
   }
+}
+
+/**
+ * Quill 2's HTML as the customer app and site read it: its bullets come as <ol><li data-list="bullet">, which an
+ * HTML viewer numbers, so they become <ul>; its own markers (<span class="ql-ui">) go.
+ */
+export function cleanEditorHtml(html: string): string {
+  return html
+    .replace(/<span class="ql-ui"[^>]*><\/span>/g, '')
+    .replace(/<ol>((?:<li data-list="bullet"[^>]*>.*?<\/li>)+)<\/ol>/g, (_m, items: string) => `<ul>${items}</ul>`)
+    .replace(/<li data-list="(?:bullet|ordered)"([^>]*)>/g, '<li$1>');
 }
 
 /** HTML as is; plain text (older descriptions) as paragraphs, its line breaks kept. */
