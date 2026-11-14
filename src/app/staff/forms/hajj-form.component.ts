@@ -10,7 +10,7 @@ import { ProductsApi } from '../products/products-api';
 import { FilterOption } from '../core/query';
 import { ChipBarComponent } from '../ui/lists';
 import { fmtNum, parseAmount, parseDate } from '../core/format';
-import {
+import { RichTextComponent,
   ChildPolicy,
   FORM_KIT,
   FormsApi,
@@ -125,7 +125,7 @@ interface HajjGroup {
 @Component({
   selector: 'ts-hajj-form',
   standalone: true,
-  imports: [CommonModule, TranslateModule, ...KIT, ...FORM_KIT, PillSwitchComponent, SwitchRowComponent, RoomsEditorComponent, ChipBarComponent],
+  imports: [RichTextComponent, CommonModule, TranslateModule, ...KIT, ...FORM_KIT, PillSwitchComponent, SwitchRowComponent, RoomsEditorComponent, ChipBarComponent],
   template: `
     <ts-step-scaffold [title]="(id ? 'APP.editPackage' : 'APP.newPackage') | translate" [nextLabel]="id && step === 3 ? ('APP.saveChanges' | translate) : ''" [steps]="steps" [current]="step" [busy]="busy" (back)="step = step - 1" (next)="next()" (jump)="jump($event)">
       <ts-loading *ngIf="loading"></ts-loading>
@@ -200,7 +200,7 @@ interface HajjGroup {
         <ts-form-section [title]="'APP.descriptions' | translate" icon="ti ti-align-right">
           <div class="ts-row-box" *ngFor="let d of descriptions; let i = index; trackBy: byIndex">
             <button type="button" class="ts-row-box__remove" (click)="descriptions.splice(i, 1)"><i class="ti ti-trash"></i></button>
-            <ts-field [label]="'APP.paragraph' | translate" [lines]="3" [value]="d" (valueChange)="descriptions[i] = $event"></ts-field>
+            <ts-rich-text [label]="'APP.paragraph' | translate" [height]="140" [value]="d" (valueChange)="descriptions[i] = $event"></ts-rich-text>
           </div>
           <button type="button" class="btn btn-secondary" (click)="descriptions.push('')"><i class="ti ti-plus"></i>{{ 'APP.addParagraph' | translate }}</button>
         </ts-form-section>

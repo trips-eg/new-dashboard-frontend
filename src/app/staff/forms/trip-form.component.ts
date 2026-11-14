@@ -9,7 +9,7 @@ import { SwitchRowComponent } from '../ui/controls';
 import { StaffSession } from '../core/session';
 import { FilterOption } from '../core/query';
 import { fmtNum, parseDate } from '../core/format';
-import {
+import { RichTextComponent,
   ChildPolicy,
   FORM_KIT,
   FormsApi,
@@ -44,7 +44,7 @@ interface TripDateRow {
 @Component({
   selector: 'ts-trip-form',
   standalone: true,
-  imports: [CommonModule, TranslateModule, ...KIT, ...FORM_KIT, ChipBarComponent, SwitchRowComponent],
+  imports: [RichTextComponent, CommonModule, TranslateModule, ...KIT, ...FORM_KIT, ChipBarComponent, SwitchRowComponent],
   template: `
     <ts-loading *ngIf="loading"></ts-loading>
     <ts-error *ngIf="loadError" [error]="loadError" (retry)="load()"></ts-error>
@@ -132,7 +132,7 @@ interface TripDateRow {
         <ts-form-section [title]="'APP.descriptions' | translate" icon="ti ti-align-right" kind="general">
           <div class="ts-row-box" *ngFor="let d of descriptions; let i = index; trackBy: byIndex">
             <button type="button" class="ts-row-box__remove" (click)="descriptions.splice(i, 1)"><i class="ti ti-trash"></i></button>
-            <ts-field [label]="'APP.paragraph' | translate" [lines]="3" [value]="d" (valueChange)="descriptions[i] = $event"></ts-field>
+            <ts-rich-text [label]="'APP.paragraph' | translate" [height]="140" [value]="d" (valueChange)="descriptions[i] = $event"></ts-rich-text>
           </div>
           <button type="button" class="btn btn-secondary" (click)="descriptions.push('')"><i class="ti ti-plus"></i>{{ 'APP.addParagraph' | translate }}</button>
         </ts-form-section>

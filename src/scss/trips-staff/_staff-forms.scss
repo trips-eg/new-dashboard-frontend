@@ -198,6 +198,9 @@
 
 .ts-time-row > * { flex: 1 1 0; min-width: 0; }
 .ts-time-row > button { flex: 0 0 auto; }
+.ts-time-row { flex-wrap: wrap; }
+// "ends the next day" under the two times
+.ts-time-row > .ts-time-note { flex: 1 0 100%; color: var(--ts-ink-nav); }
 
 .ts-check {
   display: flex;

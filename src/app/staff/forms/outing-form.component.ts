@@ -12,7 +12,7 @@ import { FilterOption } from '../core/query';
 import { fmtNum, parseAmount, parseDate } from '../core/format';
 import { ProductsApi } from '../products/products-api';
 import { ApiError } from '../core/staff-http';
-import { FORM_KIT, FormsApi, Picked, amountOf, cleanPoints, formDate, intOf, runFollowUps } from './form-kit';
+import { RichTextComponent, FORM_KIT, FormsApi, Picked, amountOf, cleanPoints, formDate, intOf, runFollowUps } from './form-kit';
 
 interface OutingTicket {
   id: number | null;
@@ -79,7 +79,7 @@ const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 @Component({
   selector: 'ts-outing-form',
   standalone: true,
-  imports: [CommonModule, TranslateModule, ...KIT, ...FORM_KIT, ChipBarComponent, PillSwitchComponent, SwitchRowComponent, SheetComponent],
+  imports: [RichTextComponent, CommonModule, TranslateModule, ...KIT, ...FORM_KIT, ChipBarComponent, PillSwitchComponent, SwitchRowComponent, SheetComponent],
   template: `
     <ts-loading *ngIf="loading"></ts-loading>
     <ts-error *ngIf="loadError" [error]="loadError" (retry)="load()"></ts-error>
@@ -100,7 +100,7 @@ const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
           <ts-field [label]="'APP.outingName' | translate" [required]="true" [(value)]="f.name"></ts-field>
           <ts-option-field [label]="'APP.category' | translate" source="outingcategories" [(value)]="f.category"></ts-option-field>
           <ts-option-field *ngIf="!vendor" [label]="'APP.vendor' | translate" source="vendors" [required]="true" [(value)]="f.vendor"></ts-option-field>
-          <ts-field [label]="'APP.description' | translate" [lines]="4" [required]="true" [(value)]="f.description"></ts-field>
+          <ts-rich-text [label]="'APP.description' | translate" [required]="true" [(value)]="f.description"></ts-rich-text>
           <ts-field [label]="'APP.targetAudience' | translate" [hint]="'APP.targetAudienceHint' | translate" [required]="true" [(value)]="f.audience"></ts-field>
           <ts-field [label]="'APP.place' | translate" [required]="true" [(value)]="f.location"></ts-field>
           <ts-field [label]="'APP.externalLink' | translate" hint="https://" [(value)]="f.link"></ts-field>
@@ -239,9 +239,11 @@ const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
           </div>
           <ts-pill-switch [items]="scheduleTypes" [selected]="String(s.type)" (selectedChange)="s.type = +$event"></ts-pill-switch>
           <div class="ts-time-row" *ngFor="let x of s.times; let j = index">
-            <ts-field [label]="'APP.start' | translate" hint="09:00" [value]="x[0]" (valueChange)="x[0] = $event"></ts-field>
-            <ts-field [label]="'APP.end' | translate" hint="12:00" [value]="x[1]" (valueChange)="x[1] = $event"></ts-field>
+            <ts-field [label]="'APP.start' | translate" type="time" [value]="x[0]" (valueChange)="x[0] = $event"></ts-field>
+            <ts-field [label]="'APP.end' | translate" type="time" [value]="x[1]" (valueChange)="x[1] = $event"></ts-field>
             <button type="button" class="ts-icon-btn" (click)="s.times.splice(j, 1)"><i class="ti ti-circle-minus"></i></button>
+            <!-- 22:00 → 01:00 runs past midnight -->
+            <small class="ts-muted ts-small ts-time-note" *ngIf="endsNextDay(x)"><i class="ti ti-moon"></i> {{ 'APP.endsNextDay' | translate }}</small>
           </div>
           <button type="button" class="btn btn-link" (click)="s.times.push(['09:00', '12:00'])"><i class="ti ti-plus"></i>{{ 'APP.addTime' | translate }}</button>
         </div>
@@ -493,6 +495,11 @@ export class OutingFormComponent implements OnInit {
     ];
   }
 
+  /** The slot ends the next day (its end is before its start). */
+  endsNextDay(x: [string, string]): boolean {
+    return TIME.test(x[0]) && TIME.test(x[1]) && x[1] < x[0];
+  }
+
   private validate(step = this.step): string | null {
     const f = this.f;
     if (step === 0 && [f.name, f.description, f.audience, f.location].some((v) => !String(v).trim())) return 'APP.fillRequired';
@@ -503,7 +510,8 @@ export class OutingFormComponent implements OnInit {
     if (step === 3 && (!this.tickets.length || this.tickets.some((t) => !t.type.trim() || t.price == null))) return 'APP.ticketsRequired';
     if (step === 3 && this.tickets.some((t) => (t.serial && t.id == null ? !t.codes.length : t.quantity == null))) return 'APP.ticketsRequired';
     if (step === 4 && this.schedules.some((s) => !s.days.length || !s.times.length || !s.from || !s.to)) return 'APP.scheduleDaysRequired';
-    if (step === 4 && this.schedules.some((s) => s.times.some((x) => !TIME.test(x[0]) || !TIME.test(x[1]) || x[0] >= x[1]))) return 'APP.scheduleTimesInvalid';
+    // An end before the start runs past midnight (22:00 → 01:00); only the same time twice is no slot
+    if (step === 4 && this.schedules.some((s) => s.times.some((x) => !TIME.test(x[0]) || !TIME.test(x[1]) || x[0] === x[1]))) return 'APP.scheduleTimesInvalid';
     return null;
   }
 

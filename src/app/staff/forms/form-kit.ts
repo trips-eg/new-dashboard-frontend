@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Injectable, Input, OnDestroy, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { EditorModule } from 'primeng/editor';
 import { TranslateModule } from '@ngx-translate/core';
 import { Observable, Subject, Subscription, debounceTime, firstValueFrom, map, of, shareReplay, switchMap, catchError } from 'rxjs';
 import { StaffHttp, mediaUrl } from '../core/staff-http';
@@ -309,6 +310,77 @@ export class FieldComponent {
     this.value = v;
     this.valueChange.emit(v);
   }
+}
+
+/**
+ * A description that keeps its layout: bold, lines and lists, kept as HTML (the customer app and site show HTML,
+ * where a plain line break is just a space). Pasted formatted text keeps its bold and lines. A description saved
+ * as plain text before opens with its lines as paragraphs.
+ */
+@Component({
+  selector: 'ts-rich-text',
+  standalone: true,
+  imports: [CommonModule, FormsModule, EditorModule],
+  template: `
+    <div class="ts-field ts-rich">
+      <span>{{ label }}<b *ngIf="required" class="req"> *</b></span>
+      <p-editor [ngModel]="html" (ngModelChange)="emit($event)" [style]="{ height: height + 'px' }">
+        <ng-template pTemplate="header">
+          <span class="ql-formats">
+            <button type="button" class="ql-bold" aria-label="Bold"></button>
+            <button type="button" class="ql-italic" aria-label="Italic"></button>
+            <button type="button" class="ql-underline" aria-label="Underline"></button>
+          </span>
+          <span class="ql-formats">
+            <button type="button" class="ql-list" value="ordered" aria-label="Numbered list"></button>
+            <button type="button" class="ql-list" value="bullet" aria-label="Bulleted list"></button>
+          </span>
+          <span class="ql-formats"><button type="button" class="ql-clean" aria-label="Clear formatting"></button></span>
+        </ng-template>
+      </p-editor>
+    </div>
+  `,
+  styles: [
+    `
+      .ts-rich ::ng-deep .ql-editor { direction: rtl; text-align: right; font-family: inherit; font-size: 15px; line-height: 1.8; }
+      .ts-rich ::ng-deep .ql-editor li { padding-right: 1.5em; padding-left: 0; }
+      .ts-rich ::ng-deep .p-editor-container .p-editor-toolbar { border-radius: 12px 12px 0 0; }
+      .ts-rich ::ng-deep .p-editor-container .p-editor-content { border-radius: 0 0 12px 12px; }
+    `
+  ]
+})
+export class RichTextComponent {
+  @Input() label = '';
+  @Input() required = false;
+  @Input() height = 180;
+  @Output() valueChange = new EventEmitter<string>();
+  html = '';
+  @Input() set value(v: string | null | undefined) {
+    const next = toRichHtml(v);
+    if (next !== this.html) this.html = next;
+  }
+  emit(v: string | null): void {
+    this.html = v ?? '';
+    // an emptied editor leaves "<p><br></p>": that is no description
+    this.valueChange.emit(isBlankHtml(this.html) ? '' : this.html);
+  }
+}
+
+/** HTML as is; plain text (older descriptions) as paragraphs, its line breaks kept. */
+export function toRichHtml(v: string | null | undefined): string {
+  const s = (v ?? '').trim();
+  if (!s) return '';
+  if (/<\/?(p|br|b|strong|i|em|u|ul|ol|li|div|span|h[1-6])\b/i.test(s)) return s;
+  const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return s
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .map((line) => (line.trim() ? `<p>${esc(line)}</p>` : '<p><br></p>'))
+    .join('');
+}
+
+export function isBlankHtml(html: string): boolean {
+  return !html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
 }
 
 export interface Picked {

@@ -10,7 +10,7 @@ import { StaffDialogs } from '../ui/dialogs';
 import { P, StaffSession } from '../core/session';
 import { FilterOption } from '../core/query';
 import { fmtNum, parseAmount, parseDate } from '../core/format';
-import { FORM_KIT, FormsApi, Picked, amountOf, intOf } from './form-kit';
+import { RichTextComponent, FORM_KIT, FormsApi, Picked, amountOf, intOf } from './form-kit';
 
 /** A price for a date range (CustomPrices in C#): replaces the night price between From and To. */
 interface SeasonPrice {
@@ -38,7 +38,7 @@ function seasonPriceError(rows: SeasonPrice[]): string | null {
 @Component({
   selector: 'ts-room-form',
   standalone: true,
-  imports: [CommonModule, TranslateModule, ...KIT, ...FORM_KIT, ChipBarComponent, SwitchRowComponent],
+  imports: [RichTextComponent, CommonModule, TranslateModule, ...KIT, ...FORM_KIT, ChipBarComponent, SwitchRowComponent],
   template: `
     <div class="ts-screen ts-screen--narrow">
       <ts-appbar [title]="(id ? 'APP.editRoomType' : 'APP.newRoomType') | translate" [subtitle]="hotelName">
@@ -62,7 +62,7 @@ function seasonPriceError(rows: SeasonPrice[]): string | null {
             <ts-field [label]="'APP.childPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [hint]="'APP.optional' | translate" [(value)]="f.child"></ts-field>
             <ts-field [label]="'APP.roomSize' | translate" [number]="true" suffix="m²" [hint]="'APP.optional' | translate" [(value)]="f.size"></ts-field>
           </div>
-          <ts-field [label]="'APP.description' | translate" [lines]="3" [(value)]="f.description"></ts-field>
+          <ts-rich-text [label]="'APP.description' | translate" [(value)]="f.description"></ts-rich-text>
         </section>
         <ts-form-section [title]="'APP.meals' | translate" icon="ti ti-tools-kitchen-2">
           <!-- BordingType 0–5; the premium and ultra variants (6–10) are kept if the room already has one -->
