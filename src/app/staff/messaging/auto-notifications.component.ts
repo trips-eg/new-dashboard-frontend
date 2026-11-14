@@ -31,6 +31,10 @@ export interface AutoNotifySettings {
   /** Which reasons count and the numbers behind them. */
   rules: Record<string, any>;
   hasKey: boolean;
+  /** What the daily job (on the mobile API server) found the last time it looked. */
+  jobCheckedAt?: string | null;
+  jobNote?: string | null;
+  jobHasKey?: boolean | null;
 }
 
 /** The reasons the admin controls: a switch and the numbers behind each one (keys of the backend's AutoRules). */
@@ -102,6 +106,11 @@ const KIND_LABEL: Record<string, string> = {
       <ng-container *ngIf="s && !loading && !error">
         <ts-card [title]="'APP.anSettings' | translate" icon="ti ti-settings">
           <ts-switch-row [title]="'APP.anEnabled' | translate" [subtitle]="(s.hasKey ? 'APP.anEnabledHint' : 'APP.anNoKey') | translate" [value]="s.enabled" [disabled]="!canEdit" (valueChange)="s.enabled = $event"></ts-switch-row>
+          <!-- The daily job runs on another server: what it found there the last time it looked -->
+          <p class="ts-muted ts-small ts-job-note" *ngIf="s.enabled">
+            <i class="ti" [class.ti-alert-triangle]="s.jobHasKey === false" [class.ti-clock]="s.jobHasKey !== false"></i>
+            {{ s.jobNote ? ('APP.anJobNote' | translate: { note: s.jobNote, at: (s.jobCheckedAt | date: 'd/M HH:mm') }) : ('APP.anJobNever' | translate) }}
+          </p>
           <ts-switch-row [title]="'APP.anAutoSend' | translate" [subtitle]="(s.autoSend ? 'APP.anAutoSendOn' : 'APP.anAutoSendOff') | translate" [value]="s.autoSend" [disabled]="!canEdit" (valueChange)="s.autoSend = $event"></ts-switch-row>
           <div class="ts-two">
             <ts-field [label]="'APP.anMaxPerWeek' | translate" [number]="true" [hint]="'APP.anMaxPerWeekHint' | translate" [value]="'' + s.maxPerWeek" (valueChange)="s.maxPerWeek = +$event"></ts-field>

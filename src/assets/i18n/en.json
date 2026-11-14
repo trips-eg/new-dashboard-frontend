@@ -2204,6 +2204,8 @@
     "discount": "Discount",
     "discountAndDates": "Discount and dates",
     "usesAllowed": "Uses allowed",
+    "anJobNote": "Daily notification, last look ({{at}}): {{note}}",
+    "anJobNever": "The daily notification has not been checked on the mobile server yet",
     "editScheduleOf": "Edit {{day}} times",
     "endsNextDay": "Ends the next day",
     "cpGroupsSeeIt": "Signed-in customers in these groups see the coupon in «My coupons» even with no notification; the notification and email are optional.",
