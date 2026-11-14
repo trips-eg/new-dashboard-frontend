@@ -2204,6 +2204,7 @@
     "discount": "Discount",
     "discountAndDates": "Discount and dates",
     "usesAllowed": "Uses allowed",
+    "editScheduleOf": "Edit {{day}} times",
     "endsNextDay": "Ends the next day",
     "cpGroupsSeeIt": "Signed-in customers in these groups see the coupon in «My coupons» even with no notification; the notification and email are optional.",
     "cpPerCustomer": "Uses per customer",

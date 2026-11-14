@@ -71,6 +71,17 @@ function ticketJson(t: OutingTicket) {
 
 const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 
+/** A slot time as 24-hour "HH:mm": older schedules were saved as "03:00 PM". */
+export function to24(t: string | null | undefined): string {
+  const s = (t ?? '').trim();
+  if (TIME.test(s)) return s;
+  const m = /^(\d{1,2}):(\d{2})\s*([AaPp])\.?[Mm]\.?$/.exec(s);
+  if (!m) return s;
+  let h = +m[1] % 12;
+  if (m[3].toUpperCase() === 'P') h += 12;
+  return `${String(h).padStart(2, '0')}:${m[2]}`;
+}
+
 /**
  * f-outing-1 … f-outing-6. The outing is created at the end of step 2 (POST AddOutingOnly, hidden), and each later
  * step saves to its own controller: add-ons, offers, tickets, schedules. Step 6 checks everything and publishes.
@@ -228,6 +239,7 @@ const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
         <div class="ts-saved-row" *ngFor="let s of savedSchedules">
           <i class="ti ti-circle-check"></i>
           <span class="ts-grow"><strong>{{ days[s.dayOfWeek % 7] }}</strong><small class="ts-num">{{ slotsOf(s) }}</small></span>
+          <button type="button" class="ts-icon-btn" [title]="'edit' | translate" (click)="editSaved(s)"><i class="ti ti-pencil"></i></button>
           <button type="button" class="ts-icon-btn" (click)="deleteSaved('/api/OutingSchedules/DeleteOutingSchedules/', s, days[s.dayOfWeek % 7])"><i class="ti ti-trash"></i></button>
         </div>
         <div class="ts-row-box" *ngFor="let s of schedules; let i = index">
@@ -269,6 +281,27 @@ const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
     </ts-step-scaffold>
 
     <!-- f-outing-ticket: how the ticket looks in the customer app (the QR is a sample) -->
+    <!-- A saved weekday schedule edited in place: its dates, kind and every slot -->
+    <ts-sheet [open]="!!editSched" (openChange)="editSched = null" [title]="editSched ? ('APP.editScheduleOf' | translate: { day: days[editSched.dayOfWeek % 7] }) : ''">
+      <ng-container *ngIf="editSched">
+        <div class="ts-two">
+          <ts-date-field [label]="'APP.validFrom' | translate" [(value)]="editSched.from"></ts-date-field>
+          <ts-date-field [label]="'APP.validTo' | translate" [(value)]="editSched.to"></ts-date-field>
+        </div>
+        <ts-pill-switch [items]="scheduleTypes" [selected]="String(editSched.type)" (selectedChange)="editSched.type = +$event"></ts-pill-switch>
+        <div class="ts-time-row" *ngFor="let x of editSched.times; let j = index">
+          <ts-field [label]="'APP.start' | translate" type="time" [value]="x.start" (valueChange)="x.start = $event"></ts-field>
+          <ts-field [label]="'APP.end' | translate" type="time" [value]="x.end" (valueChange)="x.end = $event"></ts-field>
+          <button type="button" class="ts-icon-btn" (click)="editSched.times.splice(j, 1)"><i class="ti ti-circle-minus"></i></button>
+          <small class="ts-muted ts-small ts-time-note" *ngIf="endsNextDay([x.start, x.end])"><i class="ti ti-moon"></i> {{ 'APP.endsNextDay' | translate }}</small>
+        </div>
+        <button type="button" class="btn btn-link" (click)="editSched.times.push({ id: null, start: '09:00', end: '12:00' })"><i class="ti ti-plus"></i>{{ 'APP.addTime' | translate }}</button>
+      </ng-container>
+      <div sheet-foot>
+        <button type="button" class="btn btn-primary ts-wide-btn" [disabled]="savingSchedule" (click)="saveEdited()">{{ 'APP.save' | translate }}</button>
+      </div>
+    </ts-sheet>
+
     <ts-sheet [open]="preview" (openChange)="preview = false" [title]="'APP.ticketPreview' | translate" [footer]="false">
       <p class="ts-muted">{{ 'APP.ticketPreviewHint' | translate }}</p>
       <div class="ts-ticket-preview">
@@ -434,6 +467,47 @@ export class OutingFormComponent implements OnInit {
 
   private async reloadSaved(): Promise<void> {
     this.applySaved(await firstValueFrom(this.api.get('/api/Outings/GetOutingById/', this.outingId!)));
+  }
+
+  /** The saved schedule being edited (a copy; nothing changes until it is saved). */
+  editSched: { id: number; dayOfWeek: number; from: Date | null; to: Date | null; type: number; times: { id: number | null; start: string; end: string }[] } | null = null;
+  savingSchedule = false;
+
+  editSaved(s: any): void {
+    this.editSched = {
+      id: s.id,
+      dayOfWeek: s.dayOfWeek,
+      from: s.validFrom ? parseDate(s.validFrom) : null,
+      to: s.validTo ? parseDate(s.validTo) : null,
+      type: s.schedualType ?? 1,
+      times: (s.timeSlots ?? []).map((x: any) => ({ id: x.id, start: to24(x.startTime), end: to24(x.endTime) }))
+    };
+  }
+
+  async saveEdited(): Promise<void> {
+    const e = this.editSched;
+    if (!e || this.outingId == null) return;
+    if (!e.times.length || e.times.some((x) => !TIME.test(x.start) || !TIME.test(x.end) || x.start === x.end)) {
+      this.text.showError(this.text.tr('APP.scheduleTimesInvalid'));
+      return;
+    }
+    this.savingSchedule = true;
+    try {
+      await firstValueFrom(
+        this.api.updateSchedule(this.outingId, e.id, {
+          validFrom: e.from ? formDate(e.from) : null,
+          validTo: e.to ? formDate(e.to) : null,
+          schedualType: e.type,
+          times: e.times.map((x) => ({ id: x.id, startTime: x.start, endTime: x.end }))
+        })
+      );
+      this.editSched = null;
+      await this.reloadSaved();
+    } catch (err) {
+      this.text.showError(err);
+    } finally {
+      this.savingSchedule = false;
+    }
   }
 
   async deleteSaved(path: string, row: any, label: string): Promise<void> {

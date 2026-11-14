@@ -89,6 +89,11 @@ export class FormsApi {
     return this.http.put(`/api/staff/items/${type}/${id}/gathering-points`, { points });
   }
 
+  /** PUT api/staff/outings/{outingId}/schedules/{id}: a saved weekday schedule edited in place (all its slots). */
+  updateSchedule(outingId: number, id: number, body: { validFrom: string | null; validTo: string | null; schedualType: number; times: { id: number | null; startTime: string; endTime: string }[] }) {
+    return this.http.put(`/api/staff/outings/${outingId}/schedules/${id}`, body);
+  }
+
   bookingRule(type: number, id: number, min: number, max: number | null): Observable<unknown> {
     return this.http.put(`/api/staff/items/${type}/${id}/booking-rule`, { minQuantity: min, maxQuantity: max });
   }
