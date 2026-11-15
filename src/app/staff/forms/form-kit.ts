@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { EditorModule } from 'primeng/editor';
 import { TranslateModule } from '@ngx-translate/core';
 import { Observable, Subject, Subscription, debounceTime, firstValueFrom, map, of, shareReplay, switchMap, catchError } from 'rxjs';
-import { StaffHttp, mediaUrl } from '../core/staff-http';
+import { ApiError, StaffHttp, mediaUrl } from '../core/staff-http';
 import { FilterOption, FiltersApi, optionLabel } from '../core/query';
 import { fmtNum, fmtShortDate, fmtTime, latinDigits, parseAmount, parseDate } from '../core/format';
 import { ChipBarComponent } from '../ui/lists';
@@ -178,8 +178,10 @@ export async function runFollowUps(steps: [string, () => Observable<unknown>][])
   for (const [name, step] of steps) {
     try {
       await firstValueFrom(step());
-    } catch {
-      failed.push(name);
+    } catch (e) {
+      // the server's reason with the name (16 Nov 2026: "saved except gathering points" never said why)
+      const why = e instanceof ApiError ? e.message?.trim() : '';
+      failed.push(why ? `${name}: ${why}` : name);
     }
   }
   return failed;
@@ -805,7 +807,7 @@ export class ProgramEditorComponent {
       <button type="button" class="ts-row-box__remove" (click)="removeAt(i)" [attr.aria-label]="'APP.remove' | translate"><i class="ti ti-trash"></i></button>
       <ts-field [label]="'APP.name' | translate" [value]="p.name" (valueChange)="p.name = $event; emit()"></ts-field>
       <ts-field [label]="'APP.address' | translate" [value]="p.address" (valueChange)="p.address = $event; emit()"></ts-field>
-      <ts-field [label]="'APP.meetingTime' | translate" hint="07:30" [value]="p.meetingTime" (valueChange)="p.meetingTime = $event; emit()"></ts-field>
+      <ts-field [label]="'APP.meetingTime' | translate" type="time" [value]="p.meetingTime" (valueChange)="p.meetingTime = $event; emit()"></ts-field>
     </div>
     <button type="button" class="btn btn-secondary" (click)="add()"><i class="ti ti-plus"></i>{{ 'APP.addPoint' | translate }}</button>
   `
