@@ -9,7 +9,7 @@ import { FilterOption, FiltersApi, optionLabel } from '../core/query';
 import { fmtNum, fmtShortDate, fmtTime, latinDigits, parseAmount, parseDate } from '../core/format';
 import { ChipBarComponent } from '../ui/lists';
 import { SheetComponent } from '../ui/dialogs';
-import { StaffText, TagComponent } from '../ui/kit';
+import { FieldErrors, StaffText, TagComponent } from '../ui/kit';
 
 /** A date as ASP.NET binds it: local time, no offset (the backend stores the server's local time). */
 export function formDate(d: Date): string {
@@ -295,11 +295,14 @@ export class FormSectionComponent {
         />
         <span class="ts-suffix" *ngIf="suffix">{{ suffix }}</span>
       </div>
-      <small class="err" *ngIf="error">{{ error }}</small>
+      <small class="err" *ngIf="error || fieldErrors.of(name)">{{ error || fieldErrors.of(name) }}</small>
     </label>
   `
 })
 export class FieldComponent {
+  readonly fieldErrors = inject(FieldErrors);
+  /** The field's name as the form sends it ("StartDate"), for the server's refusal to mark it. */
+  @Input() name?: string;
   @Input() label = '';
   @Input() value: string | number | null | undefined = '';
   @Input() hint?: string | null;
@@ -313,6 +316,7 @@ export class FieldComponent {
   @Output() valueChange = new EventEmitter<string>();
   emit(v: string): void {
     this.value = v;
+    this.fieldErrors.clear(this.name);
     this.valueChange.emit(v);
   }
 }
@@ -422,6 +426,7 @@ export interface Picked {
         </span>
         <i class="ti ti-chevron-down"></i>
       </button>
+      <small class="err" *ngIf="fieldErrors.of(name)">{{ fieldErrors.of(name) }}</small>
     </div>
     <ts-sheet [open]="open" (openChange)="open = false" [title]="label" [footer]="false">
       <label class="ts-search">
@@ -442,6 +447,9 @@ export class OptionFieldComponent implements OnDestroy {
   private readonly text = inject(StaffText);
   @Input() label = '';
   @Input({ required: true }) source!: string;
+  /** The field's name as the form sends it, for the server's refusal to mark it. */
+  @Input() name?: string;
+  readonly fieldErrors = inject(FieldErrors);
   @Input() value: Picked | null = null;
   @Input() required = false;
   @Output() valueChange = new EventEmitter<Picked | null>();
@@ -470,6 +478,7 @@ export class OptionFieldComponent implements OnDestroy {
   }
 
   pick(o: FilterOption): void {
+    this.fieldErrors.clear(this.name);
     this.value = { id: o.value, name: this.labelOf(o) };
     this.valueChange.emit(this.value);
     this.open = false;
@@ -490,10 +499,14 @@ export class OptionFieldComponent implements OnDestroy {
     <label class="ts-field">
       <span>{{ label }}<b *ngIf="required" class="req"> *</b></span>
       <input class="form-control" [type]="withTime ? 'datetime-local' : 'date'" [value]="inputValue" (change)="changed($any($event.target).value)" />
+      <small class="err" *ngIf="fieldErrors.of(name)">{{ fieldErrors.of(name) }}</small>
     </label>
   `
 })
 export class DateFieldComponent {
+  readonly fieldErrors = inject(FieldErrors);
+  /** The field's name as the form sends it, for the server's refusal to mark it. */
+  @Input() name?: string;
   @Input() label = '';
   @Input() value: Date | null | undefined = null;
   @Input() withTime = false;
@@ -509,6 +522,7 @@ export class DateFieldComponent {
   }
 
   changed(v: string): void {
+    this.fieldErrors.clear(this.name);
     if (!v) return this.valueChange.emit(null);
     const d = this.withTime ? new Date(v) : (() => {
       const [y, m, dd] = v.split('-').map(Number);

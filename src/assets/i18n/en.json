@@ -2459,6 +2459,7 @@
     "editUser": "Edit user",
     "keepPasswordHint": "Leave empty to keep the current password",
     "errNotOnServer": "This service is not on the server ({{path}}). The new backend is probably not deployed there yet.",
+    "errNotAvailable": "This service isn't available on the server right now. If it continues, contact support.",
     "offerForVendor": "+ Offer for a vendor",
     "editOffer": "Edit offer",
     "whoViewed": "Who viewed it",

@@ -108,13 +108,13 @@ export function to24(t: string | null | undefined): string {
       <!-- 1: data -->
       <ng-container *ngIf="step === 0">
         <ts-form-section [title]="'APP.stepData' | translate" icon="ti ti-info-circle">
-          <ts-field [label]="'APP.outingName' | translate" [required]="true" [(value)]="f.name"></ts-field>
-          <ts-option-field [label]="'APP.category' | translate" source="outingcategories" [(value)]="f.category"></ts-option-field>
-          <ts-option-field *ngIf="!vendor" [label]="'APP.vendor' | translate" source="vendors" [required]="true" [(value)]="f.vendor"></ts-option-field>
+          <ts-field name="Name" [label]="'APP.outingName' | translate" [required]="true" [(value)]="f.name"></ts-field>
+          <ts-option-field name="OutingCategoryId" [label]="'APP.category' | translate" source="outingcategories" [(value)]="f.category"></ts-option-field>
+          <ts-option-field name="VendorId" *ngIf="!vendor" [label]="'APP.vendor' | translate" source="vendors" [required]="true" [(value)]="f.vendor"></ts-option-field>
           <ts-rich-text [label]="'APP.description' | translate" [required]="true" [(value)]="f.description"></ts-rich-text>
-          <ts-field [label]="'APP.targetAudience' | translate" [hint]="'APP.targetAudienceHint' | translate" [required]="true" [(value)]="f.audience"></ts-field>
-          <ts-field [label]="'APP.place' | translate" [required]="true" [(value)]="f.location"></ts-field>
-          <ts-field [label]="'APP.externalLink' | translate" hint="https://" [(value)]="f.link"></ts-field>
+          <ts-field name="TargetAudience" [label]="'APP.targetAudience' | translate" [hint]="'APP.targetAudienceHint' | translate" [required]="true" [(value)]="f.audience"></ts-field>
+          <ts-field name="Location" [label]="'APP.place' | translate" [required]="true" [(value)]="f.location"></ts-field>
+          <ts-field name="ExternalLink" [label]="'APP.externalLink' | translate" hint="https://" [(value)]="f.link"></ts-field>
         </ts-form-section>
         <ts-form-section [title]="'APP.gatheringPoints' | translate" [subtitle]="'APP.morePoints' | translate" icon="ti ti-map-pin" kind="place">
           <ts-points-editor [(rows)]="points"></ts-points-editor>
@@ -124,14 +124,14 @@ export function to24(t: string | null | undefined): string {
       <!-- 2: prices and policies -->
       <ng-container *ngIf="step === 1">
         <ts-form-section [title]="'APP.priceDisplay' | translate" icon="ti ti-tag" kind="money">
-          <ts-field [label]="'APP.savingsRatio' | translate" [number]="true" suffix="%" [hint]="'APP.optional' | translate" [(value)]="f.savings"></ts-field>
-          <ts-field [label]="'APP.priceBefore' | translate" [number]="true" [suffix]="'APP.egp' | translate" [hint]="'APP.priceBeforeHint' | translate" [(value)]="f.priceBefore"></ts-field>
+          <ts-field name="SavingsRatio" [label]="'APP.savingsRatio' | translate" [number]="true" suffix="%" [hint]="'APP.optional' | translate" [(value)]="f.savings"></ts-field>
+          <ts-field name="PriceBefore" [label]="'APP.priceBefore' | translate" [number]="true" [suffix]="'APP.egp' | translate" [hint]="'APP.priceBeforeHint' | translate" [(value)]="f.priceBefore"></ts-field>
         </ts-form-section>
         <ts-form-section [title]="'APP.paymentAndRefund' | translate" icon="ti ti-wallet" kind="money">
-          <ts-field [label]="'APP.depositRate' | translate" [number]="true" suffix="%" [hint]="'APP.optional' | translate" [(value)]="f.deposit"></ts-field>
+          <ts-field name="depositRate" [label]="'APP.depositRate' | translate" [number]="true" suffix="%" [hint]="'APP.optional' | translate" [(value)]="f.deposit"></ts-field>
           <ts-switch-row [title]="'APP.refundable' | translate" [(value)]="f.refundable"></ts-switch-row>
-          <ts-field *ngIf="f.refundable" [label]="'APP.refundDaysBefore' | translate" [number]="true" [(value)]="f.refundDays"></ts-field>
-          <ts-field [label]="'APP.cancellationPolicy' | translate" [lines]="3" [(value)]="f.policy"></ts-field>
+          <ts-field name="MinimumDaysToRefund" *ngIf="f.refundable" [label]="'APP.refundDaysBefore' | translate" [number]="true" [(value)]="f.refundDays"></ts-field>
+          <ts-field name="CancellationPolicy" [label]="'APP.cancellationPolicy' | translate" [lines]="3" [(value)]="f.policy"></ts-field>
         </ts-form-section>
         <ts-form-section [title]="'APP.outingRules' | translate" [subtitle]="'APP.outingForeignHint' | translate" icon="ti ti-list-check">
           <div class="ts-two">

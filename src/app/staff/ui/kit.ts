@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Injectable, Input, Output, Pipe, PipeTransform, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Injectable, Input, Output, Pipe, PipeTransform, inject, signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { NavigationStart, Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
 import { ApiError } from '../core/staff-http';
@@ -9,11 +9,51 @@ import { fmtCompact, fmtDate, fmtDateTime, fmtDay, fmtMoney2, fmtNum, fmtPct, fm
 
 // ---------------- text helpers ----------------
 
+/**
+ * The form fields the server named in its last refusal (field / errors), shown red under each field with a `name`
+ * until it is changed or the screen is left (15 Nov 2026). Names are the form's field names as sent ("StartDate");
+ * "TripDates[0].EndDate" also marks "TripDates"; case does not matter.
+ */
+@Injectable({ providedIn: 'root' })
+export class FieldErrors {
+  private readonly errors = signal<Record<string, string>>({});
+
+  constructor() {
+    inject(Router, { optional: true })?.events.subscribe((e) => {
+      if (e instanceof NavigationStart) this.errors.set({});
+    });
+  }
+
+  private static matches(key: string, name: string): boolean {
+    const k = key.toLowerCase();
+    const n = name.toLowerCase();
+    return k === n || k.split(/[[.]/)[0] === n;
+  }
+
+  of(name: string | null | undefined): string | null {
+    if (!name) return null;
+    const hit = Object.entries(this.errors()).find(([k]) => FieldErrors.matches(k, name));
+    return hit ? hit[1] : null;
+  }
+
+  report(fields: Record<string, string>): void {
+    this.errors.set({ ...fields });
+  }
+
+  clear(name: string | null | undefined): void {
+    if (!name) return;
+    const now = this.errors();
+    if (!Object.keys(now).some((k) => FieldErrors.matches(k, name))) return;
+    this.errors.set(Object.fromEntries(Object.entries(now).filter(([k]) => !FieldErrors.matches(k, name))));
+  }
+}
+
 /** errorText of the app: the server's message, or a sentence for network, timeout, 403, 401, 404. */
 @Injectable({ providedIn: 'root' })
 export class StaffText {
   private readonly t = inject(TranslateService);
   private readonly toast = inject(ToastrService);
+  private readonly fieldErrors = inject(FieldErrors);
 
   get arabic(): boolean {
     return (this.t.currentLang ?? 'ar') !== 'en';
@@ -26,17 +66,8 @@ export class StaffText {
   /** What went wrong, then the details the team needs to follow it up: status, error code, the API path, the server's words. */
   error(e: unknown): string {
     if (typeof e === 'string') return e;
-    if (e instanceof ApiError) {
-      const message = this.errorMessage(e);
-      const details = [
-        e.status ? `HTTP ${e.status}` : null,
-        e.code && e.code !== 'UNEXPECTED' ? e.code : null,
-        e.path,
-        e.detail && e.detail !== message ? e.detail : null
-      ].filter(Boolean);
-      return details.length ? `${message}\n${details.join(' · ')}` : message;
-    }
-    if (e instanceof Error && e.message) return `${this.tr('APP.errUnexpected')}\n${e.message}`;
+    // The message alone (15 Nov 2026): no HTTP status, error code or API path; a server error carries its code
+    if (e instanceof ApiError) return this.errorMessage(e);
     return this.tr('APP.errUnexpected');
   }
 
@@ -46,13 +77,15 @@ export class StaffText {
     if (e.code === 'TIMEOUT') return this.tr('APP.errTimeout');
     if (e.code === 'FORBIDDEN_SCOPE' || e.status === 403) return this.tr('APP.errForbidden');
     if (e.status === 401) return this.tr('APP.errSessionEnded');
-    if (e.status === 404) return this.tr('APP.errNotOnServer', { path: e.path ?? '' });
+    if (e.status === 404) return this.tr('APP.errNotAvailable');
     if (e.status === 504 || e.status === 502) return this.tr('APP.errGatewayTimeout');
     if (e.status && e.status >= 500) return this.tr('APP.errServer');
     return this.tr('APP.errUnexpected');
   }
 
+  /** Shows the message and marks the form fields the server named. */
   showError(e: unknown): void {
+    this.fieldErrors.report(e instanceof ApiError ? e.fields : {});
     this.toast.error(this.error(e));
   }
 

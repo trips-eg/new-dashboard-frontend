@@ -48,26 +48,26 @@ function seasonPriceError(rows: SeasonPrice[]): string | null {
       <ts-error *ngIf="loadError" [error]="loadError" (retry)="load()"></ts-error>
       <ng-container *ngIf="!loading && !loadError">
         <section class="ts-section">
-          <ts-field [label]="'APP.roomTypeName' | translate" [required]="true" [(value)]="f.name"></ts-field>
-          <ts-option-field [label]="'APP.roomCategory' | translate" source="/api/RoomTypes/GetAllRoomTypes/" [required]="true" [(value)]="f.roomType"></ts-option-field>
+          <ts-field name="Name" [label]="'APP.roomTypeName' | translate" [required]="true" [(value)]="f.name"></ts-field>
+          <ts-option-field name="RoomTypeId" [label]="'APP.roomCategory' | translate" source="/api/RoomTypes/GetAllRoomTypes/" [required]="true" [(value)]="f.roomType"></ts-option-field>
           <div class="ts-two">
-            <ts-option-field [label]="'APP.bed' | translate" source="/api/BedType/GetAllBedTypes/" [required]="true" [(value)]="f.bedType"></ts-option-field>
-            <ts-field [label]="'APP.bedCount' | translate" [number]="true" [(value)]="f.beds"></ts-field>
+            <ts-option-field name="BedTypeId" [label]="'APP.bed' | translate" source="/api/BedType/GetAllBedTypes/" [required]="true" [(value)]="f.bedType"></ts-option-field>
+            <ts-field name="BedCount" [label]="'APP.bedCount' | translate" [number]="true" [(value)]="f.beds"></ts-field>
           </div>
           <div class="ts-two">
-            <ts-field [label]="'APP.nightPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [required]="true" [(value)]="f.price"></ts-field>
-            <ts-field [label]="'APP.weekendPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [hint]="'APP.optional' | translate" [(value)]="f.holiday"></ts-field>
+            <ts-field name="Price" [label]="'APP.nightPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [required]="true" [(value)]="f.price"></ts-field>
+            <ts-field name="HolidayPrice" [label]="'APP.weekendPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [hint]="'APP.optional' | translate" [(value)]="f.holiday"></ts-field>
           </div>
           <div class="ts-two">
-            <ts-field [label]="'APP.childPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [hint]="'APP.optional' | translate" [(value)]="f.child"></ts-field>
-            <ts-field [label]="'APP.roomSize' | translate" [number]="true" suffix="m²" [hint]="'APP.optional' | translate" [(value)]="f.size"></ts-field>
+            <ts-field name="ChildPrice" [label]="'APP.childPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [hint]="'APP.optional' | translate" [(value)]="f.child"></ts-field>
+            <ts-field name="Size" [label]="'APP.roomSize' | translate" [number]="true" suffix="m²" [hint]="'APP.optional' | translate" [(value)]="f.size"></ts-field>
           </div>
           <ts-rich-text [label]="'APP.description' | translate" [(value)]="f.description"></ts-rich-text>
         </section>
         <ts-form-section [title]="'APP.meals' | translate" icon="ti ti-tools-kitchen-2">
           <!-- BordingType 0–5; the premium and ultra variants (6–10) are kept if the room already has one -->
           <ts-chipbar [wrap]="true" [items]="boardings()" [selected]="[String(f.boardingType)]" (tap)="f.boardingType = +$event"></ts-chipbar>
-          <ts-field [label]="'APP.mealsNote' | translate" [hint]="'APP.optional' | translate" [(value)]="f.boarding" style="margin-top: 10px; display: block"></ts-field>
+          <ts-field name="Boarding" [label]="'APP.mealsNote' | translate" [hint]="'APP.optional' | translate" [(value)]="f.boarding" style="margin-top: 10px; display: block"></ts-field>
         </ts-form-section>
         <ts-form-section [title]="'APP.roomFeatures' | translate" icon="ti ti-list-check">
           <div class="ts-progress-line" *ngIf="!features"><span></span></div>
@@ -75,8 +75,8 @@ function seasonPriceError(rows: SeasonPrice[]): string | null {
         </ts-form-section>
         <ts-form-section [title]="'APP.availability' | translate" icon="ti ti-calendar-check" kind="schedule">
           <div class="ts-two">
-            <ts-date-field [label]="'APP.validFrom' | translate" [(value)]="f.from"></ts-date-field>
-            <ts-date-field [label]="'APP.validTo' | translate" [(value)]="f.to"></ts-date-field>
+            <ts-date-field name="AvailableFrom" [label]="'APP.validFrom' | translate" [(value)]="f.from"></ts-date-field>
+            <ts-date-field name="AvailableTo" [label]="'APP.validTo' | translate" [(value)]="f.to"></ts-date-field>
           </div>
         </ts-form-section>
         <ts-form-section [title]="'APP.seasonPrices' | translate" [subtitle]="'APP.seasonPricesHint' | translate" icon="ti ti-calendar-month" kind="money">
@@ -95,10 +95,10 @@ function seasonPriceError(rows: SeasonPrice[]): string | null {
         </ts-form-section>
         <ts-form-section [title]="'APP.paymentAndRefund' | translate" icon="ti ti-wallet" kind="money">
           <ts-switch-row [title]="'APP.refundable' | translate" [(value)]="f.refundable"></ts-switch-row>
-          <ts-field *ngIf="f.refundable" [label]="'APP.refundDaysBefore' | translate" [number]="true" [(value)]="f.refundDays"></ts-field>
-          <ts-field [label]="'APP.cancellationPolicy' | translate" [lines]="2" [(value)]="f.policy"></ts-field>
+          <ts-field name="MinimumDaysToRefund" *ngIf="f.refundable" [label]="'APP.refundDaysBefore' | translate" [number]="true" [(value)]="f.refundDays"></ts-field>
+          <ts-field name="CancellationPolicy" [label]="'APP.cancellationPolicy' | translate" [lines]="2" [(value)]="f.policy"></ts-field>
           <ts-switch-row [title]="'APP.payOnArrival' | translate" [(value)]="f.payOnArrival"></ts-switch-row>
-          <ts-field [label]="'APP.depositRate' | translate" [number]="true" suffix="%" [hint]="'APP.optional' | translate" [(value)]="f.deposit"></ts-field>
+          <ts-field name="DepositRate" [label]="'APP.depositRate' | translate" [number]="true" suffix="%" [hint]="'APP.optional' | translate" [(value)]="f.deposit"></ts-field>
           <ts-switch-row [title]="'APP.priceIncludesVat' | translate" [(value)]="f.vat"></ts-switch-row>
         </ts-form-section>
         <div class="ts-sticky-foot">

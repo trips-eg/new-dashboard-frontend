@@ -135,24 +135,24 @@ interface HajjGroup {
         <ts-form-section [title]="'APP.stepDataPlace' | translate" icon="ti ti-map" kind="place">
           <ts-pill-switch [items]="kinds" [selected]="String(f.type)" (selectedChange)="f.type = +$event"></ts-pill-switch>
           <div style="height: 12px"></div>
-          <ts-field [label]="'APP.packageName' | translate" [required]="true" [(value)]="f.name"></ts-field>
-          <ts-option-field [label]="'APP.category' | translate" source="hajjcategories" [(value)]="f.category"></ts-option-field>
-          <ts-option-field *ngIf="!vendor" [label]="'APP.vendor' | translate" source="vendors" [required]="true" [(value)]="f.vendor"></ts-option-field>
+          <ts-field name="Name" [label]="'APP.packageName' | translate" [required]="true" [(value)]="f.name"></ts-field>
+          <ts-option-field name="HajjCategoryId" [label]="'APP.category' | translate" source="hajjcategories" [(value)]="f.category"></ts-option-field>
+          <ts-option-field name="VendorId" *ngIf="!vendor" [label]="'APP.vendor' | translate" source="vendors" [required]="true" [(value)]="f.vendor"></ts-option-field>
           <div class="ts-three">
             <ts-field [label]="'APP.numberOfDays' | translate" [number]="true" [required]="true" [(value)]="f.days"></ts-field>
-            <ts-field [label]="'APP.daysInMakkah' | translate" [number]="true" [(value)]="f.makkah"></ts-field>
-            <ts-field [label]="'APP.daysInMadinah' | translate" [number]="true" [(value)]="f.madinah"></ts-field>
+            <ts-field name="DaysInMakkah" [label]="'APP.daysInMakkah' | translate" [number]="true" [(value)]="f.makkah"></ts-field>
+            <ts-field name="DaysInMadinah" [label]="'APP.daysInMadinah' | translate" [number]="true" [(value)]="f.madinah"></ts-field>
           </div>
-          <ts-field [label]="'APP.hotelInMakkah' | translate" [required]="true" [(value)]="f.resMakkah"></ts-field>
-          <ts-field [label]="'APP.hotelInMadinah' | translate" [required]="true" [(value)]="f.resMadinah"></ts-field>
-          <ts-field [label]="'APP.flightLine' | translate" [required]="true" [(value)]="f.flight"></ts-field>
-          <ts-option-field [label]="'APP.country' | translate" source="countries" [(value)]="f.country"></ts-option-field>
-          <ts-option-field [label]="'APP.city' | translate" source="cities" [(value)]="f.city"></ts-option-field>
+          <ts-field name="ResidenceInMakkah" [label]="'APP.hotelInMakkah' | translate" [required]="true" [(value)]="f.resMakkah"></ts-field>
+          <ts-field name="ResidenceInMadinah" [label]="'APP.hotelInMadinah' | translate" [required]="true" [(value)]="f.resMadinah"></ts-field>
+          <ts-field name="FlightLine" [label]="'APP.flightLine' | translate" [required]="true" [(value)]="f.flight"></ts-field>
+          <ts-option-field name="CountryId" [label]="'APP.country' | translate" source="countries" [(value)]="f.country"></ts-option-field>
+          <ts-option-field name="CityId" [label]="'APP.city' | translate" source="cities" [(value)]="f.city"></ts-option-field>
           <div class="ts-two">
-            <ts-field [label]="'APP.fromPlace' | translate" [required]="true" [(value)]="f.from"></ts-field>
-            <ts-field [label]="'APP.toPlace' | translate" [required]="true" [(value)]="f.to"></ts-field>
+            <ts-field name="FromLocation" [label]="'APP.fromPlace' | translate" [required]="true" [(value)]="f.from"></ts-field>
+            <ts-field name="ToLocation" [label]="'APP.toPlace' | translate" [required]="true" [(value)]="f.to"></ts-field>
           </div>
-          <ts-field [label]="'APP.externalLink' | translate" hint="https://" [(value)]="f.link"></ts-field>
+          <ts-field name="ExternalLink" [label]="'APP.externalLink' | translate" hint="https://" [(value)]="f.link"></ts-field>
         </ts-form-section>
         <ts-form-section [title]="'APP.groups' | translate" [subtitle]="'APP.groupsHint' | translate" icon="ti ti-users-group" kind="schedule">
           <div class="ts-row-box" *ngFor="let g of groups; let i = index">
@@ -173,11 +173,11 @@ interface HajjGroup {
       <ng-container *ngIf="step === 1">
         <ts-form-section [title]="'APP.prices' | translate" [subtitle]="'APP.hajjPriceHint' | translate" icon="ti ti-tag" kind="money">
           <div class="ts-two">
-            <ts-field [label]="'APP.startingPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [required]="true" [(value)]="f.price"></ts-field>
-            <ts-field [label]="'APP.childPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [(value)]="f.childPrice"></ts-field>
+            <ts-field name="Price" [label]="'APP.startingPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [required]="true" [(value)]="f.price"></ts-field>
+            <ts-field name="ChildPrice" [label]="'APP.childPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [(value)]="f.childPrice"></ts-field>
           </div>
-          <ts-field [label]="'APP.priceBefore' | translate" [number]="true" [suffix]="'APP.egp' | translate" [hint]="'APP.priceBeforeHint' | translate" [(value)]="f.priceBefore"></ts-field>
-          <ts-field [label]="'APP.capacity' | translate" [number]="true" [required]="true" [(value)]="f.capacity"></ts-field>
+          <ts-field name="PriceBefore" [label]="'APP.priceBefore' | translate" [number]="true" [suffix]="'APP.egp' | translate" [hint]="'APP.priceBeforeHint' | translate" [(value)]="f.priceBefore"></ts-field>
+          <ts-field name="Capacity" [label]="'APP.capacity' | translate" [number]="true" [required]="true" [(value)]="f.capacity"></ts-field>
         </ts-form-section>
         <ts-form-section [title]="'APP.childPricing' | translate" [subtitle]="'APP.childPricingHint' | translate" icon="ti ti-mood-kid" kind="money">
           <ts-child-policies [(rows)]="children"></ts-child-policies>
@@ -185,11 +185,11 @@ interface HajjGroup {
         <ts-form-section [title]="'APP.paymentAndRefund' | translate" icon="ti ti-wallet" kind="money">
           <ts-pill-switch [items]="depositTypes" [selected]="String(f.depositType)" (selectedChange)="f.depositType = +$event"></ts-pill-switch>
           <div style="height: 10px"></div>
-          <ts-field [label]="'APP.deposit' | translate" [number]="true" [suffix]="f.depositType === 1 ? '%' : ('APP.egp' | translate)" [hint]="'APP.optional' | translate" [(value)]="f.deposit"></ts-field>
+          <ts-field name="depositRate" [label]="'APP.deposit' | translate" [number]="true" [suffix]="f.depositType === 1 ? '%' : ('APP.egp' | translate)" [hint]="'APP.optional' | translate" [(value)]="f.deposit"></ts-field>
           <ts-switch-row [title]="'APP.payOnArrival' | translate" [(value)]="f.payOnArrival"></ts-switch-row>
           <ts-switch-row [title]="'APP.refundable' | translate" [(value)]="f.refundable"></ts-switch-row>
-          <ts-field *ngIf="f.refundable" [label]="'APP.refundDaysBefore' | translate" [number]="true" [(value)]="f.refundDays"></ts-field>
-          <ts-field [label]="'APP.cancellationPolicy' | translate" [lines]="3" [(value)]="f.policy"></ts-field>
+          <ts-field name="MinimumDaysToRefund" *ngIf="f.refundable" [label]="'APP.refundDaysBefore' | translate" [number]="true" [(value)]="f.refundDays"></ts-field>
+          <ts-field name="CancellationPolicy" [label]="'APP.cancellationPolicy' | translate" [lines]="3" [(value)]="f.policy"></ts-field>
           <ts-switch-row [title]="'APP.priceIncludesVat' | translate" [(value)]="f.vat"></ts-switch-row>
           <ng-container *ngIf="!vendor">
             <ts-switch-row [title]="'APP.recommended' | translate" [(value)]="f.recommended"></ts-switch-row>

@@ -61,19 +61,19 @@ interface TripDateRow {
       <!-- 1: data and place -->
       <ng-container *ngIf="step === 0">
         <ts-form-section [title]="'APP.stepDataPlace' | translate" icon="ti ti-map" kind="place">
-          <ts-field [label]="'APP.tripName' | translate" [required]="true" [(value)]="f.name"></ts-field>
+          <ts-field name="Name" [label]="'APP.tripName' | translate" [required]="true" [(value)]="f.name"></ts-field>
           <span class="ts-label">{{ 'APP.tripType' | translate }}</span>
           <ts-chipbar [wrap]="true" [items]="tripTypes" [selected]="[String(f.tripType)]" (tap)="f.tripType = +$event"></ts-chipbar>
           <p class="ts-muted" style="margin: 6px 0 10px">{{ (f.tripType === 1 ? 'APP.tripNormalHint' : f.tripType === 2 ? 'APP.tripPeriodicHint' : 'APP.tripDailyHint') | translate }}</p>
           <ts-switch-row [title]="'APP.outsideEgypt' | translate" [(value)]="f.external"></ts-switch-row>
-          <ts-option-field [label]="'APP.country' | translate" source="countries" [(value)]="f.country"></ts-option-field>
-          <ts-option-field [label]="'APP.city' | translate" source="cities" [(value)]="f.city"></ts-option-field>
+          <ts-option-field name="CountryId" [label]="'APP.country' | translate" source="countries" [(value)]="f.country"></ts-option-field>
+          <ts-option-field name="CityId" [label]="'APP.city' | translate" source="cities" [(value)]="f.city"></ts-option-field>
           <div class="ts-two">
-            <ts-field [label]="'APP.tripFromPlace' | translate" [hint]="'APP.tripFromHint' | translate" [required]="true" [(value)]="f.from"></ts-field>
-            <ts-field [label]="'APP.tripToPlace' | translate" [hint]="'APP.tripToHint' | translate" [required]="true" [(value)]="f.to"></ts-field>
+            <ts-field name="FromLocation" [label]="'APP.tripFromPlace' | translate" [hint]="'APP.tripFromHint' | translate" [required]="true" [(value)]="f.from"></ts-field>
+            <ts-field name="ToLocation" [label]="'APP.tripToPlace' | translate" [hint]="'APP.tripToHint' | translate" [required]="true" [(value)]="f.to"></ts-field>
           </div>
-          <ts-field [label]="'APP.mainMeetingPoint' | translate" [required]="true" [(value)]="f.address"></ts-field>
-          <ts-option-field *ngIf="!vendor" [label]="'APP.vendor' | translate" source="vendors" [required]="true" [(value)]="f.vendor"></ts-option-field>
+          <ts-field name="Address" [label]="'APP.mainMeetingPoint' | translate" [required]="true" [(value)]="f.address"></ts-field>
+          <ts-option-field name="VendorId" *ngIf="!vendor" [label]="'APP.vendor' | translate" source="vendors" [required]="true" [(value)]="f.vendor"></ts-option-field>
         </ts-form-section>
         <ts-form-section [title]="'APP.gatheringPoints' | translate" [subtitle]="'APP.morePoints' | translate" icon="ti ti-map-pin" kind="place">
           <ts-points-editor [(rows)]="points"></ts-points-editor>
@@ -84,12 +84,12 @@ interface TripDateRow {
       <ng-container *ngIf="step === 1">
         <ts-form-section [title]="'APP.prices' | translate" icon="ti ti-tag" kind="money">
           <div class="ts-two">
-            <ts-field [label]="'APP.adultPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [required]="true" [(value)]="f.price"></ts-field>
-            <ts-field [label]="'APP.childPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [(value)]="f.childPrice"></ts-field>
+            <ts-field name="Price" [label]="'APP.adultPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [required]="true" [(value)]="f.price"></ts-field>
+            <ts-field name="ChildPrice" [label]="'APP.childPrice' | translate" [number]="true" [suffix]="'APP.egp' | translate" [(value)]="f.childPrice"></ts-field>
           </div>
-          <ts-field [label]="'APP.priceBefore' | translate" [number]="true" [suffix]="'APP.egp' | translate" [hint]="'APP.priceBeforeHint' | translate" [(value)]="f.priceBefore"></ts-field>
+          <ts-field name="PriceBefore" [label]="'APP.priceBefore' | translate" [number]="true" [suffix]="'APP.egp' | translate" [hint]="'APP.priceBeforeHint' | translate" [(value)]="f.priceBefore"></ts-field>
           <div class="ts-two">
-            <ts-field [label]="'APP.capacity' | translate" [number]="true" [required]="true" [(value)]="f.capacity"></ts-field>
+            <ts-field name="Capacity" [label]="'APP.capacity' | translate" [number]="true" [required]="true" [(value)]="f.capacity"></ts-field>
             <ts-field [label]="'APP.numberOfDays' | translate" [number]="true" [required]="f.tripType === 2" [(value)]="f.days"></ts-field>
           </div>
         </ts-form-section>
@@ -97,8 +97,8 @@ interface TripDateRow {
           <div class="ts-row-box" *ngFor="let d of dates; let i = index">
             <button type="button" class="ts-row-box__remove" (click)="dates.splice(i, 1)"><i class="ti ti-trash"></i></button>
             <div [class.ts-two]="f.tripType !== 3">
-              <ts-date-field [label]="'APP.start' | translate" [required]="true" [(value)]="d.start"></ts-date-field>
-              <ts-date-field *ngIf="f.tripType !== 3" [label]="'APP.end' | translate" [required]="true" [(value)]="d.end"></ts-date-field>
+              <ts-date-field name="TripDates" [label]="'APP.start' | translate" [required]="true" [(value)]="d.start"></ts-date-field>
+              <ts-date-field name="TripDates" *ngIf="f.tripType !== 3" [label]="'APP.end' | translate" [required]="true" [(value)]="d.end"></ts-date-field>
             </div>
           </div>
           <button type="button" class="btn btn-secondary" (click)="dates.push({ id: 0, start: null, end: null })"><i class="ti ti-plus"></i>{{ 'APP.addDate' | translate }}</button>
@@ -118,11 +118,11 @@ interface TripDateRow {
           <ts-child-policies [(rows)]="children"></ts-child-policies>
         </ts-form-section>
         <ts-form-section [title]="'APP.paymentAndRefund' | translate" icon="ti ti-wallet" kind="money">
-          <ts-field [label]="'APP.depositRate' | translate" [number]="true" suffix="%" [hint]="'APP.optional' | translate" [(value)]="f.deposit"></ts-field>
+          <ts-field name="depositRate" [label]="'APP.depositRate' | translate" [number]="true" suffix="%" [hint]="'APP.optional' | translate" [(value)]="f.deposit"></ts-field>
           <ts-switch-row [title]="'APP.payOnArrival' | translate" [(value)]="f.payOnArrival"></ts-switch-row>
           <ts-switch-row [title]="'APP.refundable' | translate" [(value)]="f.refundable"></ts-switch-row>
-          <ts-field *ngIf="f.refundable" [label]="'APP.refundDaysBefore' | translate" [number]="true" [(value)]="f.refundDays"></ts-field>
-          <ts-field [label]="'APP.cancellationPolicy' | translate" [lines]="3" [(value)]="f.policy"></ts-field>
+          <ts-field name="MinimumDaysToRefund" *ngIf="f.refundable" [label]="'APP.refundDaysBefore' | translate" [number]="true" [(value)]="f.refundDays"></ts-field>
+          <ts-field name="CancellationPolicy" [label]="'APP.cancellationPolicy' | translate" [lines]="3" [(value)]="f.policy"></ts-field>
         </ts-form-section>
         <ts-rules-foreign [v]="rules"></ts-rules-foreign>
       </ng-container>
@@ -152,7 +152,7 @@ interface TripDateRow {
             <ts-switch-row [title]="'APP.fakeProduct' | translate" [subtitle]="'APP.fakeProductHint' | translate" [(value)]="f.fake"></ts-switch-row>
             <ts-switch-row [title]="'APP.publishNow' | translate" [(value)]="f.active"></ts-switch-row>
           </ng-container>
-          <ts-field [label]="'APP.externalLink' | translate" hint="https://" [(value)]="f.link"></ts-field>
+          <ts-field name="ExternalLink" [label]="'APP.externalLink' | translate" hint="https://" [(value)]="f.link"></ts-field>
         </ts-form-section>
       </ng-container>
 

@@ -14,7 +14,9 @@ export class ApiError extends Error {
     readonly data: unknown = null,
     /** The API path that failed (/api/...), and what else the answer said: its status text or a piece of a non-JSON body. */
     readonly path: string | null = null,
-    readonly detail: string | null = null
+    readonly detail: string | null = null,
+    /** The form fields the server named (field / errors) with their messages, for the form to mark. */
+    readonly fields: Record<string, string> = {}
   ) {
     super(message ?? '');
   }
@@ -49,6 +51,17 @@ export function errorMessageOf(body: any): string | null {
   return body.title ?? body.detail ?? null;
 }
 
+/** The fields a refusal names: our `errors` ({field: message}) or `field`, or ProblemDetails' `errors` ({field: [..]}). */
+export function fieldErrorsOf(body: any): Record<string, string> {
+  if (!body || typeof body !== 'object') return {};
+  if (body.errors && typeof body.errors === 'object') {
+    const out: Record<string, string> = {};
+    for (const [k, v] of Object.entries(body.errors)) if (k) out[k] = Array.isArray(v) ? v.join(', ') : String(v);
+    if (Object.keys(out).length) return out;
+  }
+  return typeof body.field === 'string' && body.field ? { [body.field]: body.message ?? '' } : {};
+}
+
 export type Query = Record<string, string | number | boolean | null | undefined | (string | number)[]>;
 
 /**
@@ -73,7 +86,12 @@ export class StaffHttp {
 
   private headers(form = false): HttpHeaders {
     // Each screen shows its own loading state, so the full-screen spinner stays off
-    return new HttpHeaders({ 'Accept-Language': form ? 'en-US' : this.arabic ? 'ar-EG' : 'en-US', [SKIP_SPINNER]: '1' });
+    // Messages in the screen's language even when a form sends en-US for its numbers (X-Ui-Language, 15 Nov 2026)
+    return new HttpHeaders({
+      'Accept-Language': form ? 'en-US' : this.arabic ? 'ar-EG' : 'en-US',
+      'X-Ui-Language': this.arabic ? 'ar' : 'en',
+      [SKIP_SPINNER]: '1'
+    });
   }
 
   private params(q?: Query): HttpParams {
@@ -91,7 +109,7 @@ export class StaffHttp {
       catchError((e: HttpErrorResponse) => throwError(() => this.toError(e))),
       map((body) => {
         if (!body || typeof body !== 'object') throw new ApiError(null, 'UNEXPECTED', null);
-        if (body.success === false) throw new ApiError(null, body.errorCode ?? null, errorMessageOf(body), body.data);
+        if (body.success === false) throw new ApiError(null, body.errorCode ?? null, errorMessageOf(body), body.data, null, null, fieldErrorsOf(body));
         return body.data as T;
       })
     );
@@ -104,7 +122,7 @@ export class StaffHttp {
       if (e.status === 0) return new ApiError(0, 'NETWORK', null, null, path);
       const body = e.error;
       if (body && typeof body === 'object' && !(body instanceof Blob)) {
-        return new ApiError(e.status, body.errorCode ?? null, errorMessageOf(body), body.data ?? null, path, e.statusText || null);
+        return new ApiError(e.status, body.errorCode ?? null, errorMessageOf(body), body.data ?? null, path, e.statusText || null, fieldErrorsOf(body));
       }
       return new ApiError(e.status, e.status === 401 ? 'UNAUTHORIZED' : 'UNEXPECTED', null, null, path, bodyText(body) ?? (e.statusText || null));
     }
