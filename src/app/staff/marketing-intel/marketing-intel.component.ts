@@ -28,7 +28,9 @@ export const PROVIDERS: Record<number, string> = {
   12: 'Adjust'
 };
 /** The platforms TRIPS can read today (the others are listed as "needs connecting"). */
-export const SYNCED_PROVIDERS = [1, 2, 3, 4];
+export const SYNCED_PROVIDERS = [1, 2, 3, 4, 8, 9];
+/** GA4 and Search Console (16 Nov 2026): connected with a Google service account key file, not a token. */
+export const GOOGLE_KEY_PROVIDERS = [8, 9];
 
 export enum ConnStatus {
   Pending = 0,
@@ -106,6 +108,10 @@ export interface MiMetric {
   previousValue: number | null;
   previousDay: string | null;
   syncedAt: string;
+  /** level (followers: the latest value), sum (sessions, clicks: the period's total) or average (CTR, position). */
+  kind?: 'level' | 'sum' | 'average';
+  periodValue?: number | null;
+  previousPeriodValue?: number | null;
 }
 export interface MiTask {
   id: number;
@@ -319,8 +325,9 @@ function isoDay(d: Date): string {
           <!-- Social -->
           <ts-card [title]="'MI.social' | translate" icon="ti ti-brand-instagram">
             <ts-empty *ngIf="!d.social.length" icon="ti ti-users" [message]="'MI.noSocial' | translate"></ts-empty>
-            <ts-info *ngFor="let m of d.social" [label]="provider(m.provider) + ' · ' + (m.accountName || m.accountId) + ' · ' + (('MI.metric_' + m.metric) | translate)"
-              [value]="num(m.value) + change(m)"></ts-info>
+            <ts-info *ngFor="let m of d.social"
+              [label]="provider(m.provider) + ' · ' + (m.accountName || m.accountId) + ' · ' + (('MI.metric_' + m.metric) | translate) + (m.kind === 'sum' ? ' · ' + ('MI.periodTotal' | translate) : m.kind === 'average' ? ' · ' + ('MI.dailyAverage' | translate) : '')"
+              [value]="metricValue(m)"></ts-info>
           </ts-card>
 
           <!-- Bookings -->
@@ -378,9 +385,16 @@ function isoDay(d: Date): string {
       </label>
       <ts-field *ngIf="!conn.id" [label]="'MI.accountId' | translate" [required]="true" [hint]="accountHint()" [(value)]="conn.accountId"></ts-field>
       <ts-field [label]="'MI.accountName' | translate" [(value)]="conn.accountName"></ts-field>
-      <ts-field *ngIf="!conn.id" [label]="'MI.currency' | translate" hint="EGP" [(value)]="conn.currency"></ts-field>
-      <ts-field [label]="'MI.token' | translate" type="password" [required]="!conn.id" [hint]="'MI.tokenHelp' | translate" [(value)]="conn.token"></ts-field>
-      <ts-field [label]="'MI.tokenExpires' | translate" type="date" [(value)]="conn.expires"></ts-field>
+      <ng-container *ngIf="!googleKey(); else keyFile">
+        <ts-field *ngIf="!conn.id" [label]="'MI.currency' | translate" hint="EGP" [(value)]="conn.currency"></ts-field>
+        <ts-field [label]="'MI.token' | translate" type="password" [required]="!conn.id" [hint]="'MI.tokenHelp' | translate" [(value)]="conn.token"></ts-field>
+        <ts-field [label]="'MI.tokenExpires' | translate" type="date" [(value)]="conn.expires"></ts-field>
+      </ng-container>
+      <!-- GA4 and Search Console: the service account's key file, pasted whole -->
+      <ng-template #keyFile>
+        <ts-field [label]="'MI.keyFile' | translate" [lines]="6" [required]="!conn.id" [hint]="'MI.keyFileHint' | translate" [(value)]="conn.token"></ts-field>
+        <p class="ts-muted mi-small">{{ 'MI.keyHelp' | translate }}</p>
+      </ng-template>
       <p class="ts-muted mi-small">{{ 'MI.tokenSafety' | translate }}</p>
       <div sheet-foot>
         <button type="button" class="btn btn-primary ts-wide-btn" [disabled]="busy || (!conn.id && (!conn.accountId.trim() || !conn.token.trim()))" (click)="saveConnection()">{{ 'APP.save' | translate }}</button>
@@ -579,6 +593,20 @@ export class MarketingIntelComponent implements OnInit {
 
   connTone(s: ConnStatus): 'ok' | 'pending' | 'danger' | 'neutral' {
     return s === ConnStatus.Connected ? 'ok' : s === ConnStatus.NeedsAttention ? 'danger' : s === ConnStatus.Paused ? 'neutral' : 'pending';
+  }
+
+  googleKey(): boolean {
+    return GOOGLE_KEY_PROVIDERS.includes(+this.conn.provider);
+  }
+
+  /** A daily number's total (or average) over the period against the period before; a level's latest value. */
+  metricValue(m: MiMetric): string {
+    if (!m.kind || m.kind === 'level' || m.periodValue == null) return this.num(m.value) + this.change(m);
+    const unit = m.metric === 'searchCtr' ? '%' : '';
+    const value = m.kind === 'average' ? fmtNum(m.periodValue) : this.num(m.periodValue);
+    if (m.previousPeriodValue == null || m.previousPeriodValue === 0) return value + unit;
+    const pct = ((m.periodValue - m.previousPeriodValue) / m.previousPeriodValue) * 100;
+    return `${value}${unit} (${pct >= 0 ? '+' : '−'}${fmtNum(Math.abs(Math.round(pct)))}%)`;
   }
 
   change(m: MiMetric): string {
