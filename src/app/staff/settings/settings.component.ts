@@ -773,7 +773,12 @@ export class ContractsComponent implements OnDestroy {
             <span class="ts-card-row__main" [style.cursor]="canEdit ? 'pointer' : null" (click)="canEdit && edit(u)">
               <span class="ts-card-title">{{ nameOf(u) }}</span>
               <span class="ts-muted">{{ describe(u) }}</span>
-              <ts-pill [tone]="u.iActive !== false ? 'ok' : 'neutral'" style="margin-top: 4px">{{ (u.iActive !== false ? 'APP.active' : 'APP.inactive') | translate }}</ts-pill>
+              <span class="ts-muted" *ngIf="u.companyName">{{ u.companyName }}</span>
+              <span style="margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap">
+                <ts-pill [tone]="u.iActive !== false ? 'ok' : 'neutral'">{{ (u.iActive !== false ? 'APP.active' : 'APP.inactive') | translate }}</ts-pill>
+                <!-- a scanner's or a vendor's account with no vendor can't scan (19 Nov 2026) -->
+                <ts-pill *ngIf="noVendor(u)" tone="danger">{{ 'APP.userNoVendor' | translate }}</ts-pill>
+              </span>
             </span>
             <button *ngIf="canEdit" type="button" class="ts-icon-btn" [title]="'APP.changePassword' | translate" (click)="pwFor = { userId: u.id, name: nameOf(u) }">
               <i class="ti ti-key"></i>
@@ -793,7 +798,8 @@ export class ContractsComponent implements OnDestroy {
       <ts-field [label]="'APP.password' | translate" type="password" [required]="!editing" [hint]="editing ? ('APP.keepPasswordHint' | translate) : null" [(value)]="f.pass"></ts-field>
       <p class="ts-label">{{ 'APP.role' | translate }}</p>
       <ts-chipbar [wrap]="true" [items]="roleChips" [selected]="picked" (tap)="toggleRole($event)"></ts-chipbar>
-      <ts-option-field *ngIf="!editing && needsVendor" [label]="'APP.vendor' | translate" source="vendors" [required]="true" [(value)]="vendor"></ts-option-field>
+      <ts-option-field *ngIf="needsVendor" [label]="'APP.vendor' | translate" source="vendors" [required]="true" [(value)]="vendor"></ts-option-field>
+      <p *ngIf="editing && needsVendor && !vendor" class="ts-muted" style="color: var(--bs-danger, #b42318)">{{ 'APP.userNoVendorHint' | translate }}</p>
       <div sheet-foot><button type="button" class="btn btn-primary ts-wide-btn" [disabled]="busy" (click)="save()">{{ 'APP.save' | translate }}</button></div>
     </ts-sheet>
     <ts-password-sheet [open]="!!pwFor" [userId]="pwFor?.userId ?? null" [name]="pwFor?.name ?? ''" (openChange)="pwFor = null"></ts-password-sheet>
@@ -832,6 +838,11 @@ export class UsersComponent implements OnDestroy {
     return n || u.username || u.userName || '';
   }
 
+  /** A vendor's or a scanner's account (not an admin) with no vendor linked. */
+  noVendor(u: any): boolean {
+    return u.companyId == null && (u.roles ?? []).some((r: any) => (r.roleType ?? 1) !== 1);
+  }
+
   describe(u: any): string {
     return [u.email ?? '', ...(u.roles ?? []).map((r: any) => r.name)].filter((s: string) => !!s).join(' · ');
   }
@@ -841,7 +852,8 @@ export class UsersComponent implements OnDestroy {
     this.editing = u;
     this.f = { first: u?.firstName ?? '', last: u?.lastName ?? '', user: u?.username ?? u?.userName ?? '', email: u?.email ?? '', pass: '' };
     this.picked = u ? (u.roles ?? []).map((r: any) => r.name).filter(Boolean) : [];
-    this.vendor = null;
+    // the vendor of a scanner's or a vendor's account, changed here too (19 Nov 2026)
+    this.vendor = u?.companyId ? { id: String(u.companyId), name: u.companyName ?? `#${u.companyId}` } : null;
     try {
       const page = await firstValueFrom(this.api.pageOf('/api/Users/GetAllRoles/', { get: true }));
       // Every role, admin first: a vendor's or a scanner's account is made here too, with its company
@@ -861,7 +873,7 @@ export class UsersComponent implements OnDestroy {
   async save(): Promise<void> {
     const f = this.f;
     if (!f.first.trim() || !f.user.trim() || (!this.editing && !f.pass)) return this.text.showError(this.text.tr('APP.fillRequired'));
-    if (!this.editing && this.needsVendor && !this.vendor) return this.text.showError(this.text.tr('APP.chooseVendor'));
+    if (this.needsVendor && !this.vendor) return this.text.showError(this.text.tr('APP.chooseVendor'));
     this.busy = true;
     try {
       if (this.editing) {
@@ -877,7 +889,8 @@ export class UsersComponent implements OnDestroy {
               Email: f.email.trim(),
               ...(f.pass ? { Password: f.pass } : {}),
               IActive: this.editing.iActive ?? true,
-              Roles: this.picked
+              Roles: this.picked,
+              ...(this.needsVendor && this.vendor ? { CompanyId: +this.vendor.id } : {})
             })
           )
         );

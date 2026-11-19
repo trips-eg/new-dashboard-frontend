@@ -2259,6 +2259,8 @@
     "childPricingHint": "A child is priced by age at booking",
     "choose": "Choose",
     "chooseVendor": "Choose the vendor",
+    "userNoVendor": "No vendor linked",
+    "userNoVendorHint": "This account has no vendor, so it can't scan tickets. Choose its vendor.",
     "city": "City",
     "country": "Country",
     "cover": "Cover",
