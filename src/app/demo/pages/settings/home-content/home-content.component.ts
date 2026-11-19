@@ -165,6 +165,10 @@ interface SlotGroup {
   slots: HomeIconSlot[];
 }
 
+/** The picture at the top of the customer home (home content slot, 19 Nov 2026). */
+export const HERO_SLOT = 'home.hero';
+const MAX_HERO_BYTES = 1536 * 1024;
+
 @Component({
   selector: 'app-home-content',
   standalone: true,
@@ -393,8 +397,14 @@ export class HomeContentComponent implements OnInit {
   }
 
   /** Returns the problem with the chosen file, or null when it can be uploaded. */
-  checkIconFile(file: File | null | undefined): string | null {
+  checkIconFile(file: File | null | undefined, slot?: string): string | null {
     if (!file) return 'اختار ملف';
+    // 19 Nov 2026: the picture at the top of the home is a photo slot
+    if (slot === HERO_SLOT) {
+      if (!/\.(jpe?g|png|webp|svg)$/i.test(file.name)) return 'الصورة لازم تكون JPG أو PNG أو WebP أو SVG';
+      if (file.size > MAX_HERO_BYTES) return 'حجم الصورة لازم يكون 1.5 ميجا أو أقل';
+      return null;
+    }
     if (!ICON_TYPES.includes(file.type) && !ICON_EXTENSIONS.test(file.name)) return 'الأيقونة لازم تكون SVG أو PNG أو WebP';
     if (file.size > MAX_ICON_BYTES) return 'حجم الأيقونة لازم يكون 200 KB أو أقل';
     return null;
@@ -409,7 +419,7 @@ export class HomeContentComponent implements OnInit {
 
   uploadIcon(slot: string, file: File | null | undefined): void {
     if (!this.canEdit || this.busySlot) return;
-    const problem = this.checkIconFile(file);
+    const problem = this.checkIconFile(file, slot);
     if (problem) {
       this.toaster.error(problem, 'الأيقونة مترفعتش');
       return;

@@ -402,6 +402,18 @@ export class LookupsComponent {
         <ts-field [label]="'APP.order' | translate" [number]="true" [(value)]="f.sequence"></ts-field>
         <ts-switch-row [title]="'APP.active' | translate" [(value)]="f.active"></ts-switch-row>
       </ng-container>
+      <div *ngIf="k.key === 'outing-categories'" class="ts-field">
+        <span>{{ 'APP.categoryIcon' | translate }}</span>
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+          <img *ngIf="iconPreview() as src" [src]="src" alt="" width="40" height="40" style="object-fit: contain; border: 1px solid var(--ts-line, #eee); border-radius: 10px; padding: 4px" />
+          <label class="btn btn-outline-secondary btn-sm" style="margin: 0">
+            {{ (iconPreview() ? 'APP.changeIcon' : 'APP.chooseIcon') | translate }}
+            <input type="file" hidden accept=".svg,.png,.webp,image/svg+xml,image/png,image/webp" (change)="pickIcon($any($event.target).files); $any($event.target).value = ''" />
+          </label>
+          <button *ngIf="iconPreview()" type="button" class="btn btn-link btn-sm text-danger" (click)="removeIcon()">{{ 'APP.removeIcon' | translate }}</button>
+        </div>
+        <small class="text-muted">{{ 'APP.categoryIconHint' | translate }}</small>
+      </div>
       <div *ngIf="k.multipart && k.key !== 'branches'" class="ts-field">
         <span>{{ 'APP.image' | translate }}</span>
         <ts-images-field
@@ -579,9 +591,35 @@ export class LookupListComponent implements OnInit, OnDestroy {
       inTravel: x?.isInTravel ?? true,
       inHotel: !!x?.isInHotel,
       country: x?.countryId != null ? ({ id: String(x.countryId), name: x.countryName ?? '' } as Picked) : null,
-      image: null as File | null
+      image: null as File | null,
+      icon: null as File | null,
+      iconPreview: null as string | null,
+      removeIcon: false
     };
     this.sheetOpen = true;
+  }
+
+  /** The category's icon: the one just picked, else the saved one (unless removed). */
+  iconPreview(): string | null {
+    if (this.f.iconPreview) return this.f.iconPreview;
+    return !this.f.removeIcon && this.editing?.icon ? mediaUrl(this.editing.icon) : null;
+  }
+
+  /** SVG, PNG or WebP up to 200 KB, as the server checks it. */
+  pickIcon(files: FileList | null): void {
+    const file = files?.[0];
+    if (!file) return;
+    if (!/\.(svg|png|webp)$/i.test(file.name)) return this.text.showError(this.text.tr('APP.categoryIconType'));
+    if (file.size > 200 * 1024) return this.text.showError(this.text.tr('APP.categoryIconTooBig'));
+    this.f.icon = file;
+    this.f.iconPreview = URL.createObjectURL(file);
+    this.f.removeIcon = false;
+  }
+
+  removeIcon(): void {
+    this.f.icon = null;
+    this.f.iconPreview = null;
+    this.f.removeIcon = true;
   }
 
   async save(): Promise<void> {
@@ -607,6 +645,9 @@ export class LookupListComponent implements OnInit, OnDestroy {
       ...(k.key === 'branches' ? { Location: f.location.trim() } : {}),
       ...(this.isCategory ? { IsActive: f.active, Sequence: intOf(f.sequence) ?? 0 } : {}),
       ...(k.key === 'outing-categories' ? { Icon: this.editing?.icon ?? '', ImageUrl: this.editing?.imageUrl ?? '' } : {}),
+      // 19 Nov 2026: the icon beside the category's name in the app's outings list
+      ...(k.key === 'outing-categories' && f.icon ? { UploadedIcon: f.icon } : {}),
+      ...(k.key === 'outing-categories' && f.removeIcon && !f.icon ? { RemoveIcon: true } : {}),
       ...(k.key === 'nationalities' ? { NameAr: f.nameAr.trim() } : {}),
       ...(this.place ? { EnName: f.enName.trim(), Status: f.active, Module: f.module } : {}),
       ...(k.key === 'countries' ? { CountryCode: f.code.trim().toUpperCase() } : {}),

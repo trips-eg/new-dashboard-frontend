@@ -1624,6 +1624,13 @@
     "DOWNLOAD_APP": "حمّل تطبيق Trips Partners"
   },
   "APP": {
+    "categoryIcon": "الأيقونة",
+    "chooseIcon": "اختار أيقونة",
+    "changeIcon": "غيّر الأيقونة",
+    "removeIcon": "شيل الأيقونة",
+    "categoryIconHint": "أيقونة بلون واحد على خلفية شفافة (SVG أو PNG أو WebP لحد 200 كيلوبايت)، بتظهر جنب اسم الكاتيجوري في شاشة الخروجات بالتطبيق",
+    "categoryIconType": "الأيقونة لازم تكون SVG أو PNG أو WebP",
+    "categoryIconTooBig": "حجم الأيقونة لازم يكون 200 كيلوبايت أو أقل",
     "rqBooked": "اتحجز",
     "rqOfferChosen": "العميل اختار عرض",
     "rqClosed": "مقفول",

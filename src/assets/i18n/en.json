@@ -1588,6 +1588,13 @@
     "DOWNLOAD_APP": "Get the Trips Partners app"
   },
   "APP": {
+    "categoryIcon": "Icon",
+    "chooseIcon": "Choose an icon",
+    "changeIcon": "Change the icon",
+    "removeIcon": "Remove the icon",
+    "categoryIconHint": "A one-colour icon on a clear background (SVG, PNG or WebP up to 200 KB), shown beside the category's name in the app's outings list",
+    "categoryIconType": "The icon must be SVG, PNG or WebP",
+    "categoryIconTooBig": "The icon must be 200 KB or less",
     "rqBooked": "Booked",
     "rqOfferChosen": "Customer chose an offer",
     "rqClosed": "Closed",

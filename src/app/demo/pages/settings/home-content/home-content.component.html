@@ -305,7 +305,7 @@
   <div class="hc-slot-actions">
     <label class="btn btn-sm btn-outline-primary mb-0" [class.disabled]="!canEdit || !!busySlot">
       <i class="fa-solid fa-upload"></i> {{ busySlot === slot ? 'جاري الرفع...' : 'رفع' }}
-      <input type="file" hidden accept=".svg,.png,.webp,image/svg+xml,image/png,image/webp" [disabled]="!canEdit || !!busySlot" (change)="onIconSelected(slot, $event)" />
+      <input type="file" hidden [accept]="slot === 'home.hero' ? '.jpg,.jpeg,.png,.webp,.svg,image/jpeg,image/png,image/webp,image/svg+xml' : '.svg,.png,.webp,image/svg+xml,image/png,image/webp'" [disabled]="!canEdit || !!busySlot" (change)="onIconSelected(slot, $event)" />
     </label>
     <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="!canEdit || !!busySlot || !icons[slot]" (click)="resetIcon(slot)">
       رجوع للأصلي
