@@ -256,6 +256,7 @@ export const Permissions = {
 
   // The in-app support chat (الدعم / الشات)
   SupportChatView: 'Permissions.SupportChat.View',
+  SubscriptionsView: 'Permissions.Subscriptions.View',
   SupportChatReply: 'Permissions.SupportChat.Reply'
 };
 
@@ -1028,6 +1029,17 @@ const NavigationItems = [
     icon: 'fas fa-comments',
     breadcrumbs: false,
     permissions: [Permissions.SupportChatView],
+    adminOnly: true
+  },
+  {
+    id: 'a-subscriptions',
+    title: 'SUB.title',
+    type: 'item',
+    classes: 'nav-item',
+    url: '/a/more/subscriptions',
+    icon: 'fas fa-file-invoice-dollar',
+    breadcrumbs: false,
+    permissions: [Permissions.SubscriptionsView],
     adminOnly: true
   },
   STAFF_MARKETING,

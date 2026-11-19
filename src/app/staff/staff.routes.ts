@@ -85,6 +85,14 @@ export const STAFF_ROUTES: Routes = [
     loadComponent: () => import('./support-chat/support-chat.component').then((c) => c.SupportChatComponent)
   },
 
+  // ---- admin: the services Trips pays for and their payments (19 Nov 2026) ----
+  {
+    path: 'a/more/subscriptions',
+    canActivate: [tripStarPermissionGuard],
+    data: { permission: 'Permissions.Subscriptions.View' },
+    loadComponent: () => import('./subscriptions/subscriptions.component').then((c) => c.SubscriptionsComponent)
+  },
+
   // ---- More, settings, profile ----
   { path: 'a/more', loadComponent: () => import('./more/more.component').then((c) => c.AdminMoreComponent) },
   { path: 'a/more/profile', loadComponent: () => import('./more/more.component').then((c) => c.ProfileComponent) },

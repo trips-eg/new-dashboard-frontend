@@ -64,6 +64,9 @@ export const P = {
   policyView: 'Permissions.Policy.View',
   outingCategoryView: 'Permissions.OutingCategory.View',
   supportChatView: 'Permissions.SupportChat.View',
+  // the services Trips pays for (19 Nov 2026)
+  subscriptionsView: 'Permissions.Subscriptions.View',
+  subscriptionsEdit: 'Permissions.Subscriptions.Edit',
   supportChatReply: 'Permissions.SupportChat.Reply'
 } as const;
 
